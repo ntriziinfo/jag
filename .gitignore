@@ -1,0 +1,7 @@
+gorai.zip
+gorai_restored.zip
+gorai_broken_backup_*.html
+*.log
+server.err.log
+server.out.log
+deliverables/*.zip
