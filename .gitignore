@@ -5,3 +5,4 @@ gorai_broken_backup_*.html
 server.err.log
 server.out.log
 deliverables/*.zip
+UPLOAD_TO_GITHUB.txt
