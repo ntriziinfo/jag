@@ -21,6 +21,9 @@
 | `assets/bar3_lever_on.mp4` | BAR揃い成立時、レバーON直後にリール全面へ表示する演出動画 |
 | `assets/devil_zone_fire.mp4` | デビルゾーン中に各リール内へ半透明表示する炎動画 |
 | `assets/devil_lamp.png` | 第一リール左側に表示する円形ステータスランプ画像 |
+| `assets/ui/icon_slump_graph_blue.png` | 右上ドックのスランプグラフボタン画像 |
+| `assets/ui/icon_odds_percent_blue.png` | 右上ドックの確率・設定情報ボタン画像 |
+| `assets/ui/icon_sound_red.png` | 右上ドックの音量ボタン画像 |
 | `assets/payout.wav` | pt払い出し発生時に再生する払い出し音 |
 | `assets/replay.png` | リプレイ役のリール図柄画像 |
 | `assets/battle_bgm.wav` | 継続バトル中に再生するBGM。元素材をピーク約0.86へノーマライズしたもの |
@@ -166,26 +169,31 @@
 | `#suikaCountView` | スイカ回数 |
 | `#cherryCountView` | チェリー回数 |
 | `#totalProfitView` | 損益 |
-| `#slumpGraph` | 右上ドックのスランプパネル内で、総損益（獲得pt - 投入pt）の推移を折れ線で表示するスランプグラフ |
+| `#wdMirrorSt` / `#wdMirrorBig` / `#wdMirrorReg` / `#wdMirrorSpin` / `#wdMirrorProfit` | スロット筐体上部の5連データ窓。AT回数、BIG、REG、総回転数、損益をメイン状態と同期して表示する |
+| `#wdStEmblem` | 左側DEVIL DATAパネル内の円形表示。通常時は「天井まで◯回」、BONUS確定中は「BONUS確定」、AT中は「DEVIL RUSH」を表示する |
+| `#audioDock` | 画面右上固定のユーティリティドック。`∿` でスランプグラフ、`%` で機械割・設定別確率、`♪` で音量設定を開閉する。右側のデータカウンターとは別UIとして扱い、gorai由来の設定・操作項目は該当パネル内だけに表示する |
+| `#slumpPanel` | 右上ドックのスランプ専用コンパクトパネル。機械割テーブル用の `%` パネルより小さくし、表示位置・表示倍率・縦倍率・現在/最高/最低を同パネル内に収める |
+| `#slumpGraph` | 右上ドックのスランプパネル内で、総損益（獲得pt - 投入pt）の推移を折れ線で表示するスランプグラフ。パネル表示中は1Gの投入および払い出し反映ごとに再描画する |
 | `#slumpCurrentView` | スランプグラフ上の現在差pt |
 | `#slumpHighView` | スランプグラフ上の最高差pt |
 | `#slumpLowView` | スランプグラフ上の最低差pt |
+| `.wd-data-counter-panel` | 右側に常設するデータカウンター。AT回数、BIG、REG、砂時計、ベル、スイカ、チェリー、リプレイを表示し、右上ドックの `%` パネルには移動しない |
 | `#stRemainBigView` | 残りAT |
 | `#sessionResultLayer` | STバトル終了時のリザルト画面。`assets/result/aozora.jpg` を背景に継続SET数と獲得ptを表示 |
 
 ## 7. 永続化仕様
 
 - `localStorage` を使用する。
-- ストレージキーは `white_devil_gorai_rebuild_v1`。
+- ストレージキーは `white_devil_gorai_rebuild_v2`。旧 `white_devil_shippu_st_continue_v1` の保存データは、確率表示や進行状態が旧仕様と混ざるため読み込まない。
 - 保存対象は主に `settings` と `stats`。
-- `stats.slumpHistory` に差pt推移を保存する。記録点は初期値、各ゲーム開始時の3pt投入後、各ゲーム結果反映後で、保存点数は最大800点に制限する。
+- `stats.slumpHistory` に差pt推移を保存する。記録点は初期値、各ゲーム開始時の3pt投入後、各ゲーム結果反映後で、保存点数は最大20000点に制限する。0G/0ptの基準点は保持し、そこから実履歴に沿って線を接続する。
 - ページ離脱時に現在の設定と統計を保存する。
 - 旧保存データに旧機種名が残っている場合も、読み込み時に表示名を「白い悪魔」へ正規化する。
 
 ## 8. 音・演出仕様
 
 - 通常BGM、リール操作音、上乗せ/REG/AT残りボイス、BAR専用BGM、プレミア/バトル/リール動画演出を保持する。小当たり・BIGボーナスの専用告知音は再生しない。
-- 音量操作は画面右上の♪アイコンから開く `#audioPanel` で行い、スクロール中も最前面に固定表示する。
+- 音量操作は画面右上の♪アイコンから開く `#audioPanel` で行い、スクロール中も最前面に固定表示する。BGM URLが未設定の場合は `assets/media/normal_bgm.mp3` を内蔵通常BGMとして使用する。
 - 初期音量はBGM `0.22`、効果音 `0.32` とし、実出力時にBGM・BAR専用BGM・効果音・動画音声ごとの内部係数をかけて全体音量を抑える。
 - 旧保存設定から読み込む場合は、初回読み込み時にBGM/効果音スライダー値を新しい初期音量以下へ自動調整する。
 - pt払い出しが発生した場合は `assets/payout.wav` を再生する。音量は効果音音量に連動し、内部係数 `0.25` で他の効果音とバランスを取る。

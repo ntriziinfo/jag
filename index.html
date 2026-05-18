@@ -133,6 +133,172 @@ h1{
 .machine.win .lamp{animation-duration:.24s}
 @keyframes lamp{from{opacity:.55;transform:scale(.78)}to{opacity:1;transform:scale(1.08)}}
 
+.audioDock{
+  position:fixed;
+  top:16px;
+  right:16px;
+  z-index:10000;
+  pointer-events:auto;
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+}
+.audioToggleBtn,
+.utilityToggleBtn{
+  width:54px;
+  height:54px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  padding:0;
+  overflow:visible;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+}
+.audioToggleBtn img,
+.utilityToggleBtn img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:contain;
+  pointer-events:none;
+  filter:drop-shadow(0 0 10px rgba(77,231,255,.34)) drop-shadow(0 5px 5px rgba(0,0,0,.55));
+}
+.audioDock.open .audioToggleBtn,
+.audioToggleBtn:focus-visible,
+.audioDock.slumpOpen #slumpToggleBtn,
+.audioDock.oddsOpen #oddsToggleBtn,
+.utilityToggleBtn:focus-visible{
+  outline:2px solid rgba(77,231,255,.72);
+  outline-offset:2px;
+}
+.audioPanel,
+.infoPanel{
+  display:none;
+  position:absolute;
+  z-index:10001;
+  top:54px;
+  right:0;
+  width:min(320px, calc(100vw - 32px));
+  padding:13px;
+  border-radius:18px;
+  background:rgba(9,8,26,.96);
+  border:1px solid rgba(255,211,106,.48);
+  box-shadow:0 18px 46px rgba(0,0,0,.62), 0 0 24px rgba(255,211,106,.16);
+  backdrop-filter:blur(12px);
+}
+.infoPanel{
+  width:min(760px, calc(100vw - 32px));
+  max-height:calc(100vh - 84px);
+  overflow:auto;
+}
+#slumpPanel{
+  width:min(500px, calc(100vw - 32px));
+  max-height:min(620px, calc(100vh - 94px));
+}
+.audioDock.open .audioPanel,
+.audioDock.slumpOpen #slumpPanel,
+.audioDock.oddsOpen #oddsPanel{
+  display:block;
+}
+.audioPanelHead,
+.infoPanelHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:10px;
+}
+.audioPanelTitle,
+.infoPanelTitle{
+  font-size:14px;
+  font-weight:1000;
+  color:var(--gold);
+  letter-spacing:.02em;
+}
+.audioCloseBtn,
+.infoCloseBtn{
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  padding:0;
+  font-size:18px;
+  line-height:1;
+  color:#fff;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:none;
+}
+.infoPanel .card{
+  display:block !important;
+  margin:0;
+  padding:0;
+  border:0;
+  background:transparent;
+  box-shadow:none;
+}
+.infoPanel .oddsPublic,
+.infoPanel .slumpPublic{
+  width:100% !important;
+}
+#slumpPanel .slumpCanvasWrap{
+  width:100%;
+  height:190px;
+  overflow:hidden;
+  border:1px solid rgba(77,231,255,.24);
+  border-radius:14px;
+  background:rgba(2,5,13,.72);
+}
+#slumpPanel #slumpGraph{
+  display:block;
+  width:100%;
+  height:100%;
+}
+#slumpPanel .slumpStats{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:8px;
+  margin-top:10px;
+}
+#slumpPanel .slumpStats > div{
+  min-width:0;
+  padding:9px 10px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:10px;
+  background:rgba(255,255,255,.055);
+}
+#slumpPanel .slumpStats span{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:900;
+}
+#slumpPanel .slumpStats b{
+  display:block;
+  overflow:hidden;
+  color:var(--gold);
+  font-size:20px;
+  font-weight:1000;
+  line-height:1.08;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.audioPanel .field,
+.infoPanel .field{
+  margin-bottom:10px;
+}
+.audioPanel label{
+  display:block;
+  margin-bottom:5px;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:900;
+}
+.audioPanel input{
+  width:100%;
+}
+
 .lcd{
   position:relative;
   min-height:315px;
@@ -1190,7 +1356,7 @@ input[type="range"]{padding:0}
   display:none;
   position:fixed;
   right:18px;
-  top:18px;
+  top:86px;
   bottom:18px;
   width:min(430px, 92vw);
   overflow:auto;
@@ -2099,8 +2265,8 @@ body::after{display:none !important;content:none !important;}
   line-height:1 !important;
 }
 .wd-info-strip div:first-child b{
-  color:#ff4a4a !important;
-  text-shadow:0 0 10px rgba(255,0,0,.95),0 0 18px rgba(255,255,255,.28) !important;
+  color:#fff !important;
+  text-shadow:0 0 9px rgba(255,255,255,.72),0 0 12px rgba(255,0,0,.35) !important;
 }
 .main{
   grid-template-columns:230px minmax(760px, 1fr) 270px !important;
@@ -2316,6 +2482,27 @@ body::after{display:none !important;content:none !important;}
     0 0 9px rgba(255,255,255,.85),
     0 0 15px rgba(255,0,0,.95),
     0 0 28px rgba(255,42,42,.55);
+}
+.wd-st-emblem.is-ceiling{
+  color:#fff;
+  opacity:1;
+  padding-bottom:14%;
+  font-family:system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  font-size:clamp(12px, 1.08vw, 17px);
+  line-height:1.15;
+  letter-spacing:0;
+  text-shadow:0 0 9px rgba(255,255,255,.55),0 0 16px rgba(255,0,0,.55);
+}
+.wd-st-emblem.is-ceiling b{
+  display:block;
+  margin-top:0;
+  color:#ff3838;
+  font-size:clamp(24px, 2.35vw, 36px);
+  font-weight:800;
+  line-height:.95;
+  font-family:inherit;
+  transform:translateY(-4%);
+  text-shadow:0 0 8px rgba(255,0,0,.82),0 0 16px rgba(255,255,255,.25);
 }
 .wd-st-readout{
   position:absolute;
@@ -2726,6 +2913,62 @@ body{
 
   <div class="main">
     <section class="machine normal" id="machine">
+      <div class="audioDock" id="audioDock">
+        <button class="utilityToggleBtn" id="slumpToggleBtn" type="button" aria-label="スランプグラフを開く" aria-expanded="false" title="スランプグラフ">
+          <img src="assets/ui/icon_slump_graph_blue.png" alt="">
+        </button>
+        <button class="utilityToggleBtn" id="oddsToggleBtn" type="button" aria-label="確率表を開く" aria-expanded="false" title="確率表">
+          <img src="assets/ui/icon_odds_percent_blue.png" alt="">
+        </button>
+        <button class="audioToggleBtn" id="audioToggleBtn" type="button" aria-label="音量を開く" aria-expanded="false" title="音量">
+          <img src="assets/ui/icon_sound_red.png" alt="">
+        </button>
+        <div class="infoPanel" id="slumpPanel">
+          <div class="infoPanelHead">
+            <div class="infoPanelTitle">スランプグラフ</div>
+            <button class="infoCloseBtn" id="slumpCloseBtn" type="button" aria-label="スランプグラフを閉じる" title="閉じる">×</button>
+          </div>
+          <div id="slumpPanelBody"></div>
+        </div>
+        <div class="infoPanel" id="oddsPanel">
+          <div class="infoPanelHead">
+            <div class="infoPanelTitle">確率・設定情報</div>
+            <button class="infoCloseBtn" id="oddsCloseBtn" type="button" aria-label="確率表を閉じる" title="閉じる">×</button>
+          </div>
+          <div class="settingInfo">
+            設定 <b id="settingView">1</b><br>
+            機械割 <b id="targetRtpView">80%</b><br>
+            ST <b id="stInfoView">10回転</b><br>
+            払出 <b id="payoutScaleView">固定</b>
+          </div>
+          <div id="oddsPanelBody">
+            <h2>設定別確率（分数表記）</h2>
+            <table class="oddsTable" id="settingTable"></table>
+          </div>
+        </div>
+        <div class="audioPanel" id="audioPanel">
+          <div class="audioPanelHead">
+            <div class="audioPanelTitle">音量</div>
+            <button class="audioCloseBtn" id="audioCloseBtn" type="button" aria-label="音量を閉じる" title="閉じる">×</button>
+          </div>
+          <div class="field">
+            <label>BGM URL</label>
+            <input id="bgmUrl" placeholder="空欄なら内蔵通常BGMを使用 / https://...mp3 など" />
+          </div>
+          <div class="row">
+            <button class="subBtn" id="playBgmBtn" type="button">BGM再生</button>
+            <button class="ghostBtn" id="stopBgmBtn" type="button">停止</button>
+          </div>
+          <div class="field">
+            <label>BGM音量</label>
+            <input id="bgmVolume" type="range" min="0" max="1" step="0.01" value="0.22" />
+          </div>
+          <div class="field">
+            <label>効果音音量</label>
+            <input id="sfxVolume" type="range" min="0" max="1" step="0.01" value="0.32" />
+          </div>
+        </div>
+      </div>
       <div class="lamps">
         <div class="lamp"></div><div class="lamp"></div><div class="lamp"></div><div class="lamp"></div><div class="lamp"></div>
         <div class="lamp"></div><div class="lamp"></div><div class="lamp"></div><div class="lamp"></div><div class="lamp"></div>
@@ -2736,10 +2979,10 @@ body{
         <div class="topLcd">
           <div class="modeTag normal" id="modeTag">受付中</div>
           <div class="settingInfo">
-            設定 <b id="settingView">1</b><br>
-            機械割 <b id="targetRtpView">80%</b><br>
-            ST <b id="stInfoView">10回転</b><br>
-            払出補正 <b id="payoutScaleView">なし</b>
+            設定 <b id="settingViewLegacy">1</b><br>
+            機械割 <b id="targetRtpViewLegacy">80%</b><br>
+            ST <b id="stInfoViewLegacy">10回転</b><br>
+            払出補正 <b id="payoutScaleViewLegacy">なし</b>
           </div>
         </div>
         <div class="stLampWrap">
@@ -2768,7 +3011,7 @@ body{
       </div>
 
       <section class="wd-info-strip" id="data-area">
-        <div><span>ST</span><b id="wdMirrorSt">--G</b></div>
+        <div><span>AT</span><b id="wdMirrorSt">--G</b></div>
         <div><span>BIG</span><b id="wdMirrorBig">0</b></div>
         <div><span>REG</span><b id="wdMirrorReg">0</b></div>
         <div><span>総回転数</span><b id="wdMirrorSpin">0G</b></div>
@@ -3060,16 +3303,15 @@ body{
       </div>
       <div class="card oddsPublic wd-data-counter-panel">
         <div class="wd-counter-rows">
-          <div><span>ST</span><b id="wdCounterSt">--G</b></div>
+          <div><span>AT</span><b id="wdCounterSt">--G</b></div>
           <div><span>BIG</span><b id="wdCounterBig">0</b></div>
           <div><span>REG</span><b id="wdCounterReg">0</b></div>
           <div><span>砂時計</span><b id="wdCounterSmall">0</b></div>
           <div><span>ベル</span><b id="wdCounterBell">0</b></div>
           <div><span>スイカ</span><b id="wdCounterSuika">0</b></div>
           <div><span>チェリー</span><b id="wdCounterCherry">0</b></div>
-          <div><span>損益</span><b id="wdCounterProfit">+0</b></div>
+          <div><span>リプレイ</span><b id="wdCounterReplay">0</b></div>
         </div>
-        <table class="oddsTable" id="settingTable" hidden></table>
       </div>
 
       <div class="wd-bottom-area">
@@ -3152,7 +3394,7 @@ body{
 
 
 
-<audio id="bgm" loop crossorigin="anonymous"></audio>
+<audio id="bgm" loop preload="auto"></audio>
 <audio id="koatariSound" preload="auto"></audio>
 <audio id="bigSound" preload="auto"></audio>
 <audio id="payoutSound" preload="auto"></audio>
@@ -3164,7 +3406,7 @@ body{
 (function(){
   "use strict";
 
-  const STORAGE_KEY = "white_devil_shippu_st_continue_v1";
+  const STORAGE_KEY = "white_devil_gorai_rebuild_v2";
 
   const DEFAULT_NORMAL_BGM_SRC = "assets/media/normal_bgm.mp3";
 
@@ -3456,6 +3698,7 @@ body{
   const DEBUG_FAST_SPINS_PER_SECOND = 100;
   const DEBUG_FAST_INTERVAL_MS = 100;
   const DEBUG_FAST_BATCH_SIZE = Math.max(1, Math.round(DEBUG_FAST_SPINS_PER_SECOND * DEBUG_FAST_INTERVAL_MS / 1000));
+  const SLUMP_MAX_HISTORY_POINTS = 20000;
   const SLUMP_MAX_DRAW_POINTS = 1400;
   let autoPlay = false;
   let autoTimer = null;
@@ -3468,6 +3711,7 @@ body{
     seekStart:0,
     followEnd:true
   };
+  let slumpRenderRequest = 0;
   let forceResult = "";
   let forcePremiumEffect = false;
   let pendingForceResult = "";
@@ -3510,6 +3754,13 @@ body{
   const slumpCurrentView = $("slumpCurrentView");
   const slumpHighView = $("slumpHighView");
   const slumpLowView = $("slumpLowView");
+  const audioDock = $("audioDock");
+  const slumpToggleBtn = $("slumpToggleBtn");
+  const oddsToggleBtn = $("oddsToggleBtn");
+  const audioToggleBtn = $("audioToggleBtn");
+  const audioCloseBtn = $("audioCloseBtn");
+  const slumpCloseBtn = $("slumpCloseBtn");
+  const oddsCloseBtn = $("oddsCloseBtn");
   const devilStatusLamp = $("devilStatusLamp");
 
   const reelArea = document.querySelector(".reelArea");
@@ -3518,6 +3769,8 @@ body{
   }
   let reelLightTimer = null;
   let barRainbowHold = false;
+  let guaranteedSetStartLight = false;
+  let guaranteedSetLightTimer = null;
   let barBgmActive = false;
   let battleBgmActive = false;
   let rogiBgmMuted = false;
@@ -3924,7 +4177,7 @@ body{
     [0,1,2].forEach(hideReelVideo);
   }
 
-  function playReelVideo(index, src, cls="show"){
+  function playReelVideo(index, src, loop=true){
     const found = ensureReelVideo(index);
     if(!found) return;
     const {layer, video} = found;
@@ -3936,6 +4189,9 @@ body{
     try{
       video.currentTime = 0;
     }catch(e){}
+    video.loop = !!loop;
+    video.muted = true;
+    video.playsInline = true;
     layer.classList.toggle("stopVideo", !loop);
     layer.classList.add("show");
     try{
@@ -3967,7 +4223,7 @@ body{
     video.loop = false;
     video.muted = true;
     video.playsInline = true;
-    layer.classList.add("show", cls);
+    layer.classList.add("show");
     try{
       video.currentTime = 0;
       const p = video.play();
@@ -4456,23 +4712,26 @@ body{
       if(last && last.spin === point.spin && last.profit === point.profit) continue;
       deduped.push(point);
     }
-    stats.slumpHistory = deduped;
+    stats.slumpHistory = deduped.length > SLUMP_MAX_HISTORY_POINTS
+      ? [deduped[0], ...deduped.slice(-(SLUMP_MAX_HISTORY_POINTS - 1))]
+      : deduped;
     refreshSlumpExtremes();
   }
 
   function recordSlumpPoint(){
-    if(!Array.isArray(stats.slumpHistory) || !stats.slumpHistory.length){
-      stats.slumpHistory = [{spin:0, profit:0}];
-    }
+    normalizeSlumpHistory();
     const point = {
       spin:Number(stats.totalSpins) || 0,
-      profit:(Number(stats.totalPaid) || 0) - (Number(stats.totalFee) || 0)
+      profit:currentProfit()
     };
     const last = stats.slumpHistory[stats.slumpHistory.length - 1];
     if(last && last.spin === point.spin && last.profit === point.profit) return;
     stats.slumpHistory.push(point);
-    stats.slumpHigh = Math.max(Number(stats.slumpHigh) || 0, point.profit, 0);
-    stats.slumpLow = Math.min(Number(stats.slumpLow) || 0, point.profit, 0);
+    if(stats.slumpHistory.length > SLUMP_MAX_HISTORY_POINTS){
+      stats.slumpHistory = [stats.slumpHistory[0], ...stats.slumpHistory.slice(-(SLUMP_MAX_HISTORY_POINTS - 1))];
+    }
+    refreshSlumpExtremes();
+    scheduleSlumpGraphRender();
   }
 
   function setSlumpValue(view, value){
@@ -4501,6 +4760,15 @@ body{
     const bounds = getProfitBounds(points);
     stats.slumpHigh = bounds.maxProfit;
     stats.slumpLow = bounds.minProfit;
+  }
+
+  function scheduleSlumpGraphRender(){
+    if(!audioDock || !audioDock.classList.contains("slumpOpen")) return;
+    if(slumpRenderRequest) return;
+    slumpRenderRequest = requestAnimationFrame(()=>{
+      slumpRenderRequest = 0;
+      renderSlumpGraph();
+    });
   }
 
   function getSlumpWindow(points){
@@ -5024,8 +5292,7 @@ body{
     $("stInfoView").textContent = session.active ? setGameCount() + "G/SET" : (normalState.bonusPending ? `BONUS確定 / ${pendingBonusLabel()}待ち` : `${normalModeLabel()} / 天井まで${ceilingRemain()}G`);
 
     if(bgm){
-      const normalSrc = settings.bgmUrl || DEFAULT_NORMAL_BGM_SRC;
-      if(normalSrc && !barBgmActive && !battleBgmActive && bgm.src !== normalSrc) bgm.src = normalSrc;
+      if(!barBgmActive && !battleBgmActive) ensureNormalBgmSource();
       bgm.loop = true;
       bgm.volume = bgmOutputVolume(BGM_OUTPUT_SCALE);
       if(!barBgmActive && !battleBgmActive) playNormalBgm();
@@ -5390,13 +5657,26 @@ body{
     log("演出をスキップ");
   }
 
+  function normalBgmSrc(){
+    return settings.bgmUrl || DEFAULT_NORMAL_BGM_SRC;
+  }
+
+  function ensureNormalBgmSource(){
+    if(!bgm) return "";
+    const src = normalBgmSrc();
+    if(src && bgm.getAttribute("src") !== src){
+      bgm.setAttribute("src", src);
+      try{ bgm.load(); }catch(e){}
+    }
+    return src;
+  }
+
   function playNormalBgm(){
     if(debugFastSpinActive) return;
     // ブラウザの自動再生制限により、初回クリック/操作後に再生される
     if(!bgm || barBgmActive || battleBgmActive) return;
     try{
-      const src = settings.bgmUrl || DEFAULT_NORMAL_BGM_SRC;
-      if(src && bgm.src !== src) bgm.src = src;
+      const src = ensureNormalBgmSource();
       if(!src) return;
       bgm.loop = true;
       bgm.volume = bgmOutputVolume(BGM_OUTPUT_SCALE);
@@ -5784,7 +6064,6 @@ body{
       $("totalProfitView").textContent = formatSigned(profit);
       $("totalProfitView").style.color = profit > 0 ? "var(--green)" : profit < 0 ? "var(--red)" : "var(--gold)";
     }
-    if($("wdStEmblem")) $("wdStEmblem").classList.toggle("is-profit", profit > 0);
     if($("wdBigOdds")) $("wdBigOdds").textContent = stats.bigCount > 0 && stats.totalSpins > 0
       ? `1/${(stats.totalSpins / stats.bigCount).toFixed(1)}`
       : "-";
@@ -5792,9 +6071,42 @@ body{
       ? `1/${(stats.totalSpins / stats.midCount).toFixed(1)}`
       : "-";
 
+    const setText = (id, value)=>{
+      const el = $(id);
+      if(el) el.textContent = value;
+    };
+    const atCountText = stats.totalSessions || 0;
+    const stEmblem = $("wdStEmblem");
+    if(stEmblem){
+      stEmblem.classList.toggle("is-ceiling", !active);
+      stEmblem.classList.toggle("is-profit", active && profit > 0);
+      if(active){
+        stEmblem.innerHTML = "DEVIL<br>RUSH";
+      }else if(normalState.bonusPending){
+        stEmblem.innerHTML = "BONUS<br>確定";
+      }else{
+        stEmblem.innerHTML = `天井まで<b>${ceilingRemain()}回</b>`;
+      }
+    }
+    setText("wdCounterSt", atCountText);
+    setText("wdCounterBig", stats.bigCount || 0);
+    setText("wdCounterReg", stats.midCount || 0);
+    setText("wdCounterSmall", stats.smallCount || 0);
+    setText("wdCounterBell", stats.bellCount || 0);
+    setText("wdCounterSuika", stats.suikaCount || 0);
+    setText("wdCounterCherry", stats.cherryCount || 0);
+    setText("wdCounterReplay", stats.replayCount || 0);
+    setText("wdMirrorSt", atCountText);
+    setText("wdMirrorBig", stats.bigCount || 0);
+    setText("wdMirrorReg", stats.midCount || 0);
+    setText("wdMirrorSpin", `${stats.totalSpins || 0}G`);
+    setText("wdMirrorProfit", formatSigned(profit));
+
     const remainBig = $("stRemainBigView");
     if(remainBig){
+      const label = document.querySelector(".sevenSegLabel");
       if(active){
+        if(label) label.textContent = isGoraiZoneActive() ? "DEVIL ZONE" : isContinuationBattleActive() ? "BATTLE" : "残りST";
         if(isGoraiZoneActive()){
           remainBig.textContent = String(Math.max(0, session.bigZone)).padStart(2, "0");
         }else if(isContinuationBattleActive()){
@@ -6376,7 +6688,6 @@ body{
     const label = i === 1 ? spec.label : "";
 
     stopReel(i, col, label, spec.cls, result === "MISS" ? null : lineRow);
-    if(result === "BELL") startBellStopVideo(i);
     currentSpin.stopped[i] = true;
     if(i === 1 && (result === "BIG" || result === "MID")){
       playVoiceSound(VOICE_SRC.reach);
@@ -6993,11 +7304,15 @@ body{
   }
 
   function setup(){
-    // 右側の設定カードはすべて非公開デバッグメニューへ移動。
-    // 確率表記カードだけスロット下部に残す。
+    // 公開情報は右上ドックへ移動し、残りの設定カードは非公開デバッグメニューへ移動。
+    const slumpPanelBody = $("slumpPanelBody");
+    const slumpPublicCard = document.querySelector(".slumpPublic");
+    if(slumpPanelBody && slumpPublicCard){
+      slumpPanelBody.appendChild(slumpPublicCard);
+    }
     const drawer = $("debugDrawer");
     if(drawer){
-      [...document.querySelectorAll(".side > .card:not(.oddsPublic)")].forEach(card => drawer.appendChild(card));
+      [...document.querySelectorAll(".side > .card:not(.oddsPublic):not(.slumpPublic)")].forEach(card => drawer.appendChild(card));
     }
     ["titleInput","settingSelect","feeInput","stSpinsInput","oddsMultiplierInput","smallMulInput","midMulInput","crownMulInput","cherryMulInput","bigMulInput","bigAddInput","autoDelayInput","bgmUrl","bgmVolume","sfxVolume"].forEach(id=>{
       const el = $(id);
@@ -7008,6 +7323,50 @@ body{
       const el = $(id);
       if(el) el.addEventListener("click", handler);
     };
+
+    if(audioToggleBtn){
+      audioToggleBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        setAudioPanelOpen(!audioDock.classList.contains("open"));
+      });
+    }
+    if(slumpToggleBtn){
+      slumpToggleBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        setInfoPanelOpen("slump", !audioDock.classList.contains("slumpOpen"));
+      });
+    }
+    if(oddsToggleBtn){
+      oddsToggleBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        setInfoPanelOpen("odds", !audioDock.classList.contains("oddsOpen"));
+      });
+    }
+    if(audioCloseBtn){
+      audioCloseBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        setAudioPanelOpen(false);
+        if(audioToggleBtn) audioToggleBtn.focus();
+      });
+    }
+    if(slumpCloseBtn){
+      slumpCloseBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        setInfoPanelOpen("slump", false);
+        if(slumpToggleBtn) slumpToggleBtn.focus();
+      });
+    }
+    if(oddsCloseBtn){
+      oddsCloseBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        setInfoPanelOpen("odds", false);
+        if(oddsToggleBtn) oddsToggleBtn.focus();
+      });
+    }
+    if(audioDock){
+      audioDock.addEventListener("click", e=>e.stopPropagation());
+    }
+    document.addEventListener("click", closeUtilityPanels);
 
     onClick("saveBtn", save);
     onClick("resetBtn", resetGame);
@@ -7072,10 +7431,10 @@ body{
     if($("playBgmBtn")){
       $("playBgmBtn").addEventListener("click", async()=>{
         readSettings();
-        if(!settings.bgmUrl){ log("BGM URLを入力してください"); return; }
-        bgm.src = settings.bgmUrl;
+        const src = ensureNormalBgmSource();
+        if(!src){ log("BGMを設定してください"); return; }
         bgm.volume = bgmOutputVolume(BGM_OUTPUT_SCALE);
-        try{ await bgm.play(); log("BGM再生"); }catch(e){ log("BGMを再生できませんでした"); }
+        try{ await bgm.play(); log(settings.bgmUrl ? "BGM再生" : "内蔵BGM再生"); }catch(e){ log("BGMを再生できませんでした"); }
       });
     }
     if($("stopBgmBtn")){
