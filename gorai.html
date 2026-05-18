@@ -2265,8 +2265,8 @@ body::after{display:none !important;content:none !important;}
   line-height:1 !important;
 }
 .wd-info-strip div:first-child b{
-  color:#ff4a4a !important;
-  text-shadow:0 0 10px rgba(255,0,0,.95),0 0 18px rgba(255,255,255,.28) !important;
+  color:#fff !important;
+  text-shadow:0 0 9px rgba(255,255,255,.72),0 0 12px rgba(255,0,0,.35) !important;
 }
 .main{
   grid-template-columns:230px minmax(760px, 1fr) 270px !important;
@@ -2482,6 +2482,27 @@ body::after{display:none !important;content:none !important;}
     0 0 9px rgba(255,255,255,.85),
     0 0 15px rgba(255,0,0,.95),
     0 0 28px rgba(255,42,42,.55);
+}
+.wd-st-emblem.is-ceiling{
+  color:#fff;
+  opacity:1;
+  padding-bottom:14%;
+  font-family:system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  font-size:clamp(12px, 1.08vw, 17px);
+  line-height:1.15;
+  letter-spacing:0;
+  text-shadow:0 0 9px rgba(255,255,255,.55),0 0 16px rgba(255,0,0,.55);
+}
+.wd-st-emblem.is-ceiling b{
+  display:block;
+  margin-top:0;
+  color:#ff3838;
+  font-size:clamp(24px, 2.35vw, 36px);
+  font-weight:800;
+  line-height:.95;
+  font-family:inherit;
+  transform:translateY(-4%);
+  text-shadow:0 0 8px rgba(255,0,0,.82),0 0 16px rgba(255,255,255,.25);
 }
 .wd-st-readout{
   position:absolute;
@@ -2990,7 +3011,7 @@ body{
       </div>
 
       <section class="wd-info-strip" id="data-area">
-        <div><span>ST</span><b id="wdMirrorSt">--G</b></div>
+        <div><span>AT</span><b id="wdMirrorSt">--G</b></div>
         <div><span>BIG</span><b id="wdMirrorBig">0</b></div>
         <div><span>REG</span><b id="wdMirrorReg">0</b></div>
         <div><span>総回転数</span><b id="wdMirrorSpin">0G</b></div>
@@ -3282,14 +3303,14 @@ body{
       </div>
       <div class="card oddsPublic wd-data-counter-panel">
         <div class="wd-counter-rows">
-          <div><span>ST</span><b id="wdCounterSt">--G</b></div>
+          <div><span>AT</span><b id="wdCounterSt">--G</b></div>
           <div><span>BIG</span><b id="wdCounterBig">0</b></div>
           <div><span>REG</span><b id="wdCounterReg">0</b></div>
           <div><span>砂時計</span><b id="wdCounterSmall">0</b></div>
           <div><span>ベル</span><b id="wdCounterBell">0</b></div>
           <div><span>スイカ</span><b id="wdCounterSuika">0</b></div>
           <div><span>チェリー</span><b id="wdCounterCherry">0</b></div>
-          <div><span>損益</span><b id="wdCounterProfit">+0</b></div>
+          <div><span>リプレイ</span><b id="wdCounterReplay">0</b></div>
         </div>
       </div>
 
@@ -3373,7 +3394,7 @@ body{
 
 
 
-<audio id="bgm" loop crossorigin="anonymous"></audio>
+<audio id="bgm" loop preload="auto"></audio>
 <audio id="koatariSound" preload="auto"></audio>
 <audio id="bigSound" preload="auto"></audio>
 <audio id="payoutSound" preload="auto"></audio>
@@ -3677,6 +3698,7 @@ body{
   const DEBUG_FAST_SPINS_PER_SECOND = 100;
   const DEBUG_FAST_INTERVAL_MS = 100;
   const DEBUG_FAST_BATCH_SIZE = Math.max(1, Math.round(DEBUG_FAST_SPINS_PER_SECOND * DEBUG_FAST_INTERVAL_MS / 1000));
+  const SLUMP_MAX_HISTORY_POINTS = 20000;
   const SLUMP_MAX_DRAW_POINTS = 1400;
   let autoPlay = false;
   let autoTimer = null;
@@ -3689,6 +3711,7 @@ body{
     seekStart:0,
     followEnd:true
   };
+  let slumpRenderRequest = 0;
   let forceResult = "";
   let forcePremiumEffect = false;
   let pendingForceResult = "";
@@ -4689,9 +4712,8 @@ body{
       if(last && last.spin === point.spin && last.profit === point.profit) continue;
       deduped.push(point);
     }
-    const maxPoints = 800;
-    stats.slumpHistory = deduped.length > maxPoints
-      ? [deduped[0], ...deduped.slice(-(maxPoints - 1))]
+    stats.slumpHistory = deduped.length > SLUMP_MAX_HISTORY_POINTS
+      ? [deduped[0], ...deduped.slice(-(SLUMP_MAX_HISTORY_POINTS - 1))]
       : deduped;
     refreshSlumpExtremes();
   }
@@ -4705,10 +4727,11 @@ body{
     const last = stats.slumpHistory[stats.slumpHistory.length - 1];
     if(last && last.spin === point.spin && last.profit === point.profit) return;
     stats.slumpHistory.push(point);
-    if(stats.slumpHistory.length > 800){
-      stats.slumpHistory = [stats.slumpHistory[0], ...stats.slumpHistory.slice(-799)];
+    if(stats.slumpHistory.length > SLUMP_MAX_HISTORY_POINTS){
+      stats.slumpHistory = [stats.slumpHistory[0], ...stats.slumpHistory.slice(-(SLUMP_MAX_HISTORY_POINTS - 1))];
     }
     refreshSlumpExtremes();
+    scheduleSlumpGraphRender();
   }
 
   function setSlumpValue(view, value){
@@ -4737,6 +4760,15 @@ body{
     const bounds = getProfitBounds(points);
     stats.slumpHigh = bounds.maxProfit;
     stats.slumpLow = bounds.minProfit;
+  }
+
+  function scheduleSlumpGraphRender(){
+    if(!audioDock || !audioDock.classList.contains("slumpOpen")) return;
+    if(slumpRenderRequest) return;
+    slumpRenderRequest = requestAnimationFrame(()=>{
+      slumpRenderRequest = 0;
+      renderSlumpGraph();
+    });
   }
 
   function getSlumpWindow(points){
@@ -5260,8 +5292,7 @@ body{
     $("stInfoView").textContent = session.active ? setGameCount() + "G/SET" : (normalState.bonusPending ? `BONUS確定 / ${pendingBonusLabel()}待ち` : `${normalModeLabel()} / 天井まで${ceilingRemain()}G`);
 
     if(bgm){
-      const normalSrc = settings.bgmUrl || DEFAULT_NORMAL_BGM_SRC;
-      if(normalSrc && !barBgmActive && !battleBgmActive && bgm.src !== normalSrc) bgm.src = normalSrc;
+      if(!barBgmActive && !battleBgmActive) ensureNormalBgmSource();
       bgm.loop = true;
       bgm.volume = bgmOutputVolume(BGM_OUTPUT_SCALE);
       if(!barBgmActive && !battleBgmActive) playNormalBgm();
@@ -5626,13 +5657,26 @@ body{
     log("演出をスキップ");
   }
 
+  function normalBgmSrc(){
+    return settings.bgmUrl || DEFAULT_NORMAL_BGM_SRC;
+  }
+
+  function ensureNormalBgmSource(){
+    if(!bgm) return "";
+    const src = normalBgmSrc();
+    if(src && bgm.getAttribute("src") !== src){
+      bgm.setAttribute("src", src);
+      try{ bgm.load(); }catch(e){}
+    }
+    return src;
+  }
+
   function playNormalBgm(){
     if(debugFastSpinActive) return;
     // ブラウザの自動再生制限により、初回クリック/操作後に再生される
     if(!bgm || barBgmActive || battleBgmActive) return;
     try{
-      const src = settings.bgmUrl || DEFAULT_NORMAL_BGM_SRC;
-      if(src && bgm.src !== src) bgm.src = src;
+      const src = ensureNormalBgmSource();
       if(!src) return;
       bgm.loop = true;
       bgm.volume = bgmOutputVolume(BGM_OUTPUT_SCALE);
@@ -6020,7 +6064,6 @@ body{
       $("totalProfitView").textContent = formatSigned(profit);
       $("totalProfitView").style.color = profit > 0 ? "var(--green)" : profit < 0 ? "var(--red)" : "var(--gold)";
     }
-    if($("wdStEmblem")) $("wdStEmblem").classList.toggle("is-profit", profit > 0);
     if($("wdBigOdds")) $("wdBigOdds").textContent = stats.bigCount > 0 && stats.totalSpins > 0
       ? `1/${(stats.totalSpins / stats.bigCount).toFixed(1)}`
       : "-";
@@ -6032,32 +6075,28 @@ body{
       const el = $(id);
       if(el) el.textContent = value;
     };
-    setText("wdCounterSt", active
-      ? (isGoraiZoneActive()
-        ? `${Math.max(0, session.bigZone || 0)}G`
-        : isContinuationBattleActive()
-          ? `${Math.max(0, session.battleRemain || 0)}G`
-          : `${Math.max(0, session.remain || 0)}G`)
-      : normalState.bonusPending
-        ? pendingBonusLabel()
-        : (isHighMode() ? `${Math.max(0, normalState.highRemain || 0)}G` : "--G"));
+    const atCountText = stats.totalSessions || 0;
+    const stEmblem = $("wdStEmblem");
+    if(stEmblem){
+      stEmblem.classList.toggle("is-ceiling", !active);
+      stEmblem.classList.toggle("is-profit", active && profit > 0);
+      if(active){
+        stEmblem.innerHTML = "DEVIL<br>RUSH";
+      }else if(normalState.bonusPending){
+        stEmblem.innerHTML = "BONUS<br>確定";
+      }else{
+        stEmblem.innerHTML = `天井まで<b>${ceilingRemain()}回</b>`;
+      }
+    }
+    setText("wdCounterSt", atCountText);
     setText("wdCounterBig", stats.bigCount || 0);
     setText("wdCounterReg", stats.midCount || 0);
     setText("wdCounterSmall", stats.smallCount || 0);
     setText("wdCounterBell", stats.bellCount || 0);
     setText("wdCounterSuika", stats.suikaCount || 0);
     setText("wdCounterCherry", stats.cherryCount || 0);
-    setText("wdCounterProfit", formatSigned(profit));
-    const topStText = active
-      ? (isGoraiZoneActive()
-        ? `${Math.max(0, session.bigZone || 0)}G`
-        : isContinuationBattleActive()
-          ? `${Math.max(0, session.battleRemain || 0)}G`
-          : `${Math.max(0, session.remain || 0)}G`)
-      : normalState.bonusPending
-        ? pendingBonusLabel()
-        : (isHighMode() ? `${Math.max(0, normalState.highRemain || 0)}G` : "--G");
-    setText("wdMirrorSt", topStText);
+    setText("wdCounterReplay", stats.replayCount || 0);
+    setText("wdMirrorSt", atCountText);
     setText("wdMirrorBig", stats.bigCount || 0);
     setText("wdMirrorReg", stats.midCount || 0);
     setText("wdMirrorSpin", `${stats.totalSpins || 0}G`);
@@ -7392,10 +7431,10 @@ body{
     if($("playBgmBtn")){
       $("playBgmBtn").addEventListener("click", async()=>{
         readSettings();
-        if(!settings.bgmUrl){ log("BGM URLを入力してください"); return; }
-        bgm.src = settings.bgmUrl;
+        const src = ensureNormalBgmSource();
+        if(!src){ log("BGMを設定してください"); return; }
         bgm.volume = bgmOutputVolume(BGM_OUTPUT_SCALE);
-        try{ await bgm.play(); log("BGM再生"); }catch(e){ log("BGMを再生できませんでした"); }
+        try{ await bgm.play(); log(settings.bgmUrl ? "BGM再生" : "内蔵BGM再生"); }catch(e){ log("BGMを再生できませんでした"); }
       });
     }
     if($("stopBgmBtn")){
