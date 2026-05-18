@@ -3365,7 +3365,7 @@ body{
   const ROGI_STOP_VIDEO_SRCS = Object.freeze({
     1:"assets/rogi1.mp4",
     2:"assets/rogi2.mp4",
-    3:""
+    3:"assets/rogi3.mp4"
   });
   const ROGI_STOP_EFFECT_CHANCES = Object.freeze({
     hit:{1:1.00,2:1.00,3:1.00},
@@ -3518,6 +3518,9 @@ body{
   let barRainbowHold = false;
   let barBgmActive = false;
   let battleBgmActive = false;
+  let rogiBgmMuted = false;
+  let rogiThirdStopHold = false;
+  let bellReadyVideoKeepAliveTimer = null;
   let gekiatsuActive = false;
   let gekiatsuHideTimer = null;
   let battleIntroHideTimer = null;
@@ -3530,6 +3533,51 @@ body{
 
   function hasRainbowHold(){
     return barRainbowHold || guaranteedSetStartLight;
+  }
+
+  function bgmOutputVolume(scale){
+    return rogiBgmMuted ? 0 : audioOutputVolume(settings.bgmVolume, scale);
+  }
+
+  function applyBgmOutputVolumes(){
+    if(bgm) bgm.volume = bgmOutputVolume(BGM_OUTPUT_SCALE);
+    if(barBgm) barBgm.volume = bgmOutputVolume(BAR_BGM_OUTPUT_SCALE);
+    if(battleBgm) battleBgm.volume = bgmOutputVolume(BATTLE_BGM_OUTPUT_SCALE);
+  }
+
+  function muteBgmForRogiStopEffect(){
+    rogiBgmMuted = true;
+    applyBgmOutputVolumes();
+  }
+
+  function restoreBgmAfterRogiStopEffect(){
+    if(!rogiBgmMuted) return;
+    rogiBgmMuted = false;
+    applyBgmOutputVolumes();
+  }
+
+  function isRogiThirdStopHoldActive(){
+    return !!rogiThirdStopHold;
+  }
+
+  function shouldHoldRogiThirdStopEffect(spin=currentSpin){
+    return !!(
+      spin &&
+      isRogiHighZoneSpin(spin) &&
+      !spin.effectsSkipped &&
+      spin.rogiStopEffectStarted &&
+      Number(spin.rogiLastStopEffectOrder) === 3
+    );
+  }
+
+  function startRogiThirdStopHold(){
+    if(rogiThirdStopHold) return;
+    rogiThirdStopHold = true;
+    if(autoPlay) stopAutoPlay("CZ第三停止演出保持のためオート停止");
+  }
+
+  function clearRogiThirdStopHold(){
+    rogiThirdStopHold = false;
   }
 
   function updateDevilStatusLamp(){
@@ -3594,6 +3642,7 @@ body{
 
   function flashReelLight(type, duration=1800){
     if(debugFastSpinActive) return;
+    if(isRogiThirdStopHoldActive()) return;
     if(!reelArea) return;
     clearReelLight(false);
 
@@ -4031,6 +4080,7 @@ body{
   }
 
   function stopRogiStopEffect(immediate=true){
+    restoreBgmAfterRogiStopEffect();
     if(immediate) stopGekiatsuEffect(true);
     else fadeOutGekiatsuEffect();
   }
@@ -4038,7 +4088,9 @@ body{
   function playRogiStopEffect(stopOrder){
     if(!shouldPlayRogiStopEffect(stopOrder)) return false;
     const src = ROGI_STOP_VIDEO_SRCS[stopOrder];
-    startGekiatsuEffect(false, src, `ROGI ${stopOrder}`, {muted:true});
+    muteBgmForRogiStopEffect();
+    startGekiatsuEffect(false, src, `ROGI ${stopOrder}`, {muted:true, solid:stopOrder === 3});
+    if(stopOrder === 3) startRogiThirdStopHold();
     if(currentSpin){
       currentSpin.rogiStopEffectStarted = true;
       currentSpin.rogiLastStopEffectOrder = stopOrder;
@@ -4070,6 +4122,7 @@ body{
     clearReelVideos();
     hideBattleIntro();
     hideRogiContinuationBlackout();
+    clearRogiThirdStopHold();
     stopGekiatsuEffect(true);
     if($("resultText") && isSpinning){
       $("resultText").textContent = spinCanStop ? "演出スキップ / 停止できます" : "演出スキップ / ウェイト中";
@@ -4938,9 +4991,9 @@ body{
     settings.bigMul = ROLE_PAYOUTS.BIG / PAYOUT_BASE;
     settings.bigAdd = 5;
     settings.autoDelay = clamp(Number($("autoDelayInput").value) || 0.5, 0.1, 10);
-    settings.bgmUrl = $("bgmUrl").value.trim();
-    settings.bgmVolume = clamp(Number($("bgmVolume").value) || 0, 0, 1);
-    settings.sfxVolume = clamp(Number($("sfxVolume").value) || 0, 0, 1);
+    if($("bgmUrl")) settings.bgmUrl = $("bgmUrl").value.trim();
+    if($("bgmVolume")) settings.bgmVolume = clamp(Number($("bgmVolume").value) || 0, 0, 1);
+    if($("sfxVolume")) settings.sfxVolume = clamp(Number($("sfxVolume").value) || 0, 0, 1);
     settings.audioBalanceVersion = AUDIO_BALANCE_VERSION;
 
     $("titleView").textContent = settings.title;
@@ -4952,8 +5005,7 @@ body{
       const normalSrc = settings.bgmUrl || DEFAULT_NORMAL_BGM_SRC;
       if(normalSrc && !barBgmActive && !battleBgmActive && bgm.src !== normalSrc) bgm.src = normalSrc;
       bgm.loop = true;
-      // BAR専用BGMと同じ音量スライダー値で再生
-      bgm.volume = audioOutputVolume(settings.bgmVolume, BGM_OUTPUT_SCALE);
+      bgm.volume = bgmOutputVolume(BGM_OUTPUT_SCALE);
       if(!barBgmActive && !battleBgmActive) playNormalBgm();
     }
     if(koatariSound){
@@ -4976,7 +5028,7 @@ body{
     if(barBgm){
       if(!barBgmActive && barBgm.src !== BAR_BGM_SRC) barBgm.src = BAR_BGM_SRC;
       barBgm.loop = true;
-      barBgm.volume = audioOutputVolume(settings.bgmVolume, BAR_BGM_OUTPUT_SCALE);
+      barBgm.volume = bgmOutputVolume(BAR_BGM_OUTPUT_SCALE);
       ensureBarBgmContinuing();
     }
     if(battleBgm){
@@ -4984,7 +5036,7 @@ body{
         battleBgm.setAttribute("src", BATTLE_BGM_SRC);
       }
       battleBgm.loop = true;
-      battleBgm.volume = audioOutputVolume(settings.bgmVolume, BATTLE_BGM_OUTPUT_SCALE);
+      battleBgm.volume = bgmOutputVolume(BATTLE_BGM_OUTPUT_SCALE);
       ensureBattleBgmContinuing();
     }
     if(gekiatsuVideo){
@@ -5015,9 +5067,9 @@ body{
     if($("bigMulInput")) $("bigMulInput").value = ROLE_PAYOUTS.BIG / PAYOUT_BASE;
     if($("bigAddInput")) $("bigAddInput").value = 5;
     $("autoDelayInput").value = settings.autoDelay;
-    $("bgmUrl").value = settings.bgmUrl;
-    $("bgmVolume").value = settings.bgmVolume;
-    $("sfxVolume").value = settings.sfxVolume;
+    if($("bgmUrl")) $("bgmUrl").value = settings.bgmUrl;
+    if($("bgmVolume")) $("bgmVolume").value = settings.bgmVolume;
+    if($("sfxVolume")) $("sfxVolume").value = settings.sfxVolume;
     readSettings();
   }
 
@@ -5235,6 +5287,7 @@ body{
   }
 
   function stopGekiatsuEffect(immediate=true){
+    restoreBgmAfterRogiStopEffect();
     if(gekiatsuHideTimer){
       clearTimeout(gekiatsuHideTimer);
       gekiatsuHideTimer = null;
@@ -5258,6 +5311,7 @@ body{
   }
 
   function fadeOutGekiatsuEffect(){
+    restoreBgmAfterRogiStopEffect();
     if(gekiatsuHideTimer){
       clearTimeout(gekiatsuHideTimer);
       gekiatsuHideTimer = null;
@@ -5323,8 +5377,7 @@ body{
       if(src && bgm.src !== src) bgm.src = src;
       if(!src) return;
       bgm.loop = true;
-      // BAR専用BGMと同じ音量スライダー値で再生
-      bgm.volume = audioOutputVolume(settings.bgmVolume, BGM_OUTPUT_SCALE);
+      bgm.volume = bgmOutputVolume(BGM_OUTPUT_SCALE);
       if(bgm.paused){
         bgm.play().catch(()=>{});
       }
@@ -5347,7 +5400,7 @@ body{
       barBgmActive = true;
       if(barBgm.src !== BAR_BGM_SRC) barBgm.src = BAR_BGM_SRC;
       barBgm.loop = true;
-      barBgm.volume = audioOutputVolume(settings.bgmVolume, BAR_BGM_OUTPUT_SCALE);
+      barBgm.volume = bgmOutputVolume(BAR_BGM_OUTPUT_SCALE);
       // すでに再生中なら頭出ししない。BAR揃い後は常時流し続ける。
       if(barBgm.paused){
         barBgm.play().catch(()=>{});
@@ -5373,7 +5426,7 @@ body{
         battleBgm.setAttribute("src", BATTLE_BGM_SRC);
       }
       battleBgm.loop = true;
-      battleBgm.volume = audioOutputVolume(settings.bgmVolume, BATTLE_BGM_OUTPUT_SCALE);
+      battleBgm.volume = bgmOutputVolume(BATTLE_BGM_OUTPUT_SCALE);
       if(battleBgm.paused){
         battleBgm.play().catch(()=>{});
         log("継続バトルBGM再生");
@@ -5400,7 +5453,7 @@ body{
         battleBgm.setAttribute("src", BATTLE_BGM_SRC);
       }
       battleBgm.loop = true;
-      battleBgm.volume = audioOutputVolume(settings.bgmVolume, BATTLE_BGM_OUTPUT_SCALE);
+      battleBgm.volume = bgmOutputVolume(BATTLE_BGM_OUTPUT_SCALE);
       if(battleBgm.paused){
         battleBgm.play().catch(()=>{});
       }
@@ -5425,7 +5478,7 @@ body{
     try{
       if(barBgm.src !== BAR_BGM_SRC) barBgm.src = BAR_BGM_SRC;
       barBgm.loop = true;
-      barBgm.volume = audioOutputVolume(settings.bgmVolume, BAR_BGM_OUTPUT_SCALE);
+      barBgm.volume = bgmOutputVolume(BAR_BGM_OUTPUT_SCALE);
       if(barBgm.paused){
         barBgm.play().catch(()=>{});
       }
@@ -6129,6 +6182,10 @@ body{
       return;
     }
 
+    if(isRogiThirdStopHoldActive()){
+      clearRogiThirdStopHold();
+      stopGekiatsuEffect(true);
+    }
     if(sessionStartGuard) return;
     if(pendingAtStartTimer){
       startBonusSessionNow();
@@ -6384,10 +6441,13 @@ body{
     if(resultParts.length === 0) resultParts.push(isNormalSpinResult ? "払い出しなし" : "0pt");
     if(resolved.zoneGame && zoneText) resultParts.push(zoneText);
     $("resultText").textContent = `${RESULT[result].name}${lineText} / ${resultParts.join(" / ")}`;
+    const holdRogiThirdStopEffect = shouldHoldRogiThirdStopEffect(currentSpin);
     if(currentSpin && currentSpin.normalActiveAtStart){
       applyNormalResult(result, resolved, lineRow);
       if(currentSpin && currentSpin.bar3LeverEffect){
         // BAR動画は動画側の終了イベントで透過させる。
+      }else if(holdRogiThirdStopEffect){
+        startRogiThirdStopHold();
       }else if(currentSpin && currentSpin.gekiatsu){
         stopGekiatsuEffect(false);
       }else{
@@ -6413,6 +6473,8 @@ body{
     applyResult(result, resolved, lineRow);
     if(currentSpin && currentSpin.bar3LeverEffect){
       // BAR揃い動画は動画側の終了イベントで透過させる。
+    }else if(holdRogiThirdStopEffect){
+      startRogiThirdStopHold();
     }else if(currentSpin && currentSpin.gekiatsu){
       stopGekiatsuEffect(false);
     }else{
@@ -6548,6 +6610,10 @@ body{
 
   function runAutoStep(){
     if(!autoPlay) return;
+    if(isRogiThirdStopHoldActive()){
+      stopAutoPlay("CZ第三停止演出保持のためオート停止");
+      return;
+    }
     if(isSpinning){
       autoTimer = setTimeout(runAutoStep, 150);
       return;
@@ -6569,6 +6635,10 @@ body{
 
   function scheduleNextAuto(){
     if(!autoPlay) return;
+    if(isRogiThirdStopHoldActive()){
+      stopAutoPlay("CZ第三停止演出保持のためオート停止");
+      return;
+    }
     readSettings();
     const delayMs = Math.max(100, settings.autoDelay * 1000);
     autoTimer = setTimeout(runAutoStep, delayMs);
@@ -6849,6 +6919,10 @@ body{
   function showOverlay(text){
     if(debugFastSpinActive) return;
     const o = $("overlay");
+    if(isRogiThirdStopHoldActive()){
+      if(o) o.classList.remove("show");
+      return;
+    }
     const target = document.querySelector(".reelArea") || document.querySelector(".reels");
     if(target){
       const rect = target.getBoundingClientRect();
@@ -6870,6 +6944,7 @@ body{
 
   function confetti(n){
     if(debugFastSpinActive) return;
+    if(isRogiThirdStopHoldActive()) return;
     const box = $("confetti");
     const colors = ["#ffd36a","#ff365d","#4de7ff","#62ff9a","#bd71ff","#ffffff"];
     for(let i=0;i<n;i++){
@@ -6971,7 +7046,7 @@ body{
         readSettings();
         if(!settings.bgmUrl){ log("BGM URLを入力してください"); return; }
         bgm.src = settings.bgmUrl;
-        bgm.volume = audioOutputVolume(settings.bgmVolume, BGM_OUTPUT_SCALE);
+        bgm.volume = bgmOutputVolume(BGM_OUTPUT_SCALE);
         try{ await bgm.play(); log("BGM再生"); }catch(e){ log("BGMを再生できませんでした"); }
       });
     }
