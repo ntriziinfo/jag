@@ -21,6 +21,9 @@
 | `assets/bar3_lever_on.mp4` | BAR揃い成立時、レバーON直後にリール全面へ表示する演出動画 |
 | `assets/devil_zone_fire.mp4` | デビルゾーン中に各リール内へ半透明表示する炎動画 |
 | `assets/devil_lamp.png` | 第一リール左側に表示する円形ステータスランプ画像 |
+| `assets/ui/icon_slump_graph_blue.png` | 右上ドックのスランプグラフボタン画像 |
+| `assets/ui/icon_odds_percent_blue.png` | 右上ドックの確率・設定情報ボタン画像 |
+| `assets/ui/icon_sound_red.png` | 右上ドックの音量ボタン画像 |
 | `assets/payout.wav` | pt払い出し発生時に再生する払い出し音 |
 | `assets/replay.png` | リプレイ役のリール図柄画像 |
 | `assets/battle_bgm.wav` | 継続バトル中に再生するBGM。元素材をピーク約0.86へノーマライズしたもの |
@@ -166,10 +169,13 @@
 | `#suikaCountView` | スイカ回数 |
 | `#cherryCountView` | チェリー回数 |
 | `#totalProfitView` | 損益 |
+| `#wdMirrorSt` / `#wdMirrorBig` / `#wdMirrorReg` / `#wdMirrorSpin` / `#wdMirrorProfit` | スロット筐体上部の5連データ窓。ST、BIG、REG、総回転数、損益をメイン状態と同期して表示する |
+| `#audioDock` | 画面右上固定のユーティリティドック。`∿` でスランプグラフ、`%` で機械割・設定別確率、`♪` で音量設定を開閉する。右側のデータカウンターとは別UIとして扱う |
 | `#slumpGraph` | 右上ドックのスランプパネル内で、総損益（獲得pt - 投入pt）の推移を折れ線で表示するスランプグラフ |
 | `#slumpCurrentView` | スランプグラフ上の現在差pt |
 | `#slumpHighView` | スランプグラフ上の最高差pt |
 | `#slumpLowView` | スランプグラフ上の最低差pt |
+| `.wd-data-counter-panel` | 右側に常設するデータカウンター。右上ドックの `%` パネルには移動しない |
 | `#stRemainBigView` | 残りAT |
 | `#sessionResultLayer` | STバトル終了時のリザルト画面。`assets/result/aozora.jpg` を背景に継続SET数と獲得ptを表示 |
 
