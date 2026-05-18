@@ -3164,7 +3164,7 @@ body{
 (function(){
   "use strict";
 
-  const STORAGE_KEY = "white_devil_shippu_st_continue_v1";
+  const STORAGE_KEY = "white_devil_gorai_rebuild_v2";
 
   const DEFAULT_NORMAL_BGM_SRC = "assets/media/normal_bgm.mp3";
 
@@ -3518,6 +3518,8 @@ body{
   }
   let reelLightTimer = null;
   let barRainbowHold = false;
+  let guaranteedSetStartLight = false;
+  let guaranteedSetLightTimer = null;
   let barBgmActive = false;
   let battleBgmActive = false;
   let rogiBgmMuted = false;
@@ -3924,7 +3926,7 @@ body{
     [0,1,2].forEach(hideReelVideo);
   }
 
-  function playReelVideo(index, src, cls="show"){
+  function playReelVideo(index, src, loop=true){
     const found = ensureReelVideo(index);
     if(!found) return;
     const {layer, video} = found;
@@ -3936,6 +3938,9 @@ body{
     try{
       video.currentTime = 0;
     }catch(e){}
+    video.loop = !!loop;
+    video.muted = true;
+    video.playsInline = true;
     layer.classList.toggle("stopVideo", !loop);
     layer.classList.add("show");
     try{
@@ -3967,7 +3972,7 @@ body{
     video.loop = false;
     video.muted = true;
     video.playsInline = true;
-    layer.classList.add("show", cls);
+    layer.classList.add("show");
     try{
       video.currentTime = 0;
       const p = video.play();
@@ -4456,23 +4461,26 @@ body{
       if(last && last.spin === point.spin && last.profit === point.profit) continue;
       deduped.push(point);
     }
-    stats.slumpHistory = deduped;
+    const maxPoints = 800;
+    stats.slumpHistory = deduped.length > maxPoints
+      ? [deduped[0], ...deduped.slice(-(maxPoints - 1))]
+      : deduped;
     refreshSlumpExtremes();
   }
 
   function recordSlumpPoint(){
-    if(!Array.isArray(stats.slumpHistory) || !stats.slumpHistory.length){
-      stats.slumpHistory = [{spin:0, profit:0}];
-    }
+    normalizeSlumpHistory();
     const point = {
       spin:Number(stats.totalSpins) || 0,
-      profit:(Number(stats.totalPaid) || 0) - (Number(stats.totalFee) || 0)
+      profit:currentProfit()
     };
     const last = stats.slumpHistory[stats.slumpHistory.length - 1];
     if(last && last.spin === point.spin && last.profit === point.profit) return;
     stats.slumpHistory.push(point);
-    stats.slumpHigh = Math.max(Number(stats.slumpHigh) || 0, point.profit, 0);
-    stats.slumpLow = Math.min(Number(stats.slumpLow) || 0, point.profit, 0);
+    if(stats.slumpHistory.length > 800){
+      stats.slumpHistory = [stats.slumpHistory[0], ...stats.slumpHistory.slice(-799)];
+    }
+    refreshSlumpExtremes();
   }
 
   function setSlumpValue(view, value){
@@ -5792,9 +5800,32 @@ body{
       ? `1/${(stats.totalSpins / stats.midCount).toFixed(1)}`
       : "-";
 
+    const setText = (id, value)=>{
+      const el = $(id);
+      if(el) el.textContent = value;
+    };
+    setText("wdCounterSt", active
+      ? (isGoraiZoneActive()
+        ? `${Math.max(0, session.bigZone || 0)}G`
+        : isContinuationBattleActive()
+          ? `${Math.max(0, session.battleRemain || 0)}G`
+          : `${Math.max(0, session.remain || 0)}G`)
+      : normalState.bonusPending
+        ? pendingBonusLabel()
+        : (isHighMode() ? `${Math.max(0, normalState.highRemain || 0)}G` : "--G"));
+    setText("wdCounterBig", stats.bigCount || 0);
+    setText("wdCounterReg", stats.midCount || 0);
+    setText("wdCounterSmall", stats.smallCount || 0);
+    setText("wdCounterBell", stats.bellCount || 0);
+    setText("wdCounterSuika", stats.suikaCount || 0);
+    setText("wdCounterCherry", stats.cherryCount || 0);
+    setText("wdCounterProfit", formatSigned(profit));
+
     const remainBig = $("stRemainBigView");
     if(remainBig){
+      const label = document.querySelector(".sevenSegLabel");
       if(active){
+        if(label) label.textContent = isGoraiZoneActive() ? "DEVIL ZONE" : isContinuationBattleActive() ? "BATTLE" : "残りST";
         if(isGoraiZoneActive()){
           remainBig.textContent = String(Math.max(0, session.bigZone)).padStart(2, "0");
         }else if(isContinuationBattleActive()){
@@ -6376,7 +6407,6 @@ body{
     const label = i === 1 ? spec.label : "";
 
     stopReel(i, col, label, spec.cls, result === "MISS" ? null : lineRow);
-    if(result === "BELL") startBellStopVideo(i);
     currentSpin.stopped[i] = true;
     if(i === 1 && (result === "BIG" || result === "MID")){
       playVoiceSound(VOICE_SRC.reach);

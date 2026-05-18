@@ -176,7 +176,7 @@
 ## 7. 永続化仕様
 
 - `localStorage` を使用する。
-- ストレージキーは `white_devil_gorai_rebuild_v1`。
+- ストレージキーは `white_devil_gorai_rebuild_v2`。旧 `white_devil_shippu_st_continue_v1` の保存データは、確率表示や進行状態が旧仕様と混ざるため読み込まない。
 - 保存対象は主に `settings` と `stats`。
 - `stats.slumpHistory` に差pt推移を保存する。記録点は初期値、各ゲーム開始時の3pt投入後、各ゲーム結果反映後で、保存点数は最大800点に制限する。
 - ページ離脱時に現在の設定と統計を保存する。
