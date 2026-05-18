@@ -3173,6 +3173,8 @@ body{
   const BIG_SOUND_SRC = "assets/media/big_sound.wav";
 
   const KOATARI_SOUND_SRC = "assets/media/koatari_sound.wav";
+  const PAYOUT_SOUND_SRC = "assets/payout.wav";
+  const BATTLE_BGM_SRC = "assets/battle_bgm.wav";
 
   const SETTING = {
     1:{target:0.80},
@@ -3530,6 +3532,7 @@ body{
   let machineId = adminParams.get("machine") || localStorage.getItem("white_devil_machine_id");
   let adminPushTimer = null;
   let adminCommandStream = null;
+  let adminCommandReconnectTimer = null;
 
   function hasRainbowHold(){
     return barRainbowHold || guaranteedSetStartLight;
@@ -4954,12 +4957,25 @@ body{
   }
 
   function connectAdminCommands(){
-    if(!window.EventSource || !ADMIN_SERVER) return;
+    if(!window.EventSource || !ADMIN_SERVER || !machineId) return;
+    if(adminCommandReconnectTimer){
+      clearTimeout(adminCommandReconnectTimer);
+      adminCommandReconnectTimer = null;
+    }
+    if(adminCommandStream){
+      try{ adminCommandStream.close(); }catch(e){}
+      adminCommandStream = null;
+    }
     try{
       adminCommandStream = new EventSource(`${ADMIN_SERVER}/api/machines/${encodeURIComponent(machineId)}/commands`);
       adminCommandStream.addEventListener("command", event=>{
         try{ handleAdminCommand(JSON.parse(event.data)); }catch(e){}
       });
+      adminCommandStream.onerror = ()=>{
+        try{ adminCommandStream.close(); }catch(e){}
+        adminCommandStream = null;
+        adminCommandReconnectTimer = setTimeout(connectAdminCommands, 1500);
+      };
     }catch(e){}
   }
 
@@ -4974,6 +4990,12 @@ body{
     }else if(!closeBtn){
       drawer.insertBefore(secret, drawer.firstChild);
     }
+  }
+
+  function normalizeMachineTitle(value){
+    const title = String(value || "").trim();
+    if(!title || title === "白い悪魔 轟雷") return "白い悪魔 疾風";
+    return title.replace(/白い悪魔\s*轟雷/g, "白い悪魔 疾風");
   }
 
   function readSettings(){
@@ -6982,17 +7004,22 @@ body{
       if(el) el.addEventListener("input", ()=>{ readSettings(); updateDisplay(); });
     });
 
-    $("saveBtn").addEventListener("click", save);
-    $("resetBtn").addEventListener("click", resetGame);
-    $("spinBtn").addEventListener("click", spin);
+    const onClick = (id, handler)=>{
+      const el = $(id);
+      if(el) el.addEventListener("click", handler);
+    };
+
+    onClick("saveBtn", save);
+    onClick("resetBtn", resetGame);
+    onClick("spinBtn", spin);
     const betHitArea = document.querySelector(".betArea");
     if(betHitArea){
       betHitArea.addEventListener("click", e=>{
         if(e.target !== $("spinBtn")) $("spinBtn").click();
       });
     }
-    $("autoStartBtn").addEventListener("click", startAutoPlay);
-    $("autoStopBtn").addEventListener("click", ()=>stopAutoPlay("オートAT停止"));
+    onClick("autoStartBtn", startAutoPlay);
+    onClick("autoStopBtn", ()=>stopAutoPlay("オートAT停止"));
     if($("debugFastStartBtn")) $("debugFastStartBtn").addEventListener("click", startDebugFastSpin);
     if($("debugFastStopBtn")) $("debugFastStopBtn").addEventListener("click", ()=>stopDebugFastSpin());
     if(slumpSeekRange){
@@ -7036,6 +7063,7 @@ body{
     }
 
     stopBtns.forEach((btn,i)=>{
+      if(!btn) return;
       btn.addEventListener("click", ()=>{
         stopSingleReel(i);
       });
@@ -7058,11 +7086,11 @@ body{
       });
     }
 
-    $("applyForceBtn").addEventListener("click", ()=>{
+    onClick("applyForceBtn", ()=>{
       forceResult = $("forceResult").value;
       log(forceResult ? `次回転指定：${RESULT[forceResult].name}` : "次回転指定なし");
     });
-    $("clearForceBtn").addEventListener("click", ()=>{
+    onClick("clearForceBtn", ()=>{
       forceResult = "";
       $("forceResult").value = "";
       log("次回転指定を解除");
@@ -7086,18 +7114,18 @@ body{
 
     arrangeDebugDrawerTop();
 
-    if($("debugHighBtn")) $("debugHighBtn").addEventListener("click", forceHighModeNow);
-        $("debugSmallBtn").addEventListener("click", ()=>direct("SMALL"));
-    if($("debugMidBtn")) $("debugMidBtn").addEventListener("click", ()=>direct("MID"));
-    if($("debugBar3Btn")) $("debugBar3Btn").addEventListener("click", ()=>direct("BAR3"));
-    $("debugBigBtn").addEventListener("click", ()=>direct("BIG"));
-    if($("debugBellPayBtn")) $("debugBellPayBtn").addEventListener("click", ()=>direct("BELL"));
-    if($("debugReplayBtn")) $("debugReplayBtn").addEventListener("click", ()=>direct("REPLAY"));
-    if($("debugSuikaBtn")) $("debugSuikaBtn").addEventListener("click", ()=>direct("SUICA"));
-    $("debugCherryBtn").addEventListener("click", ()=>direct("CHERRY_ANY"));
-    if($("debugCherryDoubleBtn")) $("debugCherryDoubleBtn").addEventListener("click", ()=>direct("CHERRY_DOUBLE"));
-    $("debugBellBtn").addEventListener("click", ()=>direct("CHERRY_TRIPLE"));
-    if($("debugMissBtn")) $("debugMissBtn").addEventListener("click", ()=>direct("MISS"));
+    onClick("debugHighBtn", forceHighModeNow);
+    onClick("debugSmallBtn", ()=>direct("SMALL"));
+    onClick("debugMidBtn", ()=>direct("MID"));
+    onClick("debugBar3Btn", ()=>direct("BAR3"));
+    onClick("debugBigBtn", ()=>direct("BIG"));
+    onClick("debugBellPayBtn", ()=>direct("BELL"));
+    onClick("debugReplayBtn", ()=>direct("REPLAY"));
+    onClick("debugSuikaBtn", ()=>direct("SUICA"));
+    onClick("debugCherryBtn", ()=>direct("CHERRY_ANY"));
+    onClick("debugCherryDoubleBtn", ()=>direct("CHERRY_DOUBLE"));
+    onClick("debugBellBtn", ()=>direct("CHERRY_TRIPLE"));
+    onClick("debugMissBtn", ()=>direct("MISS"));
 
     $("lcd").addEventListener("click", ()=>{
       clickCount++;
@@ -7153,6 +7181,7 @@ body{
   load();
   applySettings();
   setup();
+  connectAdminCommands();
   reels.forEach((_,i)=>setRandomReel(i));
   showMessage("READY",`1回転${SPIN_COST}pt / 通常・高確からBONUSを目指す`);
   updateDisplay();
