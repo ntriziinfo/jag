@@ -3971,7 +3971,7 @@ body{
 (function(){
   "use strict";
 
-  const STORAGE_KEY = "white_devil_gorai_rebuild_v2";
+  const STORAGE_KEY = "white_devil_gorai_complete_test_v1";
 
   const DEFAULT_NORMAL_BGM_SRC = "assets/media/normal_bgm.mp3";
 
@@ -5573,7 +5573,7 @@ body{
       completeProfit:0
     };
     showMessage("COMPLETE解除", "設定変更により打ち止めを解除しました。");
-    log("[COMPLETE] 設定変更により打ち止め解除");
+    log("[COMPLETE TEST] 設定変更により打ち止め解除");
     persistState();
   }
 
@@ -5585,7 +5585,7 @@ body{
       completeTrialState.rescueActive = true;
       showOverlay("救済発動");
       showMessage("救済発動", `差枚${formatSigned(profit)}pt / 次回ATから50%で継続率50%以上 / フリーズ1/${COMPLETE_RESCUE_BAR3_DENOM}`);
-      log(`[COMPLETE] 救済発動：${formatSigned(profit)}pt${reason ? " / " + reason : ""}`);
+      log(`[COMPLETE TEST] 救済発動：${formatSigned(profit)}pt${reason ? " / " + reason : ""}`);
       persistState();
     }
 
@@ -5598,7 +5598,7 @@ body{
       stopDebugFastSpin("COMPLETE到達");
       showOverlay("COMPLETE");
       showMessage("COMPLETE", `+${COMPLETE_LIMIT_PT}pt到達 / 設定変更まで遊戯不可`);
-      log(`[COMPLETE] +${COMPLETE_LIMIT_PT}pt到達：${formatSigned(profit)}pt / 設定${completeTrialState.lockedSetting}`);
+      log(`[COMPLETE TEST] +${COMPLETE_LIMIT_PT}pt到達：${formatSigned(profit)}pt / 設定${completeTrialState.lockedSetting}`);
       persistState();
       updateDisplay();
     }

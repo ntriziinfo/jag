@@ -1979,25 +1979,41 @@ body.debugOpen .debugDrawer .secret{
   overflow:hidden !important;
 }
 .battleIntroLogo{
-  left:58% !important;
-  top:7% !important;
-  width:min(56%, 500px) !important;
-  max-height:40% !important;
+  left:1.6% !important;
+  top:18.2% !important;
+  width:64.4% !important;
+  height:63.5% !important;
+  max-width:none !important;
+  max-height:none !important;
+  transform:none !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  z-index:7 !important;
 }
 .battleIntroRound{
-  right:7% !important;
-  bottom:5% !important;
-  width:min(24%, 180px) !important;
-  max-height:46% !important;
-  z-index:5 !important;
+  left:66.8% !important;
+  right:12.5% !important;
+  bottom:5.0% !important;
+  width:20.7% !important;
+  height:34.0% !important;
+  max-width:none !important;
+  max-height:none !important;
+  object-fit:contain !important;
+  object-position:center bottom !important;
+  z-index:8 !important;
 }
 .battleIntroCharacter,
 .battleIntroCharacter.right{
-  left:auto !important;
-  right:17% !important;
-  bottom:-12% !important;
-  max-width:38% !important;
-  max-height:113% !important;
+  left:66.4% !important;
+  right:0 !important;
+  top:0 !important;
+  bottom:0 !important;
+  width:33.6% !important;
+  height:100% !important;
+  max-width:none !important;
+  max-height:none !important;
+  object-fit:contain !important;
+  object-position:center bottom !important;
   z-index:6 !important;
 }
 .battleIntroCharacter.right{
@@ -2467,9 +2483,12 @@ body::after{display:none !important;content:none !important;}
 }
 .reelArea::before{
   inset:0 !important;
-  background:url("assets/frames/slot_cabinet_frame_data_windows.png") center/100% 100% no-repeat !important;
+  background:url("assets/frames/slot_cabinet_frame_data_windows_on.png") center/100% 100% no-repeat !important;
   opacity:1 !important;
   z-index:8 !important;
+}
+.reelArea.speedFrameOff::before{
+  background-image:url("assets/frames/slot_cabinet_frame_data_windows_off.png") !important;
 }
 .payline{
   left:14.5% !important;
@@ -3970,7 +3989,7 @@ body{
     3:{target:0.95},
     4:{target:1.01},
     5:{target:1.07},
-    6:{target:1.14}
+    6:{target:1.15}
   };
 
   const USER_FACE = "__USER_FACE__";
@@ -4092,7 +4111,8 @@ body{
     sinceBonus:0,
     bonusPending:false,
     bonusKind:"",
-    bonusSource:""
+    bonusSource:"",
+    morningCeilingActive:false
   };
 
   let session = {
@@ -4148,6 +4168,7 @@ body{
   });
   const NORMAL_BELL_PAYOUT = NORMAL_ROLE_PAYOUTS.BELL;
   const NORMAL_CEILING_GAMES = 300;
+  const MORNING_CEILING_GAMES = 200;
   const HIGH_MODE_GAMES = 10;
   const NORMAL_ROLE_RATE = 0.18;
   const HIGH_ROLE_RATE = 0.22;
@@ -4199,7 +4220,7 @@ body{
     3:0.912,
     4:0.94,
     5:0.925,
-    6:0.95
+    6:0.965
   };
   const NORMAL_DIRECT_BONUS_RATE = {
     1:1/170,
@@ -4247,11 +4268,18 @@ body{
   });
   const BIG_STOCK_ZONE_GAMES = 5;
   const CONTINUATION_BATTLE_GAMES = 4;
-  const DEBUG_FAST_SPINS_PER_SECOND = 100;
+  const DEBUG_FAST_SPINS_PER_SECOND = 1000;
   const DEBUG_FAST_INTERVAL_MS = 100;
   const DEBUG_FAST_BATCH_SIZE = Math.max(1, Math.round(DEBUG_FAST_SPINS_PER_SECOND * DEBUG_FAST_INTERVAL_MS / 1000));
+  const DEBUG_ONE_CLICK_SIM_SPINS = 10000;
   const SPEED_MODE_MAX_SPINS_PER_SECOND = 10;
   const SPEED_MODE_MULTIPLIER = 3;
+  const COMPLETE_TRIAL_ENABLED = true;
+  const COMPLETE_LIMIT_PT = 2000;
+  const COMPLETE_RESCUE_THRESHOLD_PT = -2000;
+  const COMPLETE_RESCUE_MIN_CONTINUATION_RATE = 0.50;
+  const COMPLETE_RESCUE_RATE_BOOST_CHANCE = 0.50;
+  const COMPLETE_RESCUE_BAR3_DENOM = 2000;
   const SLUMP_MAX_HISTORY_POINTS = 20000;
   const SLUMP_MAX_DRAW_POINTS = 1400;
   let autoPlay = false;
@@ -4259,11 +4287,19 @@ body{
   let speedToBonusActive = false;
   let speedToBonusTimer = null;
   let speedToBonusCount = 0;
+  let completeTrialState = {
+    locked:false,
+    lockedSetting:0,
+    rescueActive:false,
+    completeProfit:0
+  };
   let speedModeMenuOpen = false;
   let speedModeSpinRequest = false;
+  let speedFrameOffHold = false;
   let debugFastSpinActive = false;
   let debugFastTimer = null;
   let debugFastSpinCount = 0;
+  let debugOneClickSimActive = false;
   let slumpView = {
     xZoom:1,
     yZoom:1,
@@ -4534,9 +4570,18 @@ body{
     stEmblem.setAttribute("data-state", barActive ? "bar" : atActive ? "at" : atConfirmed ? "confirmed" : "normal");
   }
 
+  function updateReelFrameMode(){
+    if(!reelArea) return;
+    reelArea.classList.toggle("speedFrameOff", !!speedFrameOffHold && !session.active);
+  }
+
+  function setSpeedFrameOffHold(active){
+    speedFrameOffHold = !!active;
+    updateReelFrameMode();
+  }
+
   function setAudioPanelOpen(open){
     if(!audioDock || !audioToggleBtn) return;
-    if(open) closeInfoPanels();
     audioDock.classList.toggle("open", !!open);
     audioToggleBtn.setAttribute("aria-expanded", open ? "true" : "false");
     audioToggleBtn.setAttribute("aria-label", open ? "音量を閉じる" : "音量を開く");
@@ -4651,7 +4696,6 @@ body{
 
   function closeUtilityPanels(){
     setAudioPanelOpen(false);
-    closeInfoPanels();
   }
 
   function clearReelLight(keepBarHold=false){
@@ -5229,11 +5273,12 @@ body{
     const table = continuationRateTable(settingNo);
     const total = table.reduce((sum,item)=>sum + item.w, 0);
     let r = Math.random() * total;
+    const rescueMinRate = completeTrialRescueMinRate();
     for(const item of table){
       r -= item.w;
-      if(r <= 0) return item.rate;
+      if(r <= 0) return Math.max(item.rate, rescueMinRate);
     }
-    return table[table.length - 1].rate;
+    return Math.max(table[table.length - 1].rate, rescueMinRate);
   }
 
   function averageContinuationRate(settingNo = settings.setting){
@@ -5363,6 +5408,7 @@ body{
 
   function normalModeLabel(){
     if(normalState.bonusPending) return "BONUS確定";
+    if(normalState.morningCeilingActive) return isHighMode() ? "朝一高確" : "朝一";
     return isHighMode() ? "高確" : "通常";
   }
 
@@ -5370,8 +5416,12 @@ body{
     return normalState.bonusKind === "MID" ? "REG" : "777";
   }
 
+  function currentNormalCeilingGames(){
+    return normalState.morningCeilingActive ? MORNING_CEILING_GAMES : NORMAL_CEILING_GAMES;
+  }
+
   function ceilingRemain(){
-    return Math.max(0, NORMAL_CEILING_GAMES - (Number(normalState.sinceBonus) || 0));
+    return Math.max(0, currentNormalCeilingGames() - (Number(normalState.sinceBonus) || 0));
   }
 
   function resetNormalModeAfterBonus(){
@@ -5381,6 +5431,7 @@ body{
     normalState.bonusPending = false;
     normalState.bonusKind = "";
     normalState.bonusSource = "";
+    normalState.morningCeilingActive = false;
   }
 
   function chargeSpinCost(){
@@ -5389,6 +5440,7 @@ body{
       session.cost = (Number(session.cost) || 0) + SPIN_COST;
     }
     recordSlumpPoint();
+    updateCompleteTrialState("BET");
   }
 
   function normalRoleProbability(){
@@ -5407,6 +5459,7 @@ body{
 
   function pickNormalBonusKind(source="", result="MISS", settingNo = settings.setting){
     if(result === "MID") return "MID";
+    if(source === "朝一天井200G" || source === "天井300G") return "BIG";
     if(result === "BIG" || result === "BAR3" || source === "天井300G" || source === "BAR揃い") return "BIG";
     const bigRate = NORMAL_BIG_BONUS_RATE[settingNo] ?? NORMAL_BIG_BONUS_RATE[1];
     return Math.random() < bigRate ? "BIG" : "MID";
@@ -5491,6 +5544,76 @@ body{
 
   function currentProfit(){
     return (Number(stats.totalPaid) || 0) - (Number(stats.totalFee) || 0);
+  }
+
+  function completeTrialProfit(){
+    return currentProfit();
+  }
+
+  function completeTrialRescueMinRate(){
+    if(!COMPLETE_TRIAL_ENABLED || completeTrialState.locked) return 0;
+    if(!completeTrialState.rescueActive) return 0;
+    return Math.random() < COMPLETE_RESCUE_RATE_BOOST_CHANCE ? COMPLETE_RESCUE_MIN_CONTINUATION_RATE : 0;
+  }
+
+  function bar3PremiumDenominator(){
+    if(COMPLETE_TRIAL_ENABLED && completeTrialState.rescueActive && !completeTrialState.locked){
+      return COMPLETE_RESCUE_BAR3_DENOM;
+    }
+    return BAR3_PREMIUM_DENOM;
+  }
+
+  function unlockCompleteTrialBySettingChange(nextSetting){
+    if(!COMPLETE_TRIAL_ENABLED || !completeTrialState.locked) return;
+    if(Number(nextSetting) === Number(completeTrialState.lockedSetting)) return;
+    completeTrialState = {
+      locked:false,
+      lockedSetting:0,
+      rescueActive:false,
+      completeProfit:0
+    };
+    showMessage("COMPLETE解除", "設定変更により打ち止めを解除しました。");
+    log("[COMPLETE] 設定変更により打ち止め解除");
+    persistState();
+  }
+
+  function updateCompleteTrialState(reason=""){
+    if(!COMPLETE_TRIAL_ENABLED) return false;
+    const profit = completeTrialProfit();
+
+    if(!completeTrialState.rescueActive && profit <= COMPLETE_RESCUE_THRESHOLD_PT){
+      completeTrialState.rescueActive = true;
+      showOverlay("救済発動");
+      showMessage("救済発動", `差枚${formatSigned(profit)}pt / 次回ATから50%で継続率50%以上 / フリーズ1/${COMPLETE_RESCUE_BAR3_DENOM}`);
+      log(`[COMPLETE] 救済発動：${formatSigned(profit)}pt${reason ? " / " + reason : ""}`);
+      persistState();
+    }
+
+    if(!completeTrialState.locked && profit >= COMPLETE_LIMIT_PT){
+      completeTrialState.locked = true;
+      completeTrialState.lockedSetting = Number(settings.setting) || 1;
+      completeTrialState.completeProfit = profit;
+      stopAutoPlay("COMPLETE到達のためAUTO停止");
+      stopSpeedToBonus("COMPLETE到達のためSPEED停止");
+      stopDebugFastSpin("COMPLETE到達");
+      showOverlay("COMPLETE");
+      showMessage("COMPLETE", `+${COMPLETE_LIMIT_PT}pt到達 / 設定変更まで遊戯不可`);
+      log(`[COMPLETE] +${COMPLETE_LIMIT_PT}pt到達：${formatSigned(profit)}pt / 設定${completeTrialState.lockedSetting}`);
+      persistState();
+      updateDisplay();
+    }
+
+    return !!completeTrialState.locked;
+  }
+
+  function canPlayCompleteTrial(){
+    if(!COMPLETE_TRIAL_ENABLED || !completeTrialState.locked) return true;
+    stopAutoPlay("COMPLETE中のためAUTO停止");
+    stopSpeedToBonus("COMPLETE中のためSPEED停止");
+    stopDebugFastSpin("COMPLETE中");
+    showMessage("COMPLETE", `+${COMPLETE_LIMIT_PT}pt到達 / 設定変更まで遊戯不可`);
+    showOverlay("COMPLETE");
+    return false;
   }
 
   function normalizeSlumpHistory(){
@@ -5806,7 +5929,7 @@ body{
     }
 
     // BAR揃いは通常抽選とは別の全設定共通プレミアフラグ
-    if(Math.random() < (1 / BAR3_PREMIUM_DENOM)){
+    if(Math.random() < (1 / bar3PremiumDenominator())){
       return "BAR3";
     }
 
@@ -5823,7 +5946,7 @@ body{
     if(pendingForceResult && RESULT[pendingForceResult]){
       return pendingForceResult;
     }
-    if(Math.random() < (1 / BAR3_PREMIUM_DENOM)){
+    if(Math.random() < (1 / bar3PremiumDenominator())){
       return "BAR3";
     }
     if(Math.random() < normalRoleProbability()){
@@ -5838,12 +5961,16 @@ body{
     const directBigReady = !bonusPending && result === "BIG";
     const directRegReady = !bonusPending && result === "MID";
     const directBar3Ready = !bonusPending && result === "BAR3";
+    const ceilingLimit = currentNormalCeilingGames();
     const ceilingAfter = bonusPending
-      ? clamp(Number(normalState.sinceBonus) || 0, 0, NORMAL_CEILING_GAMES)
-      : clamp((Number(normalState.sinceBonus) || 0) + 1, 0, NORMAL_CEILING_GAMES);
+      ? clamp(Number(normalState.sinceBonus) || 0, 0, ceilingLimit)
+      : clamp((Number(normalState.sinceBonus) || 0) + 1, 0, ceilingLimit);
     let bonusSource = bonusPending ? (normalState.bonusSource || "BONUS確定") : bonusHitSourceForNormal(result);
-    if(!bonusPending && !bonusSource && ceilingAfter >= NORMAL_CEILING_GAMES){
+    if(!bonusPending && !bonusSource && ceilingAfter >= ceilingLimit){
       bonusSource = "天井300G";
+    }
+    if(!bonusPending && ceilingAfter >= ceilingLimit && normalState.morningCeilingActive){
+      bonusSource = "朝一天井200G";
     }
     const bonusKind = directBar3Ready
       ? "BIG"
@@ -5899,10 +6026,22 @@ body{
           ...normalState,
           ...data.normalState,
           highRemain:Math.max(0, Number(data.normalState.highRemain) || 0),
-          sinceBonus:clamp(Number(data.normalState.sinceBonus) || 0, 0, NORMAL_CEILING_GAMES),
+          sinceBonus:Math.max(0, Number(data.normalState.sinceBonus) || 0),
           bonusPending:!!data.normalState.bonusPending,
           bonusKind:String(data.normalState.bonusKind || ""),
-          bonusSource:String(data.normalState.bonusSource || "")
+          bonusSource:String(data.normalState.bonusSource || ""),
+          morningCeilingActive:!!data.normalState.morningCeilingActive
+        };
+        normalState.sinceBonus = clamp(normalState.sinceBonus, 0, currentNormalCeilingGames());
+      }
+      if(data?.completeTrialState){
+        completeTrialState = {
+          ...completeTrialState,
+          ...data.completeTrialState,
+          locked:!!data.completeTrialState.locked,
+          lockedSetting:clamp(Number(data.completeTrialState.lockedSetting) || 0, 0, 6),
+          rescueActive:!!data.completeTrialState.rescueActive,
+          completeProfit:Number(data.completeTrialState.completeProfit) || 0
         };
       }
     }catch(e){}
@@ -5910,7 +6049,7 @@ body{
 
   function persistState(){
     try{
-      return safeStorageSet(STORAGE_KEY, JSON.stringify({settings, stats, normalState}));
+      return safeStorageSet(STORAGE_KEY, JSON.stringify({settings, stats, normalState, completeTrialState}));
     }catch(e){
       console.warn("Failed to save local state", e);
       return false;
@@ -5946,6 +6085,7 @@ body{
       stats:{...stats, profit},
       normalState:{...normalState},
       session:{...session},
+      completeTrialState:{...completeTrialState},
       state:{
         isSpinning,
         spinCanStop,
@@ -5990,7 +6130,7 @@ body{
     setValue("bgmVolume", nextSettings.bgmVolume);
     setValue("sfxVolume", nextSettings.sfxVolume);
     readSettings();
-    safeStorageSet(STORAGE_KEY, JSON.stringify({settings, stats}));
+    safeStorageSet(STORAGE_KEY, JSON.stringify({settings, stats, normalState, completeTrialState}));
     updateDisplay();
     log("管理画面から設定を更新");
   }
@@ -6000,7 +6140,7 @@ body{
     if(command.type === "applySettings"){
       applyAdminSettings(command.settings || {});
     }else if(command.type === "reset"){
-      resetGame(false);
+      morningResetGame(false, "管理リセット");
     }else if(command.type === "forceResult"){
       forceResult = command.result && RESULT[command.result] ? command.result : "";
       if($("forceResult")) $("forceResult").value = forceResult;
@@ -6070,7 +6210,12 @@ body{
 
   function readSettings(){
     settings.title = normalizeMachineTitle($("titleInput").value);
+    const previousSetting = Number(settings.setting) || 1;
     settings.setting = clamp(Number($("settingSelect").value) || 1, 1, 6);
+    if(settings.setting !== previousSetting){
+      morningResetGame(false, "設定変更");
+      setMorningBarReels();
+    }
     settings.fee = PAYOUT_BASE;
     settings.stSpins = clamp(Number($("stSpinsInput").value) || 10, 1, 100);
     settings.oddsMultiplier = clamp(Number($("oddsMultiplierInput").value) || 1, 0.1, 100);
@@ -6093,6 +6238,8 @@ body{
     if($("targetRtpView")) $("targetRtpView").textContent = Math.round(targetRtp() * 100) + "%";
     if($("adminSettingView")) $("adminSettingView").textContent = settings.setting;
     if($("adminTargetRtpView")) $("adminTargetRtpView").textContent = Math.round(targetRtp() * 100) + "%";
+    const setting6Option = document.querySelector('#settingSelect option[value="6"]');
+    if(setting6Option) setting6Option.textContent = "設定6 / 目標115%";
     const adminStInfoText = session.active ? setGameCount() + "G/SET" : (normalState.bonusPending ? `BONUS確定 / ${pendingBonusLabel()}待ち` : `${normalModeLabel()} / 天井まで${ceilingRemain()}G`);
     if($("stInfoView")) $("stInfoView").textContent = adminStInfoText;
     if($("adminStInfoView")) $("adminStInfoView").textContent = adminStInfoText;
@@ -6232,6 +6379,7 @@ body{
   }
 
   function startBonusSessionNow(options={}){
+    setSpeedFrameOffHold(false);
     stopSpeedToBonus("ボーナス開始のためSPEED停止");
     clearPendingAtStart();
     const started = startSession(options);
@@ -6268,6 +6416,7 @@ body{
     session.battleWin = false;
     session.battleSource = "";
     resetBonusEndSpecialEffects(true);
+    setSpeedFrameOffHold(false);
     $("spinBtn").textContent = "BET";
     showSessionResultScreen(endedSets, session.paid);
     showOverlay("ATバトル終了");
@@ -6643,6 +6792,7 @@ body{
       stats.totalPaid = (Number(stats.totalPaid) || 0) + normalReward;
       playPayoutSound();
       recordSlumpPoint();
+      updateCompleteTrialState("通常払い出し");
     }
     normalState.sinceBonus = clamp(Number(resolved.ceilingAfter) || 0, 0, NORMAL_CEILING_GAMES);
     if(normalState.highRemain > 0){
@@ -6749,6 +6899,7 @@ body{
       session.paid += reward;
       stats.totalPaid += reward;
       playPayoutSound();
+      updateCompleteTrialState("AT払い出し");
     }
 
     if(zoneWasActive && session.bigZone > 0){
@@ -6872,6 +7023,7 @@ body{
 
     updateGoraiZoneGlow();
     updateDevilStatusLamp();
+    updateReelFrameMode();
     machine.className = "machine " + (active ? "active" : "normal") + (session.paid > 0 ? " win" : "");
     $("modeTag").className = "modeTag " + (active ? "active" : "");
     $("modeTag").textContent = active ? (isContinuationBattleActive() ? "継続BATTLE" : "BATTLE") : normalModeLabel();
@@ -6980,6 +7132,11 @@ body{
       spinButton.textContent = isSpinning ? (spinCanStop ? "STOP" : "WAIT") : "BET";
       spinButton.classList.toggle("waiting", isSpinning && !spinCanStop);
       spinButton.classList.toggle("stopReady", isSpinning && spinCanStop);
+      if(COMPLETE_TRIAL_ENABLED && completeTrialState.locked && !isSpinning){
+        spinButton.textContent = "COMPLETE";
+        spinButton.disabled = true;
+        stopBtns.forEach(b=>b.disabled=true);
+      }
     }
 
     if($("quickAutoBtn")){
@@ -7063,7 +7220,7 @@ body{
     table.innerHTML = html;
   }
 
-  function resetGame(){
+  function resetGame(confirmFirst=true){
     stopDebugFastSpin("初期化のため高速停止");
     stopSpeedToBonus("初期化のためSPEED停止");
     if(!confirm("統計と現在のAT状態を初期化しますか？")) return;
@@ -7089,18 +7246,144 @@ body{
     currentSpin = null;
     stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,smallCount:0,bellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
-    normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:""};
+    normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",morningCeilingActive:false};
     session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,continuationRate:0,bigZone:0,phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null};
+    completeTrialState = {locked:false,lockedSetting:0,rescueActive:false,completeProfit:0};
+    setSpeedFrameOffHold(false);
     forceResult = "";
     forcePremiumEffect = false;
     pendingForceResult = "";
     $("forceResult").value = "";
     if($("premiumForceStatus")) $("premiumForceStatus").value = "OFF";
     $("stLamp").classList.remove("on");
+    setMorningBarReels();
     showMessage("READY",`1回転${SPIN_COST}pt / 通常・高確からBONUSを目指す`);
     $("resultText").textContent = "-";
     updateDisplay();
     log("統計を初期化しました");
+    return true;
+  }
+
+  function resetRuntimeForMorning(reason="朝一リセット"){
+    stopDebugFastSpin(`${reason}のため高速停止`);
+    stopSpeedToBonus(`${reason}のためSPEED停止`);
+    stopAutoPlay(`${reason}のためAUTO停止`);
+    pauseNormalBgm();
+    stopBattleBgm(false);
+    stopBarBgm();
+    stopGekiatsuEffect(true);
+    hideBattleIntro();
+    hideRogiContinuationBlackout();
+    hideSessionResultScreen();
+    clearReelVideos();
+    stopGuaranteedSetStartLight();
+    spinIntervals.forEach(id=>clearInterval(id));
+    if(spinWaitTimer){
+      clearTimeout(spinWaitTimer);
+      spinWaitTimer = null;
+    }
+    clearPendingAtStart();
+    spinCanStop = false;
+    reels.forEach(r=>r.classList.remove("spinning"));
+    isSpinning = false;
+    currentSpin = null;
+    stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,smallCount:0,bellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
+    slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
+    normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",morningCeilingActive:true};
+    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,continuationRate:0,bigZone:0,phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null};
+    completeTrialState = {locked:false,lockedSetting:0,rescueActive:false,completeProfit:0};
+    setSpeedFrameOffHold(false);
+    forceResult = "";
+    forcePremiumEffect = false;
+    pendingForceResult = "";
+    if($("forceResult")) $("forceResult").value = "";
+    if($("premiumForceStatus")) $("premiumForceStatus").value = "OFF";
+    $("stLamp").classList.remove("on");
+    setMorningBarReels();
+    showMessage(reason, `設定${settings.setting}据え置き / 初回天井${MORNING_CEILING_GAMES}G / COMPLETE解除`);
+    $("resultText").textContent = `朝一モード / 天井まで${ceilingRemain()}G`;
+    persistState();
+    updateDisplay();
+    log(`[RESET] ${reason} / 設定${settings.setting} / 初回天井${MORNING_CEILING_GAMES}G / COMPLETE解除`);
+    return true;
+  }
+
+  function morningResetGame(confirmFirst=true, reason="朝一リセット"){
+    if(confirmFirst && !confirm(`設定はそのままでCOMPLETEを解除し、朝一モード（初回天井${MORNING_CEILING_GAMES}G）にしますか？`)) return false;
+    return resetRuntimeForMorning(reason);
+  }
+
+  function ensureMorningResetControl(){
+    if($("morningResetBtn") && $("tenKSimBtn")) return;
+    const anchor = $("debugFastStatus");
+    if(!anchor || !anchor.parentNode) return;
+    const row = document.createElement("div");
+    row.className = "row";
+    row.style.marginBottom = "8px";
+    row.innerHTML = `<button class="subBtn" id="morningResetBtn" type="button">朝一リセット</button>`;
+    const simBtn = document.createElement("button");
+    simBtn.className = "subBtn";
+    simBtn.id = "tenKSimBtn";
+    simBtn.type = "button";
+    simBtn.textContent = "1万回転試算";
+    row.appendChild(simBtn);
+    const help = document.createElement("div");
+    help.className = "help";
+    help.style.margin = "-2px 0 10px";
+    help.textContent = `朝一リセット：設定はそのまま、COMPLETE解除、初回BIG/REGまで天井${MORNING_CEILING_GAMES}G。`;
+    anchor.insertAdjacentElement("afterend", help);
+    anchor.insertAdjacentElement("afterend", row);
+  }
+
+  function runTenKSimulation(){
+    if(debugOneClickSimActive) return;
+    if(isSpinning){
+      showMessage("1万回転試算待機", "現在の回転停止後に実行してください。");
+      return;
+    }
+
+    readSettings();
+    resetRuntimeForMorning("1万回転試算リセット");
+    debugOneClickSimActive = true;
+    debugFastSpinActive = true;
+    debugFastSpinCount = 0;
+    updateDebugFastUi();
+
+    const targetSpins = DEBUG_ONE_CLICK_SIM_SPINS;
+    let spun = 0;
+    let safety = 0;
+    const safetyLimit = targetSpins * 12;
+
+    try{
+      while(spun < targetSpins && safety < safetyLimit && !completeTrialState.locked){
+        safety++;
+        if(runDebugFastStep()){
+          spun++;
+          debugFastSpinCount = spun;
+        }
+      }
+    }catch(e){
+      showMessage("1万回転試算エラー", e && e.message ? e.message : String(e));
+      log(`[SIM10000] ERROR ${e && e.message ? e.message : e}`);
+    }finally{
+      debugOneClickSimActive = false;
+      debugFastSpinActive = false;
+      updateDebugFastUi();
+      updateDisplay();
+      persistState();
+    }
+
+    const profit = currentProfit();
+    const rtpText = stats.totalFee > 0 ? `${(currentRtp() * 100).toFixed(2)}%` : "-";
+    if(completeTrialState.locked){
+      showMessage("1万回転試算 COMPLETE", `${debugFastSpinCount}Gで打ち止め / 損益${formatSigned(profit)}pt / 機械割${rtpText}`);
+      $("resultText").textContent = `COMPLETE / ${debugFastSpinCount}G / ${formatSigned(profit)}pt`;
+      log(`[SIM10000] COMPLETE / ${debugFastSpinCount}G / 損益${formatSigned(profit)}pt / 機械割${rtpText}`);
+    }else{
+      showMessage("1万回転試算完了", `${debugFastSpinCount}G / 損益${formatSigned(profit)}pt / 機械割${rtpText}`);
+      $("resultText").textContent = `試算完了 / ${debugFastSpinCount}G / ${formatSigned(profit)}pt`;
+      log(`[SIM10000] 完了 / ${debugFastSpinCount}G / 損益${formatSigned(profit)}pt / 機械割${rtpText}`);
+    }
   }
 
   function cellHtml(symbol, label, cls){
@@ -7172,6 +7455,10 @@ body{
     return Math.floor(Math.random() * 3);
   }
 
+  function resultLineRow(result){
+    return result === "BAR3" ? 1 : randomLineRow();
+  }
+
   function randomSymbol(options={}){
     const {excludeCherry=false, reelIndex=null} = options;
     const basePool = reelIndex !== null && REEL_STRIPS[reelIndex] ? REEL_STRIPS[reelIndex] : symbols;
@@ -7239,7 +7526,7 @@ body{
     // 優先順位は内部判定と同じく、7揃い > 77BAR > BAR揃いを最上位に固定。
     if(rows.some(row => row[0] === "7" && row[1] === "7" && row[2] === "7")) return "BIG";
     if(rows.some(row => row[0] === "7" && row[1] === "7" && row[2] === "BAR")) return "MID";
-    if(rows.some(row => row[0] === "BAR" && row[1] === "BAR" && row[2] === "BAR")) return "BAR3";
+    if(rows[1] && rows[1][0] === "BAR" && rows[1][1] === "BAR" && rows[1][2] === "BAR") return "BAR3";
     if(rows.some(row => row[0] === USER_FACE && row[1] === USER_FACE && row[2] === USER_FACE)) return "SMALL";
     if(rows.some(row => row[0] === "🔔" && row[1] === "🔔" && row[2] === "🔔")) return "BELL";
     if(rows.some(row => row[0] === "REPLAY" && row[1] === "REPLAY" && row[2] === "REPLAY")) return "REPLAY";
@@ -7290,6 +7577,7 @@ body{
   }
 
   function buildGrid(result, winRow=1){
+    if(result === "BAR3") winRow = 1;
     if(result === "MISS"){
       let picked = MISS_GRID_PATTERNS[randomInt(0, MISS_GRID_PATTERNS.length - 1)].map(row => row.slice());
 
@@ -7352,6 +7640,18 @@ body{
     });
   }
 
+  function setMorningBarReels(){
+    if(!reels || reels.length < 3) return;
+    const grid = [
+      ["7", USER_FACE, "REPLAY"],
+      ["BAR", "BAR", "BAR"],
+      [RESULT.BELL.reel[0], RESULT.SUICA.reel[0], RESULT.CHERRY_TRIPLE.reel[0]]
+    ];
+    for(let i=0;i<3;i++){
+      setReelColumn(i, [grid[0][i], grid[1][i], grid[2][i]], "", "", null);
+    }
+  }
+
   function escapeHtml(str){
     return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
@@ -7359,6 +7659,7 @@ body{
   async function spin(){
     if(debugFastSpinActive) return;
     if(speedToBonusActive && !speedModeSpinRequest) return;
+    if(!canPlayCompleteTrial()) return;
     // 回転中にメインボタンを押したら、残りリールを停止する
     if(isSpinning){
       stopAllReels();
@@ -7380,6 +7681,9 @@ body{
     clearReelVideos();
 
     const normalActiveAtSpinStart = !session.active;
+    if(normalActiveAtSpinStart && normalState.bonusPending){
+      setSpeedFrameOffHold(false);
+    }
     if(normalActiveAtSpinStart && session.phase === "ended" && session.resultPayout !== null && session.resultPayout !== undefined){
       const ok = confirm("ATバトルが終了しました。\n通常へ戻って新しい遊技を開始しますか？");
       if(!ok) return;
@@ -7452,7 +7756,7 @@ body{
     stopGekiatsuEffect(true);
     const result = normalActiveAtSpinStart ? drawNormalResult() : drawResult();
     const spec = RESULT[result];
-    const lineRow = randomLineRow();
+    const lineRow = resultLineRow(result);
     const resolved = normalActiveAtSpinStart ? resolveNormalOutcome(result) : resolveOutcome(result);
     const grid = buildGrid(result, lineRow);
     const bonusEffectSpin = !normalActiveAtSpinStart;
@@ -7668,6 +7972,7 @@ body{
       setTimeout(()=>clearReelVideos(), 900);
       if(resolved.bar3PremiumReady){
         stopSpeedToBonus("ボーナス確定のためSPEED停止");
+        setSpeedFrameOffHold(true);
         queueBonusSessionStart(180, {
           continuationRateMin:BAR3_CONTINUATION_RATE,
           stockSets:stockSetsForResult("BAR3"),
@@ -7675,6 +7980,7 @@ body{
         });
       }else if(resolved.bonusReady){
         stopSpeedToBonus("ボーナス確定のためSPEED停止");
+        setSpeedFrameOffHold(true);
         queueBonusSessionStart(180);
       }else{
         scheduleNextSpeedToBonus();
@@ -7721,10 +8027,11 @@ body{
 
   function direct(result){
     if(isSpinning) return;
+    if(!canPlayCompleteTrial()) return;
     readSettings();
     const normalDirect = !session.active;
     const spec = RESULT[result];
-    const lineRow = randomLineRow();
+    const lineRow = resultLineRow(result);
     const resolved = normalDirect ? resolveNormalOutcome(result) : resolveOutcome(result);
     const grid = buildGrid(result, lineRow);
     if(forcePremiumEffect){
@@ -7785,6 +8092,10 @@ body{
 
     startBtn.disabled = autoPlay;
     stopBtn.disabled = !autoPlay;
+    if(COMPLETE_TRIAL_ENABLED && completeTrialState.locked){
+      startBtn.disabled = true;
+      stopBtn.disabled = !autoPlay;
+    }
 
     if(autoPlay){
       status.textContent = `オート中：ATを自動消化`;
@@ -7803,6 +8114,7 @@ body{
 
   function startAutoPlay(){
     if(autoPlay) return;
+    if(!canPlayCompleteTrial()) return;
     stopSpeedToBonus("AUTO開始のためSPEED停止");
     readSettings();
     autoPlay = true;
@@ -7824,6 +8136,7 @@ body{
 
   function runAutoStep(){
     if(!autoPlay) return;
+    if(!canPlayCompleteTrial()) return;
     if(isRogiThirdStopHoldActive()){
       autoTimer = setTimeout(runAutoStep, 150);
       return;
@@ -7851,6 +8164,7 @@ body{
 
   function scheduleNextAuto(){
     if(!autoPlay) return;
+    if(!canPlayCompleteTrial()) return;
     if(isRogiThirdStopHoldActive()){
       autoTimer = setTimeout(runAutoStep, 150);
       return;
@@ -7861,6 +8175,7 @@ body{
   }
 
   function speedToBonusUnavailableReason(){
+    if(COMPLETE_TRIAL_ENABLED && completeTrialState.locked) return "COMPLETE到達のため設定変更まで遊戯不可";
     if(session.active) return "ボーナス中はSPEEDを使用できません";
     if(normalState.bonusPending) return "ボーナス確定中のためSPEED停止";
     if(pendingAtStartTimer) return "AT開始待機中のためSPEEDを使用できません";
@@ -7940,6 +8255,7 @@ body{
     readSettings();
     speedToBonusCount = 0;
     speedToBonusActive = true;
+    setSpeedFrameOffHold(true);
     updateSpeedToBonusUi();
     playNormalBgm();
     showMessage("SPEED MODE", `通常時のみ / AUTOの${SPEED_MODE_MULTIPLIER}倍速 / 上限${SPEED_MODE_MAX_SPINS_PER_SECOND}G/s / BGMあり・演出なし`);
@@ -7955,6 +8271,9 @@ body{
       speedToBonusTimer = null;
     }
     speedModeSpinRequest = false;
+    const keepSpeedFrameOff = speedFrameOffHold && !session.active && (normalState.bonusPending || pendingAtStartTimer || speedBonusRogiHoldActive);
+    if(keepSpeedFrameOff) updateReelFrameMode();
+    else setSpeedFrameOffHold(false);
     updateSpeedToBonusUi();
     updateDisplay();
     if(!session.active && !barBgmActive && !battleBgmActive) playNormalBgm();
@@ -7997,10 +8316,17 @@ body{
     const startBtn = $("debugFastStartBtn");
     const stopBtn = $("debugFastStopBtn");
     const status = $("debugFastStatus");
+    const simBtn = $("tenKSimBtn");
     if(!startBtn || !stopBtn || !status) return;
+
+    startBtn.textContent = `高速回転 ${DEBUG_FAST_SPINS_PER_SECOND}G/s`;
 
     startBtn.disabled = debugFastSpinActive;
     stopBtn.disabled = !debugFastSpinActive;
+    if(simBtn) simBtn.disabled = debugFastSpinActive || debugOneClickSimActive || isSpinning;
+    if(COMPLETE_TRIAL_ENABLED && completeTrialState.locked){
+      startBtn.disabled = true;
+    }
 
     if(debugFastSpinActive){
       status.textContent = `高速回転中 ${DEBUG_FAST_SPINS_PER_SECOND}G/s / 今回${debugFastSpinCount}G`;
@@ -8013,6 +8339,7 @@ body{
 
   function startDebugFastSpin(){
     if(debugFastSpinActive) return;
+    if(!canPlayCompleteTrial()) return;
     if(isSpinning){
       showMessage("高速回転待機", "現在の回転停止後に開始してください");
       log("[FAST] 回転中のため高速回転を開始できません");
@@ -8064,6 +8391,7 @@ body{
   }
 
   function runDebugFastStep(){
+    if(!canPlayCompleteTrial()) return false;
     if(isSpinning) return false;
     if(sessionStartGuard) return false;
     if(pendingAtStartTimer){
@@ -8111,7 +8439,7 @@ body{
     chargeSpinCost();
 
     const result = normalActiveAtSpinStart ? drawNormalResult() : drawResult();
-    const lineRow = randomLineRow();
+    const lineRow = resultLineRow(result);
     const resolved = normalActiveAtSpinStart ? resolveNormalOutcome(result) : resolveOutcome(result);
 
     if(normalActiveAtSpinStart){
@@ -8441,7 +8769,18 @@ body{
     document.addEventListener("click", ()=>setSpeedModeMenuOpen(false));
 
     onClick("saveBtn", save);
+    ensureMorningResetControl();
+    onClick("morningResetBtn", ()=>morningResetGame(true));
+    onClick("tenKSimBtn", runTenKSimulation);
     onClick("resetBtn", resetGame);
+    if($("settingSelect")){
+      $("settingSelect").addEventListener("change", ()=>{
+        readSettings();
+        persistState();
+        updateDisplay();
+        setMorningBarReels();
+      });
+    }
     onClick("spinBtn", spin);
     const betHitArea = document.querySelector(".betArea");
     if(betHitArea){
