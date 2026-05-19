@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>白い悪魔 疾風</title>
+<title>白い悪魔</title>
 <link rel="preload" as="image" href="assets/symbols/sym_hourglass.png">
 <link rel="preload" as="image" href="assets/symbols/sym_cherry.png">
 <link rel="preload" as="image" href="assets/symbols/sym_bell.png">
@@ -169,7 +169,6 @@ h1{
 .audioToggleBtn:focus-visible,
 .audioDock.slumpOpen #slumpToggleBtn,
 .audioDock.oddsOpen #oddsToggleBtn,
-.audioDock.dataOpen #dataToggleBtn,
 .utilityToggleBtn:focus-visible{
   outline:2px solid rgba(77,231,255,.72);
   outline-offset:2px;
@@ -251,17 +250,8 @@ h1{
 }
 .audioDock.open .audioPanel,
 .audioDock.slumpOpen #slumpPanel,
-.audioDock.oddsOpen #oddsPanel,
-.audioDock.dataOpen #dataCounterPanel{
+.audioDock.oddsOpen #oddsPanel{
   display:block;
-}
-#dataCounterPanel{
-  width:min(330px, calc(100vw - 32px));
-}
-#dataCounterPanel .wd-data-counter-panel{
-  display:block !important;
-  width:min(280px, 100%) !important;
-  margin:0 auto !important;
 }
 .audioPanelHead,
 .infoPanelHead{
@@ -3224,25 +3214,44 @@ body{
 :root{
   --wd-page-zoom:1;
   --wd-stage-width:1360px;
-  --wd-hero-fixed-height:292px;
-  --wd-cabinet-anchor-offset:-22px;
+  --wd-hero-fixed-height:533px;
+  --wd-reel-top-anchor-y:var(--wd-hero-fixed-height);
+  --wd-stage-focus-x:686px;
+  --wd-left-rail-width:256px;
+  --wd-right-rail-width:244px;
+  --wd-cabinet-anchor-offset:0px;
 }
 html,
 body{
   overflow-x:auto !important;
+  overflow-anchor:none !important;
+}
+html{
+  min-height:100% !important;
+  background:#020307 url("assets/backgrounds/bg_fire_ice.png") center top/cover fixed no-repeat !important;
 }
 body{
   min-width:calc(var(--wd-stage-width) * var(--wd-page-zoom)) !important;
+  background-color:transparent !important;
+  background-image:none !important;
+  background-size:cover !important;
+  background-position:center top !important;
+  background-attachment:fixed !important;
 }
 .wrap{
   width:var(--wd-stage-width) !important;
   min-width:var(--wd-stage-width) !important;
   max-width:none !important;
-  zoom:var(--wd-page-zoom);
+  margin:0 !important;
+  zoom:1 !important;
+  transform:scale(var(--wd-page-zoom));
+  transform-origin:var(--wd-stage-focus-x) var(--wd-reel-top-anchor-y);
+  will-change:transform;
 }
 .main{
-  grid-template-columns:230px minmax(760px, 1fr) 270px !important;
+  grid-template-columns:var(--wd-left-rail-width) minmax(760px, 1fr) var(--wd-right-rail-width) !important;
   grid-template-areas:"left machine right" "bottom bottom bottom" !important;
+  margin-top:var(--wd-cabinet-anchor-offset) !important;
 }
 .wd-hero{
   height:var(--wd-hero-fixed-height) !important;
@@ -3261,6 +3270,19 @@ body{
 .reelArea .wd-reel-data-panel{
   position:absolute !important;
   left:-4.7% !important;
+  top:27.8% !important;
+  width:16.55% !important;
+  height:50.8% !important;
+  margin:0 !important;
+  padding:0 !important;
+  aspect-ratio:auto !important;
+  z-index:9 !important;
+  pointer-events:none !important;
+  transform:none !important;
+}
+.reelArea .wd-reel-counter-panel{
+  position:absolute !important;
+  right:-4.7% !important;
   top:27.8% !important;
   width:16.55% !important;
   height:50.8% !important;
@@ -3295,10 +3317,51 @@ body{
 .reelArea .wd-reel-data-panel #wdRegOdds{
   font-size:clamp(10px, .98vw, 16px) !important;
 }
+.reelArea .wd-reel-counter-panel .wd-counter-rows{
+  left:31.4% !important;
+  right:13.2% !important;
+  top:18.9% !important;
+  bottom:9% !important;
+}
+.reelArea .wd-reel-counter-panel .wd-counter-rows div{
+  gap:3px !important;
+  padding-right:4px !important;
+}
+.reelArea .wd-reel-counter-panel .wd-counter-rows span{
+  font-size:clamp(6px, .54vw, 8px) !important;
+}
+.reelArea .wd-reel-counter-panel .wd-counter-rows b{
+  font-size:clamp(8px, .72vw, 11px) !important;
+}
+.reelArea .sessionResultLayer{
+  left:12.7% !important;
+  right:12.7% !important;
+  top:27.8% !important;
+  bottom:21.4% !important;
+  inset:27.8% 12.7% 21.4% 12.7% !important;
+  border-radius:7px !important;
+  z-index:97 !important;
+}
+.reelArea .sessionResultContent{
+  width:86% !important;
+  max-width:none !important;
+}
+.reelArea .sessionResultTitle{
+  font-size:clamp(18px, 2.6vw, 34px) !important;
+  margin-bottom:clamp(8px, 1.2vw, 16px) !important;
+}
+.reelArea .sessionResultStats{
+  gap:clamp(6px, .8vw, 12px) !important;
+}
+.reelArea .sessionResultLine{
+  gap:10px !important;
+  padding:0 clamp(4px, 1vw, 10px) !important;
+  font-size:clamp(13px, 2vw, 25px) !important;
+}
 @supports not (zoom:1){
   .wrap{
     transform:scale(var(--wd-page-zoom));
-    transform-origin:top center;
+    transform-origin:var(--wd-stage-focus-x) var(--wd-reel-top-anchor-y);
   }
 }
 
@@ -3317,9 +3380,6 @@ body{
     <div class="wd-hero-center">
       <img class="wd-logo" src="assets/logo/white_devil_logo.png" alt="白い悪魔">
       <div class="wd-subtitle">WHITE DEVIL <b>SLOT</b></div>
-    </div>
-    <div class="wd-hero-side">
-      <img src="assets/hero/kv_badge_devil_awakening_slot.png" alt="悪魔討伐型 本格スロット">
     </div>
   </section>
 
@@ -3340,9 +3400,6 @@ body{
         <button class="utilityToggleBtn" id="oddsToggleBtn" type="button" aria-label="確率表を開く" aria-expanded="false" title="確率表">
           <img src="assets/ui/icon_odds_percent_blue.png" alt="">
         </button>
-        <button class="utilityToggleBtn" id="dataToggleBtn" type="button" aria-label="データカウンターを開く" aria-expanded="false" title="データカウンター">
-          <span class="utilityGlyph">▦</span>
-        </button>
         <button class="audioToggleBtn" id="audioToggleBtn" type="button" aria-label="音量を開く" aria-expanded="false" title="音量">
           <img src="assets/ui/icon_sound_red.png" alt="">
         </button>
@@ -3360,26 +3417,13 @@ body{
         </div>
         <div class="infoPanel" id="oddsPanel">
           <div class="infoPanelHead">
-            <div class="infoPanelTitle">確率・設定情報</div>
+            <div class="infoPanelTitle">確率表</div>
             <button class="infoCloseBtn" id="oddsCloseBtn" type="button" aria-label="確率表を閉じる" title="閉じる">×</button>
-          </div>
-          <div class="settingInfo">
-            設定 <b id="settingView">1</b><br>
-            機械割 <b id="targetRtpView">80%</b><br>
-            AT <b id="stInfoView">10回転</b><br>
-            払出 <b id="payoutScaleView">固定</b>
           </div>
           <div id="oddsPanelBody">
             <h2>設定別確率（分数表記）</h2>
             <table class="oddsTable" id="settingTable"></table>
           </div>
-        </div>
-        <div class="infoPanel" id="dataCounterPanel">
-          <div class="infoPanelHead">
-            <div class="infoPanelTitle">データカウンター</div>
-            <button class="infoCloseBtn" id="dataCloseBtn" type="button" aria-label="データカウンターを閉じる" title="閉じる">×</button>
-          </div>
-          <div id="dataCounterPanelBody"></div>
         </div>
         <div class="audioPanel" id="audioPanel">
           <div class="audioPanelHead">
@@ -3465,6 +3509,18 @@ body{
             <b id="wdRegOdds">-</b>
           </div>
         </div>
+        <div class="wd-data-counter-panel wd-reel-counter-panel" id="reelDataCounter">
+          <div class="wd-counter-rows">
+            <div><span>AT</span><b id="wdCounterSt">--G</b></div>
+            <div><span>BIG</span><b id="wdCounterBig">0</b></div>
+            <div><span>REG</span><b id="wdCounterReg">0</b></div>
+            <div><span>砂時計</span><b id="wdCounterSmall">0</b></div>
+            <div><span>ベル</span><b id="wdCounterBell">0</b></div>
+            <div><span>スイカ</span><b id="wdCounterSuika">0</b></div>
+            <div><span>チェリー</span><b id="wdCounterCherry">0</b></div>
+            <div><span>リプレイ</span><b id="wdCounterReplay">0</b></div>
+          </div>
+        </div>
         <div class="payline"></div>
         <div class="reels">
           <div class="reel" data-reel="0"><div class="window">
@@ -3512,7 +3568,7 @@ body{
             <div class="speedModeMenu" id="speedModeMenu" hidden>
               <div class="speedModeHeader"><b>SPEED MODE</b><span id="speedModeState">OFF</span></div>
               <button class="speedModeToggle" id="speedModeToggleBtn" type="button">ON</button>
-              <div class="speedModeText">通常時のみAUTOの3倍速（上限10回転/s）で遊技します。音なし。</div>
+              <div class="speedModeText">通常時のみAUTOの3倍速（上限10回転/s）で遊技します。BGMあり、確定時のみ動画音声あり。</div>
               <div class="speedModeCount" id="speedModeCount">今回0G</div>
             </div>
           </div>
@@ -3568,7 +3624,7 @@ body{
         <h2>基本設定</h2>
         <div class="field">
           <label>台名</label>
-          <input id="titleInput" value="白い悪魔 疾風" />
+          <input id="titleInput" value="白い悪魔" />
         </div>
         <div class="field">
           <label>設定</label>
@@ -3592,6 +3648,15 @@ body{
         <div class="field">
           <label>確率倍率（テスト用・本番は1推奨）</label>
           <input id="oddsMultiplierInput" type="number" min="0.1" max="100" step="0.1" value="1" />
+        </div>
+        <div class="field adminPrivateSettingInfo">
+          <label>管理用：適用設定情報</label>
+          <div class="settingInfo">
+            設定 <b id="adminSettingView">1</b><br>
+            表記割 <b id="adminTargetRtpView">80%</b><br>
+            状態 <b id="adminStInfoView">10G/SET</b><br>
+            内部確率 <b id="adminPayoutScaleView">固定</b>
+          </div>
         </div>
         <div class="field">
           <label>オートAT間隔（秒）</label>
@@ -3619,8 +3684,8 @@ body{
       <div class="card">
         <h2>報酬</h2>
         <div class="field">
-          <label>砂時計倍率（払い出しなし）</label>
-          <input id="smallMulInput" type="number" min="0" max="100" step="0.01" value="0" readonly />
+          <label>砂時計倍率（15pt固定）</label>
+          <input id="smallMulInput" type="number" min="0" max="100" step="0.01" value="0.15" readonly />
         </div>
         <div class="field">
           <label>チェリー倍率（0.05倍固定）</label>
@@ -3640,10 +3705,10 @@ body{
         </div>
         <div class="field">
           <label>BIG倍率（7揃い）</label>
-          <input id="bigMulInput" type="number" min="0" max="100" step="0.01" value="2.0" readonly />
+          <input id="bigMulInput" type="number" min="0" max="100" step="0.01" value="0.15" readonly />
         </div>
         <div class="help">
-          AT・ボーナス中も1Gごとに3ptを消費します。払い出しはベル15pt、チェリー全種5pt、スイカ3pt、リプレイ3pt、7揃い・REG・BAR揃い・砂時計15pt固定です。通常・高確中の777確定後は7揃い停止後すぐATへ突入し、REG確定後はREG揃いで50pt払い出しと天井リセットを行います。
+          AT・ボーナス中も1Gごとに3ptを消費します。払い出しはベル15pt、チェリー全種5pt、スイカ3pt、リプレイ3pt、7揃い・REGは15pt固定、砂時計は15pt固定、BAR揃いは出玉なしです。通常・高確中の777確定後は7揃い停止後すぐATへ突入し、REG確定後はREG揃いで50pt払い出しと天井リセットを行います。
         </div>
       </div>
 
@@ -3651,30 +3716,30 @@ body{
         <h2>報酬・AT加算ルール</h2>
         <div class="field">
           <label>砂時計画像揃い</label>
-          <input type="text" value="払い出しなし + AT+10G" readonly />
+          <input type="text" value="15pt + AT+10G" readonly />
         </div>
         <div class="field">
           <label>REG 77BAR</label>
-          <input type="text" value="出玉0.5倍 + AT+5G" readonly />
+          <input type="text" value="通常50pt / AT中15pt + SET+1" readonly />
         </div>
         <div class="field">
           <label>BAR揃い</label>
-          <input type="text" value="払い出しなし + AT+50G" readonly />
+          <input type="text" value="出玉なし + SET+5 / 継続80%" readonly />
         </div>
         <div class="field">
-          <label>BIG 7揃い AT追加回転数（倍率ではありません）</label>
+          <label>BIG 7揃い デビルゾーンG数</label>
           <input id="bigAddInput" type="number" min="0" max="1000" step="1" value="5" readonly />
         </div>
         <div class="field">
           <label>チェリー・ANY・ANY 加算</label>
-          <input id="cherryAnyAddInput" type="text" value="出玉0.05倍 +0〜1G" readonly />
+          <input id="cherryAnyAddInput" type="text" value="出玉0.05倍 / デビルゾーン中はAT+1G" readonly />
         </div>
         <div class="field">
           <label>チェリー・チェリー・チェリー 加算</label>
-          <input id="cherryTripleAddInput" type="text" value="出玉0.05倍 +1〜3G" readonly />
+          <input id="cherryTripleAddInput" type="text" value="出玉0.05倍 / 通常AT中SET50%" readonly />
         </div>
         <div class="help">
-          AT中BIGは5Gのデビルゾーン、AT中REGは+1SET固定、通常REGは50pt払い出しと天井リセットです。砂時計はAT+10G表示、BAR揃いは+5SETと継続率80%昇格。通常・高確中はベル8pt、スイカ3pt、チェリー各種3pt、リプレイ3pt、AT中はベル15ptと2連チェリー・3連チェリー・スイカのSETストック抽選、デビルゾーン中は子役でSETストックとATゲーム数加算、別枠でデビルゾーン延長抽選を行います。
+          AT中BIGは5Gのデビルゾーン、AT中REGは+1SET固定、通常REGは50pt払い出しと天井リセットです。砂時計はAT+10Gと15pt払い出し、BAR揃いは出玉なしで+5SETと継続率80%昇格。通常・高確中はベル8pt、スイカ3pt、チェリー各種3pt、リプレイ3pt、AT中はベル15ptと2連チェリー・3連チェリー・スイカのSETストック抽選、デビルゾーン中は子役でSETストックとATゲーム数加算、別枠でデビルゾーン延長抽選を行います。
         </div>
       </div>
 
@@ -3685,10 +3750,10 @@ body{
           <select id="forceResult">
             <option value="">ランダム</option>
             <option value="MISS">ハズレ</option>
-          <option value="SMALL">砂時計（画像/AT+10）</option>
-          <option value="MID">REG（77BAR/AT+5）</option>
-            <option value="BAR3">BAR揃い（AT+50）</option>
-            <option value="BIG">BIG（7/2倍/AT+5）</option>
+          <option value="SMALL">砂時計（画像/AT+10/15pt）</option>
+          <option value="MID">REG（77BAR/15pt/SET+1）</option>
+            <option value="BAR3">BAR揃い（SET+5/出玉なし）</option>
+            <option value="BIG">BIG（777/15pt/デビルゾーン5G）</option>
             <option value="BELL">ベル揃い</option>
             <option value="REPLAY">リプレイ（AT中+3pt）</option>
             <option value="SUICA">スイカ揃い</option>
@@ -3742,19 +3807,6 @@ body{
         </div>
       </div>
 
-      <div class="card oddsPublic wd-data-counter-panel">
-        <div class="wd-counter-rows">
-          <div><span>AT</span><b id="wdCounterSt">--G</b></div>
-          <div><span>BIG</span><b id="wdCounterBig">0</b></div>
-          <div><span>REG</span><b id="wdCounterReg">0</b></div>
-          <div><span>砂時計</span><b id="wdCounterSmall">0</b></div>
-          <div><span>ベル</span><b id="wdCounterBell">0</b></div>
-          <div><span>スイカ</span><b id="wdCounterSuika">0</b></div>
-          <div><span>チェリー</span><b id="wdCounterCherry">0</b></div>
-          <div><span>リプレイ</span><b id="wdCounterReplay">0</b></div>
-        </div>
-      </div>
-
       <div class="wd-bottom-area">
         <div class="wd-bottom-left">
           <div class="wd-menu-stack">
@@ -3787,28 +3839,6 @@ body{
             </div>
           </div>
         </div>
-
-        <div class="wd-bonus-info">
-          <div class="wd-section-title">BONUS INFO</div>
-          <div class="wd-bonus-cards">
-            <div class="wd-bonus-card wd-big">
-              <h3>BIG BONUS</h3>
-              <div class="wd-symbols">777</div>
-              <p>白き悪魔、覚醒。<br>約240枚獲得</p>
-            </div>
-            <div class="wd-bonus-card wd-reg">
-              <h3>REG BONUS</h3>
-              <div class="wd-symbols blue">77BAR</div>
-              <p>闇に潜む契約成立。<br>約96枚獲得</p>
-            </div>
-            <div class="wd-bonus-card wd-rush">
-              <h3>DEVIL RUSH</h3>
-              <div class="wd-devil-mark">DEVIL</div>
-              <p>赤と青の閃光が続く限り、<br>終わらない。</p>
-            </div>
-          </div>
-        </div>
-
         <div class="wd-history-panel">
           <div class="wd-history-title">BONUS HISTORY</div>
           <table class="wd-history-table">
@@ -3896,8 +3926,8 @@ body{
   const SETTING_PROFILE = {
     // 王冠役は廃止。BAR揃いは通常テーブルから外し、全設定共通1/8192の独立プレミアへ変更。
     // BAR3で使っていた重みは、砂時計・REG・BIG・ベル・スイカへ再配分。
-    // 砂時計=AT+10G / REG=0.5倍+1SET固定 / BIG=デビルゾーン5G
-    // ベルは0.30倍固定。ベルは奇数設定寄り、スイカは偶数設定寄り。
+    // 砂時計=15pt+AT+10G / REG=15pt+1SET固定 / BIG=デビルゾーン5G
+    // ベルは0.15倍固定。ベルは奇数設定寄り、スイカは偶数設定寄り。
     // 奇数設定はBIG多めで荒波、偶数設定はREG多め、設定6はREG/BIG均等。
     1:{weights:[{result:"SMALL",w:34},{result:"MID",w:7},{result:"BIG",w:12},{result:"BELL",w:56},{result:"SUICA",w:33},{result:"CHERRY_ANY",w:34},{result:"CHERRY_TRIPLE",w:14}]},
     2:{weights:[{result:"SMALL",w:33},{result:"MID",w:15},{result:"BIG",w:8},{result:"BELL",w:35},{result:"SUICA",w:58},{result:"CHERRY_ANY",w:33},{result:"CHERRY_TRIPLE",w:14}]},
@@ -3940,18 +3970,18 @@ body{
   }
 
   let settings = {
-    title:"白い悪魔 轟雷",
+    title:"白い悪魔",
     setting:1,
     fee:100,
     stSpins:10,
     oddsMultiplier:1,
-    smallMul:0.0,
-    midMul:0.5,
+    smallMul:0.15,
+    midMul:0.15,
     crownMul:0.0,
-    cherryMul:0.0,
-    bellMul:0.30,
-    suikaMul:0.0,
-    bigMul:0.0,
+    cherryMul:0.05,
+    bellMul:0.15,
+    suikaMul:0.03,
+    bigMul:0.15,
     bigAdd:5,
     bellAdd:0,
     
@@ -4021,7 +4051,7 @@ body{
   const ROLE_PAYOUTS = Object.freeze({
     SMALL:15,
     MID:15,
-    BAR3:15,
+    BAR3:0,
     BIG:15,
     BELL:15,
     REPLAY:3,
@@ -4033,7 +4063,7 @@ body{
   const NORMAL_ROLE_PAYOUTS = Object.freeze({
     BIG:0,
     MID:50,
-    BAR3:15,
+    BAR3:0,
     BELL:8,
     REPLAY:3,
     SUICA:3,
@@ -4211,17 +4241,19 @@ body{
   const audioDock = $("audioDock");
   const slumpToggleBtn = $("slumpToggleBtn");
   const oddsToggleBtn = $("oddsToggleBtn");
-  const dataToggleBtn = $("dataToggleBtn");
   const audioToggleBtn = $("audioToggleBtn");
   const audioCloseBtn = $("audioCloseBtn");
   const slumpCloseBtn = $("slumpCloseBtn");
   const oddsCloseBtn = $("oddsCloseBtn");
-  const dataCloseBtn = $("dataCloseBtn");
   const pageZoomOutBtn = $("pageZoomOutBtn");
   const pageZoomResetBtn = $("pageZoomResetBtn");
   const pageZoomInBtn = $("pageZoomInBtn");
   const pageZoomView = $("pageZoomView");
   const effectSkipBtn = $("effectSkipBtn");
+
+  if(audioDock && audioDock.parentElement !== document.body){
+    document.body.appendChild(audioDock);
+  }
 
   const reelArea = document.querySelector(".reelArea");
   if(sessionResultLayer && reelArea && sessionResultLayer.parentElement !== reelArea){
@@ -4238,6 +4270,7 @@ body{
   let bellReadyVideoKeepAliveTimer = null;
   let gekiatsuActive = false;
   let gekiatsuHideTimer = null;
+  let speedBonusRogiHoldActive = false;
   let battleIntroHideTimer = null;
   const adminParams = new URLSearchParams(location.search);
 
@@ -4265,9 +4298,31 @@ body{
   const PAGE_ZOOM_STORAGE_KEY = "white_devil_page_zoom";
   const PAGE_STAGE_WIDTH = 1360;
   const PAGE_ZOOM_MIN = 0.75;
-  const PAGE_ZOOM_MAX = 1.35;
+  const PAGE_ZOOM_MAX = 3.00;
   const PAGE_ZOOM_STEP = 0.05;
   let pageZoom = 1;
+
+  function pageZoomFocusX(){
+    const raw = getComputedStyle(document.documentElement).getPropertyValue("--wd-stage-focus-x");
+    const value = parseFloat(raw);
+    return Number.isFinite(value) ? value : PAGE_STAGE_WIDTH / 2;
+  }
+
+  function focusScreenXBeforeZoom(){
+    return pageZoomFocusX() - (window.scrollX || document.documentElement.scrollLeft || 0);
+  }
+
+  function keepZoomFocusOnDevilE(previousFocusScreenX=null){
+    const focusX = pageZoomFocusX();
+    const viewW = window.innerWidth || document.documentElement.clientWidth || PAGE_STAGE_WIDTH;
+    let targetScreenX = Number(previousFocusScreenX);
+    if(!Number.isFinite(targetScreenX) || targetScreenX < 0 || targetScreenX > viewW){
+      targetScreenX = viewW / 2;
+    }
+    const maxScroll = Math.max(0, document.documentElement.scrollWidth - viewW);
+    const targetLeft = clamp(Math.round(focusX - targetScreenX), 0, maxScroll);
+    window.scrollTo({ left:targetLeft, top:window.scrollY || document.documentElement.scrollTop || 0, behavior:"auto" });
+  }
 
   function applyPageZoom(saveValue=false){
     pageZoom = clamp(Math.round(pageZoom * 100) / 100, PAGE_ZOOM_MIN, PAGE_ZOOM_MAX);
@@ -4286,8 +4341,12 @@ body{
   }
 
   function changePageZoom(delta){
+    const focusScreenX = focusScreenXBeforeZoom();
     pageZoom = clamp(pageZoom + delta, PAGE_ZOOM_MIN, PAGE_ZOOM_MAX);
     applyPageZoom(true);
+    requestAnimationFrame(()=>keepZoomFocusOnDevilE(focusScreenX));
+    setTimeout(()=>keepZoomFocusOnDevilE(focusScreenX), 80);
+    setTimeout(()=>keepZoomFocusOnDevilE(focusScreenX), 180);
   }
 
   function hasRainbowHold(){
@@ -4326,6 +4385,7 @@ body{
       spin &&
       isRogiHighZoneSpin(spin) &&
       !spin.effectsSkipped &&
+      isAtFirstHitForAuto(spin.resolved) &&
       spin.rogiStopEffectStarted &&
       Number(spin.rogiLastStopEffectOrder) === 3
     );
@@ -4334,7 +4394,6 @@ body{
   function startRogiThirdStopHold(){
     if(rogiThirdStopHold) return;
     rogiThirdStopHold = true;
-    if(autoPlay) stopAutoPlay("CZ第三停止演出保持のためオート停止");
   }
 
   function clearRogiThirdStopHold(){
@@ -4368,10 +4427,9 @@ body{
 
   function closeInfoPanels(){
     if(!audioDock) return;
-    audioDock.classList.remove("slumpOpen","oddsOpen","dataOpen");
+    audioDock.classList.remove("slumpOpen","oddsOpen");
     if(slumpToggleBtn) slumpToggleBtn.setAttribute("aria-expanded", "false");
     if(oddsToggleBtn) oddsToggleBtn.setAttribute("aria-expanded", "false");
-    if(dataToggleBtn) dataToggleBtn.setAttribute("aria-expanded", "false");
   }
 
   function setInfoPanelOpen(type, open){
@@ -4380,9 +4438,8 @@ body{
     closeInfoPanels();
     if(!open) return;
     const isSlump = type === "slump";
-    const isData = type === "data";
-    audioDock.classList.add(isSlump ? "slumpOpen" : isData ? "dataOpen" : "oddsOpen");
-    const btn = isSlump ? slumpToggleBtn : isData ? dataToggleBtn : oddsToggleBtn;
+    audioDock.classList.add(isSlump ? "slumpOpen" : "oddsOpen");
+    const btn = isSlump ? slumpToggleBtn : oddsToggleBtn;
     if(btn) btn.setAttribute("aria-expanded", "true");
     if(isSlump) requestAnimationFrame(renderSlumpGraph);
   }
@@ -4404,8 +4461,13 @@ body{
     }
   }
 
+  function speedModeVisualsSuppressed(spin=currentSpin){
+    return !!(spin && spin.speedModeAtStart);
+  }
+
   function flashReelLight(type, duration=1800){
     if(debugFastSpinActive) return;
+    if(speedModeVisualsSuppressed()) return;
     if(isRogiThirdStopHoldActive()) return;
     if(!reelArea) return;
     clearReelLight(false);
@@ -4686,6 +4748,7 @@ body{
   }
 
   function playReelVideo(index, src, loop=true){
+    if(speedModeVisualsSuppressed()) return;
     const found = ensureReelVideo(index);
     if(!found) return;
     const {layer, video} = found;
@@ -4775,6 +4838,7 @@ body{
     return !!(
       spin &&
       spin.normalActiveAtStart &&
+      !spin.speedModeAtStart &&
       spin.resolved &&
       spin.resolved.highAtStart &&
       !spin.resolved.bonusPendingAtStart &&
@@ -4788,6 +4852,25 @@ body{
     if(!spin || !spin.resolved) return false;
     const resolved = spin.resolved;
     return !!(resolved.bonusHit || resolved.bonusReady || resolved.regReady || resolved.bar3PremiumReady);
+  }
+
+  function shouldPlaySpeedModeBonusRogi(result, resolved){
+    if(!resolved) return result === "BIG" || result === "MID";
+    if(result === "BIG" || result === "MID") return true;
+    if(resolved.bonusReady || resolved.regReady) return true;
+    return !!(
+      resolved.bonusHit &&
+      (resolved.bonusKind === "BIG" || resolved.bonusKind === "MID")
+    );
+  }
+
+  function isAtFirstHitForAuto(resolved){
+    if(!resolved) return false;
+    if(resolved.bar3PremiumReady || resolved.bonusReady) return true;
+    return !!(
+      resolved.bonusHit &&
+      (resolved.bonusKind || "BIG") !== "MID"
+    );
   }
 
   function clampChance(value){
@@ -5063,6 +5146,10 @@ body{
   function hitProbability(settingNo = settings.setting){
     const baseP = GORAI_HIT_RATE[settingNo] ?? GORAI_HIT_RATE[1];
     return clamp(baseP * settings.oddsMultiplier, 0, 0.98);
+  }
+
+  function baseHitProbability(settingNo = settings.setting){
+    return clamp(GORAI_HIT_RATE[settingNo] ?? GORAI_HIT_RATE[1], 0, 0.98);
   }
 
   function isHighMode(){
@@ -5599,6 +5686,7 @@ body{
         }
         settings.audioBalanceVersion = AUDIO_BALANCE_VERSION;
       }
+      settings.title = normalizeMachineTitle(settings.title);
       if(!SETTING[settings.setting]) settings.setting = 1;
       if(data?.stats) stats = {...stats, ...data.stats};
       if(data?.normalState){
@@ -5771,8 +5859,8 @@ body{
 
   function normalizeMachineTitle(value){
     const title = String(value || "").trim();
-    if(!title || title === "白い悪魔 轟雷") return "白い悪魔 疾風";
-    return title.replace(/白い悪魔\s*轟雷/g, "白い悪魔 疾風");
+    if(!title || /白い悪魔\s*(轟雷|疾風)/.test(title)) return "白い悪魔";
+    return title;
   }
 
   function readSettings(){
@@ -5796,9 +5884,13 @@ body{
     settings.audioBalanceVersion = AUDIO_BALANCE_VERSION;
 
     $("titleView").textContent = settings.title;
-    $("settingView").textContent = settings.setting;
-    $("targetRtpView").textContent = Math.round(targetRtp() * 100) + "%";
-    $("stInfoView").textContent = session.active ? setGameCount() + "G/SET" : (normalState.bonusPending ? `BONUS確定 / ${pendingBonusLabel()}待ち` : `${normalModeLabel()} / 天井まで${ceilingRemain()}G`);
+    if($("settingView")) $("settingView").textContent = settings.setting;
+    if($("targetRtpView")) $("targetRtpView").textContent = Math.round(targetRtp() * 100) + "%";
+    if($("adminSettingView")) $("adminSettingView").textContent = settings.setting;
+    if($("adminTargetRtpView")) $("adminTargetRtpView").textContent = Math.round(targetRtp() * 100) + "%";
+    const adminStInfoText = session.active ? setGameCount() + "G/SET" : (normalState.bonusPending ? `BONUS確定 / ${pendingBonusLabel()}待ち` : `${normalModeLabel()} / 天井まで${ceilingRemain()}G`);
+    if($("stInfoView")) $("stInfoView").textContent = adminStInfoText;
+    if($("adminStInfoView")) $("adminStInfoView").textContent = adminStInfoText;
 
     if(bgm){
       if(!barBgmActive && !battleBgmActive) ensureNormalBgmSource();
@@ -5916,7 +6008,7 @@ body{
       recordSlumpPoint();
       $("spinBtn").textContent = "BET";
       showMessage("BATTLE BONUS", `継続率${formatRate(continuationRate)} / 1SET ${setGameCount()}G`);
-      log(`轟雷BB開始：継続率${formatRate(continuationRate)} / 設定${settings.setting}`);
+      log(`白い悪魔BB開始：継続率${formatRate(continuationRate)} / 設定${settings.setting}`);
       updateDisplay();
       playNormalBgm();
       playWinSound(false);
@@ -5958,16 +6050,9 @@ body{
     const endedSets = session.setNo || 0;
     if(autoPlay) stopAutoPlay("ATバトル終了のためオート停止");
     showMessage("ATバトルが終了しました。", `継続SET数 ${endedSets}回 / 獲得pt ${session.paid}pt`);
-    log(`轟雷BB終了：獲得${session.paid}pt / 損益${formatSigned(profit)}pt / ${endedSets}SET / STOCK獲得${session.added || 0}SET / G上乗せ${session.addedGames || 0}G`);
-    stopBattleBgm(false);
-    if(barBgmActive){
-      stopBarBgm(true);
-    }else{
-      playNormalBgm();
-    }
+    log(`白い悪魔BB終了：獲得${session.paid}pt / 損益${formatSigned(profit)}pt / ${endedSets}SET / STOCK獲得${session.added || 0}SET / G上乗せ${session.addedGames || 0}G`);
     stopGekiatsuEffect(true);
     hideBattleIntro();
-    stopGuaranteedSetStartLight();
     session.resultPayout = session.paid;
     session.active = false;
     session.remain = 0;
@@ -5977,6 +6062,7 @@ body{
     session.battleRemain = 0;
     session.battleWin = false;
     session.battleSource = "";
+    resetBonusEndSpecialEffects(true);
     $("spinBtn").textContent = "BET";
     showSessionResultScreen(endedSets, session.paid);
     showOverlay("ATバトル終了");
@@ -6093,6 +6179,7 @@ body{
     }
     const exec = ()=>{
       gekiatsuActive = false;
+      speedBonusRogiHoldActive = false;
       if(gekiatsuLayer) gekiatsuLayer.classList.remove("show", "solidMovie");
       if(gekiatsuVideo){
         try{
@@ -6116,6 +6203,7 @@ body{
       gekiatsuHideTimer = null;
     }
     gekiatsuActive = false;
+    speedBonusRogiHoldActive = false;
     if(gekiatsuVideo) gekiatsuVideo.onended = null;
     if(gekiatsuLayer) gekiatsuLayer.classList.remove("show");
     gekiatsuHideTimer = setTimeout(()=>{
@@ -6132,11 +6220,16 @@ body{
 
   function startGekiatsuEffect(forced=false, videoSrc=GEKIATSU_VIDEO_SRC, logLabel="PREMIUM MOVIE", options={}){
     if(!gekiatsuLayer || !gekiatsuVideo) return;
+    if(speedModeVisualsSuppressed() && !options.allowDuringSpeed) return;
     if(gekiatsuHideTimer){
       clearTimeout(gekiatsuHideTimer);
       gekiatsuHideTimer = null;
     }
+    if(options.muteBgm){
+      muteBgmForRogiStopEffect();
+    }
     gekiatsuActive = true;
+    speedBonusRogiHoldActive = !!options.holdUntilEndOrBet;
     gekiatsuLayer.classList.toggle("solidMovie", !!options.solid);
     gekiatsuVideo.onended = null;
     if(gekiatsuVideo.getAttribute("src") !== videoSrc){
@@ -6289,6 +6382,29 @@ body{
     updateDevilStatusLamp();
   }
 
+  function resetBonusEndSpecialEffects(resumeNormal=true){
+    restoreBgmAfterRogiStopEffect();
+    barBgmActive = false;
+    battleBgmActive = false;
+    barRainbowHold = false;
+    stopGuaranteedSetStartLight();
+    clearReelLight(false);
+    if(barBgm){
+      try{
+        barBgm.pause();
+        barBgm.currentTime = 0;
+      }catch(e){}
+    }
+    if(battleBgm){
+      try{
+        battleBgm.pause();
+        battleBgm.currentTime = 0;
+      }catch(e){}
+    }
+    updateDevilStatusLamp();
+    if(resumeNormal) playNormalBgm();
+  }
+
   function ensureBarBgmContinuing(){
     if(!barBgmActive || !barBgm || battleBgmActive || isContinuationBattleActive()) return;
     try{
@@ -6338,10 +6454,10 @@ body{
     if(resolved.bar3PremiumReady){
       resetNormalModeAfterBonus();
       $("stLamp").classList.add("on");
-      showMessage("BAR揃い", `${resolved.bonusSource} / +${normalReward}pt / AT突入 / SET+5 / 継続${formatRate(BAR3_CONTINUATION_RATE)}${lineText ? " / " + lineText : ""}`);
-      log(`BAR揃い：${resolved.bonusSource} / +${normalReward}pt / AT突入 / SET+5 / 継続${formatRate(BAR3_CONTINUATION_RATE)}`);
+      showMessage("BAR揃い", `${resolved.bonusSource} / 出玉なし / AT突入 / SET+5 / 継続${formatRate(BAR3_CONTINUATION_RATE)}${lineText ? " / " + lineText : ""}`);
+      log(`BAR揃い：${resolved.bonusSource} / 出玉なし / AT突入 / SET+5 / 継続${formatRate(BAR3_CONTINUATION_RATE)}`);
       flashReelLight("rainbow", 2600);
-      showOverlay(`BAR +${normalReward}pt SET+5 継続${formatRate(BAR3_CONTINUATION_RATE)}`);
+      showOverlay(`BAR SET+5 継続${formatRate(BAR3_CONTINUATION_RATE)}`);
       confetti(110);
       playBarBgm();
       startBarRainbowHold();
@@ -6555,16 +6671,22 @@ body{
     $("modeTag").className = "modeTag " + (active ? "active" : "");
     $("modeTag").textContent = active ? (isContinuationBattleActive() ? "継続BATTLE" : "BATTLE") : normalModeLabel();
 
-    $("settingView").textContent = settings.setting;
-    $("targetRtpView").textContent = Math.round(targetRtp() * 100) + "%";
-    $("stInfoView").textContent = active
+    if($("settingView")) $("settingView").textContent = settings.setting;
+    if($("targetRtpView")) $("targetRtpView").textContent = Math.round(targetRtp() * 100) + "%";
+    if($("adminSettingView")) $("adminSettingView").textContent = settings.setting;
+    if($("adminTargetRtpView")) $("adminTargetRtpView").textContent = Math.round(targetRtp() * 100) + "%";
+    const stInfoText = active
       ? (isContinuationBattleActive()
         ? `継続BATTLE ${session.battleRemain}G / 継続${formatRate(session.continuationRate)} STOCK${session.stockSets || 0}`
         : `${setGameCount()}G/SET 継続${formatRate(session.continuationRate)} STOCK${session.stockSets || 0}`)
       : normalState.bonusPending
         ? `BONUS確定 / ${pendingBonusLabel()}待ち / 1G ${SPIN_COST}pt`
         : `${normalModeLabel()} / 天井まで${ceilingRemain()}G / 1G ${SPIN_COST}pt`;
-    $("payoutScaleView").textContent = `通常:ベル${NORMAL_ROLE_PAYOUTS.BELL}pt/スイカ${NORMAL_ROLE_PAYOUTS.SUICA}pt/チェリー${NORMAL_ROLE_PAYOUTS.CHERRY_ANY}pt/リプレイ${NORMAL_ROLE_PAYOUTS.REPLAY}pt/REG${NORMAL_ROLE_PAYOUTS.MID}pt / 通常小役${Math.round(NORMAL_ROLE_RATE * 100)}% / 高確小役${Math.round(HIGH_ROLE_RATE * 100)}% / ATベル${ROLE_PAYOUTS.BELL}pt / 平均継続${formatRate(averageContinuationRate(settings.setting))}`;
+    if($("stInfoView")) $("stInfoView").textContent = stInfoText;
+    if($("adminStInfoView")) $("adminStInfoView").textContent = stInfoText;
+    const payoutScaleText = `通常:ベル${NORMAL_ROLE_PAYOUTS.BELL}pt/スイカ${NORMAL_ROLE_PAYOUTS.SUICA}pt/チェリー${NORMAL_ROLE_PAYOUTS.CHERRY_ANY}pt/リプレイ${NORMAL_ROLE_PAYOUTS.REPLAY}pt/REG${NORMAL_ROLE_PAYOUTS.MID}pt / 通常小役${Math.round(NORMAL_ROLE_RATE * 100)}% / 高確小役${Math.round(HIGH_ROLE_RATE * 100)}% / ATベル${ROLE_PAYOUTS.BELL}pt / 平均継続${formatRate(averageContinuationRate(settings.setting))}`;
+    if($("payoutScaleView")) $("payoutScaleView").textContent = payoutScaleText;
+    if($("adminPayoutScaleView")) $("adminPayoutScaleView").textContent = payoutScaleText;
 
     if($("totalSpinsView")) $("totalSpinsView").textContent = stats.totalSpins || 0;
     if($("totalSessionsView")) $("totalSessionsView").textContent = stats.totalSessions || 0;
@@ -6698,14 +6820,14 @@ body{
     const table = $("settingTable");
     if(!table) return;
 
-    let html = `<tr><td>設定</td><td>表記割</td><td>小役合算</td><td>砂時計</td><td>REG</td><td>ベル</td><td>デビルゾーン</td><td>BAR</td><td>2連チェリー</td><td>3連チェリー</td><td>スイカ</td><td>平均SET</td></tr>`;
+    let html = `<tr><td>設定</td><td>表記割</td><td>小役合算</td><td>砂時計</td><td>REG</td><td>BIG/デビルゾーン</td><td>ベル</td><td>スイカ</td><td>チェリー合算</td><td>BAR</td><td>平均SET</td></tr>`;
     const settingList = [1,2,3,4,5,6];
 
     for(const i of settingList){
       const weights = eventWeights(i);
       const total = weights.reduce((a,b)=>a+b.w,0);
       const weightOf = (name)=>weights.find(x=>x.result === name)?.w || 0;
-      const hit = hitProbability(i);
+      const hit = baseHitProbability(i);
 
       const smallP = hit * (weightOf("SMALL") / total);
       const midP = hit * (weightOf("MID") / total);
@@ -6722,13 +6844,13 @@ body{
         <td>${i}</td>
         <td>${targetText}</td>
         <td>${oddsText(hitTotalP)}</td>
-        <td>${oddsText(bar3P)}</td>
-        <td>${oddsText(bigP)}</td>
-        <td>${oddsText(midP)}</td>
         <td>${oddsText(smallP)}</td>
+        <td>${oddsText(midP)}</td>
+        <td>${oddsText(bigP)}</td>
         <td>${oddsText(bellP)}</td>
         <td>${oddsText(suikaP)}</td>
         <td>${oddsText(cherryP)}</td>
+        <td>${oddsText(bar3P)}</td>
         <td>${avgSt.toFixed(1)}G</td>
       </tr>`;
     }
@@ -7044,6 +7166,7 @@ body{
     }
     if(sessionStartGuard) return;
     if(pendingAtStartTimer){
+      if(speedBonusRogiHoldActive) stopGekiatsuEffect(true);
       startBonusSessionNow();
       return;
     }
@@ -7128,8 +7251,9 @@ body{
     const resolved = normalActiveAtSpinStart ? resolveNormalOutcome(result) : resolveOutcome(result);
     const grid = buildGrid(result, lineRow);
     const bonusEffectSpin = !normalActiveAtSpinStart;
-    const gekiatsuChance = bonusEffectSpin && (premiumForced || (result === "BIG" && Math.random() < GEKIATSU_CHANCE_ON_BIG));
-    const bar3LeverEffect = result === "BAR3";
+    const speedModeBonusRogiEffect = speedModeSpinAtStart && shouldPlaySpeedModeBonusRogi(result, resolved);
+    const gekiatsuChance = !speedModeSpinAtStart && bonusEffectSpin && (premiumForced || (result === "BIG" && Math.random() < GEKIATSU_CHANCE_ON_BIG));
+    const bar3LeverEffect = !speedModeSpinAtStart && result === "BAR3";
     const zakoEffect = decideZakoEffect(result, resolved, normalActiveAtSpinStart);
 
     currentSpin = {
@@ -7138,8 +7262,9 @@ body{
       lineRow,
       resolved,
       grid,
-      gekiatsu:gekiatsuChance || bar3LeverEffect,
+      gekiatsu:speedModeBonusRogiEffect || gekiatsuChance || bar3LeverEffect,
       bar3LeverEffect,
+      speedModeBonusRogiEffect,
       zoneActiveAtStart:zoneActiveAtSpinStart,
       battleActiveAtStart:battleActiveAtSpinStart,
       normalActiveAtStart:normalActiveAtSpinStart,
@@ -7160,7 +7285,17 @@ body{
       pendingBattleOutcome:null
     };
     currentSpin.rogiStopEffectMax = decideRogiStopEffectMax(currentSpin);
-    if(bar3LeverEffect){
+    if(speedModeBonusRogiEffect){
+      startGekiatsuEffect(false, ROGI_STOP_VIDEO_SRCS[3], "SPEED BONUS ROGI", {
+        muted:false,
+        solid:true,
+        fadeOnEnd:true,
+        holdUntilEndOrBet:true,
+        muteBgm:true,
+        volumeScale:ROGI_MOVIE_OUTPUT_SCALE,
+        allowDuringSpeed:true
+      });
+    }else if(bar3LeverEffect){
       startGekiatsuEffect(false, BAR3_LEVER_VIDEO_SRC, "BAR LEVER MOVIE", {solid:true, fadeOnEnd:true});
     }else if(gekiatsuChance){
       startGekiatsuEffect(premiumForced);
@@ -7304,12 +7439,19 @@ body{
     if(resolved.zoneGame && zoneText) resultParts.push(zoneText);
     $("resultText").textContent = `${RESULT[result].name}${lineText} / ${resultParts.join(" / ")}`;
     const holdRogiThirdStopEffect = shouldHoldRogiThirdStopEffect(currentSpin);
+    const holdSpeedBonusRogiEffect = currentSpin && currentSpin.speedModeBonusRogiEffect;
+    const stopAutoAtFirstHit = currentSpin && currentSpin.normalActiveAtStart && isAtFirstHitForAuto(resolved);
     if(currentSpin && currentSpin.normalActiveAtStart){
       applyNormalResult(result, resolved, lineRow);
+      if(stopAutoAtFirstHit && autoPlay){
+        stopAutoPlay("AT初当たり確定のためAUTO停止");
+      }
       if(currentSpin && currentSpin.bar3LeverEffect){
         // BAR動画は動画側の終了イベントで透過させる。
       }else if(holdRogiThirdStopEffect){
         startRogiThirdStopHold();
+      }else if(holdSpeedBonusRogiEffect){
+        // SPEED確定のろぎ3は、動画終了または次BETまで表示を保持する。
       }else if(currentSpin && currentSpin.gekiatsu){
         stopGekiatsuEffect(false);
       }else{
@@ -7478,7 +7620,7 @@ body{
   function runAutoStep(){
     if(!autoPlay) return;
     if(isRogiThirdStopHoldActive()){
-      stopAutoPlay("CZ第三停止演出保持のためオート停止");
+      autoTimer = setTimeout(runAutoStep, 150);
       return;
     }
     if(isSpinning){
@@ -7487,23 +7629,25 @@ body{
     }
 
     if(!session.active){
+      if(normalState.bonusPending && (normalState.bonusKind || "BIG") !== "MID"){
+        stopAutoPlay("AT初当たり確定のためAUTO停止");
+        return;
+      }
       spin();
       autoTimer = setTimeout(runAutoStep, Math.max(100, settings.autoDelay * 1000));
       return;
     }
 
-    if(session.remain > 0){
-      spin();
-      return;
+    spin();
+    if(!isSpinning && autoPlay){
+      autoTimer = setTimeout(runAutoStep, Math.max(100, settings.autoDelay * 1000));
     }
-
-    autoTimer = setTimeout(runAutoStep, Math.max(100, settings.autoDelay * 1000));
   }
 
   function scheduleNextAuto(){
     if(!autoPlay) return;
     if(isRogiThirdStopHoldActive()){
-      stopAutoPlay("CZ第三停止演出保持のためオート停止");
+      autoTimer = setTimeout(runAutoStep, 150);
       return;
     }
     readSettings();
@@ -7569,7 +7713,7 @@ body{
       toggle.textContent = speedToBonusActive ? "OFF" : "ON";
       toggle.classList.toggle("off", speedToBonusActive);
       toggle.disabled = !speedToBonusActive && !!unavailable;
-      toggle.title = unavailable || "通常時のみAUTOの3倍速で遊技";
+      toggle.title = unavailable || "通常時のみAUTOの3倍速で遊技 / BGMあり・演出なし";
     }
     if(count){
       count.textContent = speedToBonusActive
@@ -7592,9 +7736,9 @@ body{
     speedToBonusCount = 0;
     speedToBonusActive = true;
     updateSpeedToBonusUi();
-    if(bgm) bgm.pause();
-    showMessage("SPEED MODE", `通常時のみ / AUTOの${SPEED_MODE_MULTIPLIER}倍速 / 上限${SPEED_MODE_MAX_SPINS_PER_SECOND}G/s / 音なし`);
-    log(`[SPEED] 通常時SPEED開始 AUTOx${SPEED_MODE_MULTIPLIER} / max ${SPEED_MODE_MAX_SPINS_PER_SECOND}G/s`);
+    playNormalBgm();
+    showMessage("SPEED MODE", `通常時のみ / AUTOの${SPEED_MODE_MULTIPLIER}倍速 / 上限${SPEED_MODE_MAX_SPINS_PER_SECOND}G/s / BGMあり・演出なし`);
+    log(`[SPEED] 通常時SPEED開始 AUTOx${SPEED_MODE_MULTIPLIER} / max ${SPEED_MODE_MAX_SPINS_PER_SECOND}G/s / BGMあり・演出なし`);
     scheduleNextSpeedToBonus(0);
   }
 
@@ -7980,11 +8124,6 @@ body{
     if(slumpPanelBody && slumpPublicCard){
       slumpPanelBody.appendChild(slumpPublicCard);
     }
-    const dataCounterPanelBody = $("dataCounterPanelBody");
-    const dataCounterCard = document.querySelector(".wd-data-counter-panel");
-    if(dataCounterPanelBody && dataCounterCard){
-      dataCounterPanelBody.appendChild(dataCounterCard);
-    }
     const drawer = $("debugDrawer");
     if(drawer){
       [...document.querySelectorAll(".side > .card:not(.oddsPublic):not(.slumpPublic)")].forEach(card => drawer.appendChild(card));
@@ -8017,12 +8156,6 @@ body{
         setInfoPanelOpen("odds", !audioDock.classList.contains("oddsOpen"));
       });
     }
-    if(dataToggleBtn){
-      dataToggleBtn.addEventListener("click", e=>{
-        e.stopPropagation();
-        setInfoPanelOpen("data", !audioDock.classList.contains("dataOpen"));
-      });
-    }
     if(audioCloseBtn){
       audioCloseBtn.addEventListener("click", e=>{
         e.stopPropagation();
@@ -8044,13 +8177,6 @@ body{
         if(oddsToggleBtn) oddsToggleBtn.focus();
       });
     }
-    if(dataCloseBtn){
-      dataCloseBtn.addEventListener("click", e=>{
-        e.stopPropagation();
-        setInfoPanelOpen("data", false);
-        if(dataToggleBtn) dataToggleBtn.focus();
-      });
-    }
     if(pageZoomOutBtn){
       pageZoomOutBtn.addEventListener("click", e=>{
         e.stopPropagation();
@@ -8066,8 +8192,12 @@ body{
     if(pageZoomResetBtn){
       pageZoomResetBtn.addEventListener("click", e=>{
         e.stopPropagation();
+        const focusScreenX = focusScreenXBeforeZoom();
         pageZoom = 1;
         applyPageZoom(true);
+        requestAnimationFrame(()=>keepZoomFocusOnDevilE(focusScreenX));
+        setTimeout(()=>keepZoomFocusOnDevilE(focusScreenX), 80);
+        setTimeout(()=>keepZoomFocusOnDevilE(focusScreenX), 180);
       });
     }
     if(audioDock){
