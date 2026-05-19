@@ -598,6 +598,34 @@ h1{
     inset 0 -24px 42px rgba(0,0,0,.62),
     0 8px 24px rgba(255,26,64,.20);
 }
+
+.reelArea.goraiZoneGlow.superGoraiZoneGlow{
+  background:
+    radial-gradient(circle at 50% 50%, rgba(165,76,255,.28), rgba(0,0,0,0) 62%),
+    rgba(20,0,42,.72);
+  border-color:rgba(185,112,255,.62);
+  box-shadow:
+    0 0 0 2px rgba(185,112,255,.38),
+    0 0 36px rgba(147,76,255,.50),
+    0 0 90px rgba(58,126,255,.30),
+    inset 0 0 48px rgba(185,112,255,.20),
+    inset 0 0 34px rgba(0,0,0,.66);
+}
+.reelArea.goraiZoneGlow.superGoraiZoneGlow::before{
+  background:
+    radial-gradient(circle at 50% 50%, rgba(185,112,255,.46), rgba(58,126,255,.16) 38%, rgba(0,0,0,0) 70%);
+}
+.reelArea.goraiZoneGlow.superGoraiZoneGlow .reel{
+  background:
+    linear-gradient(180deg,rgba(185,112,255,.22),rgba(0,0,0,.22)),
+    radial-gradient(circle at 50% 48%, rgba(90,154,255,.32), rgba(22,10,44,.76) 68%),
+    #120822;
+  border-color:rgba(185,112,255,.66);
+  box-shadow:
+    inset 0 18px 36px rgba(185,112,255,.12),
+    inset 0 -24px 42px rgba(0,0,0,.62),
+    0 8px 26px rgba(90,154,255,.22);
+}
 @keyframes goraiZoneRedPulse{
   0%,100%{opacity:.58;filter:saturate(1.05)}
   50%{opacity:1;filter:saturate(1.35)}
@@ -3572,6 +3600,7 @@ body{
           <div class="stat"><div class="k">REG</div><div class="v" id="midCountView">0</div></div>
           <div class="stat"><div class="k">砂時計</div><div class="v" id="smallCountView">0</div></div>
           <div class="stat"><div class="k">ベル</div><div class="v" id="bellCountView">0</div></div>
+          <div class="stat"><div class="k">斜めベル</div><div class="v" id="diagonalBellCountView">0</div></div>
           <div class="stat"><div class="k">スイカ</div><div class="v" id="suikaCountView">0</div></div>
           <div class="stat"><div class="k">チェリー</div><div class="v" id="cherryCountView">0</div></div>
           <div class="stat"><div class="k">損益</div><div class="v" id="totalProfitView">0</div></div>
@@ -3610,6 +3639,7 @@ body{
             <div><span>REG</span><b id="wdCounterReg">0</b></div>
             <div><span>砂時計</span><b id="wdCounterSmall">0</b></div>
             <div><span>ベル</span><b id="wdCounterBell">0</b></div>
+            <div><span>斜めベル</span><b id="wdCounterDiagonalBell">0</b></div>
             <div><span>スイカ</span><b id="wdCounterSuika">0</b></div>
             <div><span>チェリー</span><b id="wdCounterCherry">0</b></div>
             <div><span>リプレイ</span><b id="wdCounterReplay">0</b></div>
@@ -3833,7 +3863,7 @@ body{
           <input id="cherryTripleAddInput" type="text" value="出玉0.05倍 / 通常AT中SET50%" readonly />
         </div>
         <div class="help">
-          AT中BIGは5Gのデビルゾーン、AT中REGは+1SET固定、通常REGは50pt払い出しと天井リセットです。砂時計はAT+10Gと15pt払い出し、BAR揃いは出玉なしで+5SETと継続率80%昇格。通常・高確中はベル8pt、スイカ3pt、チェリー各種3pt、リプレイ3pt、AT中はベル15ptと2連チェリー・3連チェリー・スイカのSETストック抽選、デビルゾーン中は子役でSETストックとATゲーム数加算、別枠でデビルゾーン延長抽選を行います。
+          AT中BIGは5Gの超デビルゾーン、AT中REGは5Gのデビルゾーン、通常REGは50pt払い出しと天井リセットです。砂時計はAT+10Gと15pt払い出し、BAR揃いは出玉なしで+5SETと継続率80%昇格。通常・高確中はベル8pt、スイカ3pt、チェリー各種3pt、リプレイ3pt、AT中はベル15ptと2連チェリー・3連チェリー・スイカのSETストック抽選、デビルゾーン中は子役でSETストックとATゲーム数加算、別枠でデビルゾーン延長抽選を行います。
         </div>
       </div>
 
@@ -3847,8 +3877,9 @@ body{
           <option value="SMALL">砂時計（画像/AT+10/15pt）</option>
           <option value="MID">REG（77BAR/15pt/SET+1）</option>
             <option value="BAR3">BAR揃い（SET+5/出玉なし）</option>
-            <option value="BIG">BIG（777/15pt/デビルゾーン5G）</option>
+            <option value="BIG">BIG（777/15pt/超デビルゾーン5G）</option>
             <option value="BELL">ベル揃い</option>
+            <option value="BELL3">斜めベル（AT中+3pt）</option>
             <option value="REPLAY">リプレイ（AT中+3pt）</option>
             <option value="SUICA">スイカ揃い</option>
             <option value="CHERRY_ANY">チェリーANY</option>
@@ -3886,6 +3917,7 @@ body{
           </div>
           <div class="row" style="margin-top:8px">
             <button class="subBtn" id="debugBellPayBtn">即ベル</button>
+            <button class="subBtn" id="debugBell3Btn">即斜めベル</button>
             <button class="subBtn" id="debugReplayBtn">即リプレイ</button>
             <button class="subBtn" id="debugSuikaBtn">即スイカ</button>
             <button class="subBtn" id="debugCherryBtn">即チェリーANY</button>
@@ -4009,7 +4041,10 @@ body{
     MID:{name:"REG", reel:["7","7","BAR"], label:"REG", cls:"purple", kind:"payadd"},
     BAR3:{name:"BAR揃い", reel:["BAR","BAR","BAR"], label:"BAR", cls:"purple", kind:"add"},
     BIG:{name:"BIG", reel:["7","7","7"], label:"BIG", cls:"red", kind:"payadd"},
+    DEVIL_ZONE:{name:"DEVIL ZONE", reel:["7","7","BAR"], label:"DZ", cls:"purple", kind:"payadd"},
+    SUPER_DEVIL_ZONE:{name:"SUPER DEVIL ZONE", reel:["7","7","7"], label:"SUPER DZ", cls:"red", kind:"payadd"},
     BELL:{name:"ベル揃い", reel:["🔔","🔔","🔔"], label:"BELL", cls:"gold", kind:"pay"},
+    BELL3:{name:"斜めベル", reel:["🔔","🔔","🔔"], label:"斜めBELL", cls:"gold", kind:"pay"},
     REPLAY:{name:"リプレイ", reel:["REPLAY","REPLAY","REPLAY"], label:"REPLAY", cls:"blue", kind:"pay"},
     SUICA:{name:"スイカ揃い", reel:["🍋","🍋","🍋"], label:"SUICA", cls:"green", kind:"pay"},
     CHERRY_ANY:{name:"チェリーANY", reel:["🍒","🍋","🔔"], label:"CHERRY", cls:"red", kind:"payadd"},
@@ -4020,7 +4055,7 @@ body{
   const SETTING_PROFILE = {
     // 王冠役は廃止。BAR揃いは通常テーブルから外し、全設定共通1/8192の独立プレミアへ変更。
     // BAR3で使っていた重みは、砂時計・REG・BIG・ベル・スイカへ再配分。
-    // 砂時計=15pt+AT+10G / REG=15pt+1SET固定 / BIG=デビルゾーン5G
+    // 砂時計=15pt+AT+10G / REG=15pt+デビルゾーン5G / BIG=デビルゾーン5G
     // ベルは0.15倍固定。ベルは奇数設定寄り、スイカは偶数設定寄り。
     // 奇数設定はBIG多めで荒波、偶数設定はREG多め、設定6はREG/BIG均等。
     1:{weights:[{result:"SMALL",w:34},{result:"MID",w:7},{result:"BIG",w:12},{result:"BELL",w:56},{result:"SUICA",w:33},{result:"CHERRY_ANY",w:34},{result:"CHERRY_TRIPLE",w:14}]},
@@ -4032,12 +4067,12 @@ body{
   };
 
   Object.assign(SETTING_PROFILE, {
-    1:{weights:[{result:"SMALL",w:4},{result:"MID",w:2},{result:"BIG",w:1},{result:"BELL",w:170},{result:"REPLAY",w:405},{result:"SUICA",w:3},{result:"CHERRY_ANY",w:5},{result:"CHERRY_DOUBLE",w:1},{result:"CHERRY_TRIPLE",w:1}]},
-    2:{weights:[{result:"SMALL",w:4},{result:"MID",w:2},{result:"BIG",w:1},{result:"BELL",w:242},{result:"REPLAY",w:434},{result:"SUICA",w:3},{result:"CHERRY_ANY",w:5},{result:"CHERRY_DOUBLE",w:1},{result:"CHERRY_TRIPLE",w:1}]},
-    3:{weights:[{result:"SMALL",w:4},{result:"MID",w:2},{result:"BIG",w:1},{result:"BELL",w:230},{result:"REPLAY",w:382},{result:"SUICA",w:3},{result:"CHERRY_ANY",w:5},{result:"CHERRY_DOUBLE",w:1},{result:"CHERRY_TRIPLE",w:1}]},
-    4:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:1},{result:"BELL",w:320},{result:"REPLAY",w:410},{result:"SUICA",w:3},{result:"CHERRY_ANY",w:5},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
-    5:{weights:[{result:"SMALL",w:5},{result:"MID",w:3},{result:"BIG",w:1},{result:"BELL",w:350},{result:"REPLAY",w:395},{result:"SUICA",w:4},{result:"CHERRY_ANY",w:6},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
-    6:{weights:[{result:"SMALL",w:5},{result:"MID",w:3},{result:"BIG",w:1},{result:"BELL",w:535},{result:"REPLAY",w:430},{result:"SUICA",w:4},{result:"CHERRY_ANY",w:6},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]}
+    1:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:35},{result:"REPLAY",w:398},{result:"SUICA",w:3},{result:"CHERRY_ANY",w:3},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
+    2:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:45},{result:"REPLAY",w:387},{result:"SUICA",w:3},{result:"CHERRY_ANY",w:4},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
+    3:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:60},{result:"REPLAY",w:371},{result:"SUICA",w:3},{result:"CHERRY_ANY",w:5},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
+    4:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:75},{result:"REPLAY",w:355},{result:"SUICA",w:3},{result:"CHERRY_ANY",w:6},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
+    5:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:90},{result:"REPLAY",w:339},{result:"SUICA",w:3},{result:"CHERRY_ANY",w:7},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
+    6:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:105},{result:"REPLAY",w:323},{result:"SUICA",w:3},{result:"CHERRY_ANY",w:8},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]}
   });
 
   const symbols = ["🍒","🍋","🔔","REPLAY","⭐","🍇","7","BAR",USER_FACE];
@@ -4097,6 +4132,7 @@ body{
     midCount:0,
     smallCount:0,
     bellCount:0,
+    diagonalBellCount:0,
     replayCount:0,
     suikaCount:0,
     cherryCount:0,
@@ -4148,7 +4184,10 @@ body{
     MID:15,
     BAR3:0,
     BIG:15,
+    DEVIL_ZONE:15,
+    SUPER_DEVIL_ZONE:15,
     BELL:15,
+    BELL3:3,
     REPLAY:3,
     SUICA:3,
     CHERRY_ANY:5,
@@ -4215,12 +4254,12 @@ body{
     6:[{rate:0.10,w:5},{rate:0.30,w:11},{rate:0.50,w:37},{rate:0.60,w:32},{rate:0.80,w:15}]
   });
   const GORAI_HIT_RATE = {
-    1:0.88,
-    2:0.925,
-    3:0.912,
-    4:0.94,
-    5:0.925,
-    6:0.965
+    1:0.945,
+    2:0.945,
+    3:0.945,
+    4:0.945,
+    5:0.945,
+    6:0.945
   };
   const NORMAL_DIRECT_BONUS_RATE = {
     1:1/170,
@@ -4267,6 +4306,12 @@ body{
     6:[{result:"BELL",w:50},{result:"REPLAY",w:27},{result:"SUICA",w:25},{result:"CHERRY_ANY",w:24},{result:"CHERRY_DOUBLE",w:14},{result:"CHERRY_TRIPLE",w:6}]
   });
   const BIG_STOCK_ZONE_GAMES = 5;
+  const SUPER_DEVIL_ZONE_GAMES = 5;
+  const ZONE_CHALLENGE_PAYOUT = 3;
+  const DEVIL_ZONE_SEVEN_CHANCE = 1 / 12;
+  const SUPER_DEVIL_ZONE_SEVEN_CHANCE = 0.50;
+  const ZONE_SEVEN_STOCK_RATE = 0.50;
+  const ZONE_SEVEN_AT_GAME_ADD = 10;
   const CONTINUATION_BATTLE_GAMES = 4;
   const DEBUG_FAST_SPINS_PER_SECOND = 1000;
   const DEBUG_FAST_INTERVAL_MS = 100;
@@ -4783,6 +4828,66 @@ body{
     return !!(session.active && session.bigZone > 0);
   }
 
+  function currentGoraiZoneType(){
+    return session.bigZoneType === "super" ? "super" : "devil";
+  }
+
+  function isSuperGoraiZoneActive(){
+    return isGoraiZoneActive() && currentGoraiZoneType() === "super";
+  }
+
+  function atInternalResult(result){
+    if(result === "MID") return "DEVIL_ZONE";
+    if(result === "BIG") return "SUPER_DEVIL_ZONE";
+    return result;
+  }
+
+  function displayResultFor(result){
+    if(result === "DEVIL_ZONE") return "MID";
+    if(result === "SUPER_DEVIL_ZONE") return "BIG";
+    return result;
+  }
+
+  function isZoneEntryResult(result){
+    return result === "DEVIL_ZONE" || result === "SUPER_DEVIL_ZONE";
+  }
+
+  function zoneSevenChance(type=currentGoraiZoneType()){
+    return type === "super" ? SUPER_DEVIL_ZONE_SEVEN_CHANCE : DEVIL_ZONE_SEVEN_CHANCE;
+  }
+
+  function drawZoneChallengeResult(type=currentGoraiZoneType()){
+    return Math.random() < zoneSevenChance(type) ? "SUPER_DEVIL_ZONE" : "MISS";
+  }
+
+  function resolveZoneSevenBonus(result){
+    if(result !== "SUPER_DEVIL_ZONE") return {sets:0, games:0, hit:false};
+    if(Math.random() < ZONE_SEVEN_STOCK_RATE) return {sets:1, games:0, hit:true};
+    return {sets:0, games:ZONE_SEVEN_AT_GAME_ADD, hit:true};
+  }
+
+  function expectedZoneSevenStock(type="devil"){
+    return zoneSevenChance(type) * ZONE_SEVEN_STOCK_RATE;
+  }
+
+  function expectedZoneSevenGames(type="devil"){
+    return zoneSevenChance(type) * (1 - ZONE_SEVEN_STOCK_RATE) * ZONE_SEVEN_AT_GAME_ADD;
+  }
+
+  function goraiZoneName(type=currentGoraiZoneType()){
+    return type === "super" ? "超デビルゾーン" : "デビルゾーン";
+  }
+
+  function goraiZoneLabel(type=currentGoraiZoneType()){
+    return type === "super" ? "SUPER DEVIL ZONE" : "DEVIL ZONE";
+  }
+
+  function startZoneForResult(result, activeType=currentGoraiZoneType()){
+    if(result === "SUPER_DEVIL_ZONE" || result === "BIG") return {games:SUPER_DEVIL_ZONE_GAMES, type:"super"};
+    if((result === "DEVIL_ZONE" || result === "MID") && activeType !== "super") return {games:BIG_STOCK_ZONE_GAMES, type:"devil"};
+    return {games:0, type:""};
+  }
+
   function isContinuationBattleActive(){
     return !!(session.active && session.phase === "battle" && session.battleRemain > 0);
   }
@@ -4882,8 +4987,8 @@ body{
     return {win:false, source:""};
   }
 
-  function goraiZoneRemainText(count){
-    return `デビルゾーン残り${Math.max(0, count)}ゲーム`;
+  function goraiZoneRemainText(count, type=currentGoraiZoneType()){
+    return `${goraiZoneName(type)}残り${Math.max(0, count)}ゲーム`;
   }
 
   function updateGoraiZoneGlow(){
@@ -5258,6 +5363,8 @@ body{
 
   function expectedStAddFor(result, settingNo = settings.setting){
     if(result === "SMALL") return 10;
+    if(result === "DEVIL_ZONE" || result === "MID") return BIG_STOCK_ZONE_GAMES * expectedZoneSevenGames("devil");
+    if(result === "SUPER_DEVIL_ZONE" || result === "BIG") return SUPER_DEVIL_ZONE_GAMES * expectedZoneSevenGames("super");
     return 0;
   }
 
@@ -5300,7 +5407,7 @@ body{
 
   function stockSetsForResult(result){
     if(result === "BAR3") return 5;
-    if(result === "MID") return 1;
+    if(result === "CHERRY_ANY") return Math.random() < 0.01 ? 1 : 0;
     if(result === "CHERRY_TRIPLE") return Math.random() < 0.50 ? 1 : 0;
     if(result === "CHERRY_DOUBLE") return Math.random() < 0.05 ? 1 : 0;
     if(result === "SUICA") return Math.random() < 0.01 ? 2 : 0;
@@ -5309,8 +5416,9 @@ body{
 
   function expectedStockSetsForResult(result, settingNo = settings.setting){
     if(result === "BAR3") return 5;
-    if(result === "MID") return 1;
-    if(result === "BIG") return BIG_STOCK_ZONE_GAMES * expectedGoraiZoneStockPerGame(settingNo);
+    if(result === "DEVIL_ZONE" || result === "MID") return BIG_STOCK_ZONE_GAMES * expectedZoneSevenStock("devil");
+    if(result === "SUPER_DEVIL_ZONE" || result === "BIG") return SUPER_DEVIL_ZONE_GAMES * expectedZoneSevenStock("super");
+    if(result === "CHERRY_ANY") return 0.01;
     if(result === "CHERRY_TRIPLE") return 0.50;
     if(result === "CHERRY_DOUBLE") return 0.05;
     if(result === "SUICA") return 0.02;
@@ -5319,6 +5427,7 @@ body{
 
   function goraiZoneStockForResult(result){
     if(result === "BAR3") return 5;
+    if(result === "CHERRY_ANY") return Math.random() < 0.02 ? 1 : 0;
     if(result === "CHERRY_TRIPLE") return 1;
     if(result === "CHERRY_DOUBLE") return Math.random() < 0.25 ? 1 : 0;
     if(result === "SUICA") return Math.random() < 0.25 ? 1 : 0;
@@ -5326,31 +5435,73 @@ body{
     return 0;
   }
 
-  function expectedGoraiZoneStockForResult(result){
-    if(result === "BAR3") return 5;
-    if(result === "CHERRY_TRIPLE") return 1;
-    if(result === "CHERRY_DOUBLE") return 0.25;
-    if(result === "SUICA") return 0.25;
-    if(result === "BELL") return 0.10;
+  function superGoraiZoneStockForResult(result){
+    if(result === "BAR3") return 10;
+    if(result === "CHERRY_ANY") return Math.random() < 0.05 ? 1 : 0;
+    if(result === "CHERRY_TRIPLE") return 2;
+    if(result === "CHERRY_DOUBLE") return Math.random() < 0.75 ? 1 : 0;
+    if(result === "SUICA") return Math.random() < 0.75 ? 1 : 0;
+    if(result === "BELL") return Math.random() < 0.25 ? 1 : 0;
+    return 0;
+  }
+
+  function expectedGoraiZoneStockForResult(result, zoneType="devil"){
+    const superZone = zoneType === "super";
+    if(result === "BAR3") return superZone ? 10 : 5;
+    if(result === "CHERRY_ANY") return superZone ? 0.05 : 0.02;
+    if(result === "CHERRY_TRIPLE") return superZone ? 2 : 1;
+    if(result === "CHERRY_DOUBLE") return superZone ? 0.75 : 0.25;
+    if(result === "SUICA") return superZone ? 0.75 : 0.25;
+    if(result === "BELL") return superZone ? 0.25 : 0.10;
     return 0;
   }
 
   function goraiZoneStGameAddForResult(result){
     if(result === "CHERRY_TRIPLE") return 5;
     if(result === "CHERRY_DOUBLE") return 3;
-    if(result === "CHERRY_ANY") return 1;
+    if(result === "CHERRY_ANY") return Math.random() < 0.10 ? 1 : 0;
     if(result === "SUICA") return 2;
     if(result === "BELL") return 1;
+    return 0;
+  }
+
+  function superGoraiZoneStGameAddForResult(result){
+    if(result === "CHERRY_TRIPLE") return 10;
+    if(result === "CHERRY_DOUBLE") return 5;
+    if(result === "CHERRY_ANY") return Math.random() < 0.25 ? 1 : 0;
+    if(result === "SUICA") return 5;
+    if(result === "BELL") return 2;
     return 0;
   }
 
   function goraiZoneGameAddForResult(result){
     if(result === "CHERRY_TRIPLE") return Math.random() < 0.50 ? 2 : 0;
     if(result === "CHERRY_DOUBLE") return Math.random() < 0.15 ? 1 : 0;
-    if(result === "CHERRY_ANY") return Math.random() < 0.05 ? 1 : 0;
+    if(result === "CHERRY_ANY") return Math.random() < 0.01 ? 1 : 0;
     if(result === "SUICA") return Math.random() < 0.10 ? 1 : 0;
     if(result === "BELL") return Math.random() < 0.05 ? 1 : 0;
     return 0;
+  }
+
+  function superGoraiZoneGameAddForResult(result){
+    if(result === "CHERRY_TRIPLE") return 3;
+    if(result === "CHERRY_DOUBLE") return 1;
+    if(result === "CHERRY_ANY") return Math.random() < 0.05 ? 1 : 0;
+    if(result === "SUICA") return 1;
+    if(result === "BELL") return Math.random() < 0.20 ? 1 : 0;
+    return 0;
+  }
+
+  function zoneStockForResult(result, zoneType="devil"){
+    return zoneType === "super" ? superGoraiZoneStockForResult(result) : goraiZoneStockForResult(result);
+  }
+
+  function zoneStGameAddForResult(result, zoneType="devil"){
+    return zoneType === "super" ? superGoraiZoneStGameAddForResult(result) : goraiZoneStGameAddForResult(result);
+  }
+
+  function zoneGameAddForResult(result, zoneType="devil"){
+    return zoneType === "super" ? superGoraiZoneGameAddForResult(result) : goraiZoneGameAddForResult(result);
   }
 
   function revivalRateForResult(result){
@@ -5361,10 +5512,10 @@ body{
     return 0;
   }
 
-  function expectedGoraiZoneStockPerGame(settingNo = settings.setting){
+  function expectedGoraiZoneStockPerGame(settingNo = settings.setting, zoneType="devil"){
     const weights = eventWeights(settingNo);
     const total = weights.reduce((a,b)=>a+b.w,0);
-    return weights.reduce((sum,t)=>sum + expectedGoraiZoneStockForResult(t.result) * (t.w / total), 0);
+    return weights.reduce((sum,t)=>sum + expectedGoraiZoneStockForResult(t.result, zoneType) * (t.w / total), 0);
   }
 
   function eventWeights(settingNo = settings.setting){
@@ -5500,6 +5651,8 @@ body{
       stats.smallCount++;
     }else if(result === "BELL"){
       stats.bellCount++;
+    }else if(result === "BELL3"){
+      stats.diagonalBellCount = (Number(stats.diagonalBellCount) || 0) + 1;
     }else if(result === "REPLAY"){
       stats.replayCount = (Number(stats.replayCount) || 0) + 1;
     }else if(result === "SUICA"){
@@ -5925,7 +6078,10 @@ body{
 
   function drawResult(){
     if(pendingForceResult && RESULT[pendingForceResult]){
-      return pendingForceResult;
+      return atInternalResult(pendingForceResult);
+    }
+    if(isGoraiZoneActive()){
+      return drawZoneChallengeResult();
     }
 
     // BAR揃いは通常抽選とは別の全設定共通プレミアフラグ
@@ -5934,7 +6090,7 @@ body{
     }
 
     if(Math.random() < hitProbability()){
-      return weightedPick(eventWeights(settings.setting));
+      return atInternalResult(weightedPick(eventWeights(settings.setting)));
     }
     return "MISS";
   }
@@ -6411,6 +6567,7 @@ body{
     session.remain = 0;
     session.stockSets = 0;
     session.bigZone = 0;
+    session.bigZoneType = "";
     session.phase = "ended";
     session.battleRemain = 0;
     session.battleWin = false;
@@ -6513,15 +6670,21 @@ body{
 
   function resolveOutcome(result){
     const inGoraiZone = session.active && session.bigZone > 0;
+    const zoneType = inGoraiZone ? currentGoraiZoneType() : "";
+    const startZone = inGoraiZone ? {games:0, type:""} : startZoneForResult(result, zoneType);
+    const zoneSeven = inGoraiZone ? resolveZoneSevenBonus(result) : {sets:0, games:0, hit:false};
     return {
-      reward: rewardFor(result),
-      add: stAddFor(result),
+      reward: inGoraiZone ? ZONE_CHALLENGE_PAYOUT : rewardFor(result),
+      add: inGoraiZone ? 0 : stAddFor(result),
       sets: inGoraiZone ? 0 : stockSetsForResult(result),
-      bigZone: result === "BIG" ? BIG_STOCK_ZONE_GAMES : 0,
+      bigZone:startZone.games,
+      bigZoneType:startZone.type,
       zoneGame: inGoraiZone,
-      zoneSets: inGoraiZone ? goraiZoneStockForResult(result) : 0,
-      zoneStGames: inGoraiZone ? goraiZoneStGameAddForResult(result) : 0,
-      zoneGameAdd: inGoraiZone ? goraiZoneGameAddForResult(result) : 0
+      zoneType,
+      zoneSets: inGoraiZone ? zoneSeven.sets : 0,
+      zoneStGames: inGoraiZone ? zoneSeven.games : 0,
+      zoneGameAdd:0,
+      zoneSevenHit:zoneSeven.hit
     };
   }
 
@@ -6879,6 +7042,13 @@ body{
       return;
     }
 
+    if(result === "BELL3"){
+      flashReelLight("blue", 1200);
+      showMessage(info.name, `${normalModeLabel()} / 天井まで${ceilingRemain()}G${lineText ? " / " + lineText : ""}${normalRewardText || " / +3pt"}`);
+      showOverlay("斜めBELL");
+      return;
+    }
+
     const main = result === "MISS" ? modeAtStart : info.name;
     showMessage(main, `${normalModeLabel()} / 天井まで${ceilingRemain()}G${lineText ? " / " + lineText : ""}${normalRewardText}`);
     if(result === "MISS"){
@@ -6907,11 +7077,19 @@ body{
     }
 
     if(resolved.bigZone > 0){
-      session.bigZone = Math.max(session.bigZone || 0, resolved.bigZone);
+      const beforeZone = Number(session.bigZone) || 0;
+      session.bigZone = Math.max(beforeZone, resolved.bigZone);
+      if(resolved.bigZoneType && resolved.bigZone >= beforeZone){
+        session.bigZoneType = resolved.bigZoneType;
+      }
     }
 
     if(zoneGameAdd > 0){
       session.bigZone = (session.bigZone || 0) + zoneGameAdd;
+    }
+
+    if((Number(session.bigZone) || 0) <= 0){
+      session.bigZoneType = "";
     }
 
     if(stGameAdd > 0){
@@ -6954,8 +7132,8 @@ body{
       const stockText = stockAdd > 0 ? `SET+${stockAdd}` : "";
       const stGameText = stGameAddTextFor(result, stGameAdd);
       const zoneGameAddText = zoneGameAdd > 0 ? `デビルゾーン+${zoneGameAdd}G` : "";
-      const zoneStartText = resolved.bigZone > 0 ? goraiZoneRemainText(resolved.bigZone) : "";
-      const zoneRollText = zoneWasActive && resolved.bigZone <= 0 ? goraiZoneRemainText(session.bigZone) : "";
+      const zoneStartText = resolved.bigZone > 0 ? goraiZoneRemainText(resolved.bigZone, resolved.bigZoneType) : "";
+      const zoneRollText = zoneWasActive && resolved.bigZone <= 0 ? goraiZoneRemainText(session.bigZone, session.bigZoneType) : "";
       const joinText = [rewardText, stockText, continuationBoostText, stGameText, zoneGameAddText, zoneStartText, zoneRollText].filter(Boolean).join(" / ");
       const lineText = result !== "MISS" ? `${lineName(lineRow)}ライン` : "";
       const phaseText = session.phase === "battle" ? battleRemainText() : `残り${session.remain}G`;
@@ -6965,13 +7143,20 @@ body{
       showMessage(info.name, subText);
       log(`${info.name}：${subText}`);
 
-      if(result === "BIG" || result === "MID" || result === "SMALL"){
+      if(resolved.zoneSevenHit){
         flashReelLight("rainbow", 2200);
-        if(result === "BIG"){
-          showOverlay("デビルゾーン");
+        showOverlay(bonusOverlayText || "777");
+        confetti(95);
+      }else if(result === "BIG" || result === "MID" || isZoneEntryResult(result) || result === "SMALL"){
+        flashReelLight("rainbow", 2200);
+        if(result === "BIG" || result === "SUPER_DEVIL_ZONE"){
+          showOverlay("SUPER DEVIL ZONE");
           confetti(95);
+        }else if(result === "MID" || result === "DEVIL_ZONE"){
+          showOverlay("DEVIL ZONE");
+          confetti(70);
         }else{
-          showOverlay(result === "MID" ? "REG" : (stGameText || "AT+10G"));
+          showOverlay(stGameText || "AT+10G");
           confetti(45);
         }
       }else if(result === "BAR3"){
@@ -6984,6 +7169,9 @@ body{
         showOverlay(bonusOverlayText || "BELL");
         confetti(20);
         if(reward <= 0) playWinSound(false);
+      }else if(result === "BELL3"){
+        flashReelLight("blue", 1200);
+        showOverlay(bonusOverlayText || "斜めBELL");
       }else if(result === "REPLAY"){
         flashReelLight("blue", 1200);
         showOverlay(bonusOverlayText || "REPLAY");
@@ -7010,7 +7198,7 @@ body{
     }
 
     $("stLamp").classList.remove("on");
-    const zoneRollText = zoneWasActive ? goraiZoneRemainText(session.bigZone) : "";
+    const zoneRollText = zoneWasActive ? goraiZoneRemainText(session.bigZone, session.bigZoneType || resolved.zoneType) : "";
     const phaseText = session.phase === "battle" ? battleRemainText() : `残り${session.remain}G`;
     const battleText = `${session.setNo || 1}SET / ${phaseText} / STOCK${session.stockSets || 0} / 継続${formatRate(session.continuationRate)}`;
     showMessage("ハズレ", [zoneRollText, battleText].filter(Boolean).join(" / "));
@@ -7041,7 +7229,7 @@ body{
         : `${normalModeLabel()} / 天井まで${ceilingRemain()}G / 1G ${SPIN_COST}pt`;
     if($("stInfoView")) $("stInfoView").textContent = stInfoText;
     if($("adminStInfoView")) $("adminStInfoView").textContent = stInfoText;
-    const payoutScaleText = `通常:ベル${NORMAL_ROLE_PAYOUTS.BELL}pt/スイカ${NORMAL_ROLE_PAYOUTS.SUICA}pt/チェリー${NORMAL_ROLE_PAYOUTS.CHERRY_ANY}pt/リプレイ${NORMAL_ROLE_PAYOUTS.REPLAY}pt/REG${NORMAL_ROLE_PAYOUTS.MID}pt / 通常小役${Math.round(NORMAL_ROLE_RATE * 100)}% / 高確小役${Math.round(HIGH_ROLE_RATE * 100)}% / ATベル${ROLE_PAYOUTS.BELL}pt / 平均継続${formatRate(averageContinuationRate(settings.setting))}`;
+    const payoutScaleText = `通常:ベル${NORMAL_ROLE_PAYOUTS.BELL}pt/スイカ${NORMAL_ROLE_PAYOUTS.SUICA}pt/チェリー${NORMAL_ROLE_PAYOUTS.CHERRY_ANY}pt/リプレイ${NORMAL_ROLE_PAYOUTS.REPLAY}pt/REG${NORMAL_ROLE_PAYOUTS.MID}pt / 通常小役${Math.round(NORMAL_ROLE_RATE * 100)}% / 高確小役${Math.round(HIGH_ROLE_RATE * 100)}% / ATベル${ROLE_PAYOUTS.BELL}pt/斜めベル${ROLE_PAYOUTS.BELL3}pt / 平均継続${formatRate(averageContinuationRate(settings.setting))}`;
     if($("payoutScaleView")) $("payoutScaleView").textContent = payoutScaleText;
     if($("adminPayoutScaleView")) $("adminPayoutScaleView").textContent = payoutScaleText;
 
@@ -7051,6 +7239,7 @@ body{
     if($("midCountView")) $("midCountView").textContent = stats.midCount || 0;
     if($("smallCountView")) $("smallCountView").textContent = stats.smallCount || 0;
     if($("bellCountView")) $("bellCountView").textContent = countOddsText(stats.bellCount);
+    if($("diagonalBellCountView")) $("diagonalBellCountView").textContent = countOddsText(stats.diagonalBellCount);
     if($("replayCountView")) $("replayCountView").textContent = countOddsText(stats.replayCount);
     if($("suikaCountView")) $("suikaCountView").textContent = countOddsText(stats.suikaCount);
     if($("cherryCountView")) $("cherryCountView").textContent = countOddsText(stats.cherryCount);
@@ -7091,12 +7280,27 @@ body{
     setText("wdCounterReg", stats.midCount || 0);
     setText("wdCounterSmall", stats.smallCount || 0);
     setText("wdCounterBell", stats.bellCount || 0);
+    setText("wdCounterDiagonalBell", stats.diagonalBellCount || 0);
     setText("wdCounterSuika", stats.suikaCount || 0);
     setText("wdCounterCherry", stats.cherryCount || 0);
     setText("wdCounterReplay", stats.replayCount || 0);
-    setText("wdMirrorSt", atCountText);
-    setText("wdMirrorBig", stats.bigCount || 0);
-    setText("wdMirrorReg", stats.midCount || 0);
+    const setMirrorCell = (valueId, label, value)=>{
+      const valueEl = $(valueId);
+      if(!valueEl) return;
+      const labelEl = valueEl.parentElement ? valueEl.parentElement.querySelector("span") : null;
+      if(labelEl) labelEl.textContent = label;
+      valueEl.textContent = value;
+    };
+    if(active){
+      const zoneRemain = Math.max(0, session.bigZone || 0);
+      setMirrorCell("wdMirrorSt", "AT残", `${Math.max(0, session.remain || 0)}G`);
+      setMirrorCell("wdMirrorBig", "DZ残", currentGoraiZoneType() === "devil" && isGoraiZoneActive() ? `${zoneRemain}G` : "0G");
+      setMirrorCell("wdMirrorReg", "超DZ残", isSuperGoraiZoneActive() ? `${zoneRemain}G` : "0G");
+    }else{
+      setMirrorCell("wdMirrorSt", "AT", atCountText);
+      setMirrorCell("wdMirrorBig", "BIG", stats.bigCount || 0);
+      setMirrorCell("wdMirrorReg", "REG", stats.midCount || 0);
+    }
     setText("wdMirrorSpin", `${stats.totalSpins || 0}G`);
     setText("wdMirrorProfit", formatSigned(profit));
 
@@ -7104,7 +7308,7 @@ body{
     if(remainBig){
       const label = document.querySelector(".sevenSegLabel");
       if(active){
-        if(label) label.textContent = isGoraiZoneActive() ? "DEVIL ZONE" : isContinuationBattleActive() ? "BATTLE" : "残りAT";
+        if(label) label.textContent = isGoraiZoneActive() ? goraiZoneLabel() : isContinuationBattleActive() ? "BATTLE" : "残りAT";
         if(isGoraiZoneActive()){
           remainBig.textContent = String(Math.max(0, session.bigZone)).padStart(2, "0");
         }else if(isContinuationBattleActive()){
@@ -7182,7 +7386,7 @@ body{
     const table = $("settingTable");
     if(!table) return;
 
-    let html = `<tr><td>設定</td><td>表記割</td><td>小役合算</td><td>砂時計</td><td>REG</td><td>BIG/デビルゾーン</td><td>ベル</td><td>スイカ</td><td>チェリー合算</td><td>BAR</td><td>平均SET</td></tr>`;
+    let html = `<tr><td>設定</td><td>表記割</td><td>BIG/超デビルゾーン</td><td>REG/デビルゾーン</td><td>砂時計</td><td>ベル</td><td>斜めベル</td><td>スイカ</td><td>チェリー合算</td><td>BAR</td><td>平均SET</td></tr>`;
     const settingList = [1,2,3,4,5,6];
 
     for(const i of settingList){
@@ -7196,24 +7400,24 @@ body{
       const bar3P = 1 / BAR3_PREMIUM_DENOM;
       const bigP = hit * (weightOf("BIG") / total);
       const bellP = hit * (weightOf("BELL") / total);
+      const bell3P = hit * (weightOf("BELL3") / total);
       const suikaP = hit * (weightOf("SUICA") / total);
       const cherryP = hit * ((weightOf("CHERRY_ANY") + weightOf("CHERRY_DOUBLE") + weightOf("CHERRY_TRIPLE")) / total);
-      const hitTotalP = hit;
-      const avgSt = expectedAverageSpins(i);
+      const avgSet = expectedAverageSets(i);
       const targetText = Math.round(targetRtpFor(i)*100) + "%";
 
       html += `<tr>
         <td>${i}</td>
         <td>${targetText}</td>
-        <td>${oddsText(hitTotalP)}</td>
-        <td>${oddsText(smallP)}</td>
-        <td>${oddsText(midP)}</td>
         <td>${oddsText(bigP)}</td>
+        <td>${oddsText(midP)}</td>
+        <td>${oddsText(smallP)}</td>
         <td>${oddsText(bellP)}</td>
+        <td>${oddsText(bell3P)}</td>
         <td>${oddsText(suikaP)}</td>
         <td>${oddsText(cherryP)}</td>
         <td>${oddsText(bar3P)}</td>
-        <td>${avgSt.toFixed(1)}G</td>
+        <td>${avgSet.toFixed(1)}SET</td>
       </tr>`;
     }
 
@@ -7244,10 +7448,10 @@ body{
     reels.forEach(r=>r.classList.remove("spinning"));
     isSpinning = false;
     currentSpin = null;
-    stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,smallCount:0,bellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
+    stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",morningCeilingActive:false};
-    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,continuationRate:0,bigZone:0,phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null};
+    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null};
     completeTrialState = {locked:false,lockedSetting:0,rescueActive:false,completeProfit:0};
     setSpeedFrameOffHold(false);
     forceResult = "";
@@ -7287,10 +7491,10 @@ body{
     reels.forEach(r=>r.classList.remove("spinning"));
     isSpinning = false;
     currentSpin = null;
-    stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,smallCount:0,bellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
+    stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",morningCeilingActive:true};
-    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,continuationRate:0,bigZone:0,phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null};
+    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null};
     completeTrialState = {locked:false,lockedSetting:0,rescueActive:false,completeProfit:0};
     setSpeedFrameOffHold(false);
     forceResult = "";
@@ -7448,6 +7652,7 @@ body{
   }
 
   function lineName(row){
+    if(Array.isArray(row)) return row[0] === 0 ? "右下がり斜め" : "右上がり斜め";
     return row === 0 ? "上段" : row === 2 ? "下段" : "中段";
   }
 
@@ -7456,7 +7661,9 @@ body{
   }
 
   function resultLineRow(result){
-    return result === "BAR3" ? 1 : randomLineRow();
+    if(result === "BAR3") return 1;
+    if(result === "BELL3") return Math.random() < 0.5 ? [0,1,2] : [2,1,0];
+    return randomLineRow();
   }
 
   function randomSymbol(options={}){
@@ -7516,6 +7723,15 @@ body{
     );
   }
 
+  function hasBellDiagonal(grid){
+    const bell = RESULT.BELL.reel[0];
+    return (
+      grid[0]?.[0] === bell && grid[1]?.[1] === bell && grid[2]?.[2] === bell
+    ) || (
+      grid[2]?.[0] === bell && grid[1]?.[1] === bell && grid[0]?.[2] === bell
+    );
+  }
+
   function hasCrownVisible(grid){
     return grid.some(row => row.includes("👑"));
   }
@@ -7529,6 +7745,7 @@ body{
     if(rows[1] && rows[1][0] === "BAR" && rows[1][1] === "BAR" && rows[1][2] === "BAR") return "BAR3";
     if(rows.some(row => row[0] === USER_FACE && row[1] === USER_FACE && row[2] === USER_FACE)) return "SMALL";
     if(rows.some(row => row[0] === "🔔" && row[1] === "🔔" && row[2] === "🔔")) return "BELL";
+    if(hasBellDiagonal(rows)) return "BELL3";
     if(rows.some(row => row[0] === "REPLAY" && row[1] === "REPLAY" && row[2] === "REPLAY")) return "REPLAY";
     if(rows.some(row => row[0] === "🍋" && row[1] === "🍋" && row[2] === "🍋")) return "SUICA";
     if(rows.some(row => row[0] === "🍒" && row[1] === "🍒" && row[2] === "🍒")) return "CHERRY_TRIPLE";
@@ -7552,10 +7769,14 @@ body{
   }
 
   function hasOnlyTargetPayline(grid, result, winRow=1){
+    if(result === "BELL3"){
+      return hasBellDiagonal(grid) && grid.every(line => displayedResultFromRow(line) === "MISS");
+    }
+    const targetResult = displayResultFor(result);
     const row = clamp(winRow, 0, 2);
     return grid.every((line, index)=>{
       const lineResult = displayedResultFromRow(line);
-      return index === row ? lineResult === result : lineResult === "MISS";
+      return index === row ? lineResult === targetResult : lineResult === "MISS";
     });
   }
 
@@ -7571,12 +7792,22 @@ body{
   }
 
   function gridMatchesResult(grid, result, winRow=1){
+    if(result === "BELL3") return !hasCrownVisible(grid) && !hasBarDiagonal(grid) && displayedResultFromGrid(grid) === "BELL3" && hasOnlyTargetPayline(grid, result, winRow);
     if(hasCrownVisible(grid)) return false;
     if(result !== "BAR3" && hasBarDiagonal(grid)) return false;
-    return displayedResultFromGrid(grid) === result && hasOnlyTargetPayline(grid, result, winRow);
+    return displayedResultFromGrid(grid) === displayResultFor(result) && hasOnlyTargetPayline(grid, result, winRow);
   }
 
   function buildGrid(result, winRow=1){
+  function buildDiagonalBellGrid(winRows){
+    const bell = RESULT.BELL.reel[0];
+    const down = Array.isArray(winRows) ? winRows[0] === 0 : Math.random() < 0.5;
+    return down
+      ? [[bell,"7","REPLAY"],["7",bell,"BAR"],["REPLAY","BAR",bell]]
+      : [["REPLAY","BAR",bell],["7",bell,"BAR"],[bell,"7","REPLAY"]];
+  }
+
+    if(result === "BELL3") return buildDiagonalBellGrid(winRow);
     if(result === "BAR3") winRow = 1;
     if(result === "MISS"){
       let picked = MISS_GRID_PATTERNS[randomInt(0, MISS_GRID_PATTERNS.length - 1)].map(row => row.slice());
@@ -7614,7 +7845,7 @@ body{
     const win = reels[index].querySelector(".window");
     win.innerHTML = "";
     columnSymbols.forEach((symbol,i)=>{
-      const isWin = winRow !== null && i === winRow;
+      const isWin = Array.isArray(winRow) ? i === winRow[index] : winRow !== null && i === winRow;
       const div = document.createElement("div");
       div.className = "cell" + (i===1 ? " center" : "") + (isWin ? " winline" : "");
       div.innerHTML = cellHtml(symbol, (isWin ? (label || "") : ""), (isWin ? (cls || "") : ""));
@@ -7721,7 +7952,7 @@ body{
         $("spinBtn").textContent = "ストップ";
         stopBtns.forEach(b=>b.disabled=false);
         $("resultText").textContent = zoneActiveAtSpinStart
-          ? `${goraiZoneRemainText(session.bigZone)} / 停止できます`
+          ? `${goraiZoneRemainText(session.bigZone, session.bigZoneType)} / 停止できます`
           : battleActiveAtSpinStart
             ? `${battleRemainText()} / 停止できます`
             : "停止できます";
@@ -7775,6 +8006,7 @@ body{
       bar3LeverEffect,
       speedModeBonusRogiEffect,
       zoneActiveAtStart:zoneActiveAtSpinStart,
+      zoneType:zoneActiveAtSpinStart ? currentGoraiZoneType() : "",
       battleActiveAtStart:battleActiveAtSpinStart,
       normalActiveAtStart:normalActiveAtSpinStart,
       speedModeAtStart:speedModeSpinAtStart,
@@ -7822,7 +8054,7 @@ body{
           ? "プレミア演出発生！ 0.5秒後に停止可能"
           : "ウェイト中... 0.5秒後に停止可能";
     $("resultText").textContent = zoneActiveAtSpinStart
-      ? `${goraiZoneRemainText(session.bigZone)} / ${waitText}`
+      ? `${goraiZoneRemainText(session.bigZone, session.bigZoneType)} / ${waitText}`
       : battleActiveAtSpinStart
         ? `${battleRemainText()} / ${waitText}`
         : waitText;
@@ -7861,7 +8093,7 @@ body{
 
     stopReel(i, col, label, spec.cls, result === "MISS" ? null : lineRow);
     currentSpin.stopped[i] = true;
-    if(i === 1 && (result === "BIG" || result === "MID")){
+    if(i === 1 && (result === "BIG" || result === "MID" || isZoneEntryResult(result))){
       playVoiceSound(VOICE_SRC.reach);
     }
     playBellReelStopVideo(i);
@@ -7933,16 +8165,16 @@ body{
     const lineText = result !== "MISS" ? ` / ${lineName(lineRow)}ライン` : "";
     const zoneRemainAfterSpin = resolved.zoneGame ? Math.max(0, session.bigZone - 1, resolved.bigZone || 0) + zoneGameAdd : null;
     const zoneText = resolved.zoneGame
-      ? goraiZoneRemainText(zoneRemainAfterSpin)
+      ? goraiZoneRemainText(zoneRemainAfterSpin, currentSpin?.zoneType || session.bigZoneType)
       : resolved.bigZone > 0
-        ? goraiZoneRemainText(resolved.bigZone)
+        ? goraiZoneRemainText(resolved.bigZone, resolved.bigZoneType)
         : "";
     const isNormalSpinResult = currentSpin && currentSpin.normalActiveAtStart;
     const resultParts = [];
     if(reward > 0) resultParts.push("+" + reward + "pt");
     if(stockAdd > 0) resultParts.push("SET+" + stockAdd);
     if(stGameAdd > 0) resultParts.push("AT+" + stGameAdd + "G");
-    if(zoneGameAdd > 0) resultParts.push("デビルゾーン+" + zoneGameAdd + "G");
+    if(zoneGameAdd > 0) resultParts.push(goraiZoneName(resolved.zoneType) + "+" + zoneGameAdd + "G");
     if(resolved.bigZone > 0 && zoneText) resultParts.push(zoneText);
     if(resultParts.length === 0) resultParts.push(isNormalSpinResult ? "払い出しなし" : "0pt");
     if(resolved.zoneGame && zoneText) resultParts.push(zoneText);
@@ -8908,6 +9140,7 @@ body{
     onClick("debugBar3Btn", ()=>direct("BAR3"));
     onClick("debugBigBtn", ()=>direct("BIG"));
     onClick("debugBellPayBtn", ()=>direct("BELL"));
+    onClick("debugBell3Btn", ()=>direct("BELL3"));
     onClick("debugReplayBtn", ()=>direct("REPLAY"));
     onClick("debugSuikaBtn", ()=>direct("SUICA"));
     onClick("debugCherryBtn", ()=>direct("CHERRY_ANY"));
