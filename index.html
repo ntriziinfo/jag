@@ -821,6 +821,13 @@ h1{
   transform:scale(1.06);
   filter:saturate(1.55) contrast(1.18) brightness(1.02);
 }
+.devilZoneFireLayer.superZoneFire{
+  opacity:.56;
+  background:rgba(29,0,54,.22);
+}
+.devilZoneFireLayer.superZoneFire video{
+  filter:hue-rotate(245deg) saturate(2.35) contrast(1.22) brightness(1.08);
+}
 .reelVideoLayer{
   position:absolute;
   inset:0;
@@ -1884,6 +1891,9 @@ body.debugOpen .debugDrawer .secret{
   border-radius:22px;
   background:radial-gradient(circle at 50% 50%, rgba(255,36,66,.24), rgba(0,0,0,0) 64%);
   animation:goraiZoneRedPulse 1.18s ease-in-out infinite;
+}
+.reelArea.goraiZoneGlow.superGoraiZoneGlow::after{
+  background:radial-gradient(circle at 50% 50%, rgba(185,112,255,.28), rgba(58,126,255,.10) 44%, rgba(0,0,0,0) 66%);
 }
 @keyframes goraiZoneRedPulse{
   0%,100%{opacity:.48;filter:saturate(1.05)}
@@ -4994,6 +5004,7 @@ body{
   function updateGoraiZoneGlow(){
     if(!reelArea) return;
     reelArea.classList.toggle("goraiZoneGlow", isGoraiZoneActive());
+    reelArea.classList.toggle("superGoraiZoneGlow", isSuperGoraiZoneActive());
     updateDevilZoneFireVideos();
   }
 
@@ -5017,6 +5028,7 @@ body{
   }
 
   function showDevilZoneFireVideos(){
+    const superZone = isSuperGoraiZoneActive();
     reels.forEach((_, index)=>{
       const found = ensureDevilZoneFireLayer(index);
       if(!found) return;
@@ -5033,6 +5045,7 @@ body{
         try{ video.currentTime = 0; }catch(e){}
       }
       layer.classList.add("show");
+      layer.classList.toggle("superZoneFire", superZone);
       layer.setAttribute("aria-hidden", "false");
       if(video.paused || video.ended){
         try{
@@ -5049,6 +5062,7 @@ body{
       if(!layer) return;
       const video = layer.querySelector("video");
       layer.classList.remove("show");
+      layer.classList.remove("superZoneFire");
       layer.setAttribute("aria-hidden", "true");
       if(video){
         try{ video.pause(); }catch(e){}
