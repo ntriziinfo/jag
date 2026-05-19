@@ -173,6 +173,10 @@ h1{
   outline:2px solid rgba(77,231,255,.72);
   outline-offset:2px;
 }
+.audioDock #slumpToggleBtn,
+.audioDock #oddsToggleBtn{
+  display:none !important;
+}
 .utilityToggleBtn .utilityGlyph{
   width:100%;
   height:100%;
@@ -244,8 +248,17 @@ h1{
   max-height:calc(100vh - 84px);
   overflow:auto;
 }
+.audioDock.slumpOpen #slumpPanel,
+.audioDock.oddsOpen #oddsPanel{
+  position:fixed;
+  left:var(--wd-info-panel-left, 50vw);
+  top:var(--wd-info-panel-top, 84px);
+  right:auto;
+  transform:translateX(-50%);
+  max-height:var(--wd-info-panel-max-height, min(620px, calc(100vh - var(--wd-info-panel-top, 84px) - 18px)));
+}
 #slumpPanel{
-  width:min(500px, calc(100vw - 32px));
+  width:min(1000px, calc(100vw - 32px));
   max-height:min(620px, calc(100vh - 94px));
 }
 .audioDock.open .audioPanel,
@@ -2389,6 +2402,7 @@ body::after{display:none !important;content:none !important;}
   border:0 !important;
   box-shadow:none !important;
   display:block !important;
+  pointer-events:none !important;
 }
 .wd-info-strip div{
   position:absolute !important;
@@ -2623,26 +2637,21 @@ body::after{display:none !important;content:none !important;}
   position:absolute !important;
   right:108% !important;
   top:0 !important;
-  width:210px !important;
-  padding:10px !important;
-  border-radius:10px !important;
-  border:1px solid rgba(255,192,82,.72) !important;
-  background:linear-gradient(180deg,rgba(20,14,34,.98),rgba(4,4,12,.96)) !important;
-  box-shadow:0 0 18px rgba(255,192,82,.28), inset 0 0 14px rgba(255,255,255,.08) !important;
+  width:240px !important;
+  padding:12px !important;
+  border-radius:8px !important;
+  border:1px solid rgba(255,214,96,.86) !important;
+  background:
+    linear-gradient(180deg,rgba(10,17,33,.98),rgba(3,5,13,.98)) !important;
+  box-shadow:0 0 20px rgba(255,192,82,.30), inset 0 0 16px rgba(255,255,255,.08) !important;
   color:#fff !important;
-  text-align:left !important;
+  text-align:center !important;
   pointer-events:auto !important;
   z-index:120 !important;
 }
 .speedModeMenu[hidden]{display:none !important;}
 .speedModeHeader{
-  display:flex !important;
-  align-items:center !important;
-  justify-content:space-between !important;
-  gap:8px !important;
-  font-size:12px !important;
-  font-weight:1000 !important;
-  letter-spacing:.06em !important;
+  display:none !important;
 }
 .speedModeHeader span{
   color:#ffcf66 !important;
@@ -2650,13 +2659,15 @@ body::after{display:none !important;content:none !important;}
 }
 .speedModeToggle{
   width:100% !important;
-  margin:8px 0 !important;
-  padding:8px 10px !important;
+  margin:0 0 10px !important;
+  padding:10px 12px !important;
   border-radius:8px !important;
   border:1px solid rgba(255,220,130,.7) !important;
   color:#221000 !important;
   background:linear-gradient(180deg,#fff2aa,#ffb12c) !important;
   font-weight:1000 !important;
+  font-size:15px !important;
+  line-height:1 !important;
 }
 .speedModeToggle.off{
   color:#fff !important;
@@ -2668,11 +2679,19 @@ body::after{display:none !important;content:none !important;}
 }
 .speedModeText,
 .speedModeCount{
-  font-size:11px !important;
+  display:block !important;
+  padding:10px 9px !important;
+  border-radius:7px !important;
+  border:1px solid rgba(77,231,255,.24) !important;
+  background:rgba(0,0,0,.34) !important;
+  color:#f8fbff !important;
+  font-size:14px !important;
+  font-weight:1000 !important;
   line-height:1.35 !important;
-  color:rgba(255,255,255,.76) !important;
+  text-align:center !important;
+  text-shadow:0 0 8px rgba(77,231,255,.42) !important;
 }
-.speedModeCount{color:#ffdf85 !important;font-weight:900 !important;}
+.speedModeCount{display:none !important;}
 .side .oddsPublic,
 .wd-public-panels{
   margin-top:0 !important;
@@ -2872,6 +2891,41 @@ body::after{display:none !important;content:none !important;}
   overflow:hidden !important;
 }
 .wd-data-counter-panel h2{display:none !important;}
+.wd-counter-actions{
+  position:absolute;
+  left:22.5%;
+  right:9.2%;
+  top:8.1%;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:4px;
+  z-index:2;
+}
+.wd-counter-action{
+  width:100%;
+  min-height:18px;
+  padding:0 5px;
+  border-radius:4px;
+  color:#dff7ff;
+  background:linear-gradient(180deg,rgba(20,81,140,.86),rgba(2,14,43,.92));
+  border:1px solid rgba(77,231,255,.42);
+  box-shadow:inset 0 0 8px rgba(255,255,255,.08), 0 0 8px rgba(77,231,255,.18);
+  font-size:clamp(7px, .62vw, 10px);
+  font-weight:1000;
+  line-height:1.05;
+  white-space:nowrap;
+  text-align:center;
+  text-shadow:0 0 6px rgba(77,231,255,.56);
+}
+.wd-counter-action.is-open{
+  color:#ffeaa8;
+  border-color:rgba(255,211,106,.70);
+  background:linear-gradient(180deg,rgba(116,52,8,.92),rgba(32,8,2,.94));
+  box-shadow:inset 0 0 8px rgba(255,255,255,.10), 0 0 11px rgba(255,211,106,.25);
+}
+.wd-data-counter-panel:not(.is-counter-open) .wd-counter-rows{
+  display:none !important;
+}
 .wd-counter-rows{
   position:absolute;
   left:31.4%;
@@ -3220,6 +3274,8 @@ body{
   --wd-left-rail-width:256px;
   --wd-right-rail-width:244px;
   --wd-cabinet-anchor-offset:0px;
+  --wd-bg-sync-x:center;
+  --wd-bg-sync-size:cover;
 }
 html,
 body{
@@ -3228,7 +3284,12 @@ body{
 }
 html{
   min-height:100% !important;
-  background:#020307 url("assets/backgrounds/bg_fire_ice.png") center top/cover fixed no-repeat !important;
+  background-color:#020307 !important;
+  background-image:url("assets/backgrounds/bg_fire_ice.png") !important;
+  background-position:var(--wd-bg-sync-x) top !important;
+  background-size:var(--wd-bg-sync-size) !important;
+  background-attachment:fixed !important;
+  background-repeat:no-repeat !important;
 }
 body{
   min-width:calc(var(--wd-stage-width) * var(--wd-page-zoom)) !important;
@@ -3290,7 +3351,7 @@ body{
   padding:0 !important;
   aspect-ratio:auto !important;
   z-index:9 !important;
-  pointer-events:none !important;
+  pointer-events:auto !important;
   transform:none !important;
 }
 .reelArea .wd-reel-data-panel::after{
@@ -3320,8 +3381,17 @@ body{
 .reelArea .wd-reel-counter-panel .wd-counter-rows{
   left:31.4% !important;
   right:13.2% !important;
-  top:18.9% !important;
-  bottom:9% !important;
+  top:39.2% !important;
+  bottom:8.8% !important;
+}
+.reelArea .wd-reel-counter-panel .wd-counter-actions{
+  left:21.8% !important;
+  right:8.8% !important;
+  top:7.8% !important;
+}
+.reelArea .wd-reel-counter-panel .wd-counter-action{
+  min-height:clamp(14px, 1.36vw, 19px) !important;
+  font-size:clamp(6px, .72vw, 10px) !important;
 }
 .reelArea .wd-reel-counter-panel .wd-counter-rows div{
   gap:3px !important;
@@ -3510,6 +3580,11 @@ body{
           </div>
         </div>
         <div class="wd-data-counter-panel wd-reel-counter-panel" id="reelDataCounter">
+          <div class="wd-counter-actions" aria-label="データ表示切替">
+            <button class="wd-counter-action" id="reelSlumpToggleBtn" type="button" aria-expanded="false">スランプグラフ</button>
+            <button class="wd-counter-action" id="reelOddsToggleBtn" type="button" aria-expanded="false">設定別確率</button>
+            <button class="wd-counter-action" id="reelDataToggleBtn" type="button" aria-expanded="false">データカウンター</button>
+          </div>
           <div class="wd-counter-rows">
             <div><span>AT</span><b id="wdCounterSt">--G</b></div>
             <div><span>BIG</span><b id="wdCounterBig">0</b></div>
@@ -3568,7 +3643,7 @@ body{
             <div class="speedModeMenu" id="speedModeMenu" hidden>
               <div class="speedModeHeader"><b>SPEED MODE</b><span id="speedModeState">OFF</span></div>
               <button class="speedModeToggle" id="speedModeToggleBtn" type="button">ON</button>
-              <div class="speedModeText">通常時のみAUTOの3倍速（上限10回転/s）で遊技します。BGMあり、確定時のみ動画音声あり。</div>
+              <div class="speedModeText">通常時のみ3倍速で遊戯できます。</div>
               <div class="speedModeCount" id="speedModeCount">今回0G</div>
             </div>
           </div>
@@ -4241,6 +4316,10 @@ body{
   const audioDock = $("audioDock");
   const slumpToggleBtn = $("slumpToggleBtn");
   const oddsToggleBtn = $("oddsToggleBtn");
+  const reelSlumpToggleBtn = $("reelSlumpToggleBtn");
+  const reelOddsToggleBtn = $("reelOddsToggleBtn");
+  const reelDataToggleBtn = $("reelDataToggleBtn");
+  const reelDataCounterPanel = $("reelDataCounter");
   const audioToggleBtn = $("audioToggleBtn");
   const audioCloseBtn = $("audioCloseBtn");
   const slumpCloseBtn = $("slumpCloseBtn");
@@ -4300,7 +4379,11 @@ body{
   const PAGE_ZOOM_MIN = 0.75;
   const PAGE_ZOOM_MAX = 3.00;
   const PAGE_ZOOM_STEP = 0.05;
+  const BG_IMAGE_WIDTH = 1881;
+  const BG_IMAGE_HEIGHT = 3344;
+  const BG_ORANGE_LOGO_ANCHOR_X = 964;
   let pageZoom = 1;
+  let backgroundSyncRaf = 0;
 
   function pageZoomFocusX(){
     const raw = getComputedStyle(document.documentElement).getPropertyValue("--wd-stage-focus-x");
@@ -4322,6 +4405,39 @@ body{
     const maxScroll = Math.max(0, document.documentElement.scrollWidth - viewW);
     const targetLeft = clamp(Math.round(focusX - targetScreenX), 0, maxScroll);
     window.scrollTo({ left:targetLeft, top:window.scrollY || document.documentElement.scrollTop || 0, behavior:"auto" });
+    requestBackgroundLogoSync();
+  }
+
+  function reelCenterScreenX(){
+    const reelWindow = document.querySelector(".reels") || document.querySelector(".reelArea") || machine;
+    if(!reelWindow) return (window.innerWidth || document.documentElement.clientWidth || PAGE_STAGE_WIDTH) / 2;
+    const rect = reelWindow.getBoundingClientRect();
+    return rect.left + rect.width / 2;
+  }
+
+  function syncBackgroundLogoToReelCenter(){
+    const root = document.documentElement;
+    const viewW = Math.max(1, window.innerWidth || root.clientWidth || PAGE_STAGE_WIDTH);
+    const viewH = Math.max(1, window.innerHeight || root.clientHeight || BG_IMAGE_HEIGHT);
+    const targetX = reelCenterScreenX();
+    const anchorX = BG_ORANGE_LOGO_ANCHOR_X;
+    const rightAnchor = Math.max(1, BG_IMAGE_WIDTH - anchorX);
+    const coverScale = Math.max(viewW / BG_IMAGE_WIDTH, viewH / BG_IMAGE_HEIGHT);
+    const leftSafeScale = targetX > 0 ? targetX / anchorX : 0;
+    const rightSafeScale = (viewW - targetX) > 0 ? (viewW - targetX) / rightAnchor : 0;
+    const scale = Math.max(coverScale, leftSafeScale, rightSafeScale, 0.001);
+    const drawW = BG_IMAGE_WIDTH * scale;
+    const left = targetX - anchorX * scale;
+    root.style.setProperty("--wd-bg-sync-size", `${Math.round(drawW * 100) / 100}px auto`);
+    root.style.setProperty("--wd-bg-sync-x", `${Math.round(left * 100) / 100}px`);
+  }
+
+  function requestBackgroundLogoSync(){
+    if(backgroundSyncRaf) return;
+    backgroundSyncRaf = requestAnimationFrame(()=>{
+      backgroundSyncRaf = 0;
+      syncBackgroundLogoToReelCenter();
+    });
   }
 
   function applyPageZoom(saveValue=false){
@@ -4332,6 +4448,7 @@ body{
     if(pageZoomOutBtn) pageZoomOutBtn.disabled = pageZoom <= PAGE_ZOOM_MIN + 0.001;
     if(pageZoomInBtn) pageZoomInBtn.disabled = pageZoom >= PAGE_ZOOM_MAX - 0.001;
     if(saveValue) safeStorageSet(PAGE_ZOOM_STORAGE_KEY, String(pageZoom));
+    requestBackgroundLogoSync();
   }
 
   function loadPageZoom(){
@@ -4430,18 +4547,106 @@ body{
     audioDock.classList.remove("slumpOpen","oddsOpen");
     if(slumpToggleBtn) slumpToggleBtn.setAttribute("aria-expanded", "false");
     if(oddsToggleBtn) oddsToggleBtn.setAttribute("aria-expanded", "false");
+    updateReelInfoButtons();
+  }
+
+  function isInfoPanelOpen(type){
+    if(!audioDock) return false;
+    return audioDock.classList.contains(type === "slump" ? "slumpOpen" : "oddsOpen");
+  }
+
+  function updateReelInfoButtons(){
+    const slumpOpen = isInfoPanelOpen("slump");
+    const oddsOpen = isInfoPanelOpen("odds");
+    if(reelSlumpToggleBtn){
+      reelSlumpToggleBtn.textContent = slumpOpen ? "とじる" : "スランプグラフ";
+      reelSlumpToggleBtn.classList.toggle("is-open", slumpOpen);
+      reelSlumpToggleBtn.setAttribute("aria-expanded", slumpOpen ? "true" : "false");
+    }
+    if(reelOddsToggleBtn){
+      reelOddsToggleBtn.textContent = oddsOpen ? "とじる" : "設定別確率";
+      reelOddsToggleBtn.classList.toggle("is-open", oddsOpen);
+      reelOddsToggleBtn.setAttribute("aria-expanded", oddsOpen ? "true" : "false");
+    }
+  }
+
+  function isReelDataCounterOpen(){
+    return !!(reelDataCounterPanel && reelDataCounterPanel.classList.contains("is-counter-open"));
+  }
+
+  function updateReelDataCounterMenu(){
+    const open = isReelDataCounterOpen();
+    if(reelDataToggleBtn){
+      reelDataToggleBtn.textContent = open ? "とじる" : "データカウンター";
+      reelDataToggleBtn.classList.toggle("is-open", open);
+      reelDataToggleBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+  }
+
+  function setReelDataCounterOpen(open){
+    if(!reelDataCounterPanel) return;
+    reelDataCounterPanel.classList.toggle("is-counter-open", !!open);
+    updateReelDataCounterMenu();
+  }
+
+  function syncInfoPanelPosition(){
+    const root = document.documentElement;
+    const reelWindow = document.querySelector(".reels") || reelArea || machine;
+    const regWindow = document.querySelector(".wd-info-strip div:nth-child(3)");
+    const activePanel = audioDock && audioDock.classList.contains("slumpOpen")
+      ? $("slumpPanel")
+      : audioDock && audioDock.classList.contains("oddsOpen")
+        ? $("oddsPanel")
+        : null;
+    const viewW = window.innerWidth || root.clientWidth || PAGE_STAGE_WIDTH;
+    let left = viewW / 2;
+    let top = 16;
+    let maxHeight = 620;
+    if(reelWindow || regWindow){
+      const reelRect = reelWindow ? reelWindow.getBoundingClientRect() : null;
+      const regRect = regWindow ? regWindow.getBoundingClientRect() : null;
+      const gap = 20;
+      const topMargin = 16;
+      const anchorRect = regRect || reelRect;
+      left = anchorRect.left + anchorRect.width / 2;
+      const anchorTop = regRect ? regRect.top : reelRect.top;
+      maxHeight = Math.max(40, anchorTop - gap - topMargin);
+      const panelHeight = activePanel
+        ? Math.min(activePanel.scrollHeight || activePanel.getBoundingClientRect().height || maxHeight, maxHeight)
+        : maxHeight;
+      top = anchorTop - gap - panelHeight;
+    }
+    left = clamp(left, 16, Math.max(16, viewW - 16));
+    top = Math.max(8, top);
+    root.style.setProperty("--wd-info-panel-left", `${Math.round(left * 100) / 100}px`);
+    root.style.setProperty("--wd-info-panel-top", `${Math.round(top * 100) / 100}px`);
+    root.style.setProperty("--wd-info-panel-max-height", `${Math.round(maxHeight * 100) / 100}px`);
+  }
+
+  function syncInfoPanelPositionIfOpen(){
+    if(audioDock && (audioDock.classList.contains("slumpOpen") || audioDock.classList.contains("oddsOpen"))){
+      syncInfoPanelPosition();
+    }
   }
 
   function setInfoPanelOpen(type, open){
     if(!audioDock) return;
     setAudioPanelOpen(false);
     closeInfoPanels();
-    if(!open) return;
+    if(!open){
+      updateReelInfoButtons();
+      return;
+    }
     const isSlump = type === "slump";
     audioDock.classList.add(isSlump ? "slumpOpen" : "oddsOpen");
     const btn = isSlump ? slumpToggleBtn : oddsToggleBtn;
     if(btn) btn.setAttribute("aria-expanded", "true");
-    if(isSlump) requestAnimationFrame(renderSlumpGraph);
+    syncInfoPanelPosition();
+    updateReelInfoButtons();
+    requestAnimationFrame(()=>{
+      syncInfoPanelPosition();
+      if(isSlump) renderSlumpGraph();
+    });
   }
 
   function closeUtilityPanels(){
@@ -8156,6 +8361,25 @@ body{
         setInfoPanelOpen("odds", !audioDock.classList.contains("oddsOpen"));
       });
     }
+    if(reelSlumpToggleBtn){
+      reelSlumpToggleBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        setInfoPanelOpen("slump", !audioDock.classList.contains("slumpOpen"));
+      });
+    }
+    if(reelOddsToggleBtn){
+      reelOddsToggleBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        setInfoPanelOpen("odds", !audioDock.classList.contains("oddsOpen"));
+      });
+    }
+    if(reelDataToggleBtn){
+      reelDataToggleBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        setReelDataCounterOpen(!isReelDataCounterOpen());
+      });
+      updateReelDataCounterMenu();
+    }
     if(audioCloseBtn){
       audioCloseBtn.addEventListener("click", e=>{
         e.stopPropagation();
@@ -8167,14 +8391,16 @@ body{
       slumpCloseBtn.addEventListener("click", e=>{
         e.stopPropagation();
         setInfoPanelOpen("slump", false);
-        if(slumpToggleBtn) slumpToggleBtn.focus();
+        if(reelSlumpToggleBtn) reelSlumpToggleBtn.focus();
+        else if(slumpToggleBtn) slumpToggleBtn.focus();
       });
     }
     if(oddsCloseBtn){
       oddsCloseBtn.addEventListener("click", e=>{
         e.stopPropagation();
         setInfoPanelOpen("odds", false);
-        if(oddsToggleBtn) oddsToggleBtn.focus();
+        if(reelOddsToggleBtn) reelOddsToggleBtn.focus();
+        else if(oddsToggleBtn) oddsToggleBtn.focus();
       });
     }
     if(pageZoomOutBtn){
@@ -8203,6 +8429,14 @@ body{
     if(audioDock){
       audioDock.addEventListener("click", e=>e.stopPropagation());
     }
+    window.addEventListener("resize", ()=>{
+      requestBackgroundLogoSync();
+      syncInfoPanelPositionIfOpen();
+    }, {passive:true});
+    window.addEventListener("scroll", ()=>{
+      requestBackgroundLogoSync();
+      syncInfoPanelPositionIfOpen();
+    }, {passive:true});
     document.addEventListener("click", closeUtilityPanels);
     document.addEventListener("click", ()=>setSpeedModeMenuOpen(false));
 
