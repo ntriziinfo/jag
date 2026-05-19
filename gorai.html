@@ -169,9 +169,61 @@ h1{
 .audioToggleBtn:focus-visible,
 .audioDock.slumpOpen #slumpToggleBtn,
 .audioDock.oddsOpen #oddsToggleBtn,
+.audioDock.dataOpen #dataToggleBtn,
 .utilityToggleBtn:focus-visible{
   outline:2px solid rgba(77,231,255,.72);
   outline-offset:2px;
+}
+.utilityToggleBtn .utilityGlyph{
+  width:100%;
+  height:100%;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  color:#eaf8ff;
+  font-size:26px;
+  font-weight:1000;
+  line-height:1;
+  background:
+    radial-gradient(circle at 50% 32%, rgba(111,239,255,.42), rgba(0,77,144,.20) 46%, rgba(4,8,26,.94) 100%),
+    linear-gradient(180deg, rgba(13,54,102,.96), rgba(2,8,25,.98));
+  border:1px solid rgba(93,224,255,.58);
+  box-shadow:
+    inset 0 0 15px rgba(255,255,255,.10),
+    0 0 12px rgba(77,231,255,.34),
+    0 6px 7px rgba(0,0,0,.55);
+  text-shadow:0 0 10px rgba(77,231,255,.70);
+}
+.pageZoomControls{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:4px;
+  border-radius:18px;
+  background:rgba(4,8,24,.78);
+  border:1px solid rgba(77,231,255,.26);
+  box-shadow:0 8px 18px rgba(0,0,0,.42), inset 0 0 12px rgba(77,231,255,.08);
+}
+.pageZoomBtn{
+  width:34px;
+  height:34px;
+  min-width:34px;
+  min-height:34px;
+  padding:0;
+  border-radius:50%;
+  font-size:20px;
+  line-height:1;
+  color:#fff;
+  background:linear-gradient(180deg, rgba(28,83,140,.98), rgba(3,12,38,.98));
+  border:1px solid rgba(77,231,255,.42);
+  box-shadow:inset 0 0 10px rgba(255,255,255,.08), 0 0 10px rgba(77,231,255,.18);
+}
+.pageZoomBtn.zoomReset{
+  width:50px;
+  border-radius:14px;
+  font-size:12px;
+  font-weight:1000;
+  color:#ffeaa8;
 }
 .audioPanel,
 .infoPanel{
@@ -199,8 +251,17 @@ h1{
 }
 .audioDock.open .audioPanel,
 .audioDock.slumpOpen #slumpPanel,
-.audioDock.oddsOpen #oddsPanel{
+.audioDock.oddsOpen #oddsPanel,
+.audioDock.dataOpen #dataCounterPanel{
   display:block;
+}
+#dataCounterPanel{
+  width:min(330px, calc(100vw - 32px));
+}
+#dataCounterPanel .wd-data-counter-panel{
+  display:block !important;
+  width:min(280px, 100%) !important;
+  margin:0 auto !important;
 }
 .audioPanelHead,
 .infoPanelHead{
@@ -936,8 +997,10 @@ h1{
 .battleIntroLogo{
   position:absolute;
   left:50%;
-  top:12%;
-  width:min(72%, 560px);
+  top:6%;
+  width:min(58%, 470px);
+  max-height:38%;
+  object-fit:contain;
   transform:translateX(-50%);
   z-index:4;
   filter:drop-shadow(0 10px 16px rgba(0,0,0,.72)) drop-shadow(0 0 18px rgba(255,220,75,.60));
@@ -945,8 +1008,10 @@ h1{
 .battleIntroRound{
   position:absolute;
   right:8%;
-  bottom:7%;
-  width:min(23%, 162px);
+  bottom:6%;
+  width:min(20%, 132px);
+  max-height:37%;
+  object-fit:contain;
   z-index:5;
   filter:drop-shadow(0 10px 16px rgba(0,0,0,.75)) drop-shadow(0 0 16px rgba(255,220,55,.62));
 }
@@ -1442,7 +1507,8 @@ body.debugOpen .debugDrawer .secret{
   align-items:center;
   justify-content:center;
 }
-.autoInlineBtn{
+.autoInlineBtn,
+.speedInlineBtn{
   min-width:130px;
   min-height:58px;
   font-size:20px;
@@ -1451,7 +1517,8 @@ body.debugOpen .debugDrawer .secret{
   background:linear-gradient(180deg,#5beeff,#244dff);
   box-shadow:0 7px 0 rgba(10,18,90,.9),0 0 18px rgba(77,231,255,.28);
 }
-.autoInlineBtn.on{
+.autoInlineBtn.on,
+.speedInlineBtn.on{
   background:linear-gradient(180deg,#ff9cad,#ff3656 70%,#8f061b);
   box-shadow:0 7px 0 rgba(79,0,13,.9),0 0 18px rgba(255,54,93,.28);
 }
@@ -1522,6 +1589,10 @@ body.debugOpen .debugDrawer .secret{
   min-width:150px;
   min-height:70px;
   font-size:22px;
+}
+.autoStack{
+  display:grid;
+  gap:6px;
 }
 .resultBoxWide{
   margin-top:12px;
@@ -1594,10 +1665,18 @@ body.debugOpen .debugDrawer .secret{
     inset 0 0 32px rgba(255,54,93,.15);
 }
 .reelArea.lightRainbow{
-  animation:rainbowReelGlow 1.2s linear infinite;
+  animation:none !important;
+  box-shadow:none !important;
+  filter:none !important;
 }
 .reelArea.lightRainbow::after{
   opacity:.35;
+  left:12.7% !important;
+  right:12.7% !important;
+  top:27.8% !important;
+  bottom:21.4% !important;
+  inset:27.8% 12.7% 21.4% 12.7% !important;
+  border-radius:7px !important;
   background:
     conic-gradient(
       from 0deg,
@@ -1612,10 +1691,18 @@ body.debugOpen .debugDrawer .secret{
   mix-blend-mode:screen;
 }
 .reelArea.lightRainbowHold{
-  animation:rainbowReelGlow 1.05s linear infinite;
+  animation:none !important;
+  box-shadow:none !important;
+  filter:none !important;
 }
 .reelArea.lightRainbowHold::after{
   opacity:.48;
+  left:12.7% !important;
+  right:12.7% !important;
+  top:27.8% !important;
+  bottom:21.4% !important;
+  inset:27.8% 12.7% 21.4% 12.7% !important;
+  border-radius:7px !important;
   background:
     conic-gradient(
       from 0deg,
@@ -1671,14 +1758,44 @@ body.debugOpen .debugDrawer .secret{
     filter:saturate(1.15);
   }
 }
+.reelArea.lightRainbow .reel,
+.reelArea.lightRainbowHold .reel{
+  animation:rainbowReelInnerGlow 1.05s linear infinite !important;
+}
+@keyframes rainbowReelInnerGlow{
+  0%,100%{
+    border-color:rgba(255,54,93,.58);
+    box-shadow:
+      inset 0 0 18px rgba(255,54,93,.22),
+      inset 0 0 34px rgba(255,211,106,.14);
+  }
+  25%{
+    border-color:rgba(255,211,106,.58);
+    box-shadow:
+      inset 0 0 18px rgba(255,211,106,.24),
+      inset 0 0 34px rgba(98,255,154,.14);
+  }
+  50%{
+    border-color:rgba(98,255,154,.56);
+    box-shadow:
+      inset 0 0 18px rgba(98,255,154,.24),
+      inset 0 0 34px rgba(77,231,255,.14);
+  }
+  75%{
+    border-color:rgba(77,231,255,.58);
+    box-shadow:
+      inset 0 0 18px rgba(77,231,255,.24),
+      inset 0 0 34px rgba(180,90,255,.16);
+  }
+}
 
 
 .gekiatsuLayer{
   position:absolute;
   left:12.7%;
   right:12.7%;
-  top:29.3%;
-  bottom:21.8%;
+  top:27.8%;
+  bottom:21.4%;
   border-radius:7px;
   overflow:hidden;
   display:flex;
@@ -1770,8 +1887,8 @@ body.debugOpen .debugDrawer .secret{
   position:absolute;
   left:12.7%;
   right:12.7%;
-  top:29.3%;
-  bottom:21.8%;
+  top:27.8%;
+  bottom:21.4%;
   border-radius:7px;
   overflow:hidden;
   display:flex;
@@ -1815,8 +1932,10 @@ body.debugOpen .debugDrawer .secret{
 .battleIntroLogo{
   position:absolute;
   left:50%;
-  top:12%;
-  width:min(72%, 560px);
+  top:6%;
+  width:min(58%, 470px);
+  max-height:38%;
+  object-fit:contain;
   transform:translateX(-50%);
   z-index:4;
   filter:drop-shadow(0 10px 16px rgba(0,0,0,.72)) drop-shadow(0 0 18px rgba(255,220,75,.60));
@@ -1824,8 +1943,10 @@ body.debugOpen .debugDrawer .secret{
 .battleIntroRound{
   position:absolute;
   right:8%;
-  bottom:7%;
-  width:min(23%, 162px);
+  bottom:6%;
+  width:min(20%, 132px);
+  max-height:37%;
+  object-fit:contain;
   z-index:5;
   filter:drop-shadow(0 10px 16px rgba(0,0,0,.75)) drop-shadow(0 0 16px rgba(255,220,55,.62));
 }
@@ -2109,12 +2230,12 @@ body::after{
 .symImg,.barSymImg,.sevenSymImg,.missSymImg,.grapeSymImg,.cherrySymImg,.bellSymImg,.replaySymImg,.suikaSymImg{max-width:95% !important;max-height:95% !important;object-fit:contain !important;}
 .barSymImg{width:98% !important;height:auto !important;}
 .buttonRow{position:relative;z-index:10;margin-top:20px !important;}
-.betBtn,.centerStopBtns button,.autoArea .autoInlineBtn{background-size:100% 100% !important;background-repeat:no-repeat !important;background-position:center !important;color:transparent !important;text-shadow:none !important;border:none !important;box-shadow:none !important;filter:drop-shadow(0 0 12px rgba(255,255,255,.28));}
+.betBtn,.centerStopBtns button,.autoArea .autoInlineBtn,.autoArea .speedInlineBtn{background-size:100% 100% !important;background-repeat:no-repeat !important;background-position:center !important;color:transparent !important;text-shadow:none !important;border:none !important;box-shadow:none !important;filter:drop-shadow(0 0 12px rgba(255,255,255,.28));}
 .betBtn{background-image:url("assets/buttons/btn_bet.png") !important;width:120px !important;height:80px !important;min-width:120px !important;min-height:80px !important;}
 .betBtn.waiting,.betBtn.stopReady{background-image:url("assets/buttons/btn_bet_on.png") !important;}
 .centerStopBtns button{background-image:url("assets/buttons/btn_stop.png") !important;width:118px !important;height:78px !important;}
 .centerStopBtns button:not(:disabled){background-image:url("assets/buttons/btn_stop_on.png") !important;}
-.autoArea .autoInlineBtn{background-image:url("assets/buttons/btn_auto.png") !important;min-width:118px !important;min-height:76px !important;}
+.autoArea .autoInlineBtn,.autoArea .speedInlineBtn{background-image:url("assets/buttons/btn_auto.png") !important;min-width:118px !important;min-height:76px !important;}
 .resultBoxWide{font-size:15px;color:#9edcff !important;text-shadow:0 0 10px rgba(20,165,255,.6) !important;}
 .side{display:contents !important;}
 .side > .card,.debugDrawer{grid-area:bottom;}
@@ -2173,6 +2294,7 @@ body::after{display:none !important;content:none !important;}
 .wd-hero{
   position:relative !important;
   min-height:292px !important;
+  height:292px !important;
   display:grid !important;
   grid-template-columns:210px 1fr 270px !important;
   align-items:center !important;
@@ -2189,7 +2311,8 @@ body::after{display:none !important;content:none !important;}
   content:none !important;
 }
 .wd-logo{
-  width:min(700px,56vw) !important;
+  width:700px !important;
+  max-width:700px !important;
   position:relative !important;
   z-index:1 !important;
   filter:drop-shadow(0 12px 16px rgba(0,0,0,.94)) drop-shadow(0 3px 2px rgba(0,0,0,.96)) !important;
@@ -2199,18 +2322,21 @@ body::after{display:none !important;content:none !important;}
   z-index:1 !important;
 }
 .wd-vertical-copy{
-  width:min(156px, 13.4vw) !important;
+  width:156px !important;
+  max-width:156px !important;
 }
 .wd-hero-side{
-  width:min(280px, 21vw) !important;
+  width:280px !important;
+  max-width:280px !important;
 }
 .wd-subtitle{
   position:absolute !important;
   left:50% !important;
-  bottom:2.8% !important;
+  bottom:8px !important;
   transform:translateX(-50%) !important;
   z-index:3 !important;
-  width:min(660px, 51vw) !important;
+  width:660px !important;
+  max-width:660px !important;
   min-height:44px !important;
   display:flex !important;
   align-items:center !important;
@@ -2273,7 +2399,7 @@ body::after{display:none !important;content:none !important;}
   gap:12px !important;
   align-items:start !important;
   padding-top:0 !important;
-  margin-top:-22px !important;
+  margin-top:var(--wd-cabinet-anchor-offset, -22px) !important;
 }
 .machine{
   position:relative !important;
@@ -2319,8 +2445,8 @@ body::after{display:none !important;content:none !important;}
   position:absolute !important;
   left:12.7% !important;
   right:12.7% !important;
-  top:29.3% !important;
-  bottom:21.8% !important;
+  top:27.8% !important;
+  bottom:21.4% !important;
   gap:1.65% !important;
   z-index:3 !important;
 }
@@ -2376,7 +2502,8 @@ body::after{display:none !important;content:none !important;}
 .playControls .autoArea{left:84.55% !important;}
 .betBtn,
 .centerStopBtns button,
-.autoArea .autoInlineBtn{
+.autoArea .autoInlineBtn,
+.autoArea .speedInlineBtn{
   transform:none !important;
   padding:0 !important;
   position:relative !important;
@@ -2419,6 +2546,53 @@ body::after{display:none !important;content:none !important;}
   height:100% !important;
   min-width:0 !important;
   min-height:0 !important;
+}
+.autoStack{
+  position:absolute !important;
+  inset:3% 4% !important;
+  display:grid !important;
+  grid-template-rows:1fr 1fr !important;
+  gap:6% !important;
+  z-index:84 !important;
+  pointer-events:auto !important;
+}
+.autoArea .autoInlineBtn,
+.autoArea .speedInlineBtn{
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  padding:0 !important;
+  border-radius:12px !important;
+  color:#f4fcff !important;
+  text-shadow:0 0 8px rgba(77,231,255,.78),0 1px 2px rgba(0,0,0,.9) !important;
+  background-image:none !important;
+  background:linear-gradient(180deg,rgba(43,138,222,.98),rgba(5,35,91,.98)) !important;
+  border:1px solid rgba(96,226,255,.52) !important;
+  box-shadow:inset 0 0 10px rgba(255,255,255,.14),0 0 10px rgba(77,231,255,.26) !important;
+  filter:drop-shadow(0 0 8px rgba(77,231,255,.18)) !important;
+  font-size:clamp(9px,.9vw,13px) !important;
+  font-weight:1000 !important;
+  letter-spacing:.06em !important;
+  line-height:1 !important;
+}
+.autoArea .speedInlineBtn{
+  background:linear-gradient(180deg,rgba(116,94,255,.98),rgba(23,22,111,.98)) !important;
+}
+.autoArea .autoInlineBtn.on,
+.autoArea .speedInlineBtn.on{
+  background:linear-gradient(180deg,rgba(255,104,132,.98),rgba(129,5,34,.98)) !important;
+  border-color:rgba(255,150,170,.72) !important;
+  box-shadow:inset 0 0 10px rgba(255,255,255,.14),0 0 12px rgba(255,54,93,.32) !important;
+}
+.autoArea .speedInlineBtn.on{
+  background:linear-gradient(180deg,rgba(255,192,82,.98),rgba(186,72,0,.98)) !important;
+}
+.autoArea .autoInlineBtn:disabled,
+.autoArea .speedInlineBtn:disabled{
+  opacity:.45 !important;
+  cursor:not-allowed !important;
+  filter:grayscale(.45) drop-shadow(0 0 4px rgba(255,255,255,.12)) !important;
 }
 .side .oddsPublic,
 .wd-public-panels{
@@ -2472,7 +2646,8 @@ body::after{display:none !important;content:none !important;}
   letter-spacing:.03em;
   text-shadow:0 0 6px rgba(255,255,255,.18),0 0 10px rgba(255,0,0,.22);
   opacity:.72;
-  transition:color .22s ease, opacity .22s ease, text-shadow .22s ease, filter .22s ease;
+  transition:color .22s ease, opacity .22s ease, text-shadow .22s ease, filter .22s ease, box-shadow .22s ease, background .22s ease;
+  box-shadow:inset 0 0 18px rgba(0,0,0,.72);
 }
 .wd-st-emblem.is-profit{
   color:#fff;
@@ -2482,6 +2657,41 @@ body::after{display:none !important;content:none !important;}
     0 0 9px rgba(255,255,255,.85),
     0 0 15px rgba(255,0,0,.95),
     0 0 28px rgba(255,42,42,.55);
+}
+.wd-st-emblem.status-lit{
+  color:#fff;
+  opacity:1;
+  background:radial-gradient(circle at 50% 43%, rgba(255,78,78,.28), rgba(72,0,0,.18) 48%, rgba(0,0,0,.10) 74%);
+  box-shadow:
+    inset 0 0 18px rgba(255,42,42,.28),
+    inset 0 0 36px rgba(255,255,255,.08),
+    0 0 16px rgba(255,42,42,.50);
+  text-shadow:
+    0 0 8px rgba(255,255,255,.84),
+    0 0 14px rgba(255,0,0,.92),
+    0 0 26px rgba(255,42,42,.50);
+}
+.wd-st-emblem.status-confirmed{
+  filter:brightness(1.12) saturate(1.12);
+}
+.wd-st-emblem.status-blink{
+  animation:wdStEmblemBlink 1s ease-in-out infinite;
+}
+.wd-st-emblem.status-rainbow{
+  animation:wdStEmblemRainbow 1.05s linear infinite;
+  color:#fff;
+  opacity:1;
+}
+.wd-st-emblem.status-rainbow b{
+  color:#fff6b8;
+}
+.wd-st-emblem.is-bonus-pending{
+  color:#fff;
+  opacity:1;
+  padding-bottom:9%;
+  font-size:clamp(15px, 1.28vw, 20px);
+  line-height:1.02;
+  letter-spacing:.03em;
 }
 .wd-st-emblem.is-ceiling{
   color:#fff;
@@ -2503,6 +2713,44 @@ body::after{display:none !important;content:none !important;}
   font-family:inherit;
   transform:translateY(-4%);
   text-shadow:0 0 8px rgba(255,0,0,.82),0 0 16px rgba(255,255,255,.25);
+}
+@keyframes wdStEmblemBlink{
+  0%,100%{
+    filter:brightness(.90);
+    box-shadow:
+      inset 0 0 16px rgba(255,42,42,.20),
+      0 0 10px rgba(255,42,42,.36);
+  }
+  50%{
+    filter:brightness(1.28);
+    box-shadow:
+      inset 0 0 22px rgba(255,42,42,.38),
+      inset 0 0 40px rgba(255,255,255,.12),
+      0 0 20px rgba(255,42,42,.74);
+  }
+}
+@keyframes wdStEmblemRainbow{
+  0%,100%{
+    filter:hue-rotate(0deg) brightness(1.14);
+    box-shadow:
+      inset 0 0 18px rgba(255,0,92,.34),
+      inset 0 0 38px rgba(255,220,0,.16),
+      0 0 16px rgba(255,0,92,.55);
+  }
+  33%{
+    filter:hue-rotate(120deg) brightness(1.22);
+    box-shadow:
+      inset 0 0 18px rgba(60,255,110,.32),
+      inset 0 0 38px rgba(0,220,255,.16),
+      0 0 18px rgba(60,255,110,.56);
+  }
+  66%{
+    filter:hue-rotate(240deg) brightness(1.20);
+    box-shadow:
+      inset 0 0 18px rgba(70,90,255,.34),
+      inset 0 0 38px rgba(255,0,220,.16),
+      0 0 18px rgba(70,90,255,.58);
+  }
 }
 .wd-st-readout{
   position:absolute;
@@ -2806,7 +3054,8 @@ body::after{display:none !important;content:none !important;}
   .reel{padding:4px !important;border-radius:6px !important;}
   .window{gap:4px !important;}
   .betBtn,
-  .autoArea .autoInlineBtn{
+  .autoArea .autoInlineBtn,
+  .autoArea .speedInlineBtn{
     width:100% !important;
     height:100% !important;
   }
@@ -2882,6 +3131,50 @@ body{
   .main{margin-top:0 !important;}
 }
 
+/* Fixed-stage viewing: do not collapse the cabinet by viewport width; use scroll and manual zoom. */
+:root{
+  --wd-page-zoom:1;
+  --wd-stage-width:1360px;
+  --wd-hero-fixed-height:292px;
+  --wd-cabinet-anchor-offset:-22px;
+}
+html,
+body{
+  overflow-x:auto !important;
+}
+body{
+  min-width:calc(var(--wd-stage-width) * var(--wd-page-zoom)) !important;
+}
+.wrap{
+  width:var(--wd-stage-width) !important;
+  min-width:var(--wd-stage-width) !important;
+  max-width:none !important;
+  zoom:var(--wd-page-zoom);
+}
+.main{
+  grid-template-columns:230px minmax(760px, 1fr) 270px !important;
+  grid-template-areas:"left machine right" "bottom bottom bottom" !important;
+}
+.wd-hero{
+  height:var(--wd-hero-fixed-height) !important;
+  min-height:var(--wd-hero-fixed-height) !important;
+}
+.wd-public-panels{
+  grid-area:left !important;
+  width:230px !important;
+  flex-direction:column !important;
+  overflow:visible !important;
+}
+.side .wd-data-counter-panel{
+  display:none !important;
+}
+@supports not (zoom:1){
+  .wrap{
+    transform:scale(var(--wd-page-zoom));
+    transform-origin:top center;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2920,9 +3213,17 @@ body{
         <button class="utilityToggleBtn" id="oddsToggleBtn" type="button" aria-label="確率表を開く" aria-expanded="false" title="確率表">
           <img src="assets/ui/icon_odds_percent_blue.png" alt="">
         </button>
+        <button class="utilityToggleBtn" id="dataToggleBtn" type="button" aria-label="データカウンターを開く" aria-expanded="false" title="データカウンター">
+          <span class="utilityGlyph">▦</span>
+        </button>
         <button class="audioToggleBtn" id="audioToggleBtn" type="button" aria-label="音量を開く" aria-expanded="false" title="音量">
           <img src="assets/ui/icon_sound_red.png" alt="">
         </button>
+        <div class="pageZoomControls" aria-label="画面倍率">
+          <button class="pageZoomBtn" id="pageZoomOutBtn" type="button" title="縮小" aria-label="画面を縮小">−</button>
+          <button class="pageZoomBtn zoomReset" id="pageZoomResetBtn" type="button" title="100%に戻す" aria-label="画面倍率を100%に戻す"><span id="pageZoomView">100%</span></button>
+          <button class="pageZoomBtn" id="pageZoomInBtn" type="button" title="拡大" aria-label="画面を拡大">＋</button>
+        </div>
         <div class="infoPanel" id="slumpPanel">
           <div class="infoPanelHead">
             <div class="infoPanelTitle">スランプグラフ</div>
@@ -2945,6 +3246,13 @@ body{
             <h2>設定別確率（分数表記）</h2>
             <table class="oddsTable" id="settingTable"></table>
           </div>
+        </div>
+        <div class="infoPanel" id="dataCounterPanel">
+          <div class="infoPanelHead">
+            <div class="infoPanelTitle">データカウンター</div>
+            <button class="infoCloseBtn" id="dataCloseBtn" type="button" aria-label="データカウンターを閉じる" title="閉じる">×</button>
+          </div>
+          <div id="dataCounterPanelBody"></div>
         </div>
         <div class="audioPanel" id="audioPanel">
           <div class="audioPanelHead">
@@ -3019,9 +3327,6 @@ body{
       </section>
 
       <div class="reelArea">
-        <div class="devilStatusLamp" id="devilStatusLamp" aria-hidden="true">
-          <img src="assets/devil_lamp.png" alt="" decoding="async" draggable="false">
-        </div>
         <div class="payline"></div>
         <div class="reels">
           <div class="reel" data-reel="0"><div class="window">
@@ -3063,7 +3368,10 @@ body{
         </div>
 
         <div class="autoArea">
-          <button class="autoInlineBtn" id="quickAutoBtn">オート</button>
+          <div class="autoStack">
+            <button class="autoInlineBtn" id="quickAutoBtn" type="button">AUTO</button>
+            <button class="speedInlineBtn" id="speedAutoBtn" type="button">SPEED</button>
+          </div>
           <button class="effectSkipBtn" id="effectSkipBtn" type="button">SKIP</button>
         </div>
       </div>
@@ -3476,15 +3784,21 @@ body{
   });
 
   const symbols = ["🍒","🍋","🔔","REPLAY","⭐","🍇","7","BAR",USER_FACE];
-  const AUDIO_BALANCE_VERSION = 1;
+  const AUDIO_BALANCE_VERSION = 2;
   const DEFAULT_BGM_VOLUME = 0.22;
   const DEFAULT_SFX_VOLUME = 0.32;
-  const BGM_OUTPUT_SCALE = 0.70;
-  const BAR_BGM_OUTPUT_SCALE = 0.58;
+  const MATCHED_BGM_GAIN_DB = -4.5;
+  const BGM_OUTPUT_SCALE = dbToGain(MATCHED_BGM_GAIN_DB);
+  const BAR_BGM_OUTPUT_SCALE = dbToGain(MATCHED_BGM_GAIN_DB);
   const SFX_OUTPUT_SCALE = 0.65;
   const PAYOUT_SOUND_OUTPUT_SCALE = 0.25;
-  const BATTLE_BGM_OUTPUT_SCALE = 0.54;
+  const BATTLE_BGM_OUTPUT_SCALE = dbToGain(MATCHED_BGM_GAIN_DB);
   const MOVIE_OUTPUT_SCALE = 0.50;
+  const ROGI_MOVIE_OUTPUT_SCALE = dbToGain(-3);
+
+  function dbToGain(db){
+    return Math.pow(10, Number(db) / 20);
+  }
 
   function audioOutputVolume(value, scale=1){
     const raw = Number(value);
@@ -3698,10 +4012,15 @@ body{
   const DEBUG_FAST_SPINS_PER_SECOND = 100;
   const DEBUG_FAST_INTERVAL_MS = 100;
   const DEBUG_FAST_BATCH_SIZE = Math.max(1, Math.round(DEBUG_FAST_SPINS_PER_SECOND * DEBUG_FAST_INTERVAL_MS / 1000));
+  const SPEED_TO_BONUS_SPINS_PER_SECOND = 10;
+  const SPEED_TO_BONUS_INTERVAL_MS = Math.round(1000 / SPEED_TO_BONUS_SPINS_PER_SECOND);
   const SLUMP_MAX_HISTORY_POINTS = 20000;
   const SLUMP_MAX_DRAW_POINTS = 1400;
   let autoPlay = false;
   let autoTimer = null;
+  let speedToBonusActive = false;
+  let speedToBonusTimer = null;
+  let speedToBonusCount = 0;
   let debugFastSpinActive = false;
   let debugFastTimer = null;
   let debugFastSpinCount = 0;
@@ -3757,11 +4076,17 @@ body{
   const audioDock = $("audioDock");
   const slumpToggleBtn = $("slumpToggleBtn");
   const oddsToggleBtn = $("oddsToggleBtn");
+  const dataToggleBtn = $("dataToggleBtn");
   const audioToggleBtn = $("audioToggleBtn");
   const audioCloseBtn = $("audioCloseBtn");
   const slumpCloseBtn = $("slumpCloseBtn");
   const oddsCloseBtn = $("oddsCloseBtn");
-  const devilStatusLamp = $("devilStatusLamp");
+  const dataCloseBtn = $("dataCloseBtn");
+  const pageZoomOutBtn = $("pageZoomOutBtn");
+  const pageZoomResetBtn = $("pageZoomResetBtn");
+  const pageZoomInBtn = $("pageZoomInBtn");
+  const pageZoomView = $("pageZoomView");
+  const effectSkipBtn = $("effectSkipBtn");
 
   const reelArea = document.querySelector(".reelArea");
   if(sessionResultLayer && reelArea && sessionResultLayer.parentElement !== reelArea){
@@ -3780,19 +4105,62 @@ body{
   let gekiatsuHideTimer = null;
   let battleIntroHideTimer = null;
   const adminParams = new URLSearchParams(location.search);
+
+  function safeStorageGet(key){
+    try{ return window.localStorage ? localStorage.getItem(key) : null; }
+    catch(e){ return null; }
+  }
+
+  function safeStorageSet(key, value){
+    try{
+      if(!window.localStorage) return false;
+      localStorage.setItem(key, value);
+      return true;
+    }catch(e){
+      return false;
+    }
+  }
+
   const ADMIN_SERVER_DEFAULT = location.protocol.startsWith("http") ? location.origin : "http://localhost:8787";
-  const ADMIN_SERVER = (adminParams.get("server") || localStorage.getItem("white_devil_admin_server") || ADMIN_SERVER_DEFAULT).replace(/\/$/, "");
-  let machineId = adminParams.get("machine") || localStorage.getItem("white_devil_machine_id");
+  const ADMIN_SERVER = (adminParams.get("server") || safeStorageGet("white_devil_admin_server") || ADMIN_SERVER_DEFAULT).replace(/\/$/, "");
+  let machineId = adminParams.get("machine") || safeStorageGet("white_devil_machine_id");
   let adminPushTimer = null;
   let adminCommandStream = null;
   let adminCommandReconnectTimer = null;
+  const PAGE_ZOOM_STORAGE_KEY = "white_devil_page_zoom";
+  const PAGE_STAGE_WIDTH = 1360;
+  const PAGE_ZOOM_MIN = 0.75;
+  const PAGE_ZOOM_MAX = 1.35;
+  const PAGE_ZOOM_STEP = 0.05;
+  let pageZoom = 1;
+
+  function applyPageZoom(saveValue=false){
+    pageZoom = clamp(Math.round(pageZoom * 100) / 100, PAGE_ZOOM_MIN, PAGE_ZOOM_MAX);
+    document.documentElement.style.setProperty("--wd-page-zoom", String(pageZoom));
+    document.body.style.minWidth = `${Math.ceil(PAGE_STAGE_WIDTH * pageZoom)}px`;
+    if(pageZoomView) pageZoomView.textContent = `${Math.round(pageZoom * 100)}%`;
+    if(pageZoomOutBtn) pageZoomOutBtn.disabled = pageZoom <= PAGE_ZOOM_MIN + 0.001;
+    if(pageZoomInBtn) pageZoomInBtn.disabled = pageZoom >= PAGE_ZOOM_MAX - 0.001;
+    if(saveValue) safeStorageSet(PAGE_ZOOM_STORAGE_KEY, String(pageZoom));
+  }
+
+  function loadPageZoom(){
+    const saved = Number(safeStorageGet(PAGE_ZOOM_STORAGE_KEY));
+    if(Number.isFinite(saved) && saved > 0) pageZoom = saved;
+    applyPageZoom(false);
+  }
+
+  function changePageZoom(delta){
+    pageZoom = clamp(pageZoom + delta, PAGE_ZOOM_MIN, PAGE_ZOOM_MAX);
+    applyPageZoom(true);
+  }
 
   function hasRainbowHold(){
     return barRainbowHold || guaranteedSetStartLight;
   }
 
   function bgmOutputVolume(scale){
-    return rogiBgmMuted ? 0 : audioOutputVolume(settings.bgmVolume, scale);
+    return audioOutputVolume(settings.bgmVolume, scale);
   }
 
   function applyBgmOutputVolumes(){
@@ -3803,7 +4171,9 @@ body{
 
   function muteBgmForRogiStopEffect(){
     rogiBgmMuted = true;
-    applyBgmOutputVolumes();
+    if(bgm) bgm.volume = 0;
+    if(barBgm) barBgm.volume = 0;
+    if(battleBgm) battleBgm.volume = 0;
   }
 
   function restoreBgmAfterRogiStopEffect(){
@@ -3837,7 +4207,8 @@ body{
   }
 
   function updateDevilStatusLamp(){
-    if(!devilStatusLamp) return;
+    const stEmblem = $("wdStEmblem");
+    if(!stEmblem) return;
     const barActive = !!barBgmActive;
     const atActive = !!session.active;
     const atConfirmed = !atActive && !!(
@@ -3845,11 +4216,11 @@ body{
       (normalState.bonusPending && normalState.bonusKind !== "MID")
     );
 
-    devilStatusLamp.classList.toggle("rainbow", barActive);
-    devilStatusLamp.classList.toggle("blink", !barActive && atActive);
-    devilStatusLamp.classList.toggle("lit", barActive || atActive || atConfirmed);
-    devilStatusLamp.classList.toggle("confirmed", !barActive && !atActive && atConfirmed);
-    devilStatusLamp.setAttribute("data-state", barActive ? "bar" : atActive ? "at" : atConfirmed ? "confirmed" : "normal");
+    stEmblem.classList.toggle("status-rainbow", barActive);
+    stEmblem.classList.toggle("status-blink", !barActive && atActive);
+    stEmblem.classList.toggle("status-lit", barActive || atActive || atConfirmed);
+    stEmblem.classList.toggle("status-confirmed", !barActive && !atActive && atConfirmed);
+    stEmblem.setAttribute("data-state", barActive ? "bar" : atActive ? "at" : atConfirmed ? "confirmed" : "normal");
   }
 
   function setAudioPanelOpen(open){
@@ -3862,9 +4233,10 @@ body{
 
   function closeInfoPanels(){
     if(!audioDock) return;
-    audioDock.classList.remove("slumpOpen","oddsOpen");
+    audioDock.classList.remove("slumpOpen","oddsOpen","dataOpen");
     if(slumpToggleBtn) slumpToggleBtn.setAttribute("aria-expanded", "false");
     if(oddsToggleBtn) oddsToggleBtn.setAttribute("aria-expanded", "false");
+    if(dataToggleBtn) dataToggleBtn.setAttribute("aria-expanded", "false");
   }
 
   function setInfoPanelOpen(type, open){
@@ -3873,8 +4245,9 @@ body{
     closeInfoPanels();
     if(!open) return;
     const isSlump = type === "slump";
-    audioDock.classList.add(isSlump ? "slumpOpen" : "oddsOpen");
-    const btn = isSlump ? slumpToggleBtn : oddsToggleBtn;
+    const isData = type === "data";
+    audioDock.classList.add(isSlump ? "slumpOpen" : isData ? "dataOpen" : "oddsOpen");
+    const btn = isSlump ? slumpToggleBtn : isData ? dataToggleBtn : oddsToggleBtn;
     if(btn) btn.setAttribute("aria-expanded", "true");
     if(isSlump) requestAnimationFrame(renderSlumpGraph);
   }
@@ -4269,6 +4642,7 @@ body{
       spin.normalActiveAtStart &&
       spin.resolved &&
       spin.resolved.highAtStart &&
+      !spin.resolved.bonusPendingAtStart &&
       !spin.effectsSkipped &&
       !spin.gekiatsu &&
       !spin.bar3LeverEffect
@@ -4348,7 +4722,7 @@ body{
     if(!shouldPlayRogiStopEffect(stopOrder)) return false;
     const src = ROGI_STOP_VIDEO_SRCS[stopOrder];
     muteBgmForRogiStopEffect();
-    startGekiatsuEffect(false, src, `ROGI ${stopOrder}`, {muted:true, solid:stopOrder === 3});
+    startGekiatsuEffect(false, src, `ROGI ${stopOrder}`, {muted:false, solid:stopOrder === 3, volumeScale:ROGI_MOVIE_OUTPUT_SCALE});
     if(stopOrder === 3) startRogiThirdStopHold();
     if(currentSpin){
       currentSpin.rogiStopEffectStarted = true;
@@ -5064,6 +5438,7 @@ body{
       zoneStGames:0,
       zoneGameAdd:0,
       highAtStart,
+      bonusPendingAtStart:bonusPending,
       highAdd:(bonusPending || bonusSource) ? 0 : highTransitionGamesForResult(result),
       ceilingAfter,
       bonusHit:!bonusPending && !!bonusSource && !directBigReady && !directRegReady && !directBar3Ready,
@@ -5077,7 +5452,7 @@ body{
 
   function load(){
     try{
-      const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      const data = JSON.parse(safeStorageGet(STORAGE_KEY));
       if(data?.settings){
         const previousAudioBalance = data.settings.audioBalanceVersion || 0;
         settings = {...settings, ...data.settings};
@@ -5107,8 +5482,7 @@ body{
 
   function persistState(){
     try{
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({settings, stats, normalState}));
-      return true;
+      return safeStorageSet(STORAGE_KEY, JSON.stringify({settings, stats, normalState}));
     }catch(e){
       console.warn("Failed to save local state", e);
       return false;
@@ -5188,7 +5562,7 @@ body{
     setValue("bgmVolume", nextSettings.bgmVolume);
     setValue("sfxVolume", nextSettings.sfxVolume);
     readSettings();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({settings, stats}));
+    safeStorageSet(STORAGE_KEY, JSON.stringify({settings, stats}));
     updateDisplay();
     log("管理画面から設定を更新");
   }
@@ -5315,7 +5689,7 @@ body{
       voiceSound.volume = audioOutputVolume(settings.sfxVolume, SFX_OUTPUT_SCALE);
     }
     if(barBgm){
-      if(!barBgmActive && barBgm.src !== BAR_BGM_SRC) barBgm.src = BAR_BGM_SRC;
+      if(!barBgmActive && barBgm.getAttribute("src") !== BAR_BGM_SRC) barBgm.setAttribute("src", BAR_BGM_SRC);
       barBgm.loop = true;
       barBgm.volume = bgmOutputVolume(BAR_BGM_OUTPUT_SCALE);
       ensureBarBgmContinuing();
@@ -5426,6 +5800,7 @@ body{
   }
 
   function startBonusSessionNow(options={}){
+    stopSpeedToBonus("ボーナス開始のためSPEED停止");
     clearPendingAtStart();
     const started = startSession(options);
     if(started) scheduleNextAuto();
@@ -5636,7 +6011,8 @@ body{
     gekiatsuVideo.loop = false;
     gekiatsuVideo.muted = !!options.muted;
     gekiatsuVideo.playsInline = true;
-    gekiatsuVideo.volume = audioOutputVolume(settings.sfxVolume, MOVIE_OUTPUT_SCALE);
+    const videoVolumeScale = Number.isFinite(Number(options.volumeScale)) ? Number(options.volumeScale) : MOVIE_OUTPUT_SCALE;
+    gekiatsuVideo.volume = audioOutputVolume(settings.sfxVolume, videoVolumeScale);
     if(options.fadeOnEnd){
       gekiatsuVideo.onended = fadeOutGekiatsuEffect;
     }
@@ -5700,7 +6076,10 @@ body{
     try{
       pauseNormalBgm();
       barBgmActive = true;
-      if(barBgm.src !== BAR_BGM_SRC) barBgm.src = BAR_BGM_SRC;
+      if(barBgm.getAttribute("src") !== BAR_BGM_SRC){
+        barBgm.setAttribute("src", BAR_BGM_SRC);
+        try{ barBgm.load(); }catch(e){}
+      }
       barBgm.loop = true;
       barBgm.volume = bgmOutputVolume(BAR_BGM_OUTPUT_SCALE);
       // すでに再生中なら頭出ししない。BAR揃い後は常時流し続ける。
@@ -5778,7 +6157,10 @@ body{
   function ensureBarBgmContinuing(){
     if(!barBgmActive || !barBgm || battleBgmActive || isContinuationBattleActive()) return;
     try{
-      if(barBgm.src !== BAR_BGM_SRC) barBgm.src = BAR_BGM_SRC;
+      if(barBgm.getAttribute("src") !== BAR_BGM_SRC){
+        barBgm.setAttribute("src", BAR_BGM_SRC);
+        try{ barBgm.load(); }catch(e){}
+      }
       barBgm.loop = true;
       barBgm.volume = bgmOutputVolume(BAR_BGM_OUTPUT_SCALE);
       if(barBgm.paused){
@@ -6078,7 +6460,8 @@ body{
     const atCountText = stats.totalSessions || 0;
     const stEmblem = $("wdStEmblem");
     if(stEmblem){
-      stEmblem.classList.toggle("is-ceiling", !active);
+      stEmblem.classList.toggle("is-ceiling", !active && !normalState.bonusPending);
+      stEmblem.classList.toggle("is-bonus-pending", !active && normalState.bonusPending);
       stEmblem.classList.toggle("is-profit", active && profit > 0);
       if(active){
         stEmblem.innerHTML = "DEVIL<br>RUSH";
@@ -6087,6 +6470,7 @@ body{
       }else{
         stEmblem.innerHTML = `天井まで<b>${ceilingRemain()}回</b>`;
       }
+      updateDevilStatusLamp();
     }
     setText("wdCounterSt", atCountText);
     setText("wdCounterBig", stats.bigCount || 0);
@@ -6137,9 +6521,10 @@ body{
     }
 
     if($("quickAutoBtn")){
-      $("quickAutoBtn").textContent = autoPlay ? "オート停止" : "オート";
+      $("quickAutoBtn").textContent = autoPlay ? "STOP" : "AUTO";
       $("quickAutoBtn").classList.toggle("on", autoPlay);
     }
+    updateSpeedToBonusUi();
     scheduleAdminStatePush();
   }
 
@@ -6218,6 +6603,7 @@ body{
 
   function resetGame(){
     stopDebugFastSpin("初期化のため高速停止");
+    stopSpeedToBonus("初期化のためSPEED停止");
     if(!confirm("統計と現在のAT状態を初期化しますか？")) return;
     stopAutoPlay("初期化のためオート停止");
     pauseNormalBgm();
@@ -6510,6 +6896,7 @@ body{
 
   async function spin(){
     if(debugFastSpinActive) return;
+    if(speedToBonusActive) return;
     // 回転中にメインボタンを押したら、残りリールを停止する
     if(isSpinning){
       stopAllReels();
@@ -6916,13 +7303,15 @@ body{
     }
 
     if($("quickAutoBtn")){
-      $("quickAutoBtn").textContent = autoPlay ? "オート停止" : "オート";
+      $("quickAutoBtn").textContent = autoPlay ? "STOP" : "AUTO";
       $("quickAutoBtn").classList.toggle("on", autoPlay);
     }
+    updateSpeedToBonusUi();
   }
 
   function startAutoPlay(){
     if(autoPlay) return;
+    stopSpeedToBonus("AUTO開始のためSPEED停止");
     readSettings();
     autoPlay = true;
     updateAutoUi();
@@ -6977,6 +7366,122 @@ body{
     autoTimer = setTimeout(runAutoStep, delayMs);
   }
 
+  function speedToBonusUnavailableReason(){
+    if(session.active) return "ボーナス中はSPEEDを使用できません";
+    if(normalState.bonusPending) return "ボーナス確定中のためSPEED停止";
+    if(pendingAtStartTimer) return "AT開始待機中のためSPEEDを使用できません";
+    if(isSpinning) return "現在の回転停止後にSPEEDを開始してください";
+    if(debugFastSpinActive) return "高速回転中のためSPEEDを使用できません";
+    return "";
+  }
+
+  function updateSpeedToBonusUi(){
+    const btn = $("speedAutoBtn");
+    if(!btn) return;
+    const unavailable = speedToBonusUnavailableReason();
+    btn.textContent = speedToBonusActive ? "STOP" : "SPEED";
+    btn.classList.toggle("on", speedToBonusActive);
+    btn.disabled = !speedToBonusActive && !!unavailable;
+    btn.title = speedToBonusActive
+      ? `SPEED停止 / 今回${speedToBonusCount}G`
+      : (unavailable || `当たりまで${SPEED_TO_BONUS_SPINS_PER_SECOND}G/s`);
+  }
+
+  function startSpeedToBonus(){
+    if(speedToBonusActive) return;
+    const reason = speedToBonusUnavailableReason();
+    if(reason){
+      showMessage("SPEED待機", reason);
+      log(`[SPEED] ${reason}`);
+      updateSpeedToBonusUi();
+      return;
+    }
+    stopAutoPlay("SPEED開始のためAUTO停止");
+    readSettings();
+    speedToBonusCount = 0;
+    speedToBonusActive = true;
+    updateSpeedToBonusUi();
+    showMessage("SPEED", `当たりまで${SPEED_TO_BONUS_SPINS_PER_SECOND}G/s`);
+    log(`[SPEED] 当たり待ち開始 ${SPEED_TO_BONUS_SPINS_PER_SECOND}G/s`);
+    speedToBonusTimer = setInterval(runSpeedToBonusStep, SPEED_TO_BONUS_INTERVAL_MS);
+    runSpeedToBonusStep();
+  }
+
+  function stopSpeedToBonus(reason="SPEED停止"){
+    if(!speedToBonusActive && !speedToBonusTimer) return;
+    speedToBonusActive = false;
+    if(speedToBonusTimer){
+      clearInterval(speedToBonusTimer);
+      speedToBonusTimer = null;
+    }
+    updateSpeedToBonusUi();
+    updateDisplay();
+    log(`[SPEED] ${reason} / 今回${speedToBonusCount}G`);
+  }
+
+  function runSpeedToBonusStep(){
+    if(!speedToBonusActive) return;
+    try{
+      const reason = speedToBonusUnavailableReason();
+      if(session.active || normalState.bonusPending || pendingAtStartTimer || isSpinning || debugFastSpinActive){
+        stopSpeedToBonus(reason || "ボーナス確定で停止");
+        return;
+      }
+      if(!session.active && session.phase === "ended" && session.resultPayout !== null && session.resultPayout !== undefined){
+        hideSessionResultScreen();
+        session.phase = "idle";
+        session.resultPayout = null;
+      }
+
+      pendingForceResult = forceResult;
+      const premiumForced = forcePremiumEffect;
+      forceResult = "";
+      forcePremiumEffect = false;
+      if($("forceResult")) $("forceResult").value = "";
+      if($("premiumForceStatus")) $("premiumForceStatus").value = "OFF";
+      if(premiumForced && !pendingForceResult) pendingForceResult = "BIG";
+
+      stats.totalSpins++;
+      chargeSpinCost();
+
+      const result = drawNormalResult();
+      const lineRow = randomLineRow();
+      const resolved = resolveNormalOutcome(result);
+      const shouldStop = !!(resolved.bonusHit || resolved.bonusReady || resolved.regReady || resolved.bar3PremiumReady);
+      speedToBonusCount++;
+
+      if(shouldStop){
+        const grid = buildGrid(result, lineRow);
+        const spec = RESULT[result] || RESULT.MISS;
+        for(let i=0; i<3; i++){
+          const col = [grid[0][i], grid[1][i], grid[2][i]];
+          setReelColumn(i, col, i === 1 ? spec.label : "", spec.cls, lineRow);
+        }
+        stopSpeedToBonus("ボーナス確定で停止");
+      }
+
+      applyNormalResult(result, resolved, lineRow);
+      pendingForceResult = "";
+
+      if(resolved.bar3PremiumReady){
+        queueBonusSessionStart(180, {
+          continuationRateMin:BAR3_CONTINUATION_RATE,
+          stockSets:stockSetsForResult("BAR3"),
+          initialPaid:Number(resolved.reward) || 0
+        });
+      }else if(resolved.bonusReady){
+        queueBonusSessionStart(180);
+      }
+      updateDisplay();
+      updateSpeedToBonusUi();
+      persistState();
+    }catch(e){
+      stopSpeedToBonus("SPEEDエラー停止");
+      showMessage("SPEEDエラー", e && e.message ? e.message : String(e));
+      log(`[SPEED] ERROR ${e && e.message ? e.message : e}`);
+    }
+  }
+
   function updateDebugFastUi(){
     const startBtn = $("debugFastStartBtn");
     const stopBtn = $("debugFastStopBtn");
@@ -7003,6 +7508,7 @@ body{
       return;
     }
     stopAutoPlay("高速回転開始のためオート停止");
+    stopSpeedToBonus("高速回転開始のためSPEED停止");
     readSettings();
     debugFastSpinCount = 0;
     debugFastSpinActive = true;
@@ -7171,7 +7677,7 @@ body{
   }
 
   function playPayoutSound(){
-    if(debugFastSpinActive) return;
+    if(debugFastSpinActive || speedToBonusActive) return;
     if(!payoutSound) return;
     try{
       payoutSound.pause();
@@ -7186,7 +7692,7 @@ body{
   }
 
   function playVoiceSound(src, delayMs=0){
-    if(debugFastSpinActive) return;
+    if(debugFastSpinActive || speedToBonusActive) return;
     if(!voiceSound || !src) return;
     if(delayMs > 0){
       setTimeout(()=>playVoiceSound(src), delayMs);
@@ -7205,7 +7711,7 @@ body{
   }
 
   function playZakoVoiceSound(src, delayMs=0){
-    if(debugFastSpinActive) return;
+    if(debugFastSpinActive || speedToBonusActive) return;
     if(!src) return;
     if(delayMs > 0){
       setTimeout(()=>playZakoVoiceSound(src), delayMs);
@@ -7236,21 +7742,21 @@ body{
     }
   }
 
-  function playSpinSound(){ if(debugFastSpinActive) return; for(let i=0;i<8;i++) beep(180+i*36,.055,"sawtooth",.045,i*.045); }
-  function playStopSound(i){ if(debugFastSpinActive) return; beep(380+i*80,.07,"square",.075); }
+  function playSpinSound(){ if(debugFastSpinActive || speedToBonusActive) return; for(let i=0;i<8;i++) beep(180+i*36,.055,"sawtooth",.045,i*.045); }
+  function playStopSound(i){ if(debugFastSpinActive || speedToBonusActive) return; beep(380+i*80,.07,"square",.075); }
   function playWinSound(big){
-    if(debugFastSpinActive) return;
+    if(debugFastSpinActive || speedToBonusActive) return;
     const notes = big ? [523,659,784,1046,1318] : [440,554,659,880];
     notes.forEach((n,i)=>beep(n,.16,"triangle",.17,i*.11));
   }
   function playGodSound(){
-    if(debugFastSpinActive) return;
+    if(debugFastSpinActive || speedToBonusActive) return;
     [262,330,392,523,659,784,1046].forEach((n,i)=>beep(n,.18,"triangle",.13,i*.13));
   }
-  function playLoseSound(){ if(debugFastSpinActive) return; beep(190,.13,"sawtooth",.055); }
+  function playLoseSound(){ if(debugFastSpinActive || speedToBonusActive) return; beep(190,.13,"sawtooth",.055); }
 
   function showOverlay(text){
-    if(debugFastSpinActive) return;
+    if(debugFastSpinActive || speedToBonusActive) return;
     const o = $("overlay");
     if(isRogiThirdStopHoldActive()){
       if(o) o.classList.remove("show");
@@ -7276,7 +7782,7 @@ body{
   }
 
   function confetti(n){
-    if(debugFastSpinActive) return;
+    if(debugFastSpinActive || speedToBonusActive) return;
     if(isRogiThirdStopHoldActive()) return;
     const box = $("confetti");
     const colors = ["#ffd36a","#ff365d","#4de7ff","#62ff9a","#bd71ff","#ffffff"];
@@ -7294,7 +7800,9 @@ body{
   }
 
   function log(text){
-    if(debugFastSpinActive && !String(text || "").startsWith("[FAST]")) return;
+    const textString = String(text || "");
+    if(debugFastSpinActive && !textString.startsWith("[FAST]")) return;
+    if(speedToBonusActive && !textString.startsWith("[SPEED]")) return;
     const box = $("logList");
     const div = document.createElement("div");
     div.className = "logItem";
@@ -7309,6 +7817,11 @@ body{
     const slumpPublicCard = document.querySelector(".slumpPublic");
     if(slumpPanelBody && slumpPublicCard){
       slumpPanelBody.appendChild(slumpPublicCard);
+    }
+    const dataCounterPanelBody = $("dataCounterPanelBody");
+    const dataCounterCard = document.querySelector(".wd-data-counter-panel");
+    if(dataCounterPanelBody && dataCounterCard){
+      dataCounterPanelBody.appendChild(dataCounterCard);
     }
     const drawer = $("debugDrawer");
     if(drawer){
@@ -7342,6 +7855,12 @@ body{
         setInfoPanelOpen("odds", !audioDock.classList.contains("oddsOpen"));
       });
     }
+    if(dataToggleBtn){
+      dataToggleBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        setInfoPanelOpen("data", !audioDock.classList.contains("dataOpen"));
+      });
+    }
     if(audioCloseBtn){
       audioCloseBtn.addEventListener("click", e=>{
         e.stopPropagation();
@@ -7361,6 +7880,32 @@ body{
         e.stopPropagation();
         setInfoPanelOpen("odds", false);
         if(oddsToggleBtn) oddsToggleBtn.focus();
+      });
+    }
+    if(dataCloseBtn){
+      dataCloseBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        setInfoPanelOpen("data", false);
+        if(dataToggleBtn) dataToggleBtn.focus();
+      });
+    }
+    if(pageZoomOutBtn){
+      pageZoomOutBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        changePageZoom(-PAGE_ZOOM_STEP);
+      });
+    }
+    if(pageZoomInBtn){
+      pageZoomInBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        changePageZoom(PAGE_ZOOM_STEP);
+      });
+    }
+    if(pageZoomResetBtn){
+      pageZoomResetBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        pageZoom = 1;
+        applyPageZoom(true);
       });
     }
     if(audioDock){
@@ -7411,13 +7956,21 @@ body{
         else startAutoPlay();
       });
     }
+    if($("speedAutoBtn")){
+      $("speedAutoBtn").addEventListener("click", ()=>{
+        if(speedToBonusActive) stopSpeedToBonus("手動停止");
+        else startSpeedToBonus();
+      });
+    }
     if(effectSkipBtn){
       effectSkipBtn.addEventListener("click", skipActiveEffects);
     }
     const autoHitArea = document.querySelector(".autoArea");
     if(autoHitArea){
       autoHitArea.addEventListener("click", e=>{
-        if(e.target !== $("quickAutoBtn")) $("quickAutoBtn").click();
+        if(e.target.closest("button")) return;
+        if(e.target.closest(".autoStack")) return;
+        if($("quickAutoBtn")) $("quickAutoBtn").click();
       });
     }
 
@@ -7538,6 +8091,7 @@ body{
   }
 
   load();
+  loadPageZoom();
   applySettings();
   setup();
   connectAdminCommands();
