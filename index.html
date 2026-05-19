@@ -1965,6 +1965,41 @@ body.debugOpen .debugDrawer .secret{
   right:2%;
   transform:scaleX(-1);
 }
+
+/* Battle intro composition: fill the reel display frame without overflowing it. */
+.battleIntroLayer{
+  left:12.7% !important;
+  right:12.7% !important;
+  top:27.8% !important;
+  bottom:21.4% !important;
+  border-radius:7px !important;
+  overflow:hidden !important;
+}
+.battleIntroLogo{
+  left:58% !important;
+  top:7% !important;
+  width:min(56%, 500px) !important;
+  max-height:40% !important;
+}
+.battleIntroRound{
+  right:7% !important;
+  bottom:5% !important;
+  width:min(24%, 180px) !important;
+  max-height:46% !important;
+  z-index:5 !important;
+}
+.battleIntroCharacter,
+.battleIntroCharacter.right{
+  left:auto !important;
+  right:17% !important;
+  bottom:-12% !important;
+  max-width:38% !important;
+  max-height:113% !important;
+  z-index:6 !important;
+}
+.battleIntroCharacter.right{
+  transform:scaleX(-1);
+}
 .sessionResultLayer{
   position:absolute;
   inset:0;
@@ -2594,6 +2629,60 @@ body::after{display:none !important;content:none !important;}
   cursor:not-allowed !important;
   filter:grayscale(.45) drop-shadow(0 0 4px rgba(255,255,255,.12)) !important;
 }
+.speedModeMenu{
+  position:absolute !important;
+  right:108% !important;
+  top:0 !important;
+  width:210px !important;
+  padding:10px !important;
+  border-radius:10px !important;
+  border:1px solid rgba(255,192,82,.72) !important;
+  background:linear-gradient(180deg,rgba(20,14,34,.98),rgba(4,4,12,.96)) !important;
+  box-shadow:0 0 18px rgba(255,192,82,.28), inset 0 0 14px rgba(255,255,255,.08) !important;
+  color:#fff !important;
+  text-align:left !important;
+  pointer-events:auto !important;
+  z-index:120 !important;
+}
+.speedModeMenu[hidden]{display:none !important;}
+.speedModeHeader{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:8px !important;
+  font-size:12px !important;
+  font-weight:1000 !important;
+  letter-spacing:.06em !important;
+}
+.speedModeHeader span{
+  color:#ffcf66 !important;
+  text-shadow:0 0 8px rgba(255,192,82,.65) !important;
+}
+.speedModeToggle{
+  width:100% !important;
+  margin:8px 0 !important;
+  padding:8px 10px !important;
+  border-radius:8px !important;
+  border:1px solid rgba(255,220,130,.7) !important;
+  color:#221000 !important;
+  background:linear-gradient(180deg,#fff2aa,#ffb12c) !important;
+  font-weight:1000 !important;
+}
+.speedModeToggle.off{
+  color:#fff !important;
+  background:linear-gradient(180deg,#ff879e,#b4072e) !important;
+}
+.speedModeToggle:disabled{
+  opacity:.5 !important;
+  cursor:not-allowed !important;
+}
+.speedModeText,
+.speedModeCount{
+  font-size:11px !important;
+  line-height:1.35 !important;
+  color:rgba(255,255,255,.76) !important;
+}
+.speedModeCount{color:#ffdf85 !important;font-weight:900 !important;}
 .side .oddsPublic,
 .wd-public-panels{
   margin-top:0 !important;
@@ -3168,6 +3257,44 @@ body{
 .side .wd-data-counter-panel{
   display:none !important;
 }
+
+.reelArea .wd-reel-data-panel{
+  position:absolute !important;
+  left:-4.7% !important;
+  top:27.8% !important;
+  width:16.55% !important;
+  height:50.8% !important;
+  margin:0 !important;
+  padding:0 !important;
+  aspect-ratio:auto !important;
+  z-index:9 !important;
+  pointer-events:none !important;
+  transform:none !important;
+}
+.reelArea .wd-reel-data-panel::after{
+  font-size:clamp(8px, .72vw, 12px) !important;
+  letter-spacing:.08em !important;
+}
+.reelArea .wd-reel-data-panel .wd-st-emblem{
+  font-size:clamp(10px, .92vw, 15px) !important;
+}
+.reelArea .wd-reel-data-panel .wd-st-emblem.is-bonus-pending{
+  font-size:clamp(9px, .78vw, 13px) !important;
+}
+.reelArea .wd-reel-data-panel .wd-st-emblem.is-ceiling{
+  font-size:clamp(8px, .68vw, 11px) !important;
+}
+.reelArea .wd-reel-data-panel .wd-st-emblem.is-ceiling b{
+  font-size:clamp(13px, 1.18vw, 19px) !important;
+}
+.reelArea .wd-reel-data-panel .wd-st-readout span{
+  font-size:clamp(6px, .52vw, 8px) !important;
+}
+.reelArea .wd-reel-data-panel .wd-st-readout b,
+.reelArea .wd-reel-data-panel #wdBigOdds,
+.reelArea .wd-reel-data-panel #wdRegOdds{
+  font-size:clamp(10px, .98vw, 16px) !important;
+}
 @supports not (zoom:1){
   .wrap{
     transform:scale(var(--wd-page-zoom));
@@ -3198,7 +3325,7 @@ body{
 
   <div class="header">
     <div class="titleBox">
-      <div class="badge">ST ONLY / MID+BIG 3LINE</div>
+      <div class="badge">AT ONLY / MID+BIG 3LINE</div>
       <h1 id="titleView">白い悪魔 SLOT</h1>
     </div>
     <div class="notice">配信・RP・ゲーム内ポイント専用。現金・換金・景品交換・実利益化には使用しないでください。</div>
@@ -3239,7 +3366,7 @@ body{
           <div class="settingInfo">
             設定 <b id="settingView">1</b><br>
             機械割 <b id="targetRtpView">80%</b><br>
-            ST <b id="stInfoView">10回転</b><br>
+            AT <b id="stInfoView">10回転</b><br>
             払出 <b id="payoutScaleView">固定</b>
           </div>
           <div id="oddsPanelBody">
@@ -3289,25 +3416,25 @@ body{
           <div class="settingInfo">
             設定 <b id="settingViewLegacy">1</b><br>
             機械割 <b id="targetRtpViewLegacy">80%</b><br>
-            ST <b id="stInfoViewLegacy">10回転</b><br>
+            AT <b id="stInfoViewLegacy">10回転</b><br>
             払出補正 <b id="payoutScaleViewLegacy">なし</b>
           </div>
         </div>
         <div class="stLampWrap">
-          <div class="stLamp" id="stLamp">ST</div>
+          <div class="stLamp" id="stLamp">AT</div>
         </div>
 
         <div class="message" id="message">READY</div>
-        <div class="subMessage" id="subMessage">利用料を払ってSTスタート / 王冠なし・奇数はBIG寄り・偶数はREG寄り・6は均等</div>
+        <div class="subMessage" id="subMessage">利用料を払ってATスタート / 王冠なし・奇数はBIG寄り・偶数はREG寄り・6は均等</div>
 
         <div class="sevenSegPanel">
-          <div class="sevenSegLabel">残りST</div>
+          <div class="sevenSegLabel">残りAT</div>
           <div class="sevenSegValue" id="stRemainBigView">--</div>
         </div>
 
         <div class="stats">
           <div class="stat"><div class="k">回転数</div><div class="v" id="totalSpinsView">0</div></div>
-          <div class="stat"><div class="k">ST</div><div class="v" id="totalSessionsView">0</div></div>
+          <div class="stat"><div class="k">AT</div><div class="v" id="totalSessionsView">0</div></div>
           <div class="stat"><div class="k">BIG</div><div class="v" id="bigCountView">0</div></div>
           <div class="stat"><div class="k">REG</div><div class="v" id="midCountView">0</div></div>
           <div class="stat"><div class="k">砂時計</div><div class="v" id="smallCountView">0</div></div>
@@ -3327,6 +3454,17 @@ body{
       </section>
 
       <div class="reelArea">
+        <div class="wd-public-panels wd-st-status-panel wd-reel-data-panel" id="bonus-info">
+          <div class="wd-st-emblem" id="wdStEmblem">DEVIL<br>RUSH</div>
+          <div class="wd-st-readout">
+            <span>BIG確率</span>
+            <b id="wdBigOdds">-</b>
+          </div>
+          <div class="wd-st-readout">
+            <span>REG確率</span>
+            <b id="wdRegOdds">-</b>
+          </div>
+        </div>
         <div class="payline"></div>
         <div class="reels">
           <div class="reel" data-reel="0"><div class="window">
@@ -3371,6 +3509,12 @@ body{
           <div class="autoStack">
             <button class="autoInlineBtn" id="quickAutoBtn" type="button">AUTO</button>
             <button class="speedInlineBtn" id="speedAutoBtn" type="button">SPEED</button>
+            <div class="speedModeMenu" id="speedModeMenu" hidden>
+              <div class="speedModeHeader"><b>SPEED MODE</b><span id="speedModeState">OFF</span></div>
+              <button class="speedModeToggle" id="speedModeToggleBtn" type="button">ON</button>
+              <div class="speedModeText">通常時のみAUTOの3倍速（上限10回転/s）で遊技します。音なし。</div>
+              <div class="speedModeCount" id="speedModeCount">今回0G</div>
+            </div>
           </div>
           <button class="effectSkipBtn" id="effectSkipBtn" type="button">SKIP</button>
         </div>
@@ -3378,7 +3522,7 @@ body{
       <div class="resultBox resultBoxWide" id="resultText">-</div>
       <div class="sessionResultLayer" id="sessionResultLayer" aria-hidden="true">
         <div class="sessionResultContent">
-          <div class="sessionResultTitle">STバトルが終了しました。</div>
+          <div class="sessionResultTitle">ATバトルが終了しました。</div>
           <div class="sessionResultStats">
             <div class="sessionResultLine"><span>継続SET数</span><b id="resultSetCountView">0回</b></div>
             <div class="sessionResultLine"><span>獲得pt</span><b id="resultPayoutView">0pt</b></div>
@@ -3442,7 +3586,7 @@ body{
           <input id="feeInput" type="number" min="1" max="10000000" step="1" value="100" />
         </div>
         <div class="field">
-          <label>ST回転数</label>
+          <label>AT回転数</label>
           <input id="stSpinsInput" type="number" min="1" max="100" step="1" value="10" />
         </div>
         <div class="field">
@@ -3450,7 +3594,7 @@ body{
           <input id="oddsMultiplierInput" type="number" min="0.1" max="100" step="0.1" value="1" />
         </div>
         <div class="field">
-          <label>オートST間隔（秒）</label>
+          <label>オートAT間隔（秒）</label>
           <input id="autoDelayInput" type="number" min="0.1" max="10" step="0.1" value="0.5" />
         </div>
         <div class="row">
@@ -3504,21 +3648,21 @@ body{
       </div>
 
       <div class="card">
-        <h2>報酬・ST加算ルール</h2>
+        <h2>報酬・AT加算ルール</h2>
         <div class="field">
           <label>砂時計画像揃い</label>
-          <input type="text" value="払い出しなし + ST+10G" readonly />
+          <input type="text" value="払い出しなし + AT+10G" readonly />
         </div>
         <div class="field">
           <label>REG 77BAR</label>
-          <input type="text" value="出玉0.5倍 + ST+5G" readonly />
+          <input type="text" value="出玉0.5倍 + AT+5G" readonly />
         </div>
         <div class="field">
           <label>BAR揃い</label>
-          <input type="text" value="払い出しなし + ST+50G" readonly />
+          <input type="text" value="払い出しなし + AT+50G" readonly />
         </div>
         <div class="field">
-          <label>BIG 7揃い ST追加回転数（倍率ではありません）</label>
+          <label>BIG 7揃い AT追加回転数（倍率ではありません）</label>
           <input id="bigAddInput" type="number" min="0" max="1000" step="1" value="5" readonly />
         </div>
         <div class="field">
@@ -3541,10 +3685,10 @@ body{
           <select id="forceResult">
             <option value="">ランダム</option>
             <option value="MISS">ハズレ</option>
-          <option value="SMALL">砂時計（画像/ST+10）</option>
-          <option value="MID">REG（77BAR/ST+5）</option>
-            <option value="BAR3">BAR揃い（ST+50）</option>
-            <option value="BIG">BIG（7/2倍/ST+5）</option>
+          <option value="SMALL">砂時計（画像/AT+10）</option>
+          <option value="MID">REG（77BAR/AT+5）</option>
+            <option value="BAR3">BAR揃い（AT+50）</option>
+            <option value="BIG">BIG（7/2倍/AT+5）</option>
             <option value="BELL">ベル揃い</option>
             <option value="REPLAY">リプレイ（AT中+3pt）</option>
             <option value="SUICA">スイカ揃い</option>
@@ -3594,21 +3738,10 @@ body{
           </div>
         </div>
         <div class="help" style="margin-top:10px">
-          このメニューは液晶5回クリックで開閉します。直行操作はST中のみ反映します。
+          このメニューは液晶5回クリックで開閉します。直行操作はAT中のみ反映します。
         </div>
       </div>
 
-      <div class="wd-public-panels wd-st-status-panel" id="bonus-info">
-        <div class="wd-st-emblem" id="wdStEmblem">DEVIL<br>RUSH</div>
-        <div class="wd-st-readout">
-          <span>BIG確率</span>
-          <b id="wdBigOdds">-</b>
-        </div>
-        <div class="wd-st-readout">
-          <span>REG確率</span>
-          <b id="wdRegOdds">-</b>
-        </div>
-      </div>
       <div class="card oddsPublic wd-data-counter-panel">
         <div class="wd-counter-rows">
           <div><span>AT</span><b id="wdCounterSt">--G</b></div>
@@ -4012,8 +4145,8 @@ body{
   const DEBUG_FAST_SPINS_PER_SECOND = 100;
   const DEBUG_FAST_INTERVAL_MS = 100;
   const DEBUG_FAST_BATCH_SIZE = Math.max(1, Math.round(DEBUG_FAST_SPINS_PER_SECOND * DEBUG_FAST_INTERVAL_MS / 1000));
-  const SPEED_TO_BONUS_SPINS_PER_SECOND = 10;
-  const SPEED_TO_BONUS_INTERVAL_MS = Math.round(1000 / SPEED_TO_BONUS_SPINS_PER_SECOND);
+  const SPEED_MODE_MAX_SPINS_PER_SECOND = 10;
+  const SPEED_MODE_MULTIPLIER = 3;
   const SLUMP_MAX_HISTORY_POINTS = 20000;
   const SLUMP_MAX_DRAW_POINTS = 1400;
   let autoPlay = false;
@@ -4021,6 +4154,8 @@ body{
   let speedToBonusActive = false;
   let speedToBonusTimer = null;
   let speedToBonusCount = 0;
+  let speedModeMenuOpen = false;
+  let speedModeSpinRequest = false;
   let debugFastSpinActive = false;
   let debugFastTimer = null;
   let debugFastSpinCount = 0;
@@ -4827,7 +4962,7 @@ body{
   function stGameAddTextFor(result, amount){
     const value = Math.max(0, Number(amount) || 0);
     if(value <= 0) return "";
-    return `${result === "SMALL" ? "ST" : "AT"}+${value}G`;
+    return `${result === "SMALL" ? "AT" : "AT"}+${value}G`;
   }
 
   function stockSetsForResult(result){
@@ -5593,7 +5728,7 @@ body{
     }else if(command.type === "startAuto"){
       startAutoPlay();
     }else if(command.type === "stopAuto"){
-      stopAutoPlay("管理画面：オートST停止");
+      stopAutoPlay("管理画面：オートAT停止");
     }
     scheduleAdminStatePush(50);
   }
@@ -5741,7 +5876,7 @@ body{
     if(session.active) return false;
     if(sessionStartGuard) return false;
     if(session.phase === "ended" && session.resultPayout !== null && session.resultPayout !== undefined){
-      const ok = confirm("STバトルが終了しました。\n新しいSTをはじめますか？");
+      const ok = confirm("ATバトルが終了しました。\n新しいATをはじめますか？");
       if(!ok) return false;
       hideSessionResultScreen();
     }
@@ -5821,8 +5956,8 @@ body{
   function finishSession(){
     const profit = session.paid - (Number(session.cost) || 0);
     const endedSets = session.setNo || 0;
-    if(autoPlay) stopAutoPlay("STバトル終了のためオート停止");
-    showMessage("STバトルが終了しました。", `継続SET数 ${endedSets}回 / 獲得pt ${session.paid}pt`);
+    if(autoPlay) stopAutoPlay("ATバトル終了のためオート停止");
+    showMessage("ATバトルが終了しました。", `継続SET数 ${endedSets}回 / 獲得pt ${session.paid}pt`);
     log(`轟雷BB終了：獲得${session.paid}pt / 損益${formatSigned(profit)}pt / ${endedSets}SET / STOCK獲得${session.added || 0}SET / G上乗せ${session.addedGames || 0}G`);
     stopBattleBgm(false);
     if(barBgmActive){
@@ -5844,7 +5979,7 @@ body{
     session.battleSource = "";
     $("spinBtn").textContent = "BET";
     showSessionResultScreen(endedSets, session.paid);
-    showOverlay("STバトル終了");
+    showOverlay("ATバトル終了");
     if(profit > 0){
       confetti(70);
       playWinSound(true);
@@ -6223,7 +6358,7 @@ body{
       showMessage("7揃い", `${resolved.bonusSource} / AT突入${lineText ? " / " + lineText : ""}`);
       log(`7揃い：${resolved.bonusSource} / AT突入`);
       flashReelLight("rainbow", 2200);
-      showOverlay("ST突入");
+      showOverlay("AT突入");
       confetti(90);
       playWinSound(true);
       return;
@@ -6364,7 +6499,7 @@ body{
           showOverlay("デビルゾーン");
           confetti(95);
         }else{
-          showOverlay(result === "MID" ? "REG" : (stGameText || "ST+10G"));
+          showOverlay(result === "MID" ? "REG" : (stGameText || "AT+10G"));
           confetti(45);
         }
       }else if(result === "BAR3"){
@@ -6490,7 +6625,7 @@ body{
     if(remainBig){
       const label = document.querySelector(".sevenSegLabel");
       if(active){
-        if(label) label.textContent = isGoraiZoneActive() ? "DEVIL ZONE" : isContinuationBattleActive() ? "BATTLE" : "残りST";
+        if(label) label.textContent = isGoraiZoneActive() ? "DEVIL ZONE" : isContinuationBattleActive() ? "BATTLE" : "残りAT";
         if(isGoraiZoneActive()){
           remainBig.textContent = String(Math.max(0, session.bigZone)).padStart(2, "0");
         }else if(isContinuationBattleActive()){
@@ -6896,7 +7031,7 @@ body{
 
   async function spin(){
     if(debugFastSpinActive) return;
-    if(speedToBonusActive) return;
+    if(speedToBonusActive && !speedModeSpinRequest) return;
     // 回転中にメインボタンを押したら、残りリールを停止する
     if(isSpinning){
       stopAllReels();
@@ -6918,7 +7053,7 @@ body{
 
     const normalActiveAtSpinStart = !session.active;
     if(normalActiveAtSpinStart && session.phase === "ended" && session.resultPayout !== null && session.resultPayout !== undefined){
-      const ok = confirm("STバトルが終了しました。\n通常へ戻って新しい遊技を開始しますか？");
+      const ok = confirm("ATバトルが終了しました。\n通常へ戻って新しい遊技を開始しますか？");
       if(!ok) return;
       hideSessionResultScreen();
       session.phase = "idle";
@@ -6937,6 +7072,8 @@ body{
     }
     const battleActiveAtSpinStart = isContinuationBattleActive() && !zoneActiveAtSpinStart;
     const battleRoundAtSpinStart = battleActiveAtSpinStart ? battleRoundNumber() : 0;
+    const speedModeSpinAtStart = speedToBonusActive && speedModeSpinRequest && normalActiveAtSpinStart;
+    const spinWaitMs = speedModeSpinAtStart ? speedModeWaitMs() : MIN_SPIN_WAIT_MS;
 
     isSpinning = true;
     clearReelLight(true);
@@ -6957,7 +7094,7 @@ body{
             ? `${battleRemainText()} / 停止できます`
             : "停止できます";
       }
-    }, MIN_SPIN_WAIT_MS);
+    }, spinWaitMs);
 
     pendingForceResult = forceResult;
     const premiumForced = forcePremiumEffect;
@@ -6969,9 +7106,9 @@ body{
 
     const atSpinAtStart = session.active && !zoneActiveAtSpinStart && !battleActiveAtSpinStart;
     if(normalActiveAtSpinStart){
-      // 通常・高確中は天井ゲーム数だけ進める。ST残りは減算しない。
+      // 通常・高確中は天井ゲーム数だけ進める。AT残りは減算しない。
     }else if(zoneActiveAtSpinStart){
-      // デビルゾーン中はSTも継続バトルも減算しない。
+      // デビルゾーン中はATも継続バトルも減算しない。
     }else if(battleActiveAtSpinStart){
       session.battleRemain = Math.max(0, (session.battleRemain || 0) - 1);
     }else{
@@ -7006,6 +7143,7 @@ body{
       zoneActiveAtStart:zoneActiveAtSpinStart,
       battleActiveAtStart:battleActiveAtSpinStart,
       normalActiveAtStart:normalActiveAtSpinStart,
+      speedModeAtStart:speedModeSpinAtStart,
       battleRound:battleRoundAtSpinStart,
       stopped:[false,false,false],
       effectsSkipped:false,
@@ -7032,17 +7170,19 @@ body{
       if(zakoEffect.bell) playZakoVoiceSound(VOICE_SRC.hyahha);
     }
 
-    const waitText = bar3LeverEffect
-      ? "BAR揃い演出発生！ 0.5秒後に停止可能"
-      : gekiatsuChance
-        ? "プレミア演出発生！ 0.5秒後に停止可能"
-        : "ウェイト中... 0.5秒後に停止可能";
+    const waitText = speedModeSpinAtStart
+      ? "SPEED中 / 停止できます"
+      : bar3LeverEffect
+        ? "BAR揃い演出発生！ 0.5秒後に停止可能"
+        : gekiatsuChance
+          ? "プレミア演出発生！ 0.5秒後に停止可能"
+          : "ウェイト中... 0.5秒後に停止可能";
     $("resultText").textContent = zoneActiveAtSpinStart
       ? `${goraiZoneRemainText(session.bigZone)} / ${waitText}`
       : battleActiveAtSpinStart
         ? `${battleRemainText()} / ${waitText}`
         : waitText;
-    playNormalBgm();
+    if(!speedModeSpinAtStart) playNormalBgm();
     playSpinSound();
     ensureBattleBgmContinuing();
     ensureBarBgmContinuing();
@@ -7052,10 +7192,11 @@ body{
       spinIntervals[i] = setInterval(()=>setRandomReel(i), 48 + i*10);
     });
 
-    // オート中だけ自動停止。手動時はストップ/左中右を押すまで止まらない。
-    if(autoPlay){
+    // オート/SPEED中だけ自動停止。手動時はストップ/左中右を押すまで止まらない。
+    if(autoPlay || speedModeSpinAtStart){
       [0,1,2].forEach(i=>{
-        setTimeout(()=>stopSingleReel(i), MIN_SPIN_WAIT_MS + 120 + i*360);
+        const delay = speedModeSpinAtStart ? speedModeStopDelay(i) : (MIN_SPIN_WAIT_MS + 120 + i*360);
+        setTimeout(()=>stopSingleReel(i), delay);
       });
     }
   }
@@ -7095,12 +7236,13 @@ body{
         ensurePendingBattleOutcome(currentSpin);
         showBattleIntro(battleRoundNumber(), !!(currentSpin.pendingBattleOutcome && currentSpin.pendingBattleOutcome.win));
       }
-      $("resultText").textContent = "全リール停止 / 結果確定待ち...";
+      $("resultText").textContent = currentSpin.speedModeAtStart ? "全リール停止 / 結果反映中..." : "全リール停止 / 結果確定待ち...";
+      const resultWaitMs = currentSpin.speedModeAtStart ? 0 : RESULT_WAIT_MS;
       setTimeout(()=>{
         if(currentSpin){
           finishSpin(currentSpin.result, currentSpin.resolved, currentSpin.lineRow);
         }
-      }, RESULT_WAIT_MS);
+      }, resultWaitMs);
     }
   }
 
@@ -7155,7 +7297,7 @@ body{
     const resultParts = [];
     if(reward > 0) resultParts.push("+" + reward + "pt");
     if(stockAdd > 0) resultParts.push("SET+" + stockAdd);
-    if(stGameAdd > 0) resultParts.push("ST+" + stGameAdd + "G");
+    if(stGameAdd > 0) resultParts.push("AT+" + stGameAdd + "G");
     if(zoneGameAdd > 0) resultParts.push("デビルゾーン+" + zoneGameAdd + "G");
     if(resolved.bigZone > 0 && zoneText) resultParts.push(zoneText);
     if(resultParts.length === 0) resultParts.push(isNormalSpinResult ? "払い出しなし" : "0pt");
@@ -7178,14 +7320,17 @@ body{
       updateDisplay();
       setTimeout(()=>clearReelVideos(), 900);
       if(resolved.bar3PremiumReady){
+        stopSpeedToBonus("ボーナス確定のためSPEED停止");
         queueBonusSessionStart(180, {
           continuationRateMin:BAR3_CONTINUATION_RATE,
           stockSets:stockSetsForResult("BAR3"),
           initialPaid:Number(resolved.reward) || 0
         });
       }else if(resolved.bonusReady){
+        stopSpeedToBonus("ボーナス確定のためSPEED停止");
         queueBonusSessionStart(180);
       }else{
+        scheduleNextSpeedToBonus();
         scheduleNextAuto();
       }
       return;
@@ -7295,7 +7440,7 @@ body{
     stopBtn.disabled = !autoPlay;
 
     if(autoPlay){
-      status.textContent = `オート中：STを自動消化`;
+      status.textContent = `オート中：ATを自動消化`;
       status.style.color = "var(--green)";
     }else{
       status.textContent = "オート停止中";
@@ -7315,7 +7460,7 @@ body{
     readSettings();
     autoPlay = true;
     updateAutoUi();
-    log("オートST開始");
+    log("オートAT開始");
     runAutoStep();
   }
 
@@ -7375,16 +7520,62 @@ body{
     return "";
   }
 
+  function speedModeDelayMs(){
+    const autoMs = Math.max(100, (Number(settings.autoDelay) || 0.5) * 1000);
+    const maxRateMs = Math.round(1000 / SPEED_MODE_MAX_SPINS_PER_SECOND);
+    return Math.max(maxRateMs, Math.round(autoMs / SPEED_MODE_MULTIPLIER));
+  }
+
+  function speedModeWaitMs(){
+    return 0;
+  }
+
+  function speedModeStopDelay(index){
+    return Math.max(40, Math.round((120 + index * 360) / SPEED_MODE_MULTIPLIER));
+  }
+
+  function setSpeedModeMenuOpen(open){
+    speedModeMenuOpen = !!open;
+    updateSpeedToBonusUi();
+  }
+
+  function scheduleNextSpeedToBonus(delayMs=null){
+    if(!speedToBonusActive) return;
+    if(speedToBonusTimer){
+      clearTimeout(speedToBonusTimer);
+      speedToBonusTimer = null;
+    }
+    speedToBonusTimer = setTimeout(runSpeedToBonusStep, delayMs === null ? speedModeDelayMs() : delayMs);
+  }
+
   function updateSpeedToBonusUi(){
     const btn = $("speedAutoBtn");
-    if(!btn) return;
+    const menu = $("speedModeMenu");
+    const state = $("speedModeState");
+    const toggle = $("speedModeToggleBtn");
+    const count = $("speedModeCount");
     const unavailable = speedToBonusUnavailableReason();
-    btn.textContent = speedToBonusActive ? "STOP" : "SPEED";
-    btn.classList.toggle("on", speedToBonusActive);
-    btn.disabled = !speedToBonusActive && !!unavailable;
-    btn.title = speedToBonusActive
-      ? `SPEED停止 / 今回${speedToBonusCount}G`
-      : (unavailable || `当たりまで${SPEED_TO_BONUS_SPINS_PER_SECOND}G/s`);
+    if(btn){
+      btn.textContent = "SPEED";
+      btn.classList.toggle("on", speedToBonusActive || speedModeMenuOpen);
+      btn.disabled = false;
+      btn.title = speedToBonusActive
+        ? `SPEED ON / 今回${speedToBonusCount}G`
+        : (unavailable || "SPEEDメニューを開く");
+    }
+    if(menu) menu.hidden = !speedModeMenuOpen;
+    if(state) state.textContent = speedToBonusActive ? "ON" : "OFF";
+    if(toggle){
+      toggle.textContent = speedToBonusActive ? "OFF" : "ON";
+      toggle.classList.toggle("off", speedToBonusActive);
+      toggle.disabled = !speedToBonusActive && !!unavailable;
+      toggle.title = unavailable || "通常時のみAUTOの3倍速で遊技";
+    }
+    if(count){
+      count.textContent = speedToBonusActive
+        ? `ON / 今回${speedToBonusCount}G / ${Math.round(1000 / speedModeDelayMs())}G/s目安`
+        : (unavailable ? `OFF / ${unavailable}` : "OFF / 通常時のみ");
+    }
   }
 
   function startSpeedToBonus(){
@@ -7401,21 +7592,23 @@ body{
     speedToBonusCount = 0;
     speedToBonusActive = true;
     updateSpeedToBonusUi();
-    showMessage("SPEED", `当たりまで${SPEED_TO_BONUS_SPINS_PER_SECOND}G/s`);
-    log(`[SPEED] 当たり待ち開始 ${SPEED_TO_BONUS_SPINS_PER_SECOND}G/s`);
-    speedToBonusTimer = setInterval(runSpeedToBonusStep, SPEED_TO_BONUS_INTERVAL_MS);
-    runSpeedToBonusStep();
+    if(bgm) bgm.pause();
+    showMessage("SPEED MODE", `通常時のみ / AUTOの${SPEED_MODE_MULTIPLIER}倍速 / 上限${SPEED_MODE_MAX_SPINS_PER_SECOND}G/s / 音なし`);
+    log(`[SPEED] 通常時SPEED開始 AUTOx${SPEED_MODE_MULTIPLIER} / max ${SPEED_MODE_MAX_SPINS_PER_SECOND}G/s`);
+    scheduleNextSpeedToBonus(0);
   }
 
   function stopSpeedToBonus(reason="SPEED停止"){
     if(!speedToBonusActive && !speedToBonusTimer) return;
     speedToBonusActive = false;
     if(speedToBonusTimer){
-      clearInterval(speedToBonusTimer);
+      clearTimeout(speedToBonusTimer);
       speedToBonusTimer = null;
     }
+    speedModeSpinRequest = false;
     updateSpeedToBonusUi();
     updateDisplay();
+    if(!session.active && !barBgmActive && !battleBgmActive) playNormalBgm();
     log(`[SPEED] ${reason} / 今回${speedToBonusCount}G`);
   }
 
@@ -7424,7 +7617,11 @@ body{
     try{
       const reason = speedToBonusUnavailableReason();
       if(session.active || normalState.bonusPending || pendingAtStartTimer || isSpinning || debugFastSpinActive){
-        stopSpeedToBonus(reason || "ボーナス確定で停止");
+        if(isSpinning){
+          scheduleNextSpeedToBonus();
+          return;
+        }
+        stopSpeedToBonus(reason || "通常時以外のためSPEED停止");
         return;
       }
       if(!session.active && session.phase === "ended" && session.resultPayout !== null && session.resultPayout !== undefined){
@@ -7433,49 +7630,14 @@ body{
         session.resultPayout = null;
       }
 
-      pendingForceResult = forceResult;
-      const premiumForced = forcePremiumEffect;
-      forceResult = "";
-      forcePremiumEffect = false;
-      if($("forceResult")) $("forceResult").value = "";
-      if($("premiumForceStatus")) $("premiumForceStatus").value = "OFF";
-      if(premiumForced && !pendingForceResult) pendingForceResult = "BIG";
-
-      stats.totalSpins++;
-      chargeSpinCost();
-
-      const result = drawNormalResult();
-      const lineRow = randomLineRow();
-      const resolved = resolveNormalOutcome(result);
-      const shouldStop = !!(resolved.bonusHit || resolved.bonusReady || resolved.regReady || resolved.bar3PremiumReady);
       speedToBonusCount++;
-
-      if(shouldStop){
-        const grid = buildGrid(result, lineRow);
-        const spec = RESULT[result] || RESULT.MISS;
-        for(let i=0; i<3; i++){
-          const col = [grid[0][i], grid[1][i], grid[2][i]];
-          setReelColumn(i, col, i === 1 ? spec.label : "", spec.cls, lineRow);
-        }
-        stopSpeedToBonus("ボーナス確定で停止");
-      }
-
-      applyNormalResult(result, resolved, lineRow);
-      pendingForceResult = "";
-
-      if(resolved.bar3PremiumReady){
-        queueBonusSessionStart(180, {
-          continuationRateMin:BAR3_CONTINUATION_RATE,
-          stockSets:stockSetsForResult("BAR3"),
-          initialPaid:Number(resolved.reward) || 0
-        });
-      }else if(resolved.bonusReady){
-        queueBonusSessionStart(180);
-      }
-      updateDisplay();
+      speedModeSpinRequest = true;
+      spin();
+      speedModeSpinRequest = false;
       updateSpeedToBonusUi();
       persistState();
     }catch(e){
+      speedModeSpinRequest = false;
       stopSpeedToBonus("SPEEDエラー停止");
       showMessage("SPEEDエラー", e && e.message ? e.message : String(e));
       log(`[SPEED] ERROR ${e && e.message ? e.message : e}`);
@@ -7912,6 +8074,7 @@ body{
       audioDock.addEventListener("click", e=>e.stopPropagation());
     }
     document.addEventListener("click", closeUtilityPanels);
+    document.addEventListener("click", ()=>setSpeedModeMenuOpen(false));
 
     onClick("saveBtn", save);
     onClick("resetBtn", resetGame);
@@ -7952,12 +8115,22 @@ body{
     }
     if($("quickAutoBtn")){
       $("quickAutoBtn").addEventListener("click", ()=>{
-        if(autoPlay) stopAutoPlay("オートST停止");
+        if(autoPlay) stopAutoPlay("オートAT停止");
         else startAutoPlay();
       });
     }
     if($("speedAutoBtn")){
-      $("speedAutoBtn").addEventListener("click", ()=>{
+      $("speedAutoBtn").addEventListener("click", e=>{
+        e.stopPropagation();
+        setSpeedModeMenuOpen(!speedModeMenuOpen);
+      });
+    }
+    if($("speedModeMenu")){
+      $("speedModeMenu").addEventListener("click", e=>e.stopPropagation());
+    }
+    if($("speedModeToggleBtn")){
+      $("speedModeToggleBtn").addEventListener("click", e=>{
+        e.stopPropagation();
         if(speedToBonusActive) stopSpeedToBonus("手動停止");
         else startSpeedToBonus();
       });
