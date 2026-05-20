@@ -12,6 +12,10 @@
 <link rel="preload" as="image" href="assets/symbols/sym_grape.webp">
 <link rel="preload" as="image" href="assets/symbols/sym_seven.png">
 <link rel="preload" as="image" href="assets/logo/white_devil_logo.png">
+<link rel="preload" as="image" href="assets/frames/slot_cabinet_frame_data_windows_off.png">
+<link rel="preload" as="image" href="assets/frames/slot_cabinet_frame_data_windows_on.png">
+<link rel="preload" as="image" href="assets/buttons/btn_auto_half_blue.png">
+<link rel="preload" as="image" href="assets/buttons/btn_speed_half_blue.png">
 <style>
 :root{
   --bg:#05060c;
@@ -1420,7 +1424,7 @@ input[type="range"]{padding:0}
   width:100%;
 }
 .slumpControls{
-  display:grid;
+  display:none !important;
   gap:8px;
   margin-top:10px;
 }
@@ -2327,7 +2331,8 @@ body::after{
 .betBtn.waiting,.betBtn.stopReady{background-image:url("assets/buttons/btn_bet_on.png") !important;}
 .centerStopBtns button{background-image:url("assets/buttons/btn_stop.png") !important;width:118px !important;height:78px !important;}
 .centerStopBtns button:not(:disabled){background-image:url("assets/buttons/btn_stop_on.png") !important;}
-.autoArea .autoInlineBtn,.autoArea .speedInlineBtn{background-image:url("assets/buttons/btn_auto.png") !important;min-width:118px !important;min-height:76px !important;}
+.autoArea .autoInlineBtn{background-image:url("assets/buttons/btn_auto_half_blue.png") !important;min-width:118px !important;min-height:38px !important;}
+.autoArea .speedInlineBtn{background-image:url("assets/buttons/btn_speed_half_blue.png") !important;min-width:118px !important;min-height:38px !important;}
 .resultBoxWide{font-size:15px;color:#9edcff !important;text-shadow:0 0 10px rgba(20,165,255,.6) !important;}
 .side{display:contents !important;}
 .side > .card,.debugDrawer{grid-area:bottom;}
@@ -2521,12 +2526,23 @@ body::after{display:none !important;content:none !important;}
 }
 .reelArea::before{
   inset:0 !important;
-  background:url("assets/frames/slot_cabinet_frame_data_windows_on.png") center/100% 100% no-repeat !important;
+  background:url("assets/frames/slot_cabinet_frame_data_windows_off.png") center/100% 100% no-repeat !important;
   opacity:1 !important;
   z-index:8 !important;
 }
-.reelArea.speedFrameOff::before{
-  background-image:url("assets/frames/slot_cabinet_frame_data_windows_off.png") !important;
+.reelFrameOnOverlay{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  object-fit:fill !important;
+  opacity:0 !important;
+  z-index:9 !important;
+  pointer-events:none !important;
+  transition:opacity .12s linear !important;
+}
+.reelArea.reelFrameOn .reelFrameOnOverlay{
+  opacity:1 !important;
 }
 .payline{
   left:14.5% !important;
@@ -2645,10 +2661,10 @@ body::after{display:none !important;content:none !important;}
 }
 .autoStack{
   position:absolute !important;
-  inset:3% 4% !important;
+  inset:-2% -5% !important;
   display:grid !important;
   grid-template-rows:1fr 1fr !important;
-  gap:6% !important;
+  gap:0 !important;
   z-index:84 !important;
   pointer-events:auto !important;
 }
@@ -2659,30 +2675,35 @@ body::after{display:none !important;content:none !important;}
   min-width:0 !important;
   min-height:0 !important;
   padding:0 !important;
-  border-radius:12px !important;
-  color:#f4fcff !important;
-  text-shadow:0 0 8px rgba(77,231,255,.78),0 1px 2px rgba(0,0,0,.9) !important;
-  background-image:none !important;
-  background:linear-gradient(180deg,rgba(43,138,222,.98),rgba(5,35,91,.98)) !important;
-  border:1px solid rgba(96,226,255,.52) !important;
-  box-shadow:inset 0 0 10px rgba(255,255,255,.14),0 0 10px rgba(77,231,255,.26) !important;
-  filter:drop-shadow(0 0 8px rgba(77,231,255,.18)) !important;
+  border-radius:0 !important;
+  color:transparent !important;
+  text-shadow:none !important;
+  background-color:transparent !important;
+  background-repeat:no-repeat !important;
+  background-position:center !important;
+  background-size:100% 100% !important;
+  border:0 !important;
+  box-shadow:none !important;
+  filter:drop-shadow(0 0 7px rgba(77,231,255,.22)) !important;
   font-size:clamp(9px,.9vw,13px) !important;
   font-weight:1000 !important;
   letter-spacing:.06em !important;
   line-height:1 !important;
 }
+.autoArea .autoInlineBtn{
+  background-image:url("assets/buttons/btn_auto_half_blue.png") !important;
+}
 .autoArea .speedInlineBtn{
-  background:linear-gradient(180deg,rgba(116,94,255,.98),rgba(23,22,111,.98)) !important;
+  background-image:url("assets/buttons/btn_speed_half_blue.png") !important;
 }
 .autoArea .autoInlineBtn.on,
 .autoArea .speedInlineBtn.on{
-  background:linear-gradient(180deg,rgba(255,104,132,.98),rgba(129,5,34,.98)) !important;
-  border-color:rgba(255,150,170,.72) !important;
-  box-shadow:inset 0 0 10px rgba(255,255,255,.14),0 0 12px rgba(255,54,93,.32) !important;
+  transform:translateY(2px) scale(.97) !important;
+  filter:drop-shadow(0 0 14px rgba(94,221,255,.66)) brightness(.72) saturate(1.18) contrast(1.16) !important;
+  box-shadow:none !important;
 }
 .autoArea .speedInlineBtn.on{
-  background:linear-gradient(180deg,rgba(255,192,82,.98),rgba(186,72,0,.98)) !important;
+  filter:drop-shadow(0 0 14px rgba(94,221,255,.66)) brightness(.72) saturate(1.18) contrast(1.16) !important;
 }
 .autoArea .autoInlineBtn:disabled,
 .autoArea .speedInlineBtn:disabled{
@@ -2784,15 +2805,14 @@ body::after{display:none !important;content:none !important;}
 }
 .wd-st-emblem{
   position:absolute;
-  left:23%;
-  right:23%;
-  top:19%;
-  aspect-ratio:1 / 1;
+  left:24%;
+  right:22%;
+  top:23%;
+  aspect-ratio:1 / 0.8;
   display:grid;
   place-items:center;
   border-radius:50%;
   color:rgba(255,255,255,.36);
-  padding-bottom:7%;
   font-size:clamp(16px, 1.52vw, 23px);
   line-height:.98;
   font-family:Georgia, "Times New Roman", serif;
@@ -2805,6 +2825,8 @@ body::after{display:none !important;content:none !important;}
   box-shadow:inset 0 0 18px rgba(0,0,0,.72);
 }
 .wd-st-emblem.is-profit{
+  top:16%;
+  aspect-ratio:1 / 1;
   color:#fff;
   opacity:1;
   filter:brightness(1.18);
@@ -2814,9 +2836,11 @@ body::after{display:none !important;content:none !important;}
     0 0 28px rgba(255,42,42,.55);
 }
 .wd-st-emblem.status-lit{
+  top:16%;
+  aspect-ratio:1 / 1;
   color:#fff;
   opacity:1;
-  background:radial-gradient(circle at 50% 43%, rgba(255,78,78,.28), rgba(72,0,0,.18) 48%, rgba(0,0,0,.10) 74%);
+  background:radial-gradient(circle at 50% 36%, rgba(255,78,78,.28), rgba(72,0,0,.18) 48%, rgba(0,0,0,.10) 74%);
   box-shadow:
     inset 0 0 18px rgba(255,42,42,.28),
     inset 0 0 36px rgba(255,255,255,.08),
@@ -2827,6 +2851,8 @@ body::after{display:none !important;content:none !important;}
     0 0 26px rgba(255,42,42,.50);
 }
 .wd-st-emblem.status-confirmed{
+  top:16%;
+  aspect-ratio:1 / 1;
   filter:brightness(1.12) saturate(1.12);
 }
 .wd-st-emblem.status-blink{
@@ -2841,9 +2867,19 @@ body::after{display:none !important;content:none !important;}
   color:#fff6b8;
 }
 .wd-st-emblem.is-bonus-pending{
+  top:16%;
+  aspect-ratio:1 / 1;
   color:#fff;
   opacity:1;
-  padding-bottom:9%;
+  background:radial-gradient(circle at 50% 36%, rgba(255,78,78,.28), rgba(72,0,0,.18) 48%, rgba(0,0,0,.10) 74%);
+  box-shadow:
+    inset 0 0 18px rgba(255,42,42,.28),
+    inset 0 0 36px rgba(255,255,255,.08),
+    0 0 16px rgba(255,42,42,.50);
+  text-shadow:
+    0 0 8px rgba(255,255,255,.84),
+    0 0 14px rgba(255,0,0,.92),
+    0 0 26px rgba(255,42,42,.50);
   font-size:clamp(15px, 1.28vw, 20px);
   line-height:1.02;
   letter-spacing:.03em;
@@ -2939,9 +2975,9 @@ body::after{display:none !important;content:none !important;}
 }
 .wd-data-counter-panel{
   position:relative !important;
-  aspect-ratio:803 / 1410 !important;
+  aspect-ratio:865 / 1535 !important;
   padding:0 !important;
-  background:url("assets/panels/data_counter_panel_blue.png") center/100% 100% no-repeat !important;
+  background:url("assets/panels/panel_blue_menu_tall.png") center/100% 100% no-repeat !important;
   border:0 !important;
   border-radius:0 !important;
   box-shadow:none !important;
@@ -2950,35 +2986,40 @@ body::after{display:none !important;content:none !important;}
 .wd-data-counter-panel h2{display:none !important;}
 .wd-counter-actions{
   position:absolute;
-  left:22.5%;
-  right:9.2%;
-  top:8.1%;
+  left:19.5%;
+  right:13.5%;
+  top:19.2%;
   display:grid;
   grid-template-columns:1fr;
-  gap:4px;
+  gap:33.5%;
   z-index:2;
 }
 .wd-counter-action{
   width:100%;
-  min-height:18px;
-  padding:0 5px;
-  border-radius:4px;
-  color:#dff7ff;
-  background:linear-gradient(180deg,rgba(20,81,140,.86),rgba(2,14,43,.92));
-  border:1px solid rgba(77,231,255,.42);
-  box-shadow:inset 0 0 8px rgba(255,255,255,.08), 0 0 8px rgba(77,231,255,.18);
-  font-size:clamp(7px, .62vw, 10px);
+  aspect-ratio:1767 / 647;
+  min-height:0;
+  padding:0;
+  border:0;
+  border-radius:0;
+  color:transparent;
+  background:center/100% 100% no-repeat transparent;
+  box-shadow:none;
+  font-size:0;
   font-weight:1000;
   line-height:1.05;
   white-space:nowrap;
   text-align:center;
-  text-shadow:0 0 6px rgba(77,231,255,.56);
+  text-shadow:none;
+  filter:drop-shadow(0 0 7px rgba(33,168,255,.25));
+}
+#reelSlumpToggleBtn{background-image:url("assets/panels/button_slump_graph_blue.png");aspect-ratio:1936 / 679;}
+#reelOddsToggleBtn{background-image:url("assets/panels/button_setting_odds_blue.png");aspect-ratio:1767 / 647;}
+#reelDataToggleBtn{background-image:url("assets/panels/button_data_counter_blue.png");aspect-ratio:1935 / 666;}
+.wd-counter-action:hover{
+  filter:brightness(1.08) drop-shadow(0 0 10px rgba(33,168,255,.35));
 }
 .wd-counter-action.is-open{
-  color:#ffeaa8;
-  border-color:rgba(255,211,106,.70);
-  background:linear-gradient(180deg,rgba(116,52,8,.92),rgba(32,8,2,.94));
-  box-shadow:inset 0 0 8px rgba(255,255,255,.10), 0 0 11px rgba(255,211,106,.25);
+  filter:brightness(1.22) saturate(1.12) drop-shadow(0 0 12px rgba(77,231,255,.55));
 }
 .wd-data-counter-panel:not(.is-counter-open) .wd-counter-rows{
   display:none !important;
@@ -3255,6 +3296,34 @@ body::after{display:none !important;content:none !important;}
   }
 }
 
+@media(max-width:760px){
+  .wd-info-strip span{
+    font-size:11px !important;
+  }
+  .wd-info-strip b{
+    font-size:18px !important;
+  }
+  .reels{
+    left:12.7% !important;
+    right:12.7% !important;
+    top:27.8% !important;
+    bottom:21.4% !important;
+    gap:1.65% !important;
+  }
+  .reel{
+    height:auto !important;
+    padding:0 !important;
+    border-radius:7px !important;
+  }
+  .window{
+    gap:0 !important;
+  }
+  .centerStopBtns button{
+    width:12.2% !important;
+    height:14.48% !important;
+  }
+}
+
 .debugToggleBtn{
   position:fixed;
   right:14px;
@@ -3279,12 +3348,12 @@ body.debugOpen .debugToggleBtn{
   box-shadow:0 0 16px rgba(255,54,93,.38), inset 0 0 12px rgba(255,255,255,.08);
 }
 
-/* Full-page KV background. The image scrolls with the page instead of staying fixed. */
+/* Full-page KV background. Keep it attached to the page so it scrolls with the cabinet. */
 body{
   background-color:#020307 !important;
   background-image:url("assets/backgrounds/bg_fire_ice.png") !important;
   background-position:center top !important;
-  background-size:100% auto !important;
+  background-size:1360px auto !important;
   background-repeat:no-repeat !important;
   background-attachment:scroll !important;
 }
@@ -3312,8 +3381,9 @@ body{
 }
 @media(max-width:760px){
   body{
-    background-size:auto 1000px !important;
+    background-size:1360px auto !important;
     background-position:center top !important;
+    background-attachment:scroll !important;
   }
   .wd-hero{
     min-height:clamp(300px, 76vw, 480px) !important;
@@ -3325,51 +3395,61 @@ body{
 :root{
   --wd-page-zoom:1;
   --wd-stage-width:1360px;
-  --wd-hero-fixed-height:533px;
-  --wd-reel-top-anchor-y:var(--wd-hero-fixed-height);
-  --wd-stage-focus-x:686px;
+  --wd-hero-fixed-height:562px;
+  --wd-reel-top-anchor-y:570px;
+  --wd-stage-focus-x:610px;
   --wd-left-rail-width:256px;
   --wd-right-rail-width:244px;
   --wd-cabinet-anchor-offset:0px;
-  --wd-bg-sync-x:center;
-  --wd-bg-sync-size:cover;
+  --wd-cabinet-x-offset:-15px;
+  --wd-bg-sync-x:center top;
+  --wd-bg-sync-size:100% auto;
 }
-html,
-body{
-  overflow-x:auto !important;
+html{
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
   overflow-anchor:none !important;
 }
 html{
   min-height:100% !important;
   background-color:#020307 !important;
   background-image:url("assets/backgrounds/bg_fire_ice.png") !important;
-  background-position:var(--wd-bg-sync-x) top !important;
+  background-position:var(--wd-bg-sync-x) !important;
   background-size:var(--wd-bg-sync-size) !important;
-  background-attachment:fixed !important;
+  background-attachment:scroll !important;
   background-repeat:no-repeat !important;
 }
 body{
-  min-width:calc(var(--wd-stage-width) * var(--wd-page-zoom)) !important;
+  width:100% !important;
+  min-width:100% !important;
+  min-height:100% !important;
+  overflow:hidden !important;
+  overflow-anchor:none !important;
   background-color:transparent !important;
   background-image:none !important;
-  background-size:cover !important;
+  background-size:1360px auto !important;
   background-position:center top !important;
-  background-attachment:fixed !important;
+  background-attachment:scroll !important;
 }
 .wrap{
   width:var(--wd-stage-width) !important;
   min-width:var(--wd-stage-width) !important;
   max-width:none !important;
-  margin:0 !important;
+  margin:0 auto !important;
   zoom:1 !important;
   transform:scale(var(--wd-page-zoom));
   transform-origin:var(--wd-stage-focus-x) var(--wd-reel-top-anchor-y);
   will-change:transform;
 }
+.pageScrollSpacer{
+  height:0;
+  pointer-events:none;
+}
 .main{
   grid-template-columns:var(--wd-left-rail-width) minmax(760px, 1fr) var(--wd-right-rail-width) !important;
   grid-template-areas:"left machine right" "bottom bottom bottom" !important;
   margin-top:var(--wd-cabinet-anchor-offset) !important;
+  transform:translateX(var(--wd-cabinet-x-offset)) !important;
 }
 .wd-hero{
   height:var(--wd-hero-fixed-height) !important;
@@ -3412,53 +3492,53 @@ body{
   transform:none !important;
 }
 .reelArea .wd-reel-data-panel::after{
-  font-size:clamp(8px, .72vw, 12px) !important;
+  font-size:12px !important;
   letter-spacing:.08em !important;
 }
 .reelArea .wd-reel-data-panel .wd-st-emblem{
-  font-size:clamp(10px, .92vw, 15px) !important;
+  font-size:15px !important;
 }
 .reelArea .wd-reel-data-panel .wd-st-emblem.is-bonus-pending{
-  font-size:clamp(9px, .78vw, 13px) !important;
+  font-size:13px !important;
 }
 .reelArea .wd-reel-data-panel .wd-st-emblem.is-ceiling{
-  font-size:clamp(8px, .68vw, 11px) !important;
+  font-size:11px !important;
 }
 .reelArea .wd-reel-data-panel .wd-st-emblem.is-ceiling b{
-  font-size:clamp(13px, 1.18vw, 19px) !important;
+  font-size:19px !important;
 }
 .reelArea .wd-reel-data-panel .wd-st-readout span{
-  font-size:clamp(6px, .52vw, 8px) !important;
+  font-size:8px !important;
 }
 .reelArea .wd-reel-data-panel .wd-st-readout b,
 .reelArea .wd-reel-data-panel #wdBigOdds,
 .reelArea .wd-reel-data-panel #wdRegOdds{
-  font-size:clamp(10px, .98vw, 16px) !important;
+  font-size:16px !important;
 }
 .reelArea .wd-reel-counter-panel .wd-counter-rows{
   left:31.4% !important;
   right:13.2% !important;
-  top:39.2% !important;
+  top:56% !important;
   bottom:8.8% !important;
 }
 .reelArea .wd-reel-counter-panel .wd-counter-actions{
-  left:21.8% !important;
-  right:8.8% !important;
-  top:7.8% !important;
+  left:13.8% !important;
+  right:12.8% !important;
+  top:20.5% !important;
 }
 .reelArea .wd-reel-counter-panel .wd-counter-action{
-  min-height:clamp(14px, 1.36vw, 19px) !important;
-  font-size:clamp(6px, .72vw, 10px) !important;
+  min-height:0 !important;
+  font-size:0 !important;
 }
 .reelArea .wd-reel-counter-panel .wd-counter-rows div{
   gap:3px !important;
   padding-right:4px !important;
 }
 .reelArea .wd-reel-counter-panel .wd-counter-rows span{
-  font-size:clamp(6px, .54vw, 8px) !important;
+  font-size:8px !important;
 }
 .reelArea .wd-reel-counter-panel .wd-counter-rows b{
-  font-size:clamp(8px, .72vw, 11px) !important;
+  font-size:11px !important;
 }
 .reelArea .sessionResultLayer{
   left:12.7% !important;
@@ -3474,16 +3554,16 @@ body{
   max-width:none !important;
 }
 .reelArea .sessionResultTitle{
-  font-size:clamp(18px, 2.6vw, 34px) !important;
-  margin-bottom:clamp(8px, 1.2vw, 16px) !important;
+  font-size:34px !important;
+  margin-bottom:16px !important;
 }
 .reelArea .sessionResultStats{
-  gap:clamp(6px, .8vw, 12px) !important;
+  gap:12px !important;
 }
 .reelArea .sessionResultLine{
   gap:10px !important;
-  padding:0 clamp(4px, 1vw, 10px) !important;
-  font-size:clamp(13px, 2vw, 25px) !important;
+  padding:0 10px !important;
+  font-size:25px !important;
 }
 @supports not (zoom:1){
   .wrap{
@@ -3626,6 +3706,7 @@ body{
       </section>
 
       <div class="reelArea">
+        <img class="reelFrameOnOverlay" src="assets/frames/slot_cabinet_frame_data_windows_on.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false">
         <div class="wd-public-panels wd-st-status-panel wd-reel-data-panel" id="bonus-info">
           <div class="wd-st-emblem" id="wdStEmblem">DEVIL<br>RUSH</div>
           <div class="wd-st-readout">
@@ -3999,6 +4080,7 @@ body{
   </div>
 </div>
 
+<div class="pageScrollSpacer" id="pageScrollSpacer" aria-hidden="true"></div>
 
 
 <audio id="bgm" loop preload="auto"></audio>
@@ -4468,13 +4550,73 @@ body{
   const PAGE_ZOOM_STORAGE_KEY = "white_devil_page_zoom";
   const PAGE_STAGE_WIDTH = 1360;
   const PAGE_ZOOM_MIN = 0.75;
-  const PAGE_ZOOM_MAX = 3.00;
+  const PAGE_ZOOM_MAX = 1.30;
   const PAGE_ZOOM_STEP = 0.05;
+  const PAGE_ZOOM_BASE = 1.20;
+  const CABINET_X_OFFSET_AT_75 = 0;
+  const CABINET_X_OFFSET_AT_100 = -15;
+  const CABINET_X_OFFSET_AT_130 = -32;
+  const SLOT_ZOOM_ANCHOR_X = 610;
+  const SLOT_ZOOM_ANCHOR_Y = 570;
   const BG_IMAGE_WIDTH = 1881;
   const BG_IMAGE_HEIGHT = 3344;
   const BG_ORANGE_LOGO_ANCHOR_X = 964;
+  const BG_LOGO_LOWER_ANCHOR_Y = 742;
   let pageZoom = 1;
   let backgroundSyncRaf = 0;
+  let pageScrollBoundsRaf = 0;
+
+  function renderedPageZoom(){
+    return pageZoom * PAGE_ZOOM_BASE;
+  }
+
+  function cabinetXOffsetForPageZoom(){
+    if(pageZoom <= 1){
+      const progress = clamp((pageZoom - PAGE_ZOOM_MIN) / (1 - PAGE_ZOOM_MIN), 0, 1);
+      return CABINET_X_OFFSET_AT_75 + (CABINET_X_OFFSET_AT_100 - CABINET_X_OFFSET_AT_75) * progress;
+    }
+    const progress = clamp((pageZoom - 1) / (PAGE_ZOOM_MAX - 1), 0, 1);
+    return CABINET_X_OFFSET_AT_100 + (CABINET_X_OFFSET_AT_130 - CABINET_X_OFFSET_AT_100) * progress;
+  }
+
+  function pageZoomFocusPoint(){
+    syncZoomAnchorToSlotTop();
+    const style = getComputedStyle(document.documentElement);
+    const rawX = style.getPropertyValue("--wd-stage-focus-x");
+    const rawY = style.getPropertyValue("--wd-reel-top-anchor-y");
+    const x = parseFloat(rawX);
+    const y = parseFloat(rawY);
+    return {
+      x:Number.isFinite(x) ? x : PAGE_STAGE_WIDTH / 2,
+      y:Number.isFinite(y) ? y : 0
+    };
+  }
+
+  function pageZoomFocusDocumentPoint(){
+    const point = pageZoomFocusPoint();
+    const wrapEl = document.querySelector(".wrap");
+    if(!wrapEl){
+      return {
+        x:point.x,
+        y:point.y
+      };
+    }
+    const rect = wrapEl.getBoundingClientRect();
+    const zoom = Number.isFinite(renderedPageZoom()) && renderedPageZoom() > 0 ? renderedPageZoom() : 1;
+    const layoutLeft = rect.left - (1 - zoom) * point.x;
+    const layoutTop = rect.top - (1 - zoom) * point.y;
+    return {
+      x:(window.scrollX || document.documentElement.scrollLeft || 0) + layoutLeft + point.x,
+      y:(window.scrollY || document.documentElement.scrollTop || 0) + layoutTop + point.y
+    };
+  }
+
+  function syncZoomAnchorToSlotTop(){
+    const root = document.documentElement;
+    if(!root) return;
+    root.style.setProperty("--wd-stage-focus-x", `${SLOT_ZOOM_ANCHOR_X}px`);
+    root.style.setProperty("--wd-reel-top-anchor-y", `${SLOT_ZOOM_ANCHOR_Y}px`);
+  }
 
   function pageZoomFocusX(){
     const raw = getComputedStyle(document.documentElement).getPropertyValue("--wd-stage-focus-x");
@@ -4482,21 +4624,33 @@ body{
     return Number.isFinite(value) ? value : PAGE_STAGE_WIDTH / 2;
   }
 
-  function focusScreenXBeforeZoom(){
-    return pageZoomFocusX() - (window.scrollX || document.documentElement.scrollLeft || 0);
+  function focusScreenPointBeforeZoom(){
+    const point = pageZoomFocusDocumentPoint();
+    return {
+      x:point.x - (window.scrollX || document.documentElement.scrollLeft || 0),
+      y:point.y - (window.scrollY || document.documentElement.scrollTop || 0)
+    };
   }
 
-  function keepZoomFocusOnDevilE(previousFocusScreenX=null){
-    const focusX = pageZoomFocusX();
+  function focusScreenXBeforeZoom(){
+    return focusScreenPointBeforeZoom().x;
+  }
+
+  function keepZoomFocusOnSlotTop(previousFocusScreenPoint=null){
+    const focusPoint = pageZoomFocusDocumentPoint();
     const viewW = window.innerWidth || document.documentElement.clientWidth || PAGE_STAGE_WIDTH;
-    let targetScreenX = Number(previousFocusScreenX);
+    let targetScreenX = Number(previousFocusScreenPoint && previousFocusScreenPoint.x);
     if(!Number.isFinite(targetScreenX) || targetScreenX < 0 || targetScreenX > viewW){
       targetScreenX = viewW / 2;
     }
     const maxScroll = Math.max(0, document.documentElement.scrollWidth - viewW);
-    const targetLeft = clamp(Math.round(focusX - targetScreenX), 0, maxScroll);
+    const targetLeft = clamp(Math.round(focusPoint.x - targetScreenX), 0, maxScroll);
     window.scrollTo({ left:targetLeft, top:window.scrollY || document.documentElement.scrollTop || 0, behavior:"auto" });
     requestBackgroundLogoSync();
+  }
+
+  function keepZoomFocusOnDevilE(previousFocusScreenX=null){
+    keepZoomFocusOnSlotTop({ x:previousFocusScreenX, y:null });
   }
 
   function reelCenterScreenX(){
@@ -4508,19 +4662,8 @@ body{
 
   function syncBackgroundLogoToReelCenter(){
     const root = document.documentElement;
-    const viewW = Math.max(1, window.innerWidth || root.clientWidth || PAGE_STAGE_WIDTH);
-    const viewH = Math.max(1, window.innerHeight || root.clientHeight || BG_IMAGE_HEIGHT);
-    const targetX = reelCenterScreenX();
-    const anchorX = BG_ORANGE_LOGO_ANCHOR_X;
-    const rightAnchor = Math.max(1, BG_IMAGE_WIDTH - anchorX);
-    const coverScale = Math.max(viewW / BG_IMAGE_WIDTH, viewH / BG_IMAGE_HEIGHT);
-    const leftSafeScale = targetX > 0 ? targetX / anchorX : 0;
-    const rightSafeScale = (viewW - targetX) > 0 ? (viewW - targetX) / rightAnchor : 0;
-    const scale = Math.max(coverScale, leftSafeScale, rightSafeScale, 0.001);
-    const drawW = BG_IMAGE_WIDTH * scale;
-    const left = targetX - anchorX * scale;
-    root.style.setProperty("--wd-bg-sync-size", `${Math.round(drawW * 100) / 100}px auto`);
-    root.style.setProperty("--wd-bg-sync-x", `${Math.round(left * 100) / 100}px`);
+    root.style.setProperty("--wd-bg-sync-size", "100% auto");
+    root.style.setProperty("--wd-bg-sync-x", "center top");
   }
 
   function requestBackgroundLogoSync(){
@@ -4531,15 +4674,39 @@ body{
     });
   }
 
+  function updatePageScrollBounds(){
+    const targets = [".wrap", ".main", ".machine", ".reelArea", ".buttonRow", ".autoStack"]
+      .flatMap(selector=>Array.from(document.querySelectorAll(selector)));
+    const wrapEl = document.querySelector(".wrap");
+    const spacer = $("pageScrollSpacer");
+    if(!targets.length || !wrapEl || !spacer) return;
+    const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+    const visualBottom = targets.reduce((max, el)=>Math.max(max, scrollY + el.getBoundingClientRect().bottom), 0);
+    const layoutBottom = wrapEl.offsetTop + wrapEl.offsetHeight;
+    const extraHeight = Math.max(0, Math.ceil(visualBottom - layoutBottom + 100));
+    spacer.style.height = `${extraHeight}px`;
+    document.body.style.minHeight = "100%";
+  }
+
+  function requestPageScrollBoundsUpdate(){
+    if(pageScrollBoundsRaf) return;
+    pageScrollBoundsRaf = requestAnimationFrame(()=>{
+      pageScrollBoundsRaf = 0;
+      updatePageScrollBounds();
+    });
+  }
+
   function applyPageZoom(saveValue=false){
     pageZoom = clamp(Math.round(pageZoom * 100) / 100, PAGE_ZOOM_MIN, PAGE_ZOOM_MAX);
-    document.documentElement.style.setProperty("--wd-page-zoom", String(pageZoom));
-    document.body.style.minWidth = `${Math.ceil(PAGE_STAGE_WIDTH * pageZoom)}px`;
+    const visualZoom = renderedPageZoom();
+    document.documentElement.style.setProperty("--wd-page-zoom", String(visualZoom));
+    document.documentElement.style.setProperty("--wd-cabinet-x-offset", `${Math.round(cabinetXOffsetForPageZoom() * 100) / 100}px`);
+    document.body.style.minWidth = "100%";
+    requestPageScrollBoundsUpdate();
     if(pageZoomView) pageZoomView.textContent = `${Math.round(pageZoom * 100)}%`;
     if(pageZoomOutBtn) pageZoomOutBtn.disabled = pageZoom <= PAGE_ZOOM_MIN + 0.001;
     if(pageZoomInBtn) pageZoomInBtn.disabled = pageZoom >= PAGE_ZOOM_MAX - 0.001;
     if(saveValue) safeStorageSet(PAGE_ZOOM_STORAGE_KEY, String(pageZoom));
-    requestBackgroundLogoSync();
   }
 
   function loadPageZoom(){
@@ -4549,12 +4716,9 @@ body{
   }
 
   function changePageZoom(delta){
-    const focusScreenX = focusScreenXBeforeZoom();
+    syncZoomAnchorToSlotTop();
     pageZoom = clamp(pageZoom + delta, PAGE_ZOOM_MIN, PAGE_ZOOM_MAX);
     applyPageZoom(true);
-    requestAnimationFrame(()=>keepZoomFocusOnDevilE(focusScreenX));
-    setTimeout(()=>keepZoomFocusOnDevilE(focusScreenX), 80);
-    setTimeout(()=>keepZoomFocusOnDevilE(focusScreenX), 180);
   }
 
   function hasRainbowHold(){
@@ -4627,7 +4791,14 @@ body{
 
   function updateReelFrameMode(){
     if(!reelArea) return;
-    reelArea.classList.toggle("speedFrameOff", !!speedFrameOffHold && !session.active);
+    const frameOn = !!(
+      session.active ||
+      normalState.bonusPending ||
+      pendingAtStartTimer ||
+      speedBonusRogiHoldActive
+    );
+    reelArea.classList.toggle("reelFrameOn", frameOn);
+    reelArea.classList.remove("speedFrameOff");
   }
 
   function setSpeedFrameOffHold(active){
@@ -8906,6 +9077,7 @@ body{
     const drawer = $("debugDrawer");
     if(drawer){
       [...document.querySelectorAll(".side > .card:not(.oddsPublic):not(.slumpPublic)")].forEach(card => drawer.appendChild(card));
+      if(drawer.parentElement !== document.body) document.body.appendChild(drawer);
     }
     ["titleInput","settingSelect","feeInput","stSpinsInput","oddsMultiplierInput","smallMulInput","midMulInput","crownMulInput","cherryMulInput","bigMulInput","bigAddInput","autoDelayInput","bgmUrl","bgmVolume","sfxVolume"].forEach(id=>{
       const el = $(id);
@@ -8992,23 +9164,21 @@ body{
     if(pageZoomResetBtn){
       pageZoomResetBtn.addEventListener("click", e=>{
         e.stopPropagation();
-        const focusScreenX = focusScreenXBeforeZoom();
+        syncZoomAnchorToSlotTop();
         pageZoom = 1;
         applyPageZoom(true);
-        requestAnimationFrame(()=>keepZoomFocusOnDevilE(focusScreenX));
-        setTimeout(()=>keepZoomFocusOnDevilE(focusScreenX), 80);
-        setTimeout(()=>keepZoomFocusOnDevilE(focusScreenX), 180);
       });
     }
     if(audioDock){
       audioDock.addEventListener("click", e=>e.stopPropagation());
     }
     window.addEventListener("resize", ()=>{
-      requestBackgroundLogoSync();
+      syncZoomAnchorToSlotTop();
+      requestPageScrollBoundsUpdate();
       syncInfoPanelPositionIfOpen();
     }, {passive:true});
+    window.addEventListener("load", requestPageScrollBoundsUpdate, {once:true});
     window.addEventListener("scroll", ()=>{
-      requestBackgroundLogoSync();
       syncInfoPanelPositionIfOpen();
     }, {passive:true});
     document.addEventListener("click", closeUtilityPanels);
