@@ -68,6 +68,11 @@ function sendCommand(machineId, command){
 }
 
 function serveFile(res, pathname){
+  if(pathname === "/gorai.html" || pathname === "/gourai.html" || pathname === "/gorai_complete_test.html"){
+    res.writeHead(302, {"Location":"/whitedevil.html"});
+    res.end();
+    return;
+  }
   const clean = pathname === "/" ? "/index.html" : pathname;
   const filePath = path.normalize(path.join(ROOT, clean));
   if(!filePath.startsWith(ROOT)){

@@ -34,7 +34,7 @@ if exist ".git\index.lock" (
 "%GIT_EXE%" config --global --add safe.directory "%CD%" >nul 2>nul
 
 echo Syncing current workspace files...
-if exist "%WORK_DIR%\gorai.html" copy /Y "%WORK_DIR%\gorai.html" "%REPO_DIR%gorai.html" >nul
+if exist "%WORK_DIR%\whitedevil.html" copy /Y "%WORK_DIR%\whitedevil.html" "%REPO_DIR%whitedevil.html" >nul
 if exist "%WORK_DIR%\AGENTS.md" copy /Y "%WORK_DIR%\AGENTS.md" "%REPO_DIR%AGENTS.md" >nul
 if exist "%WORK_DIR%\.gitignore" copy /Y "%WORK_DIR%\.gitignore" "%REPO_DIR%.gitignore" >nul
 
@@ -59,7 +59,7 @@ if exist "%WORK_DIR%\assets" (
 )
 
 echo Staging files...
-"%GIT_EXE%" add -- gorai.html Documents assets AGENTS.md .gitignore push-to-github.cmd
+"%GIT_EXE%" add -- whitedevil.html index.html admin.html server.js README.txt Documents assets AGENTS.md .gitignore push-to-github.cmd
 if errorlevel 1 (
   echo Failed to stage files.
   pause

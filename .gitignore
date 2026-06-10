@@ -1,8 +1,9 @@
-gorai.zip
-gorai_restored.zip
-gorai_broken_backup_*.html
 *.log
 server.err.log
 server.out.log
 deliverables/*.zip
 UPLOAD_TO_GITHUB.txt
+
+whitedevil.zip
+whitedevil_restored.zip
+whitedevil_broken_backup_*.html
