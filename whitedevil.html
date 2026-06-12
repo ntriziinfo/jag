@@ -4827,9 +4827,7 @@ body{
   function shouldHoldRogiThirdStopEffect(spin=currentSpin){
     return !!(
       spin &&
-      isRogiHighZoneSpin(spin) &&
       !spin.effectsSkipped &&
-      isAtFirstHitForAuto(spin.resolved) &&
       spin.rogiStopEffectStarted &&
       Number(spin.rogiLastStopEffectOrder) === 3
     );
@@ -4842,6 +4840,21 @@ body{
 
   function clearRogiThirdStopHold(){
     rogiThirdStopHold = false;
+  }
+
+  function isRogiThirdStopMoviePlaying(){
+    return !!(
+      isRogiThirdStopHoldActive() &&
+      gekiatsuVideo &&
+      !gekiatsuVideo.paused &&
+      !gekiatsuVideo.ended
+    );
+  }
+
+  function clearRogiThirdStopHoldForNextGame(){
+    if(!isRogiThirdStopHoldActive()) return;
+    clearRogiThirdStopHold();
+    stopGekiatsuEffect(true);
   }
 
   function updateDevilStatusLamp(){
@@ -5605,8 +5618,14 @@ body{
     if(!shouldPlayRogiStopEffect(stopOrder)) return false;
     const src = ROGI_STOP_VIDEO_SRCS[stopOrder];
     muteBgmForRogiStopEffect();
-    startGekiatsuEffect(false, src, `ROGI ${stopOrder}`, {muted:false, solid:stopOrder === 3, volumeScale:ROGI_MOVIE_OUTPUT_SCALE});
-    if(stopOrder === 3) startRogiThirdStopHold();
+    const holdThirdStop = stopOrder === 3;
+    startGekiatsuEffect(false, src, `ROGI ${stopOrder}`, {
+      muted:false,
+      solid:holdThirdStop,
+      volumeScale:ROGI_MOVIE_OUTPUT_SCALE,
+      holdUntilBet:holdThirdStop
+    });
+    if(holdThirdStop) startRogiThirdStopHold();
     if(currentSpin){
       currentSpin.rogiStopEffectStarted = true;
       currentSpin.rogiLastStopEffectOrder = stopOrder;
@@ -6857,11 +6876,17 @@ body{
   function queueBonusSessionStart(delayMs=450, options={}){
     clearPendingAtStart();
     const startOptions = {...options};
-    pendingAtStartTimer = setTimeout(()=>{
+    const waitAndStart = ()=>{
+      if(isRogiThirdStopHoldActive()){
+        pendingAtStartTimer = setTimeout(waitAndStart, 150);
+        updateDevilStatusLamp();
+        return;
+      }
       pendingAtStartTimer = null;
       updateDevilStatusLamp();
       startBonusSessionNow(startOptions);
-    }, Math.max(0, delayMs));
+    };
+    pendingAtStartTimer = setTimeout(waitAndStart, Math.max(0, delayMs));
     updateDevilStatusLamp();
   }
 
@@ -7071,6 +7096,8 @@ body{
     gekiatsuVideo.volume = audioOutputVolume(settings.sfxVolume, videoVolumeScale);
     if(options.fadeOnEnd){
       gekiatsuVideo.onended = fadeOutGekiatsuEffect;
+    }else if(options.holdUntilBet){
+      gekiatsuVideo.onended = ()=>restoreBgmAfterRogiStopEffect();
     }
     try{
       gekiatsuVideo.currentTime = 0;
@@ -8714,8 +8741,11 @@ body{
     if(!autoPlay) return;
     if(!canPlayCompleteTrial()) return;
     if(isRogiThirdStopHoldActive()){
-      autoTimer = setTimeout(runAutoStep, 150);
-      return;
+      if(isRogiThirdStopMoviePlaying()){
+        autoTimer = setTimeout(runAutoStep, 150);
+        return;
+      }
+      clearRogiThirdStopHoldForNextGame();
     }
     if(isSpinning){
       autoTimer = setTimeout(runAutoStep, 150);
