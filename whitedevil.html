@@ -825,13 +825,6 @@ h1{
   transform:scale(1.06);
   filter:saturate(1.55) contrast(1.18) brightness(1.02);
 }
-.devilZoneFireLayer.superZoneFire{
-  opacity:.56;
-  background:rgba(29,0,54,.22);
-}
-.devilZoneFireLayer.superZoneFire video{
-  filter:hue-rotate(245deg) saturate(2.35) contrast(1.22) brightness(1.08);
-}
 .reelVideoLayer{
   position:absolute;
   inset:0;
@@ -1935,9 +1928,6 @@ body.debugOpen .debugDrawer .secret{
   background:radial-gradient(circle at 50% 50%, rgba(255,36,66,.24), rgba(0,0,0,0) 64%);
   animation:goraiZoneRedPulse 1.18s ease-in-out infinite;
 }
-.reelArea.goraiZoneGlow.superGoraiZoneGlow::after{
-  background:radial-gradient(circle at 50% 50%, rgba(185,112,255,.28), rgba(58,126,255,.10) 44%, rgba(0,0,0,0) 66%);
-}
 @keyframes goraiZoneRedPulse{
   0%,100%{opacity:.48;filter:saturate(1.05)}
   50%{opacity:.92;filter:saturate(1.35)}
@@ -2154,6 +2144,29 @@ body.debugOpen .debugDrawer .secret{
     0 2px 0 rgba(75,48,0,.72),
     0 0 18px rgba(255,212,74,.58),
     0 9px 26px rgba(0,42,86,.38);
+}
+.sessionResultLayer.hasSignal .sessionResultContent{
+  transform:translateX(-11%);
+}
+.sessionResultSignal{
+  position:absolute;
+  right:clamp(12px,5%,42px);
+  bottom:clamp(8px,3.5%,26px);
+  width:min(30%,230px);
+  max-height:82%;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  pointer-events:none;
+}
+.sessionResultSignal[hidden]{display:none !important;}
+.sessionResultSignal img{
+  display:block;
+  width:100%;
+  max-height:100%;
+  object-fit:contain;
+  object-position:center bottom;
+  filter:drop-shadow(0 12px 18px rgba(0,0,0,.55)) drop-shadow(0 0 18px rgba(255,255,255,.22));
 }
 .effectSkipBtn{
   display:none;
@@ -3607,6 +3620,16 @@ body{
   padding:0 10px !important;
   font-size:25px !important;
 }
+.reelArea .sessionResultLayer.hasSignal .sessionResultContent{
+  width:64% !important;
+  transform:translateX(-18%) !important;
+}
+.reelArea .sessionResultSignal{
+  right:2.4% !important;
+  bottom:1.8% !important;
+  width:31% !important;
+  max-height:96% !important;
+}
 @supports not (zoom:1){
   .wrap{
     transform:scale(var(--wd-page-zoom));
@@ -3689,11 +3712,11 @@ body{
           </div>
           <div class="field">
             <label>BGM音量</label>
-            <input id="bgmVolume" type="range" min="0" max="1" step="0.01" value="0.22" />
+            <input id="bgmVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
           </div>
           <div class="field">
             <label>効果音音量</label>
-            <input id="sfxVolume" type="range" min="0" max="1" step="0.01" value="0.32" />
+            <input id="sfxVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
           </div>
         </div>
       </div>
@@ -3841,6 +3864,9 @@ body{
             <div class="sessionResultLine"><span>獲得pt</span><b id="resultPayoutView">0pt</b></div>
           </div>
         </div>
+        <div class="sessionResultSignal" id="sessionResultSignal" hidden aria-hidden="true">
+          <img id="sessionResultSignalImage" alt="">
+        </div>
       </div>
     </section>
 
@@ -3973,7 +3999,7 @@ body{
         <h2>報酬・AT加算ルール</h2>
         <div class="field">
           <label>砂時計画像揃い</label>
-          <input type="text" value="15pt + AT+10G" readonly />
+          <input type="text" value="15pt + SET抽選" readonly />
         </div>
         <div class="field">
           <label>REG 77BAR</label>
@@ -3996,7 +4022,7 @@ body{
           <input id="cherryTripleAddInput" type="text" value="出玉0.05倍 / 通常AT中SET50%" readonly />
         </div>
         <div class="help">
-          AT中BIGは5Gの超デビルゾーン、AT中REGは5Gのデビルゾーン、通常REGは50pt払い出しと天井リセットです。砂時計はAT+10Gと15pt払い出し、BAR揃いは出玉なしで+5SETと継続率80%昇格。通常・高確中はベル8pt、スイカ3pt、チェリー各種3pt、リプレイ3pt、AT中はベル15ptと2連チェリー・3連チェリー・スイカのSETストック抽選、デビルゾーン中は子役でSETストックとATゲーム数加算、別枠でデビルゾーン延長抽選を行います。
+          AT中BIGは5Gの超デビルゾーン、AT中REGは5Gのデビルゾーン、通常REGは50pt払い出しと天井リセットです。砂時計は15pt払い出し+設定別SET抽選、BAR揃いは出玉なしで+5SETと継続率80%昇格。通常・高確中はベル8pt、スイカ3pt、2連/3連チェリー各3pt、リプレイ3pt、AT中はベル15ptと砂時計・2連チェリー・3連チェリー・スイカのSETストック抽選、デビルゾーン/超デビルゾーン中は7揃いでSET上乗せを行います。
         </div>
       </div>
 
@@ -4015,7 +4041,6 @@ body{
             <option value="BELL3">斜めベル（AT中+3pt）</option>
             <option value="REPLAY">リプレイ（AT中+3pt）</option>
             <option value="SUICA">スイカ揃い</option>
-            <option value="CHERRY_ANY">チェリーANY</option>
             <option value="CHERRY_DOUBLE">チェリー2連</option>
             <option value="CHERRY_TRIPLE">チェリー3つ</option>
           </select>
@@ -4147,12 +4172,15 @@ body{
 
   const KOATARI_SOUND_SRC = "assets/media/koatari_sound.wav";
   const PAYOUT_SOUND_SRC = "assets/payout.wav";
+  const PAYOUT_3PT_BELL_SOUND_SRC = "assets/pay1.wav";
+  const REPLAY_SOUND_SRC = "assets/rep.wav";
   const BATTLE_BGM_SRC = "assets/battle_bgm.wav";
+  const SPEED_BGM_SRC = "assets/media/speed_bgm.wav";
 
   const SETTING = {
-    1:{target:0.80},
-    2:{target:0.88},
-    3:{target:0.95},
+    1:{target:0.88},
+    2:{target:0.93},
+    3:{target:0.96},
     4:{target:1.01},
     5:{target:1.07},
     6:{target:1.15}
@@ -4213,32 +4241,28 @@ body{
   };
 
   const SETTING_PROFILE = {
-    // 王冠役は廃止。BAR揃いは通常テーブルから外し、全設定共通1/8192の独立プレミアへ変更。
-    // BAR3で使っていた重みは、砂時計・REG・BIG・ベル・スイカへ再配分。
-    // 砂時計=15pt+AT+10G / REG=15pt+デビルゾーン5G / BIG=デビルゾーン5G
-    // ベルは0.15倍固定。ベルは奇数設定寄り、スイカは偶数設定寄り。
-    // 奇数設定はBIG多めで荒波、偶数設定はREG多め、設定6はREG/BIG均等。
-    1:{weights:[{result:"SMALL",w:34},{result:"MID",w:7},{result:"BIG",w:12},{result:"BELL",w:56},{result:"SUICA",w:33},{result:"CHERRY_ANY",w:34},{result:"CHERRY_TRIPLE",w:14}]},
-    2:{weights:[{result:"SMALL",w:33},{result:"MID",w:15},{result:"BIG",w:8},{result:"BELL",w:35},{result:"SUICA",w:58},{result:"CHERRY_ANY",w:33},{result:"CHERRY_TRIPLE",w:14}]},
-    3:{weights:[{result:"SMALL",w:33},{result:"MID",w:10},{result:"BIG",w:16},{result:"BELL",w:61},{result:"SUICA",w:36},{result:"CHERRY_ANY",w:32},{result:"CHERRY_TRIPLE",w:14}]},
-    4:{weights:[{result:"SMALL",w:32},{result:"MID",w:19},{result:"BIG",w:13},{result:"BELL",w:40},{result:"SUICA",w:64},{result:"CHERRY_ANY",w:30},{result:"CHERRY_TRIPLE",w:14}]},
-    5:{weights:[{result:"SMALL",w:31},{result:"MID",w:16},{result:"BIG",w:22},{result:"BELL",w:67},{result:"SUICA",w:38},{result:"CHERRY_ANY",w:29},{result:"CHERRY_TRIPLE",w:14}]},
-    6:{weights:[{result:"SMALL",w:29},{result:"MID",w:22},{result:"BIG",w:22},{result:"BELL",w:44},{result:"SUICA",w:70},{result:"CHERRY_ANY",w:28},{result:"CHERRY_TRIPLE",w:14}]}
+    // 実抽選は下の共通ATテーブルで運用。左のみチェリーは廃止し、AT中はSET上乗せ抽選へ統一。
+    1:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:70},{result:"REPLAY",w:366},{result:"SUICA",w:3},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
+    2:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:70},{result:"REPLAY",w:366},{result:"SUICA",w:3},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
+    3:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:70},{result:"REPLAY",w:366},{result:"SUICA",w:3},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
+    4:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:70},{result:"REPLAY",w:366},{result:"SUICA",w:3},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
+    5:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:70},{result:"REPLAY",w:366},{result:"SUICA",w:3},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
+    6:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:70},{result:"REPLAY",w:366},{result:"SUICA",w:3},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]}
   };
 
   Object.assign(SETTING_PROFILE, {
-    1:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:35},{result:"REPLAY",w:398},{result:"SUICA",w:3},{result:"CHERRY_ANY",w:3},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
-    2:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:45},{result:"REPLAY",w:387},{result:"SUICA",w:3},{result:"CHERRY_ANY",w:4},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
-    3:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:60},{result:"REPLAY",w:371},{result:"SUICA",w:3},{result:"CHERRY_ANY",w:5},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
-    4:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:75},{result:"REPLAY",w:355},{result:"SUICA",w:3},{result:"CHERRY_ANY",w:6},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
-    5:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:90},{result:"REPLAY",w:339},{result:"SUICA",w:3},{result:"CHERRY_ANY",w:7},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
-    6:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:105},{result:"REPLAY",w:323},{result:"SUICA",w:3},{result:"CHERRY_ANY",w:8},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]}
+    1:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:70},{result:"REPLAY",w:366},{result:"SUICA",w:3},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
+    2:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:70},{result:"REPLAY",w:366},{result:"SUICA",w:3},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
+    3:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:70},{result:"REPLAY",w:366},{result:"SUICA",w:3},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
+    4:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:70},{result:"REPLAY",w:366},{result:"SUICA",w:3},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
+    5:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:70},{result:"REPLAY",w:366},{result:"SUICA",w:3},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]},
+    6:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:70},{result:"REPLAY",w:366},{result:"SUICA",w:3},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]}
   });
 
   const symbols = ["🍒","🍋","🔔","REPLAY","⭐","🍇","7","BAR",USER_FACE];
-  const AUDIO_BALANCE_VERSION = 2;
-  const DEFAULT_BGM_VOLUME = 0.22;
-  const DEFAULT_SFX_VOLUME = 0.32;
+  const AUDIO_BALANCE_VERSION = 3;
+  const DEFAULT_BGM_VOLUME = 0.50;
+  const DEFAULT_SFX_VOLUME = 0.50;
   const MATCHED_BGM_GAIN_DB = -4.5;
   const BGM_OUTPUT_SCALE = dbToGain(MATCHED_BGM_GAIN_DB);
   const BAR_BGM_OUTPUT_SCALE = dbToGain(MATCHED_BGM_GAIN_DB);
@@ -4328,7 +4352,8 @@ body{
     battleRemain:0,
     battleWin:false,
     battleSource:"",
-    resultPayout:null
+    resultPayout:null,
+    endSignal:null
   };
 
   let isSpinning = false;
@@ -4405,6 +4430,12 @@ body{
   const BATTLE_INTRO_LOGO_SRC = "assets/battle/battle.png";
   const BATTLE_ROUND_IMAGE_SRCS = Array.from({length:10}, (_,i)=>i ? `assets/battle/round_${i}.png` : "");
   const BATTLE_CHARACTER_SRCS = Array.from({length:6}, (_,i)=>`assets/battle/character_${i + 1}.png`);
+  const AT_END_SETTING_SIGNALS = Object.freeze([
+    {key:"rainbow", name:"レインボー", label:"設定6以上確定", minSetting:6, rate:0.02, src:"assets/result_signals/at_end_rainbow.png"},
+    {key:"gold", name:"金", label:"設定5以上確定", minSetting:5, rate:0.05, src:"assets/result_signals/at_end_gold.png"},
+    {key:"silver", name:"銀", label:"設定4以上確定", minSetting:4, rate:0.10, src:"assets/result_signals/at_end_silver.png"},
+    {key:"bronze", name:"銅", label:"設定2以上確定", minSetting:2, rate:0.20, src:"assets/result_signals/at_end_bronze.png"}
+  ]);
   const GORAI_CONTINUATION_RATES_BY_SETTING = Object.freeze({
     1:[{rate:0.10,w:24},{rate:0.30,w:24},{rate:0.50,w:22},{rate:0.60,w:12},{rate:0.80,w:18}],
     2:[{rate:0.10,w:18},{rate:0.30,w:30},{rate:0.50,w:34},{rate:0.60,w:15},{rate:0.80,w:3}],
@@ -4422,56 +4453,62 @@ body{
     6:0.945
   };
   const NORMAL_DIRECT_BONUS_RATE = {
-    1:1/170,
-    2:1/95,
-    3:1/142,
-    4:1/104,
-    5:1/200,
-    6:1/125
+    1:1/204,
+    2:1/103,
+    3:1/138,
+    4:1/83,
+    5:1/115,
+    6:1/91.5
   };
   const HIGH_DIRECT_BONUS_RATE = {
-    1:1/24,
-    2:1/31.1,
-    3:1/32,
-    4:1/28.8,
-    5:1/47.3,
-    6:1/42
+    1:1/48.5,
+    2:1/43.5,
+    3:1/64,
+    4:1/68.2,
+    5:1/70.2,
+    6:1/30.3
   };
   const NORMAL_BIG_BONUS_RATE = Object.freeze({
-    1:0.68,
-    2:0.58,
-    3:0.70,
-    4:0.58,
-    5:0.66,
-    6:0.56
+    1:0.58,
+    2:0.60,
+    3:0.67,
+    4:0.71,
+    5:0.71,
+    6:0.73
   });
   const CHERRY_DOUBLE_BONUS_RATE = Object.freeze({
     normal:0.12,
     high:0.25
   });
   const NORMAL_ROLE_WEIGHTS_BY_SETTING = Object.freeze({
-    1:[{result:"BELL",w:54},{result:"REPLAY",w:24},{result:"SUICA",w:18},{result:"CHERRY_ANY",w:18},{result:"CHERRY_DOUBLE",w:3},{result:"CHERRY_TRIPLE",w:3}],
-    2:[{result:"BELL",w:54},{result:"REPLAY",w:23},{result:"SUICA",w:18},{result:"CHERRY_ANY",w:18},{result:"CHERRY_DOUBLE",w:4},{result:"CHERRY_TRIPLE",w:3}],
-    3:[{result:"BELL",w:53},{result:"REPLAY",w:23},{result:"SUICA",w:18},{result:"CHERRY_ANY",w:18},{result:"CHERRY_DOUBLE",w:5},{result:"CHERRY_TRIPLE",w:3}],
-    4:[{result:"BELL",w:53},{result:"REPLAY",w:22},{result:"SUICA",w:18},{result:"CHERRY_ANY",w:18},{result:"CHERRY_DOUBLE",w:6},{result:"CHERRY_TRIPLE",w:3}],
-    5:[{result:"BELL",w:52},{result:"REPLAY",w:22},{result:"SUICA",w:18},{result:"CHERRY_ANY",w:17},{result:"CHERRY_DOUBLE",w:8},{result:"CHERRY_TRIPLE",w:3}],
-    6:[{result:"BELL",w:51},{result:"REPLAY",w:22},{result:"SUICA",w:18},{result:"CHERRY_ANY",w:16},{result:"CHERRY_DOUBLE",w:10},{result:"CHERRY_TRIPLE",w:3}]
+    1:[{result:"BELL",w:54},{result:"REPLAY",w:42},{result:"SUICA",w:18},{result:"CHERRY_DOUBLE",w:3},{result:"CHERRY_TRIPLE",w:3}],
+    2:[{result:"BELL",w:54},{result:"REPLAY",w:41},{result:"SUICA",w:18},{result:"CHERRY_DOUBLE",w:4},{result:"CHERRY_TRIPLE",w:3}],
+    3:[{result:"BELL",w:53},{result:"REPLAY",w:41},{result:"SUICA",w:18},{result:"CHERRY_DOUBLE",w:5},{result:"CHERRY_TRIPLE",w:3}],
+    4:[{result:"BELL",w:53},{result:"REPLAY",w:40},{result:"SUICA",w:18},{result:"CHERRY_DOUBLE",w:6},{result:"CHERRY_TRIPLE",w:3}],
+    5:[{result:"BELL",w:52},{result:"REPLAY",w:39},{result:"SUICA",w:18},{result:"CHERRY_DOUBLE",w:8},{result:"CHERRY_TRIPLE",w:3}],
+    6:[{result:"BELL",w:51},{result:"REPLAY",w:38},{result:"SUICA",w:18},{result:"CHERRY_DOUBLE",w:10},{result:"CHERRY_TRIPLE",w:3}]
   });
   const HIGH_ROLE_WEIGHTS_BY_SETTING = Object.freeze({
-    1:[{result:"BELL",w:52},{result:"REPLAY",w:30},{result:"SUICA",w:25},{result:"CHERRY_ANY",w:24},{result:"CHERRY_DOUBLE",w:9},{result:"CHERRY_TRIPLE",w:6}],
-    2:[{result:"BELL",w:52},{result:"REPLAY",w:29},{result:"SUICA",w:25},{result:"CHERRY_ANY",w:24},{result:"CHERRY_DOUBLE",w:10},{result:"CHERRY_TRIPLE",w:6}],
-    3:[{result:"BELL",w:52},{result:"REPLAY",w:28},{result:"SUICA",w:25},{result:"CHERRY_ANY",w:24},{result:"CHERRY_DOUBLE",w:11},{result:"CHERRY_TRIPLE",w:6}],
-    4:[{result:"BELL",w:51},{result:"REPLAY",w:28},{result:"SUICA",w:25},{result:"CHERRY_ANY",w:24},{result:"CHERRY_DOUBLE",w:12},{result:"CHERRY_TRIPLE",w:6}],
-    5:[{result:"BELL",w:50},{result:"REPLAY",w:28},{result:"SUICA",w:25},{result:"CHERRY_ANY",w:24},{result:"CHERRY_DOUBLE",w:13},{result:"CHERRY_TRIPLE",w:6}],
-    6:[{result:"BELL",w:50},{result:"REPLAY",w:27},{result:"SUICA",w:25},{result:"CHERRY_ANY",w:24},{result:"CHERRY_DOUBLE",w:14},{result:"CHERRY_TRIPLE",w:6}]
+    1:[{result:"BELL",w:52},{result:"REPLAY",w:54},{result:"SUICA",w:25},{result:"CHERRY_DOUBLE",w:9},{result:"CHERRY_TRIPLE",w:6}],
+    2:[{result:"BELL",w:52},{result:"REPLAY",w:53},{result:"SUICA",w:25},{result:"CHERRY_DOUBLE",w:10},{result:"CHERRY_TRIPLE",w:6}],
+    3:[{result:"BELL",w:52},{result:"REPLAY",w:52},{result:"SUICA",w:25},{result:"CHERRY_DOUBLE",w:11},{result:"CHERRY_TRIPLE",w:6}],
+    4:[{result:"BELL",w:51},{result:"REPLAY",w:52},{result:"SUICA",w:25},{result:"CHERRY_DOUBLE",w:12},{result:"CHERRY_TRIPLE",w:6}],
+    5:[{result:"BELL",w:50},{result:"REPLAY",w:52},{result:"SUICA",w:25},{result:"CHERRY_DOUBLE",w:13},{result:"CHERRY_TRIPLE",w:6}],
+    6:[{result:"BELL",w:50},{result:"REPLAY",w:51},{result:"SUICA",w:25},{result:"CHERRY_DOUBLE",w:14},{result:"CHERRY_TRIPLE",w:6}]
   });
   const BIG_STOCK_ZONE_GAMES = 5;
   const SUPER_DEVIL_ZONE_GAMES = 5;
   const ZONE_CHALLENGE_PAYOUT = 3;
   const DEVIL_ZONE_SEVEN_CHANCE = 1 / 12;
   const SUPER_DEVIL_ZONE_SEVEN_CHANCE = 0.50;
-  const ZONE_SEVEN_STOCK_RATE = 0.50;
-  const ZONE_SEVEN_AT_GAME_ADD = 10;
+  const ZONE_SEVEN_STOCK_RATE = 1.00;
+  const ZONE_SEVEN_AT_GAME_ADD = 0;
+  const AT_SET_STOCK_RATES_BY_SETTING = Object.freeze({
+    SMALL:{1:0.35,2:0.38,3:0.41,4:0.44,5:0.47,6:0.50},
+    CHERRY_DOUBLE:{1:0.03,2:0.04,3:0.055,4:0.07,5:0.085,6:0.10},
+    CHERRY_TRIPLE:{1:0.35,2:0.40,3:0.45,4:0.50,5:0.55,6:0.60},
+    SUICA:{1:0.005,2:0.008,3:0.011,4:0.014,5:0.017,6:0.02}
+  });
   const CONTINUATION_BATTLE_GAMES = 4;
   const DEBUG_FAST_SPINS_PER_SECOND = 1000;
   const DEBUG_FAST_INTERVAL_MS = 100;
@@ -4480,6 +4517,7 @@ body{
   const SPEED_MODE_MAX_SPINS_PER_SECOND = 10;
   const SPEED_MODE_MULTIPLIER = 3;
   const COMPLETE_TRIAL_ENABLED = true;
+  const COMPLETE_LOCK_ENABLED = false;
   const COMPLETE_LIMIT_PT = 2000;
   const COMPLETE_RESCUE_THRESHOLD_PT = -2000;
   const COMPLETE_RESCUE_MIN_CONTINUATION_RATE = 0.50;
@@ -4545,6 +4583,8 @@ body{
   const sessionResultLayer = $("sessionResultLayer");
   const resultSetCountView = $("resultSetCountView");
   const resultPayoutView = $("resultPayoutView");
+  const sessionResultSignal = $("sessionResultSignal");
+  const sessionResultSignalImage = $("sessionResultSignalImage");
   const slumpGraph = $("slumpGraph");
   const slumpSeekRange = $("slumpSeekRange");
   const slumpZoomInput = $("slumpZoomInput");
@@ -5126,18 +5166,18 @@ body{
     return Math.random() < zoneSevenChance(type) ? "SUPER_DEVIL_ZONE" : "MISS";
   }
 
-  function resolveZoneSevenBonus(result){
+  function resolveZoneSevenBonus(result, type=currentGoraiZoneType()){
     if(result !== "SUPER_DEVIL_ZONE") return {sets:0, games:0, hit:false};
-    if(Math.random() < ZONE_SEVEN_STOCK_RATE) return {sets:1, games:0, hit:true};
-    return {sets:0, games:ZONE_SEVEN_AT_GAME_ADD, hit:true};
+    if(type === "super") return {sets:Math.random() < 0.50 ? 1 : 2, games:0, hit:true};
+    return {sets:1, games:0, hit:true};
   }
 
   function expectedZoneSevenStock(type="devil"){
-    return zoneSevenChance(type) * ZONE_SEVEN_STOCK_RATE;
+    return zoneSevenChance(type) * (type === "super" ? 1.5 : 1);
   }
 
   function expectedZoneSevenGames(type="devil"){
-    return zoneSevenChance(type) * (1 - ZONE_SEVEN_STOCK_RATE) * ZONE_SEVEN_AT_GAME_ADD;
+    return 0;
   }
 
   function goraiZoneName(type=currentGoraiZoneType()){
@@ -5176,9 +5216,33 @@ body{
     if(battleIntroLayer) battleIntroLayer.setAttribute("aria-hidden", "true");
   }
 
-  function showSessionResultScreen(setCount, payout){
+  function pickAtEndSignal(settingNo=settings.setting){
+    const current = Number(settingNo) || 1;
+    for(const signal of AT_END_SETTING_SIGNALS){
+      if(current >= signal.minSetting && Math.random() < signal.rate) return signal;
+    }
+    return null;
+  }
+
+  function setSessionResultSignal(signal){
+    const activeSignal = signal && signal.src ? signal : null;
+    if(sessionResultLayer) sessionResultLayer.classList.toggle("hasSignal", !!activeSignal);
+    if(sessionResultSignal){
+      sessionResultSignal.hidden = !activeSignal;
+      sessionResultSignal.setAttribute("aria-hidden", activeSignal ? "false" : "true");
+      if(activeSignal) sessionResultSignal.setAttribute("aria-label", `${activeSignal.label} ${activeSignal.name}`);
+      else sessionResultSignal.removeAttribute("aria-label");
+    }
+    if(sessionResultSignalImage){
+      sessionResultSignalImage.src = activeSignal ? activeSignal.src : "";
+      sessionResultSignalImage.alt = activeSignal ? `${activeSignal.label} ${activeSignal.name}` : "";
+    }
+  }
+
+  function showSessionResultScreen(setCount, payout, signal=null){
     if(resultSetCountView) resultSetCountView.textContent = `${Math.max(0, setCount || 0)}回`;
     if(resultPayoutView) resultPayoutView.textContent = `${Math.max(0, payout || 0)}pt`;
+    setSessionResultSignal(signal);
     if(sessionResultLayer){
       sessionResultLayer.classList.add("show");
       sessionResultLayer.setAttribute("aria-hidden", "false");
@@ -5186,6 +5250,8 @@ body{
   }
 
   function hideSessionResultScreen(){
+    setSessionResultSignal(null);
+    if(session) session.endSignal = null;
     if(sessionResultLayer){
       sessionResultLayer.classList.remove("show");
       sessionResultLayer.setAttribute("aria-hidden", "true");
@@ -5260,7 +5326,6 @@ body{
   function updateGoraiZoneGlow(){
     if(!reelArea) return;
     reelArea.classList.toggle("goraiZoneGlow", isGoraiZoneActive());
-    reelArea.classList.toggle("superGoraiZoneGlow", isSuperGoraiZoneActive());
     updateDevilZoneFireVideos();
   }
 
@@ -5284,7 +5349,6 @@ body{
   }
 
   function showDevilZoneFireVideos(){
-    const superZone = isSuperGoraiZoneActive();
     reels.forEach((_, index)=>{
       const found = ensureDevilZoneFireLayer(index);
       if(!found) return;
@@ -5301,7 +5365,6 @@ body{
         try{ video.currentTime = 0; }catch(e){}
       }
       layer.classList.add("show");
-      layer.classList.toggle("superZoneFire", superZone);
       layer.setAttribute("aria-hidden", "false");
       if(video.paused || video.ended){
         try{
@@ -5318,7 +5381,6 @@ body{
       if(!layer) return;
       const video = layer.querySelector("video");
       layer.classList.remove("show");
-      layer.classList.remove("superZoneFire");
       layer.setAttribute("aria-hidden", "true");
       if(video){
         try{ video.pause(); }catch(e){}
@@ -5687,14 +5749,10 @@ body{
   }
 
   function stAddFor(result){
-    if(result === "SMALL") return 10;
     return 0;
   }
 
   function expectedStAddFor(result, settingNo = settings.setting){
-    if(result === "SMALL") return 10;
-    if(result === "DEVIL_ZONE" || result === "MID") return BIG_STOCK_ZONE_GAMES * expectedZoneSevenGames("devil");
-    if(result === "SUPER_DEVIL_ZONE" || result === "BIG") return SUPER_DEVIL_ZONE_GAMES * expectedZoneSevenGames("super");
     return 0;
   }
 
@@ -5735,24 +5793,21 @@ body{
     return `${result === "SMALL" ? "AT" : "AT"}+${value}G`;
   }
 
-  function stockSetsForResult(result){
+  function atSetStockRateFor(result, settingNo = settings.setting){
+    const table = AT_SET_STOCK_RATES_BY_SETTING[result];
+    return table ? Number(table[settingNo] ?? table[1]) || 0 : 0;
+  }
+
+  function stockSetsForResult(result, settingNo = settings.setting){
     if(result === "BAR3") return 5;
-    if(result === "CHERRY_ANY") return Math.random() < 0.01 ? 1 : 0;
-    if(result === "CHERRY_TRIPLE") return Math.random() < 0.50 ? 1 : 0;
-    if(result === "CHERRY_DOUBLE") return Math.random() < 0.05 ? 1 : 0;
-    if(result === "SUICA") return Math.random() < 0.01 ? 2 : 0;
-    return 0;
+    return Math.random() < atSetStockRateFor(result, settingNo) ? 1 : 0;
   }
 
   function expectedStockSetsForResult(result, settingNo = settings.setting){
     if(result === "BAR3") return 5;
     if(result === "DEVIL_ZONE" || result === "MID") return BIG_STOCK_ZONE_GAMES * expectedZoneSevenStock("devil");
     if(result === "SUPER_DEVIL_ZONE" || result === "BIG") return SUPER_DEVIL_ZONE_GAMES * expectedZoneSevenStock("super");
-    if(result === "CHERRY_ANY") return 0.01;
-    if(result === "CHERRY_TRIPLE") return 0.50;
-    if(result === "CHERRY_DOUBLE") return 0.05;
-    if(result === "SUICA") return 0.02;
-    return 0;
+    return atSetStockRateFor(result, settingNo);
   }
 
   function goraiZoneStockForResult(result){
@@ -6033,21 +6088,29 @@ body{
     return currentProfit();
   }
 
+  function isCompleteLockEnabled(){
+    return COMPLETE_TRIAL_ENABLED && COMPLETE_LOCK_ENABLED;
+  }
+
+  function isCompleteTrialLocked(){
+    return isCompleteLockEnabled() && !!completeTrialState.locked;
+  }
+
   function completeTrialRescueMinRate(){
-    if(!COMPLETE_TRIAL_ENABLED || completeTrialState.locked) return 0;
+    if(!COMPLETE_TRIAL_ENABLED || isCompleteTrialLocked()) return 0;
     if(!completeTrialState.rescueActive) return 0;
     return Math.random() < COMPLETE_RESCUE_RATE_BOOST_CHANCE ? COMPLETE_RESCUE_MIN_CONTINUATION_RATE : 0;
   }
 
   function bar3PremiumDenominator(){
-    if(COMPLETE_TRIAL_ENABLED && completeTrialState.rescueActive && !completeTrialState.locked){
+    if(COMPLETE_TRIAL_ENABLED && completeTrialState.rescueActive && !isCompleteTrialLocked()){
       return COMPLETE_RESCUE_BAR3_DENOM;
     }
     return BAR3_PREMIUM_DENOM;
   }
 
   function unlockCompleteTrialBySettingChange(nextSetting){
-    if(!COMPLETE_TRIAL_ENABLED || !completeTrialState.locked) return;
+    if(!isCompleteLockEnabled() || !completeTrialState.locked) return;
     if(Number(nextSetting) === Number(completeTrialState.lockedSetting)) return;
     completeTrialState = {
       locked:false,
@@ -6072,7 +6135,7 @@ body{
       persistState();
     }
 
-    if(!completeTrialState.locked && profit >= COMPLETE_LIMIT_PT){
+    if(isCompleteLockEnabled() && !completeTrialState.locked && profit >= COMPLETE_LIMIT_PT){
       completeTrialState.locked = true;
       completeTrialState.lockedSetting = Number(settings.setting) || 1;
       completeTrialState.completeProfit = profit;
@@ -6086,11 +6149,11 @@ body{
       updateDisplay();
     }
 
-    return !!completeTrialState.locked;
+    return isCompleteTrialLocked();
   }
 
   function canPlayCompleteTrial(){
-    if(!COMPLETE_TRIAL_ENABLED || !completeTrialState.locked) return true;
+    if(!isCompleteTrialLocked()) return true;
     stopAutoPlay("COMPLETE中のためAUTO停止");
     stopSpeedToBonus("COMPLETE中のためSPEED停止");
     stopDebugFastSpin("COMPLETE中");
@@ -6499,8 +6562,10 @@ body{
         if(previousAudioBalance < AUDIO_BALANCE_VERSION){
           const savedBgmVolume = Number(settings.bgmVolume);
           const savedSfxVolume = Number(settings.sfxVolume);
-          settings.bgmVolume = Math.max(0, Math.min(Number.isFinite(savedBgmVolume) ? savedBgmVolume : DEFAULT_BGM_VOLUME, DEFAULT_BGM_VOLUME));
-          settings.sfxVolume = Math.max(0, Math.min(Number.isFinite(savedSfxVolume) ? savedSfxVolume : DEFAULT_SFX_VOLUME, DEFAULT_SFX_VOLUME));
+          const oldDefaultBgm = 0.22;
+          const oldDefaultSfx = 0.32;
+          settings.bgmVolume = (!Number.isFinite(savedBgmVolume) || Math.abs(savedBgmVolume - oldDefaultBgm) < 0.005) ? DEFAULT_BGM_VOLUME : clamp(savedBgmVolume, 0, 1);
+          settings.sfxVolume = (!Number.isFinite(savedSfxVolume) || Math.abs(savedSfxVolume - oldDefaultSfx) < 0.005) ? DEFAULT_SFX_VOLUME : clamp(savedSfxVolume, 0, 1);
         }
         settings.audioBalanceVersion = AUDIO_BALANCE_VERSION;
       }
@@ -6529,6 +6594,11 @@ body{
           rescueActive:!!data.completeTrialState.rescueActive,
           completeProfit:Number(data.completeTrialState.completeProfit) || 0
         };
+        if(!COMPLETE_LOCK_ENABLED){
+          completeTrialState.locked = false;
+          completeTrialState.lockedSetting = 0;
+          completeTrialState.completeProfit = 0;
+        }
       }
     }catch(e){}
   }
@@ -6840,7 +6910,8 @@ body{
         battleRemain:0,
         battleWin:false,
         battleSource:"",
-        resultPayout:null
+        resultPayout:null,
+        endSignal:null
       };
       stats.totalSessions++;
       recordSlumpPoint();
@@ -6898,7 +6969,9 @@ body{
     log(`白い悪魔BB終了：獲得${session.paid}pt / 損益${formatSigned(profit)}pt / ${endedSets}SET / STOCK獲得${session.added || 0}SET / G上乗せ${session.addedGames || 0}G`);
     stopGekiatsuEffect(true);
     hideBattleIntro();
+    const endSignal = pickAtEndSignal(settings.setting);
     session.resultPayout = session.paid;
+    session.endSignal = endSignal;
     session.active = false;
     session.remain = 0;
     session.stockSets = 0;
@@ -6911,7 +6984,8 @@ body{
     resetBonusEndSpecialEffects(true);
     setSpeedFrameOffHold(false);
     $("spinBtn").textContent = "BET";
-    showSessionResultScreen(endedSets, session.paid);
+    showSessionResultScreen(endedSets, session.paid, endSignal);
+    if(endSignal) log(`AT終了画面示唆：${endSignal.label} / ${endSignal.name}`);
     showOverlay("ATバトル終了");
     if(profit > 0){
       confetti(70);
@@ -7117,6 +7191,7 @@ body{
   }
 
   function normalBgmSrc(){
+    if(speedToBonusActive) return SPEED_BGM_SRC;
     return settings.bgmUrl || DEFAULT_NORMAL_BGM_SRC;
   }
 
@@ -7291,7 +7366,7 @@ body{
     countRoleStat(result, !!(resolved.bonusReady || resolved.regReady));
     if(normalReward > 0){
       stats.totalPaid = (Number(stats.totalPaid) || 0) + normalReward;
-      playPayoutSound();
+      playPayoutSound(result, normalReward);
       recordSlumpPoint();
       updateCompleteTrialState("通常払い出し");
     }
@@ -7406,7 +7481,7 @@ body{
     if(reward > 0){
       session.paid += reward;
       stats.totalPaid += reward;
-      playPayoutSound();
+      playPayoutSound(result, reward);
       updateCompleteTrialState("AT払い出し");
     }
 
@@ -7494,7 +7569,7 @@ body{
           showOverlay("DEVIL ZONE");
           confetti(70);
         }else{
-          showOverlay(stGameText || "AT+10G");
+          showOverlay(stockText || rewardText || "砂時計");
           confetti(45);
         }
       }else if(result === "BAR3"){
@@ -7674,7 +7749,7 @@ body{
       spinButton.textContent = isSpinning ? (spinCanStop ? "STOP" : "WAIT") : "BET";
       spinButton.classList.toggle("waiting", isSpinning && !spinCanStop);
       spinButton.classList.toggle("stopReady", isSpinning && spinCanStop);
-      if(COMPLETE_TRIAL_ENABLED && completeTrialState.locked && !isSpinning){
+      if(isCompleteTrialLocked() && !isSpinning){
         spinButton.textContent = "COMPLETE";
         spinButton.disabled = true;
         stopBtns.forEach(b=>b.disabled=true);
@@ -7790,7 +7865,7 @@ body{
     stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",morningCeilingActive:false};
-    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null};
+    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     completeTrialState = {locked:false,lockedSetting:0,rescueActive:false,completeProfit:0};
     setSpeedFrameOffHold(false);
     forceResult = "";
@@ -7834,7 +7909,7 @@ body{
     stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",morningCeilingActive:true};
-    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null};
+    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     completeTrialState = {locked:false,lockedSetting:0,rescueActive:false,completeProfit:0};
     setSpeedFrameOffHold(false);
     forceResult = "";
@@ -7899,7 +7974,7 @@ body{
     const safetyLimit = targetSpins * 12;
 
     try{
-      while(spun < targetSpins && safety < safetyLimit && !completeTrialState.locked){
+      while(spun < targetSpins && safety < safetyLimit && !isCompleteTrialLocked()){
         safety++;
         if(runDebugFastStep()){
           spun++;
@@ -7919,7 +7994,7 @@ body{
 
     const profit = currentProfit();
     const rtpText = stats.totalFee > 0 ? `${(currentRtp() * 100).toFixed(2)}%` : "-";
-    if(completeTrialState.locked){
+    if(isCompleteTrialLocked()){
       showMessage("1万回転試算 COMPLETE", `${debugFastSpinCount}Gで打ち止め / 損益${formatSigned(profit)}pt / 機械割${rtpText}`);
       $("resultText").textContent = `COMPLETE / ${debugFastSpinCount}G / ${formatSigned(profit)}pt`;
       log(`[SIM10000] COMPLETE / ${debugFastSpinCount}G / 損益${formatSigned(profit)}pt / 機械割${rtpText}`);
@@ -8118,7 +8193,6 @@ body{
     if(rows.some(row => row[0] === "🍋" && row[1] === "🍋" && row[2] === "🍋")) return "SUICA";
     if(rows.some(row => row[0] === "🍒" && row[1] === "🍒" && row[2] === "🍒")) return "CHERRY_TRIPLE";
     if(rows.some(row => row[0] === "🍒" && row[1] === "🍒" && row[2] !== "🍒")) return "CHERRY_DOUBLE";
-    if(rows.some(row => row[0] === "🍒")) return "CHERRY_ANY";
     return "MISS";
   }
 
@@ -8132,7 +8206,6 @@ body{
       if(row[0] === reel[0] && row[1] === reel[1] && row[2] === reel[2]) return result;
     }
     if(row[0] === cherry && row[1] === cherry && row[2] !== cherry) return "CHERRY_DOUBLE";
-    if(row[0] === cherry) return "CHERRY_ANY";
     return "MISS";
   }
 
@@ -8695,7 +8768,7 @@ body{
 
     startBtn.disabled = autoPlay;
     stopBtn.disabled = !autoPlay;
-    if(COMPLETE_TRIAL_ENABLED && completeTrialState.locked){
+    if(isCompleteTrialLocked()){
       startBtn.disabled = true;
       stopBtn.disabled = !autoPlay;
     }
@@ -8781,7 +8854,7 @@ body{
   }
 
   function speedToBonusUnavailableReason(){
-    if(COMPLETE_TRIAL_ENABLED && completeTrialState.locked) return "COMPLETE到達のため設定変更まで遊戯不可";
+    if(isCompleteTrialLocked()) return "COMPLETE到達のため設定変更まで遊戯不可";
     if(session.active) return "ボーナス中はSPEEDを使用できません";
     if(normalState.bonusPending) return "ボーナス確定中のためSPEED停止";
     if(pendingAtStartTimer) return "AT開始待機中のためSPEEDを使用できません";
@@ -8930,7 +9003,7 @@ body{
     startBtn.disabled = debugFastSpinActive;
     stopBtn.disabled = !debugFastSpinActive;
     if(simBtn) simBtn.disabled = debugFastSpinActive || debugOneClickSimActive || isSpinning;
-    if(COMPLETE_TRIAL_ENABLED && completeTrialState.locked){
+    if(isCompleteTrialLocked()){
       startBtn.disabled = true;
     }
 
@@ -9121,13 +9194,20 @@ body{
     }catch(e){}
   }
 
-  function playPayoutSound(){
+  function payoutSoundSrcFor(result, reward=0){
+    if(result === "REPLAY") return REPLAY_SOUND_SRC;
+    if(result === "BELL3" && Number(reward) === 3) return PAYOUT_3PT_BELL_SOUND_SRC;
+    return PAYOUT_SOUND_SRC;
+  }
+
+  function playPayoutSound(result="", reward=0){
     if(debugFastSpinActive || speedToBonusActive) return;
     if(!payoutSound) return;
     try{
+      const src = payoutSoundSrcFor(result, reward);
       payoutSound.pause();
-      if(payoutSound.getAttribute("src") !== PAYOUT_SOUND_SRC){
-        payoutSound.setAttribute("src", PAYOUT_SOUND_SRC);
+      if(payoutSound.getAttribute("src") !== src){
+        payoutSound.setAttribute("src", src);
       }
       payoutSound.currentTime = 0;
       payoutSound.volume = audioOutputVolume(settings.sfxVolume, PAYOUT_SOUND_OUTPUT_SCALE);
@@ -9532,7 +9612,7 @@ body{
     onClick("debugBell3Btn", ()=>direct("BELL3"));
     onClick("debugReplayBtn", ()=>direct("REPLAY"));
     onClick("debugSuikaBtn", ()=>direct("SUICA"));
-    onClick("debugCherryBtn", ()=>direct("CHERRY_ANY"));
+    onClick("debugCherryBtn", ()=>direct("CHERRY_DOUBLE"));
     onClick("debugCherryDoubleBtn", ()=>direct("CHERRY_DOUBLE"));
     onClick("debugBellBtn", ()=>direct("CHERRY_TRIPLE"));
     onClick("debugMissBtn", ()=>direct("MISS"));
