@@ -4141,7 +4141,7 @@ body{
             <option value="">ランダム</option>
             <option value="MISS">ハズレ</option>
           <option value="SMALL">砂時計（画像/AT+10/15pt）</option>
-          <option value="MID">REG（77BAR/15pt/SET+1）</option>
+          <option value="MID">REG（77BAR/15pt/デビルゾーン5G）</option>
             <option value="BAR3">BAR揃い（SET+5/出玉なし）</option>
             <option value="BIG">BIG（777/15pt/超デビルゾーン5G）</option>
             <option value="BELL">ベル揃い</option>
@@ -4517,6 +4517,7 @@ body{
   const BELL_REEL_STOP_VIDEO_SRC = "assets/zako1-2.mp4";
   const DEVIL_ZONE_FIRE_VIDEO_SRC = "assets/devil_zone_fire.mp4";
   const DEVIL_ZONE_CONFIRM_IMAGE_SRC = "assets/effects/devilzone_confirm_loop.gif";
+  const SUPER_DEVIL_ZONE_CONFIRM_IMAGE_SRC = "assets/effects/super_devilzone_confirm_loop.gif";
   const GEKIATSU_VIDEO_SRC = "assets/puremia.mp4";
   const BAR3_LEVER_VIDEO_SRC = "assets/bar3_lever_on.mp4";
   const ROGI_STOP_VIDEO_SRCS = Object.freeze({
@@ -6154,11 +6155,22 @@ body{
     bonusConfirmLayer.setAttribute("aria-hidden", "true");
   }
 
-  function showDevilZoneConfirmScreen(mode="translucent"){
+  function devilZoneConfirmImageFor(type=currentGoraiZoneType()){
+    return type === "super" ? SUPER_DEVIL_ZONE_CONFIRM_IMAGE_SRC : DEVIL_ZONE_CONFIRM_IMAGE_SRC;
+  }
+
+  function devilZoneConfirmTypeForResult(result){
+    if(result === "SUPER_DEVIL_ZONE" || result === "BIG") return "super";
+    if(result === "DEVIL_ZONE" || result === "MID") return "devil";
+    return "";
+  }
+
+  function showDevilZoneConfirmScreen(mode="translucent", type=currentGoraiZoneType()){
     if(!devilZoneConfirmLayer) return;
     const image = devilZoneConfirmLayer.querySelector("img");
-    if(image && image.getAttribute("src") !== DEVIL_ZONE_CONFIRM_IMAGE_SRC){
-      image.setAttribute("src", DEVIL_ZONE_CONFIRM_IMAGE_SRC);
+    const src = devilZoneConfirmImageFor(type);
+    if(image && image.getAttribute("src") !== src){
+      image.setAttribute("src", src);
     }
     devilZoneConfirmLayer.classList.toggle("translucent", mode === "translucent");
     devilZoneConfirmLayer.classList.add("show");
@@ -6172,12 +6184,13 @@ body{
   }
 
   function shouldStartDevilZoneConfirmIntro(result, resolved){
+    const entryType = devilZoneConfirmTypeForResult(result);
     return !!(
+      entryType &&
       session.active &&
       resolved &&
       !resolved.zoneGame &&
-      Number(resolved.bigZone) > 0 &&
-      (result === "BIG" || result === "SUPER_DEVIL_ZONE")
+      Number(resolved.bigZone) > 0
     );
   }
 
@@ -7799,7 +7812,7 @@ body{
 
     if(shouldStartDevilZoneConfirmIntro(result, resolved)){
       devilZoneConfirmIntroPending = true;
-      showDevilZoneConfirmScreen("solid");
+      showDevilZoneConfirmScreen("solid", devilZoneConfirmTypeForResult(result));
     }else{
       syncDevilZoneConfirmScreen();
     }
