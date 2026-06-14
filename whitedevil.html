@@ -252,6 +252,10 @@ h1{
   max-height:calc(100vh - 84px);
   overflow:auto;
 }
+.audioPanel{
+  max-height:calc(100vh - 84px);
+  overflow:auto;
+}
 .audioDock.slumpOpen #slumpPanel,
 .audioDock.oddsOpen #oddsPanel{
   position:fixed;
@@ -1340,6 +1344,11 @@ input[type="range"]{padding:0}
   background:rgba(255,255,255,.1);
   border:1px solid rgba(255,255,255,.15);
   box-shadow:none;
+}
+.audioPanel .ghostBtn.active{
+  color:#0b0610;
+  background:linear-gradient(180deg,#ffeaa8,#ff8a2a);
+  border-color:rgba(255,234,168,.75);
 }
 .dangerBtn{
   color:#fff;
@@ -3702,13 +3711,8 @@ body{
             <div class="audioPanelTitle">音量</div>
             <button class="audioCloseBtn" id="audioCloseBtn" type="button" aria-label="音量を閉じる" title="閉じる">×</button>
           </div>
-          <div class="field">
-            <label>BGM URL</label>
-            <input id="bgmUrl" placeholder="空欄なら内蔵通常BGMを使用 / https://...mp3 など" />
-          </div>
           <div class="row">
-            <button class="subBtn" id="playBgmBtn" type="button">BGM再生</button>
-            <button class="ghostBtn" id="stopBgmBtn" type="button">停止</button>
+            <button class="ghostBtn" id="audioMuteBtn" type="button">ミュート</button>
           </div>
           <div class="field">
             <label>BGM音量</label>
@@ -3717,6 +3721,18 @@ body{
           <div class="field">
             <label>効果音音量</label>
             <input id="sfxVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
+          </div>
+          <div class="field">
+            <label>払い出し音量</label>
+            <input id="payoutVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
+          </div>
+          <div class="field">
+            <label>動画音量</label>
+            <input id="movieVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
+          </div>
+          <div class="field">
+            <label>CZ動画音量</label>
+            <input id="rogiMovieVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
           </div>
         </div>
       </div>
@@ -4260,9 +4276,12 @@ body{
   });
 
   const symbols = ["🍒","🍋","🔔","REPLAY","⭐","🍇","7","BAR",USER_FACE];
-  const AUDIO_BALANCE_VERSION = 3;
+  const AUDIO_BALANCE_VERSION = 4;
   const DEFAULT_BGM_VOLUME = 0.50;
   const DEFAULT_SFX_VOLUME = 0.50;
+  const DEFAULT_PAYOUT_VOLUME = 0.50;
+  const DEFAULT_MOVIE_VOLUME = 0.50;
+  const DEFAULT_ROGI_MOVIE_VOLUME = 0.50;
   const MATCHED_BGM_GAIN_DB = -4.5;
   const BGM_OUTPUT_SCALE = dbToGain(MATCHED_BGM_GAIN_DB);
   const BAR_BGM_OUTPUT_SCALE = dbToGain(MATCHED_BGM_GAIN_DB);
@@ -4277,6 +4296,7 @@ body{
   }
 
   function audioOutputVolume(value, scale=1){
+    if(typeof settings !== "undefined" && settings.audioMuted) return 0;
     const raw = Number(value);
     if(!Number.isFinite(raw) || raw <= 0) return 0;
     return Math.max(0, Math.min(1, raw * scale));
@@ -4299,9 +4319,12 @@ body{
     bellAdd:0,
     
     autoDelay:0.5,
-    bgmUrl:"",
     bgmVolume:DEFAULT_BGM_VOLUME,
     sfxVolume:DEFAULT_SFX_VOLUME,
+    payoutVolume:DEFAULT_PAYOUT_VOLUME,
+    movieVolume:DEFAULT_MOVIE_VOLUME,
+    rogiMovieVolume:DEFAULT_ROGI_MOVIE_VOLUME,
+    audioMuted:false,
     audioBalanceVersion:AUDIO_BALANCE_VERSION
   };
 
@@ -4839,6 +4862,56 @@ body{
 
   function bgmOutputVolume(scale){
     return audioOutputVolume(settings.bgmVolume, scale);
+  }
+
+  function sfxOutputVolume(scale=SFX_OUTPUT_SCALE){
+    return audioOutputVolume(settings.sfxVolume, scale);
+  }
+
+  function payoutOutputVolume(scale=PAYOUT_SOUND_OUTPUT_SCALE){
+    return audioOutputVolume(settings.payoutVolume, scale);
+  }
+
+  function movieOutputVolume(scale=MOVIE_OUTPUT_SCALE){
+    return audioOutputVolume(settings.movieVolume, scale);
+  }
+
+  function rogiMovieOutputVolume(scale=ROGI_MOVIE_OUTPUT_SCALE){
+    return audioOutputVolume(settings.rogiMovieVolume, scale);
+  }
+
+  function updateAudioMuteButton(){
+    const btn = $("audioMuteBtn");
+    if(!btn) return;
+    btn.textContent = settings.audioMuted ? "ミュート解除" : "ミュート";
+    btn.classList.toggle("active", !!settings.audioMuted);
+    btn.setAttribute("aria-pressed", settings.audioMuted ? "true" : "false");
+  }
+
+  function currentGekiatsuVideoOutputVolume(){
+    if(!gekiatsuVideo) return 0;
+    const src = gekiatsuVideo.getAttribute("src") || "";
+    const isRogi = Object.values(ROGI_STOP_VIDEO_SRCS).some(rogiSrc => src === rogiSrc || src.endsWith(rogiSrc));
+    return isRogi ? rogiMovieOutputVolume(ROGI_MOVIE_OUTPUT_SCALE) : movieOutputVolume(MOVIE_OUTPUT_SCALE);
+  }
+
+  function applyAudioOutputVolumes(){
+    applyBgmOutputVolumes();
+    if(koatariSound) koatariSound.volume = sfxOutputVolume();
+    if(bigSound) bigSound.volume = sfxOutputVolume();
+    if(payoutSound) payoutSound.volume = payoutOutputVolume();
+    if(voiceSound) voiceSound.volume = sfxOutputVolume();
+    if(zakoVoiceSound) zakoVoiceSound.volume = sfxOutputVolume();
+    if(gekiatsuVideo) gekiatsuVideo.volume = currentGekiatsuVideoOutputVolume();
+    updateAudioMuteButton();
+  }
+
+  function toggleAudioMute(){
+    settings.audioMuted = !settings.audioMuted;
+    applyAudioOutputVolumes();
+    updateDisplay();
+    persistState();
+    log(settings.audioMuted ? "音量をミュートしました" : "ミュートを解除しました");
   }
 
   function applyBgmOutputVolumes(){
@@ -5604,6 +5677,21 @@ body{
     );
   }
 
+  function isBigPremiumEffectEligible(result, resolved){
+    if(result === "BIG" || result === "SUPER_DEVIL_ZONE") return true;
+    if(!resolved) return false;
+    if(resolved.bonusReady) return true;
+    return !!(
+      resolved.bonusHit &&
+      (resolved.bonusKind || "BIG") !== "MID"
+    );
+  }
+
+  function decideBigPremiumEffect(result, resolved, premiumForced=false){
+    if(!isBigPremiumEffectEligible(result, resolved)) return false;
+    return !!premiumForced || Math.random() < GEKIATSU_CHANCE_ON_BIG;
+  }
+
   function isAtFirstHitForAuto(resolved){
     if(!resolved) return false;
     if(resolved.bar3PremiumReady || resolved.bonusReady) return true;
@@ -5685,6 +5773,7 @@ body{
       muted:false,
       solid:holdThirdStop,
       volumeScale:ROGI_MOVIE_OUTPUT_SCALE,
+      volumeGroup:"rogi",
       holdUntilBet:holdThirdStop
     });
     if(holdThirdStop) startRogiThirdStopHold();
@@ -6562,10 +6651,17 @@ body{
         if(previousAudioBalance < AUDIO_BALANCE_VERSION){
           const savedBgmVolume = Number(settings.bgmVolume);
           const savedSfxVolume = Number(settings.sfxVolume);
+          const savedPayoutVolume = Number(settings.payoutVolume);
+          const savedMovieVolume = Number(settings.movieVolume);
+          const savedRogiMovieVolume = Number(settings.rogiMovieVolume);
           const oldDefaultBgm = 0.22;
           const oldDefaultSfx = 0.32;
           settings.bgmVolume = (!Number.isFinite(savedBgmVolume) || Math.abs(savedBgmVolume - oldDefaultBgm) < 0.005) ? DEFAULT_BGM_VOLUME : clamp(savedBgmVolume, 0, 1);
           settings.sfxVolume = (!Number.isFinite(savedSfxVolume) || Math.abs(savedSfxVolume - oldDefaultSfx) < 0.005) ? DEFAULT_SFX_VOLUME : clamp(savedSfxVolume, 0, 1);
+          const inheritedSfxVolume = Number.isFinite(Number(settings.sfxVolume)) ? clamp(Number(settings.sfxVolume), 0, 1) : DEFAULT_SFX_VOLUME;
+          settings.payoutVolume = Object.prototype.hasOwnProperty.call(data.settings, "payoutVolume") && Number.isFinite(savedPayoutVolume) ? clamp(savedPayoutVolume, 0, 1) : inheritedSfxVolume;
+          settings.movieVolume = Object.prototype.hasOwnProperty.call(data.settings, "movieVolume") && Number.isFinite(savedMovieVolume) ? clamp(savedMovieVolume, 0, 1) : inheritedSfxVolume;
+          settings.rogiMovieVolume = Object.prototype.hasOwnProperty.call(data.settings, "rogiMovieVolume") && Number.isFinite(savedRogiMovieVolume) ? clamp(savedRogiMovieVolume, 0, 1) : inheritedSfxVolume;
         }
         settings.audioBalanceVersion = AUDIO_BALANCE_VERSION;
       }
@@ -6636,7 +6732,11 @@ body{
         oddsMultiplier: settings.oddsMultiplier,
         autoDelay: settings.autoDelay,
         bgmVolume: settings.bgmVolume,
-        sfxVolume: settings.sfxVolume
+        sfxVolume: settings.sfxVolume,
+        payoutVolume: settings.payoutVolume,
+        movieVolume: settings.movieVolume,
+        rogiMovieVolume: settings.rogiMovieVolume,
+        audioMuted: settings.audioMuted
       },
       stats:{...stats, profit},
       normalState:{...normalState},
@@ -6685,6 +6785,10 @@ body{
     setValue("autoDelayInput", nextSettings.autoDelay);
     setValue("bgmVolume", nextSettings.bgmVolume);
     setValue("sfxVolume", nextSettings.sfxVolume);
+    setValue("payoutVolume", nextSettings.payoutVolume);
+    setValue("movieVolume", nextSettings.movieVolume);
+    setValue("rogiMovieVolume", nextSettings.rogiMovieVolume);
+    if(nextSettings.audioMuted !== undefined) settings.audioMuted = !!nextSettings.audioMuted;
     readSettings();
     safeStorageSet(STORAGE_KEY, JSON.stringify({settings, stats, normalState, completeTrialState}));
     updateDisplay();
@@ -6784,9 +6888,12 @@ body{
     settings.bigMul = ROLE_PAYOUTS.BIG / PAYOUT_BASE;
     settings.bigAdd = 5;
     settings.autoDelay = clamp(Number($("autoDelayInput").value) || 0.5, 0.1, 10);
-    if($("bgmUrl")) settings.bgmUrl = $("bgmUrl").value.trim();
     if($("bgmVolume")) settings.bgmVolume = clamp(Number($("bgmVolume").value) || 0, 0, 1);
     if($("sfxVolume")) settings.sfxVolume = clamp(Number($("sfxVolume").value) || 0, 0, 1);
+    if($("payoutVolume")) settings.payoutVolume = clamp(Number($("payoutVolume").value) || 0, 0, 1);
+    if($("movieVolume")) settings.movieVolume = clamp(Number($("movieVolume").value) || 0, 0, 1);
+    if($("rogiMovieVolume")) settings.rogiMovieVolume = clamp(Number($("rogiMovieVolume").value) || 0, 0, 1);
+    settings.audioMuted = !!settings.audioMuted;
     settings.audioBalanceVersion = AUDIO_BALANCE_VERSION;
 
     $("titleView").textContent = settings.title;
@@ -6808,20 +6915,20 @@ body{
     }
     if(koatariSound){
       koatariSound.src = KOATARI_SOUND_SRC;
-      koatariSound.volume = audioOutputVolume(settings.sfxVolume, SFX_OUTPUT_SCALE);
+      koatariSound.volume = sfxOutputVolume();
     }
     if(bigSound){
       bigSound.src = BIG_SOUND_SRC;
-      bigSound.volume = audioOutputVolume(settings.sfxVolume, SFX_OUTPUT_SCALE);
+      bigSound.volume = sfxOutputVolume();
     }
     if(payoutSound){
       if(payoutSound.getAttribute("src") !== PAYOUT_SOUND_SRC){
         payoutSound.setAttribute("src", PAYOUT_SOUND_SRC);
       }
-      payoutSound.volume = audioOutputVolume(settings.sfxVolume, PAYOUT_SOUND_OUTPUT_SCALE);
+      payoutSound.volume = payoutOutputVolume();
     }
     if(voiceSound){
-      voiceSound.volume = audioOutputVolume(settings.sfxVolume, SFX_OUTPUT_SCALE);
+      voiceSound.volume = sfxOutputVolume();
     }
     if(barBgm){
       if(!barBgmActive && barBgm.getAttribute("src") !== BAR_BGM_SRC) barBgm.setAttribute("src", BAR_BGM_SRC);
@@ -6843,8 +6950,9 @@ body{
         gekiatsuVideo.load();
       }
       gekiatsuVideo.loop = false;
-      gekiatsuVideo.volume = audioOutputVolume(settings.sfxVolume, MOVIE_OUTPUT_SCALE);
+      gekiatsuVideo.volume = movieOutputVolume();
     }
+    updateAudioMuteButton();
     renderSettingTable();
   }
 
@@ -6865,9 +6973,11 @@ body{
     if($("bigMulInput")) $("bigMulInput").value = ROLE_PAYOUTS.BIG / PAYOUT_BASE;
     if($("bigAddInput")) $("bigAddInput").value = 5;
     $("autoDelayInput").value = settings.autoDelay;
-    if($("bgmUrl")) $("bgmUrl").value = settings.bgmUrl;
     if($("bgmVolume")) $("bgmVolume").value = settings.bgmVolume;
     if($("sfxVolume")) $("sfxVolume").value = settings.sfxVolume;
+    if($("payoutVolume")) $("payoutVolume").value = settings.payoutVolume;
+    if($("movieVolume")) $("movieVolume").value = settings.movieVolume;
+    if($("rogiMovieVolume")) $("rogiMovieVolume").value = settings.rogiMovieVolume;
     readSettings();
   }
 
@@ -7167,7 +7277,9 @@ body{
     gekiatsuVideo.muted = !!options.muted;
     gekiatsuVideo.playsInline = true;
     const videoVolumeScale = Number.isFinite(Number(options.volumeScale)) ? Number(options.volumeScale) : MOVIE_OUTPUT_SCALE;
-    gekiatsuVideo.volume = audioOutputVolume(settings.sfxVolume, videoVolumeScale);
+    gekiatsuVideo.volume = options.volumeGroup === "rogi"
+      ? rogiMovieOutputVolume(videoVolumeScale)
+      : movieOutputVolume(videoVolumeScale);
     if(options.fadeOnEnd){
       gekiatsuVideo.onended = fadeOutGekiatsuEffect;
     }else if(options.holdUntilBet){
@@ -7192,7 +7304,7 @@ body{
 
   function normalBgmSrc(){
     if(speedToBonusActive) return SPEED_BGM_SRC;
-    return settings.bgmUrl || DEFAULT_NORMAL_BGM_SRC;
+    return DEFAULT_NORMAL_BGM_SRC;
   }
 
   function ensureNormalBgmSource(){
@@ -8432,10 +8544,10 @@ body{
     const lineRow = resultLineRow(result);
     const resolved = normalActiveAtSpinStart ? resolveNormalOutcome(result) : resolveOutcome(result);
     const grid = buildGrid(result, lineRow);
-    const bonusEffectSpin = !normalActiveAtSpinStart;
-    const speedModeBonusRogiEffect = speedModeSpinAtStart && shouldPlaySpeedModeBonusRogi(result, resolved);
-    const gekiatsuChance = !speedModeSpinAtStart && bonusEffectSpin && (premiumForced || (result === "BIG" && Math.random() < GEKIATSU_CHANCE_ON_BIG));
     const bar3LeverEffect = !speedModeSpinAtStart && result === "BAR3";
+    const bigPremiumEffect = !bar3LeverEffect && decideBigPremiumEffect(result, resolved, premiumForced);
+    const speedModeBonusRogiEffect = speedModeSpinAtStart && !bigPremiumEffect && shouldPlaySpeedModeBonusRogi(result, resolved);
+    const gekiatsuChance = bigPremiumEffect;
     const zakoEffect = decideZakoEffect(result, resolved, normalActiveAtSpinStart);
 
     currentSpin = {
@@ -8476,6 +8588,7 @@ body{
         holdUntilEndOrBet:true,
         muteBgm:true,
         volumeScale:ROGI_MOVIE_OUTPUT_SCALE,
+        volumeGroup:"rogi",
         allowDuringSpeed:true
       });
     }else if(bar3LeverEffect){
@@ -9156,7 +9269,7 @@ body{
   }
 
   function beep(freq=440,dur=.12,type="sine",gain=.18,delay=0){
-    const vol = audioOutputVolume(settings.sfxVolume, SFX_OUTPUT_SCALE);
+    const vol = sfxOutputVolume();
     if(vol <= 0) return;
     const ctx = getAudio();
     const o = ctx.createOscillator();
@@ -9177,7 +9290,7 @@ body{
     try{
       koatariSound.pause();
       koatariSound.currentTime = 0;
-      koatariSound.volume = audioOutputVolume(settings.sfxVolume, SFX_OUTPUT_SCALE);
+      koatariSound.volume = sfxOutputVolume();
       const p = koatariSound.play();
       if(p && typeof p.catch === "function") p.catch(()=>{});
     }catch(e){}
@@ -9188,7 +9301,7 @@ body{
     try{
       bigSound.pause();
       bigSound.currentTime = 0;
-      bigSound.volume = audioOutputVolume(settings.sfxVolume, SFX_OUTPUT_SCALE);
+      bigSound.volume = sfxOutputVolume();
       const p = bigSound.play();
       if(p && typeof p.catch === "function") p.catch(()=>{});
     }catch(e){}
@@ -9210,7 +9323,7 @@ body{
         payoutSound.setAttribute("src", src);
       }
       payoutSound.currentTime = 0;
-      payoutSound.volume = audioOutputVolume(settings.sfxVolume, PAYOUT_SOUND_OUTPUT_SCALE);
+      payoutSound.volume = payoutOutputVolume();
       const p = payoutSound.play();
       if(p && typeof p.catch === "function") p.catch(()=>{});
     }catch(e){}
@@ -9229,7 +9342,7 @@ body{
         voiceSound.setAttribute("src", src);
       }
       voiceSound.currentTime = 0;
-      voiceSound.volume = audioOutputVolume(settings.sfxVolume, SFX_OUTPUT_SCALE);
+      voiceSound.volume = sfxOutputVolume();
       const p = voiceSound.play();
       if(p && typeof p.catch === "function") p.catch(()=>{});
     }catch(e){}
@@ -9253,7 +9366,7 @@ body{
         zakoVoiceSound.load();
       }
       zakoVoiceSound.currentTime = 0;
-      zakoVoiceSound.volume = audioOutputVolume(settings.sfxVolume, SFX_OUTPUT_SCALE);
+      zakoVoiceSound.volume = sfxOutputVolume();
       const p = zakoVoiceSound.play();
       if(p && typeof p.catch === "function"){
         p.catch(()=>{
@@ -9364,7 +9477,7 @@ body{
       [...document.querySelectorAll(".side > .card:not(.oddsPublic):not(.slumpPublic)")].forEach(card => drawer.appendChild(card));
       if(drawer.parentElement !== document.body) document.body.appendChild(drawer);
     }
-    ["titleInput","settingSelect","feeInput","stSpinsInput","oddsMultiplierInput","smallMulInput","midMulInput","crownMulInput","cherryMulInput","bigMulInput","bigAddInput","autoDelayInput","bgmUrl","bgmVolume","sfxVolume"].forEach(id=>{
+    ["titleInput","settingSelect","feeInput","stSpinsInput","oddsMultiplierInput","smallMulInput","midMulInput","crownMulInput","cherryMulInput","bigMulInput","bigAddInput","autoDelayInput","bgmVolume","sfxVolume","payoutVolume","movieVolume","rogiMovieVolume"].forEach(id=>{
       const el = $(id);
       if(el) el.addEventListener("input", ()=>{ readSettings(); updateDisplay(); });
     });
@@ -9558,21 +9671,8 @@ body{
       });
     });
 
-    if($("playBgmBtn")){
-      $("playBgmBtn").addEventListener("click", async()=>{
-        readSettings();
-        const src = ensureNormalBgmSource();
-        if(!src){ log("BGMを設定してください"); return; }
-        bgm.volume = bgmOutputVolume(BGM_OUTPUT_SCALE);
-        try{ await bgm.play(); log(settings.bgmUrl ? "BGM再生" : "内蔵BGM再生"); }catch(e){ log("BGMを再生できませんでした"); }
-      });
-    }
-    if($("stopBgmBtn")){
-      $("stopBgmBtn").addEventListener("click", ()=>{
-        bgm.pause();
-        bgm.currentTime = 0;
-        log("通常BGM停止");
-      });
+    if($("audioMuteBtn")){
+      $("audioMuteBtn").addEventListener("click", toggleAudioMute);
     }
 
     onClick("applyForceBtn", ()=>{
