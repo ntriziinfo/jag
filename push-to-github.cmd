@@ -2,7 +2,6 @@
 setlocal EnableExtensions
 
 set "REPO_DIR=%~dp0"
-for %%I in ("%REPO_DIR%..") do set "WORK_DIR=%%~fI"
 set "GIT_EXE=C:\Program Files\Git\cmd\git.exe"
 set "COMMIT_MSG=%~1"
 
@@ -16,6 +15,13 @@ if not exist "%GIT_EXE%" (
     exit /b 1
   )
   set "GIT_EXE=git"
+)
+
+if not exist "%REPO_DIR%.git" (
+  echo This script must be placed in the Git repository folder.
+  echo Expected .git at: %REPO_DIR%.git
+  pause
+  exit /b 1
 )
 
 cd /d "%REPO_DIR%" || (
@@ -33,33 +39,8 @@ if exist ".git\index.lock" (
 
 "%GIT_EXE%" config --global --add safe.directory "%CD%" >nul 2>nul
 
-echo Syncing current workspace files...
-if exist "%WORK_DIR%\whitedevil.html" copy /Y "%WORK_DIR%\whitedevil.html" "%REPO_DIR%whitedevil.html" >nul
-if exist "%WORK_DIR%\AGENTS.md" copy /Y "%WORK_DIR%\AGENTS.md" "%REPO_DIR%AGENTS.md" >nul
-if exist "%WORK_DIR%\.gitignore" copy /Y "%WORK_DIR%\.gitignore" "%REPO_DIR%.gitignore" >nul
-
-if exist "%WORK_DIR%\Documents" (
-  if not exist "%REPO_DIR%Documents" mkdir "%REPO_DIR%Documents"
-  robocopy "%WORK_DIR%\Documents" "%REPO_DIR%Documents" /E /NFL /NDL /NJH /NJS /NP >nul
-  if errorlevel 8 (
-    echo Failed to sync Documents.
-    pause
-    exit /b 1
-  )
-)
-
-if exist "%WORK_DIR%\assets" (
-  if not exist "%REPO_DIR%assets" mkdir "%REPO_DIR%assets"
-  robocopy "%WORK_DIR%\assets" "%REPO_DIR%assets" /E /NFL /NDL /NJH /NJS /NP >nul
-  if errorlevel 8 (
-    echo Failed to sync assets.
-    pause
-    exit /b 1
-  )
-)
-
-echo Staging files...
-"%GIT_EXE%" add -- whitedevil.html index.html admin.html server.js README.txt Documents assets AGENTS.md .gitignore push-to-github.cmd
+echo Staging GitHub source files only...
+"%GIT_EXE%" add -A -- .gitignore AGENTS.md README.txt admin.html gorai.html index.html server.js whitedevil.html Documents assets push-to-github.cmd pull-from-github.cmd sync-dropbox-from-git.cmd sync-dropbox-from-git.ps1
 if errorlevel 1 (
   echo Failed to stage files.
   pause
@@ -67,19 +48,36 @@ if errorlevel 1 (
 )
 
 "%GIT_EXE%" diff --cached --quiet
-if not errorlevel 1 (
-  echo No changes to commit.
-  "%GIT_EXE%" status --short
-  pause
-  exit /b 0
+if errorlevel 1 (
+  echo Creating commit...
+  "%GIT_EXE%" commit -m "%COMMIT_MSG%"
+  if errorlevel 1 (
+    echo Failed to create commit.
+    pause
+    exit /b 1
+  )
+) else (
+  echo No new local changes to commit.
 )
 
-echo Creating commit...
-"%GIT_EXE%" commit -m "%COMMIT_MSG%"
+echo Fetching latest GitHub main...
+"%GIT_EXE%" fetch origin main
 if errorlevel 1 (
-  echo Failed to create commit.
+  echo Failed to fetch from GitHub. Check network or GitHub login.
   pause
   exit /b 1
+)
+
+"%GIT_EXE%" merge-base --is-ancestor origin/main HEAD
+if errorlevel 1 (
+  echo GitHub has newer commits. Rebasing local commits on latest GitHub main...
+  "%GIT_EXE%" pull --rebase origin main
+  if errorlevel 1 (
+    echo Rebase failed. Resolve the conflict, then run this script again.
+    echo If you are unsure, ask Codex to inspect the Git state.
+    pause
+    exit /b 1
+  )
 )
 
 echo Pushing to GitHub...
@@ -91,5 +89,6 @@ if errorlevel 1 (
 )
 
 echo Done.
-"%GIT_EXE%" status --short
+"%GIT_EXE%" log -1 --oneline
+"%GIT_EXE%" status --short --branch
 pause
