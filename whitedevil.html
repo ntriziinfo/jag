@@ -1644,8 +1644,11 @@ body.debugOpen .debugDrawer .secret{
     inset 0 0 28px rgba(255,54,93,.12),
     0 0 24px rgba(255,54,93,.18);
   text-align:center;
+  overflow:hidden;
 }
 .sevenSegLabel{
+  position:relative;
+  z-index:2;
   color:var(--muted);
   font-size:13px;
   font-weight:1000;
@@ -1653,6 +1656,8 @@ body.debugOpen .debugDrawer .secret{
   margin-bottom:4px;
 }
 .sevenSegValue{
+  position:relative;
+  z-index:1;
   font-family:"Consolas","Courier New",monospace;
   font-size:clamp(56px,9vw,124px);
   line-height:.9;
@@ -1668,6 +1673,29 @@ body.debugOpen .debugDrawer .secret{
 .sevenSegValue.idle{
   color:rgba(255,54,93,.28);
   text-shadow:0 0 8px rgba(255,54,93,.18);
+}
+.dzHoldBadge{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:min(250px,88%);
+  transform:translate(-50%, -52%) scale(.96);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  z-index:3;
+  filter:
+    drop-shadow(0 0 12px rgba(255,66,0,.78))
+    drop-shadow(0 8px 14px rgba(0,0,0,.84));
+  transition:opacity .16s ease, visibility .16s ease, transform .16s ease;
+}
+.sevenSegPanel.zoneHold .dzHoldBadge{
+  opacity:.86;
+  visibility:visible;
+  transform:translate(-50%, -52%) scale(1);
+}
+.sevenSegPanel.zoneHold .sevenSegValue{
+  opacity:.42;
 }
 .centerButtons{
   display:flex;
@@ -3846,6 +3874,7 @@ body{
 
         <div class="sevenSegPanel">
           <div class="sevenSegLabel">残りAT</div>
+          <img class="dzHoldBadge" id="dzHoldBadge" src="assets/effects/dz_hold_badge.png" alt="HOLD" decoding="async" draggable="false" aria-hidden="true">
           <div class="sevenSegValue" id="stRemainBigView">--</div>
         </div>
 
@@ -8032,6 +8061,8 @@ body{
 
     const remainBig = $("stRemainBigView");
     if(remainBig){
+      const sevenSegPanel = remainBig.closest(".sevenSegPanel");
+      if(sevenSegPanel) sevenSegPanel.classList.toggle("zoneHold", active && isGoraiZoneActive());
       const label = document.querySelector(".sevenSegLabel");
       if(active){
         if(label) label.textContent = isGoraiZoneActive() ? goraiZoneLabel() : isContinuationBattleActive() ? "BATTLE" : "残りAT";

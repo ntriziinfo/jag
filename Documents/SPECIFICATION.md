@@ -20,6 +20,7 @@
 | `assets/effects/bonus_kakutei_gold.gif` | BONUS確定後1G目のハズレ演出でリール枠内に不透明表示し、2G目の確定役揃いでは半透明表示するBONUS確定GIF |
 | `assets/effects/devilzone_confirm_loop.gif` | AT中77BAR揃い後にデビルゾーンへ直行する際、BET前はリール枠内に不透明表示し、BET後は半透明でゾーン終了まで表示するDEVILZONE GIF |
 | `assets/effects/super_devilzone_confirm_loop.gif` | AT中777揃い後に超デビルゾーンへ直行する際、BET前はリール枠内に不透明表示し、BET後は半透明でゾーン終了まで表示する超DEVILZONE GIF |
+| `assets/effects/dz_hold_badge.png` | デビルゾーン/超デビルゾーン中に、AT残表示へ重ねるHOLD画像 |
 | `assets/bar3_lever_on.mp4` | BAR揃い成立時、レバーON直後にリール全面へ表示する演出動画 |
 | `assets/devil_zone_fire.mp4` | デビルゾーン中に各リール内へ半透明表示する炎動画 |
 | `assets/devil_lamp.png` | 旧円形ステータスランプ画像。現在の通常表示では使用しない |
@@ -155,6 +156,7 @@
 - デビルゾーン中はATを減算しない。
 - 成立役ごとにSETストック、ATゲーム数、デビルゾーンゲーム数の抽選を行う。
 - AT本編中に77BAR（内部役 `DEVIL_ZONE`）が成立した場合は、停止後すぐデビルゾーン状態へ入る。AT本編中に777（内部役 `SUPER_DEVIL_ZONE`）が成立した場合は、停止後すぐ超デビルゾーン状態へ入る。入口画面はそれぞれ専用GIFを使い、BET前に不透明、BET押下後に半透明へ切り替え、ゾーン残りが0になるまでリール枠内へ表示する。
+- デビルゾーン/超デビルゾーン中は、AT残表示パネルに `assets/effects/dz_hold_badge.png` を重ね、AT本編の減算停止を視覚的に示す。
 - デビルゾーン中は各リール内に `assets/devil_zone_fire.mp4` をループ再生する。炎動画は図柄の背面寄りに半透明で重ね、リール停止、zako動画、プレミア動画、バトル開始演出の視認性を邪魔しない範囲で見える濃さに調整する。
 - デビルゾーン中の主な追加抽選:
   - 3連チェリー: 確定+1SET、AT+5G
