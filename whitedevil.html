@@ -3779,7 +3779,7 @@ body{
 
   <div class="header">
     <div class="titleBox">
-      <div class="badge">AT ONLY / MID+BIG 3LINE</div>
+      <div class="badge">AT ONLY / 7・BAR MIDLINE</div>
       <h1 id="titleView">白い悪魔 SLOT</h1>
     </div>
     <div class="notice">配信・RP・ゲーム内ポイント専用。現金・換金・景品交換・実利益化には使用しないでください。</div>
@@ -8454,7 +8454,7 @@ body{
   }
 
   function resultLineRow(result){
-    if(result === "BAR3") return 1;
+    if(isMiddleLineOnlyResult(result)) return 1;
     if(result === "BELL3") return Math.random() < 0.5 ? [0,1,2] : [2,1,0];
     return randomLineRow();
   }
@@ -8505,7 +8505,7 @@ body{
   }
 
   function has77BarLine(grid){
-    return grid.some(row => row[0] === "7" && row[1] === "7" && row[2] === "BAR");
+    return grid[1]?.[0] === "7" && grid[1]?.[1] === "7" && grid[1]?.[2] === "BAR";
   }
 
   function hasBarDiagonal(grid){
@@ -8531,11 +8531,12 @@ body{
 
   function displayedResultFromGrid(grid){
     const rows = Array.isArray(grid) ? grid : [];
+    const middle = rows[1] || [];
 
-    // 優先順位は内部判定と同じく、7揃い > 77BAR > BAR揃いを最上位に固定。
-    if(rows.some(row => row[0] === "7" && row[1] === "7" && row[2] === "7")) return "BIG";
-    if(rows.some(row => row[0] === "7" && row[1] === "7" && row[2] === "BAR")) return "MID";
-    if(rows[1] && rows[1][0] === "BAR" && rows[1][1] === "BAR" && rows[1][2] === "BAR") return "BAR3";
+    // 7揃い・77BAR・BAR揃いは中段だけを成立ラインとして扱う。
+    if(middle[0] === "7" && middle[1] === "7" && middle[2] === "7") return "BIG";
+    if(middle[0] === "7" && middle[1] === "7" && middle[2] === "BAR") return "MID";
+    if(middle[0] === "BAR" && middle[1] === "BAR" && middle[2] === "BAR") return "BAR3";
     if(rows.some(row => row[0] === USER_FACE && row[1] === USER_FACE && row[2] === USER_FACE)) return "SMALL";
     if(rows.some(row => row[0] === "🔔" && row[1] === "🔔" && row[2] === "🔔")) return "BELL";
     if(hasBellDiagonal(rows)) return "BELL3";
@@ -8557,6 +8558,11 @@ body{
     }
     if(row[0] === cherry && row[1] === cherry && row[2] !== cherry) return "CHERRY_DOUBLE";
     return "MISS";
+  }
+
+  function isMiddleLineOnlyResult(result){
+    const display = displayResultFor(result);
+    return display === "BIG" || display === "MID" || display === "BAR3";
   }
 
   function hasOnlyTargetPayline(grid, result, winRow=1){
@@ -8585,7 +8591,7 @@ body{
   function gridMatchesResult(grid, result, winRow=1){
     if(result === "BELL3") return !hasCrownVisible(grid) && !hasBarDiagonal(grid) && displayedResultFromGrid(grid) === "BELL3" && hasOnlyTargetPayline(grid, result, winRow);
     if(hasCrownVisible(grid)) return false;
-    if(result !== "BAR3" && hasBarDiagonal(grid)) return false;
+    if(hasBarDiagonal(grid)) return false;
     return displayedResultFromGrid(grid) === displayResultFor(result) && hasOnlyTargetPayline(grid, result, winRow);
   }
 
@@ -8599,7 +8605,7 @@ body{
   }
 
     if(result === "BELL3") return buildDiagonalBellGrid(winRow);
-    if(result === "BAR3") winRow = 1;
+    if(isMiddleLineOnlyResult(result)) winRow = 1;
     if(result === "MISS"){
       let picked = MISS_GRID_PATTERNS[randomInt(0, MISS_GRID_PATTERNS.length - 1)].map(row => row.slice());
 
