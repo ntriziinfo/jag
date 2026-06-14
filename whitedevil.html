@@ -975,6 +975,49 @@ h1{
 .bonusConfirmLayer.show.translucent img{
   filter:saturate(1.15) brightness(1.04) contrast(.95);
 }
+.devilZoneConfirmLayer{
+  position:absolute;
+  left:12.7%;
+  right:12.7%;
+  top:27.8%;
+  bottom:21.4%;
+  border-radius:8px;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  z-index:15;
+  background:#000;
+  transition:opacity .16s ease, visibility .16s ease, transform .16s ease;
+  transform:scale(.985);
+  box-shadow:
+    inset 0 0 42px rgba(255,36,10,.36),
+    0 0 32px rgba(255,44,0,.32);
+}
+.devilZoneConfirmLayer.show{
+  opacity:1;
+  visibility:visible;
+  transform:scale(1);
+  mix-blend-mode:normal;
+}
+.devilZoneConfirmLayer.show.translucent{
+  opacity:.72;
+  z-index:10;
+  background:rgba(0,0,0,.08);
+  mix-blend-mode:screen;
+}
+.devilZoneConfirmLayer img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.devilZoneConfirmLayer.show.translucent img{
+  filter:saturate(1.18) brightness(1.04) contrast(.95);
+}
 .rogiBlackoutLayer{
   position:absolute;
   inset:10px;
@@ -3883,6 +3926,9 @@ body{
         <div class="bonusConfirmLayer" id="bonusConfirmLayer" aria-hidden="true">
           <img src="assets/effects/bonus_kakutei_gold.gif" alt="BONUS確定" decoding="async" draggable="false">
         </div>
+        <div class="devilZoneConfirmLayer" id="devilZoneConfirmLayer" aria-hidden="true">
+          <img src="assets/effects/devilzone_confirm_loop.gif" alt="DEVILZONE" decoding="async" draggable="false">
+        </div>
         <div class="battleIntroLayer" id="battleIntroLayer" aria-hidden="true">
           <img class="battleIntroLogo" id="battleIntroLogo" alt="BATTLE" decoding="async" draggable="false">
           <img class="battleIntroCharacter" id="battleIntroCharacter" alt="" decoding="async" draggable="false">
@@ -4470,6 +4516,7 @@ body{
   const BELL_REEL_READY_VIDEO_SRC = "assets/zako1.mp4";
   const BELL_REEL_STOP_VIDEO_SRC = "assets/zako1-2.mp4";
   const DEVIL_ZONE_FIRE_VIDEO_SRC = "assets/devil_zone_fire.mp4";
+  const DEVIL_ZONE_CONFIRM_IMAGE_SRC = "assets/effects/devilzone_confirm_loop.gif";
   const GEKIATSU_VIDEO_SRC = "assets/puremia.mp4";
   const BAR3_LEVER_VIDEO_SRC = "assets/bar3_lever_on.mp4";
   const ROGI_STOP_VIDEO_SRCS = Object.freeze({
@@ -4624,6 +4671,7 @@ body{
   let pendingForceResult = "";
   let sessionStartGuard = false;
   let pendingAtStartTimer = null;
+  let devilZoneConfirmIntroPending = false;
   let audioCtx = null;
   let spinIntervals = [];
   let reelSpinOffsets = [0, 0, 0];
@@ -4645,6 +4693,7 @@ body{
   const gekiatsuLayer = $("gekiatsuLayer");
   const gekiatsuVideo = $("gekiatsuVideo");
   const bonusConfirmLayer = $("bonusConfirmLayer");
+  const devilZoneConfirmLayer = $("devilZoneConfirmLayer");
   const rogiBlackoutLayer = $("rogiBlackoutLayer");
   const battleIntroLayer = $("battleIntroLayer");
   const battleIntroLogo = $("battleIntroLogo");
@@ -6105,6 +6154,42 @@ body{
     bonusConfirmLayer.setAttribute("aria-hidden", "true");
   }
 
+  function showDevilZoneConfirmScreen(mode="translucent"){
+    if(!devilZoneConfirmLayer) return;
+    const image = devilZoneConfirmLayer.querySelector("img");
+    if(image && image.getAttribute("src") !== DEVIL_ZONE_CONFIRM_IMAGE_SRC){
+      image.setAttribute("src", DEVIL_ZONE_CONFIRM_IMAGE_SRC);
+    }
+    devilZoneConfirmLayer.classList.toggle("translucent", mode === "translucent");
+    devilZoneConfirmLayer.classList.add("show");
+    devilZoneConfirmLayer.setAttribute("aria-hidden", "false");
+  }
+
+  function hideDevilZoneConfirmScreen(){
+    if(!devilZoneConfirmLayer) return;
+    devilZoneConfirmLayer.classList.remove("show", "translucent");
+    devilZoneConfirmLayer.setAttribute("aria-hidden", "true");
+  }
+
+  function shouldStartDevilZoneConfirmIntro(result, resolved){
+    return !!(
+      session.active &&
+      resolved &&
+      !resolved.zoneGame &&
+      Number(resolved.bigZone) > 0 &&
+      (result === "BIG" || result === "SUPER_DEVIL_ZONE")
+    );
+  }
+
+  function syncDevilZoneConfirmScreen(){
+    if(!session.active || session.phase === "battle" || !isGoraiZoneActive()){
+      devilZoneConfirmIntroPending = false;
+      hideDevilZoneConfirmScreen();
+      return;
+    }
+    showDevilZoneConfirmScreen(devilZoneConfirmIntroPending ? "solid" : "translucent");
+  }
+
   function currentNormalCeilingGames(){
     return normalState.morningCeilingActive ? MORNING_CEILING_GAMES : NORMAL_CEILING_GAMES;
   }
@@ -7068,6 +7153,8 @@ body{
     try{
       stopBattleBgm(false);
       stopGuaranteedSetStartLight();
+      devilZoneConfirmIntroPending = false;
+      hideDevilZoneConfirmScreen();
       readSettings();
       const premiumStockSets = Math.max(0, Number(options.stockSets) || 0);
       const initialPaid = Math.max(0, Number(options.initialPaid) || 0);
@@ -7152,6 +7239,8 @@ body{
     log(`白い悪魔BB終了：獲得${session.paid}pt / 損益${formatSigned(profit)}pt / ${endedSets}SET / STOCK獲得${session.added || 0}SET / G上乗せ${session.addedGames || 0}G`);
     stopGekiatsuEffect(true);
     hideBattleIntro();
+    devilZoneConfirmIntroPending = false;
+    hideDevilZoneConfirmScreen();
     const endSignal = pickAtEndSignal(settings.setting);
     session.resultPayout = session.paid;
     session.endSignal = endSignal;
@@ -7503,6 +7592,8 @@ body{
     barBgmActive = false;
     battleBgmActive = false;
     barRainbowHold = false;
+    devilZoneConfirmIntroPending = false;
+    hideDevilZoneConfirmScreen();
     stopGuaranteedSetStartLight();
     clearReelLight(false);
     if(barBgm){
@@ -7706,6 +7797,13 @@ body{
       session.bigZoneType = "";
     }
 
+    if(shouldStartDevilZoneConfirmIntro(result, resolved)){
+      devilZoneConfirmIntroPending = true;
+      showDevilZoneConfirmScreen("solid");
+    }else{
+      syncDevilZoneConfirmScreen();
+    }
+
     if(stGameAdd > 0){
       session.remain = (session.remain || 0) + stGameAdd;
       session.addedGames = (session.addedGames || 0) + stGameAdd;
@@ -7826,6 +7924,7 @@ body{
     updateGoraiZoneGlow();
     updateDevilStatusLamp();
     updateReelFrameMode();
+    syncDevilZoneConfirmScreen();
     machine.className = "machine " + (active ? "active" : "normal") + (session.paid > 0 ? " win" : "");
     $("modeTag").className = "modeTag " + (active ? "active" : "");
     $("modeTag").textContent = active ? (isContinuationBattleActive() ? "継続BATTLE" : "BATTLE") : normalModeLabel();
@@ -8048,6 +8147,8 @@ body{
     stopBarBgm();
     stopGekiatsuEffect(true);
     hideBonusConfirmScreen();
+    devilZoneConfirmIntroPending = false;
+    hideDevilZoneConfirmScreen();
     hideBattleIntro();
     hideRogiContinuationBlackout();
     hideSessionResultScreen();
@@ -8093,6 +8194,8 @@ body{
     stopBarBgm();
     stopGekiatsuEffect(true);
     hideBonusConfirmScreen();
+    devilZoneConfirmIntroPending = false;
+    hideDevilZoneConfirmScreen();
     hideBattleIntro();
     hideRogiContinuationBlackout();
     hideSessionResultScreen();
@@ -8570,6 +8673,12 @@ body{
     }
 
     const zoneActiveAtSpinStart = session.active && isGoraiZoneActive();
+    if(zoneActiveAtSpinStart){
+      devilZoneConfirmIntroPending = false;
+      showDevilZoneConfirmScreen("translucent");
+    }else{
+      syncDevilZoneConfirmScreen();
+    }
     if(session.active && session.remain <= 0 && session.phase !== "battle" && !zoneActiveAtSpinStart){
       startContinuationBattlePart();
       scheduleNextAuto();
