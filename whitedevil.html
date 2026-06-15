@@ -16,6 +16,8 @@
 <link rel="preload" as="image" href="assets/frames/slot_cabinet_frame_data_windows_on.png">
 <link rel="preload" as="image" href="assets/buttons/btn_auto_half_blue.png">
 <link rel="preload" as="image" href="assets/buttons/btn_speed_half_blue.png">
+<link rel="preload" as="image" href="assets/effects/reverse_push_blue.png">
+<link rel="preload" as="image" href="assets/effects/reverse_push_red.png">
 <style>
 :root{
   --bg:#05060c;
@@ -1017,6 +1019,38 @@ h1{
 }
 .devilZoneConfirmLayer.show.translucent img{
   filter:saturate(1.18) brightness(1.04) contrast(.95);
+}
+.reversePushGuideLayer{
+  position:absolute;
+  left:12.7%;
+  right:12.7%;
+  top:27.8%;
+  bottom:21.4%;
+  border-radius:8px;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  z-index:16;
+  background:rgba(0,0,0,.05);
+  transition:opacity .12s ease, visibility .12s ease, transform .12s ease;
+  transform:scale(.992);
+  mix-blend-mode:screen;
+}
+.reversePushGuideLayer.show{
+  opacity:.70;
+  visibility:visible;
+  transform:scale(1);
+}
+.reversePushGuideLayer img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  filter:saturate(1.16) brightness(1.04) contrast(.98);
 }
 .rogiBlackoutLayer{
   position:absolute;
@@ -2489,7 +2523,7 @@ body::after{
   content:"";
   position:absolute;
   inset:-26px -40px -74px;
-  background:url("assets/frames/slot_frame.png") center/100% 100% no-repeat;
+  background:url("assets/frames/slot_cabinet_frame_data_windows_off.png") center/100% 100% no-repeat;
   pointer-events:none;
   z-index:8;
   opacity:.95;
@@ -3958,6 +3992,9 @@ body{
         <div class="devilZoneConfirmLayer" id="devilZoneConfirmLayer" aria-hidden="true">
           <img src="assets/effects/devilzone_confirm_loop.gif" alt="DEVILZONE" decoding="async" draggable="false">
         </div>
+        <div class="reversePushGuideLayer" id="reversePushGuideLayer" aria-hidden="true">
+          <img src="assets/effects/reverse_push_blue.png" alt="逆押し7狙い" decoding="async" draggable="false">
+        </div>
         <div class="battleIntroLayer" id="battleIntroLayer" aria-hidden="true">
           <img class="battleIntroLogo" id="battleIntroLogo" alt="BATTLE" decoding="async" draggable="false">
           <img class="battleIntroCharacter" id="battleIntroCharacter" alt="" decoding="async" draggable="false">
@@ -4547,6 +4584,13 @@ body{
   const DEVIL_ZONE_FIRE_VIDEO_SRC = "assets/devil_zone_fire.mp4";
   const DEVIL_ZONE_CONFIRM_IMAGE_SRC = "assets/effects/devilzone_confirm_loop.gif";
   const SUPER_DEVIL_ZONE_CONFIRM_IMAGE_SRC = "assets/effects/super_devilzone_confirm_loop.gif";
+  const REVERSE_PUSH_GUIDE_IMAGE_SRCS = Object.freeze({
+    blue:"assets/effects/reverse_push_blue.png",
+    red:"assets/effects/reverse_push_red.png"
+  });
+  const REVERSE_PUSH_RED_EXPECTATION = 0.80;
+  const REVERSE_PUSH_BLUE_EXPECTATION = 0.30;
+  const REVERSE_PUSH_HIT_RED_RATE = 0.70;
   const GEKIATSU_VIDEO_SRC = "assets/puremia.mp4";
   const BAR3_LEVER_VIDEO_SRC = "assets/bar3_lever_on.mp4";
   const ROGI_STOP_VIDEO_SRCS = Object.freeze({
@@ -4724,6 +4768,7 @@ body{
   const gekiatsuVideo = $("gekiatsuVideo");
   const bonusConfirmLayer = $("bonusConfirmLayer");
   const devilZoneConfirmLayer = $("devilZoneConfirmLayer");
+  const reversePushGuideLayer = $("reversePushGuideLayer");
   const rogiBlackoutLayer = $("rogiBlackoutLayer");
   const battleIntroLayer = $("battleIntroLayer");
   const battleIntroLogo = $("battleIntroLogo");
@@ -5365,6 +5410,35 @@ body{
     return Math.random() < zoneSevenChance(type) ? "SUPER_DEVIL_ZONE" : "MISS";
   }
 
+  function reversePushMissSignalRate(hitRate, hitSignalRate, targetExpectation){
+    const p = clamp(Number(hitRate) || 0, 0, 1);
+    const h = clamp(Number(hitSignalRate) || 0, 0, 1);
+    const t = clamp(Number(targetExpectation) || 0, 0.01, 0.99);
+    if(p <= 0 || h <= 0 || p >= 1) return 0;
+    return clamp((p * h * (1 - t)) / (t * (1 - p)), 0, 1);
+  }
+
+  function decideReversePushGuide(result, type=currentGoraiZoneType()){
+    const hitRate = zoneSevenChance(type);
+    const redHitRate = REVERSE_PUSH_HIT_RED_RATE;
+    const blueHitRate = 1 - redHitRate;
+    if(result === "SUPER_DEVIL_ZONE"){
+      return Math.random() < redHitRate ? "red" : "blue";
+    }
+
+    let redMissRate = reversePushMissSignalRate(hitRate, redHitRate, REVERSE_PUSH_RED_EXPECTATION);
+    let blueMissRate = reversePushMissSignalRate(hitRate, blueHitRate, REVERSE_PUSH_BLUE_EXPECTATION);
+    const totalMissRate = redMissRate + blueMissRate;
+    if(totalMissRate > 1){
+      redMissRate /= totalMissRate;
+      blueMissRate /= totalMissRate;
+    }
+    const roll = Math.random();
+    if(roll < redMissRate) return "red";
+    if(roll < redMissRate + blueMissRate) return "blue";
+    return "";
+  }
+
   function resolveZoneSevenBonus(result, type=currentGoraiZoneType()){
     if(result !== "SUPER_DEVIL_ZONE") return {sets:0, games:0, hit:false};
     if(type === "super") return {sets:Math.random() < 0.50 ? 1 : 2, games:0, hit:true};
@@ -5682,6 +5756,7 @@ body{
   function clearReelVideos(){
     clearBellZakoVideos();
     [0,1,2].forEach(hideReelVideo);
+    hideReversePushGuide();
   }
 
   function playBellZakoVideo(index, src, loop=true){
@@ -6210,6 +6285,23 @@ body{
     if(!devilZoneConfirmLayer) return;
     devilZoneConfirmLayer.classList.remove("show", "translucent");
     devilZoneConfirmLayer.setAttribute("aria-hidden", "true");
+  }
+
+  function showReversePushGuide(color){
+    if(!reversePushGuideLayer || !REVERSE_PUSH_GUIDE_IMAGE_SRCS[color]) return;
+    const image = reversePushGuideLayer.querySelector("img");
+    const src = REVERSE_PUSH_GUIDE_IMAGE_SRCS[color];
+    if(image && image.getAttribute("src") !== src){
+      image.setAttribute("src", src);
+    }
+    reversePushGuideLayer.classList.add("show");
+    reversePushGuideLayer.setAttribute("aria-hidden", "false");
+  }
+
+  function hideReversePushGuide(){
+    if(!reversePushGuideLayer) return;
+    reversePushGuideLayer.classList.remove("show");
+    reversePushGuideLayer.setAttribute("aria-hidden", "true");
   }
 
   function shouldStartDevilZoneConfirmIntro(result, resolved){
@@ -8790,6 +8882,7 @@ body{
     $("spinBtn").textContent = "ストップ";
 
     stopGekiatsuEffect(true);
+    hideReversePushGuide();
     const result = normalActiveAtSpinStart ? drawNormalResult() : drawResult();
     const spec = RESULT[result];
     const lineRow = resultLineRow(result);
@@ -8800,6 +8893,7 @@ body{
     const speedModeBonusRogiEffect = speedModeSpinAtStart && !bigPremiumEffect && shouldPlaySpeedModeBonusRogi(result, resolved);
     const gekiatsuChance = bigPremiumEffect;
     const zakoEffect = decideZakoEffect(result, resolved, normalActiveAtSpinStart);
+    const reversePushGuide = zoneActiveAtSpinStart ? decideReversePushGuide(result, zoneActiveAtSpinStart ? currentGoraiZoneType() : "") : "";
 
     currentSpin = {
       result,
@@ -8830,6 +8924,7 @@ body{
       zakoBellEffect:zakoEffect.bell,
       zakoAddEffect:zakoEffect.add,
       zakoThirdStopVoicesPlayed:false,
+      reversePushGuide,
       pendingBattleOutcome:null
     };
     if(currentSpin.bonusConfirmWaitSpin){
@@ -8857,6 +8952,9 @@ body{
     if(zakoEffect.active){
       if(zakoEffect.bell) playZakoVoiceSound(VOICE_SRC.hyahha);
       startBellReelReadyVideos();
+    }
+    if(reversePushGuide){
+      showReversePushGuide(reversePushGuide);
     }
 
     const waitText = speedModeSpinAtStart
