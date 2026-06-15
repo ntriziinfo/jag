@@ -1010,6 +1010,11 @@ h1{
   background:rgba(0,0,0,.08);
   mix-blend-mode:screen;
 }
+.devilZoneConfirmLayer.fading{
+  opacity:0;
+  visibility:visible;
+  transform:scale(1.012);
+}
 .devilZoneConfirmLayer img{
   position:absolute;
   inset:0;
@@ -1043,6 +1048,11 @@ h1{
   opacity:.70;
   visibility:visible;
   transform:scale(1);
+}
+.reversePushGuideLayer.fading{
+  opacity:0;
+  visibility:visible;
+  transform:scale(1.012);
 }
 .reversePushGuideLayer img{
   position:absolute;
@@ -5753,10 +5763,17 @@ body{
     if(bellZakoLayer) bellZakoLayer.classList.remove("show");
   }
 
-  function clearReelVideos(){
+  function shouldKeepReversePushGuide(){
+    return !!(session.active && isGoraiZoneActive());
+  }
+
+  function clearReelVideos(options={}){
+    const forceReversePush = !!(options && options.forceReversePush);
     clearBellZakoVideos();
     [0,1,2].forEach(hideReelVideo);
-    hideReversePushGuide();
+    if(forceReversePush || !shouldKeepReversePushGuide()){
+      hideReversePushGuide();
+    }
   }
 
   function playBellZakoVideo(index, src, loop=true){
@@ -6004,7 +6021,7 @@ body{
 
   function skipActiveEffects(){
     if(currentSpin) currentSpin.effectsSkipped = true;
-    clearReelVideos();
+    clearReelVideos({forceReversePush:true});
     hideBattleIntro();
     hideRogiContinuationBlackout();
     clearRogiThirdStopHold();
@@ -6277,14 +6294,26 @@ body{
       image.setAttribute("src", src);
     }
     devilZoneConfirmLayer.classList.toggle("translucent", mode === "translucent");
+    devilZoneConfirmLayer.classList.remove("fading");
     devilZoneConfirmLayer.classList.add("show");
     devilZoneConfirmLayer.setAttribute("aria-hidden", "false");
   }
 
   function hideDevilZoneConfirmScreen(){
     if(!devilZoneConfirmLayer) return;
-    devilZoneConfirmLayer.classList.remove("show", "translucent");
+    devilZoneConfirmLayer.classList.remove("show", "translucent", "fading");
     devilZoneConfirmLayer.setAttribute("aria-hidden", "true");
+  }
+
+  function fadeOutDevilZoneConfirmScreen(){
+    if(!devilZoneConfirmLayer || !devilZoneConfirmLayer.classList.contains("show")) return;
+    devilZoneConfirmLayer.classList.add("fading");
+    devilZoneConfirmLayer.setAttribute("aria-hidden", "true");
+    setTimeout(()=>{
+      if(devilZoneConfirmLayer && devilZoneConfirmLayer.classList.contains("fading")){
+        hideDevilZoneConfirmScreen();
+      }
+    }, 620);
   }
 
   function showReversePushGuide(color){
@@ -6294,14 +6323,35 @@ body{
     if(image && image.getAttribute("src") !== src){
       image.setAttribute("src", src);
     }
+    reversePushGuideLayer.classList.remove("fading");
     reversePushGuideLayer.classList.add("show");
     reversePushGuideLayer.setAttribute("aria-hidden", "false");
   }
 
   function hideReversePushGuide(){
     if(!reversePushGuideLayer) return;
-    reversePushGuideLayer.classList.remove("show");
+    reversePushGuideLayer.classList.remove("show", "fading");
     reversePushGuideLayer.setAttribute("aria-hidden", "true");
+  }
+
+  function fadeOutReversePushGuide(){
+    if(!reversePushGuideLayer || !reversePushGuideLayer.classList.contains("show")) return;
+    reversePushGuideLayer.classList.add("fading");
+    reversePushGuideLayer.setAttribute("aria-hidden", "true");
+    setTimeout(()=>{
+      if(reversePushGuideLayer && reversePushGuideLayer.classList.contains("fading")){
+        hideReversePushGuide();
+      }
+    }, 620);
+  }
+
+  function shouldFadeReversePushAtZoneEnd(spin=currentSpin){
+    if(!spin || !spin.zoneActiveAtStart || !spin.resolved) return false;
+    const currentZoneRemain = Math.max(0, Number(session.bigZone) || 0);
+    const zoneGameAdd = Math.max(0, Number(spin.resolved.zoneGameAdd) || 0);
+    const restartZone = Math.max(0, Number(spin.resolved.bigZone) || 0);
+    const nextZoneRemain = Math.max(0, currentZoneRemain - 1, restartZone) + zoneGameAdd;
+    return nextZoneRemain <= 0;
   }
 
   function shouldStartDevilZoneConfirmIntro(result, resolved){
@@ -7594,7 +7644,7 @@ body{
     if(currentSpin) currentSpin.effectsSkipped = true;
     stopGekiatsuEffect(true);
     hideBonusConfirmScreen();
-    clearReelVideos();
+    clearReelVideos({forceReversePush:true});
     hideBattleIntro();
     log("演出をスキップ");
   }
@@ -8288,7 +8338,7 @@ body{
     hideBattleIntro();
     hideRogiContinuationBlackout();
     hideSessionResultScreen();
-    clearReelVideos();
+    clearReelVideos({forceReversePush:true});
     stopGuaranteedSetStartLight();
     spinIntervals.forEach(id=>clearInterval(id));
     if(spinWaitTimer){
@@ -8335,7 +8385,7 @@ body{
     hideBattleIntro();
     hideRogiContinuationBlackout();
     hideSessionResultScreen();
-    clearReelVideos();
+    clearReelVideos({forceReversePush:true});
     stopGuaranteedSetStartLight();
     spinIntervals.forEach(id=>clearInterval(id));
     if(spinWaitTimer){
@@ -8882,7 +8932,7 @@ body{
     $("spinBtn").textContent = "ストップ";
 
     stopGekiatsuEffect(true);
-    hideReversePushGuide();
+    if(!zoneActiveAtSpinStart) hideReversePushGuide();
     const result = normalActiveAtSpinStart ? drawNormalResult() : drawResult();
     const spec = RESULT[result];
     const lineRow = resultLineRow(result);
@@ -9012,6 +9062,10 @@ body{
     playBellReelStopVideo(i);
     if(stopOrder === 3){
       playZakoThirdStopVoices(currentSpin);
+      if(shouldFadeReversePushAtZoneEnd(currentSpin)){
+        fadeOutDevilZoneConfirmScreen();
+        fadeOutReversePushGuide();
+      }
     }
     const rogiPlayed = playRogiStopEffect(stopOrder);
     if(!rogiPlayed && shouldBlackoutRogiContinuationStop(stopOrder, currentSpin)){
