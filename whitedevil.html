@@ -1045,9 +1045,12 @@ h1{
   mix-blend-mode:screen;
 }
 .reversePushGuideLayer.show{
-  opacity:.70;
+  opacity:1;
   visibility:visible;
   transform:scale(1);
+}
+.reversePushGuideLayer.show.translucent{
+  opacity:.42;
 }
 .reversePushGuideLayer.fading{
   opacity:0;
@@ -1061,6 +1064,40 @@ h1{
   height:100%;
   object-fit:cover;
   filter:saturate(1.16) brightness(1.04) contrast(.98);
+}
+.devilRushEntryLayer{
+  position:absolute;
+  left:12.7%;
+  right:12.7%;
+  top:27.8%;
+  bottom:21.4%;
+  border-radius:8px;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  z-index:15;
+  background:rgba(0,0,0,.06);
+  transition:opacity .12s ease, visibility .12s ease, transform .12s ease;
+  transform:scale(.992);
+}
+.devilRushEntryLayer.show{
+  opacity:1;
+  visibility:visible;
+  transform:scale(1);
+}
+.devilRushEntryLayer.show.translucent{
+  opacity:.42;
+}
+.devilRushEntryLayer img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  filter:saturate(1.14) brightness(1.04) contrast(1.02);
 }
 .rogiBlackoutLayer{
   position:absolute;
@@ -2710,6 +2747,26 @@ body::after{display:none !important;content:none !important;}
   color:#fff !important;
   text-shadow:0 0 9px rgba(255,255,255,.72),0 0 12px rgba(255,0,0,.35) !important;
 }
+.wd-info-strip div.zoneHold{
+  overflow:visible !important;
+}
+.wd-info-strip div.zoneHold::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:145%;
+  height:190%;
+  transform:translate(-50%, -50%);
+  background:url("assets/effects/dz_hold_badge_custom.png") center/contain no-repeat;
+  opacity:.94;
+  z-index:8;
+  pointer-events:none;
+  filter:drop-shadow(0 0 9px rgba(255,194,44,.82)) drop-shadow(0 7px 10px rgba(0,0,0,.72));
+}
+.wd-info-strip div.zoneHold b{
+  opacity:.28;
+}
 .main{
   grid-template-columns:230px minmax(760px, 1fr) 270px !important;
   gap:12px !important;
@@ -3918,7 +3975,7 @@ body{
 
         <div class="sevenSegPanel">
           <div class="sevenSegLabel">残りAT</div>
-          <img class="dzHoldBadge" id="dzHoldBadge" src="assets/effects/dz_hold_badge.png" alt="HOLD" decoding="async" draggable="false" aria-hidden="true">
+          <img class="dzHoldBadge" id="dzHoldBadge" src="assets/effects/dz_hold_badge_custom.png" alt="HOLD" decoding="async" draggable="false" aria-hidden="true">
           <div class="sevenSegValue" id="stRemainBigView">--</div>
         </div>
 
@@ -4003,7 +4060,10 @@ body{
           <img src="assets/effects/devilzone_confirm_loop.gif" alt="DEVILZONE" decoding="async" draggable="false">
         </div>
         <div class="reversePushGuideLayer" id="reversePushGuideLayer" aria-hidden="true">
-          <img src="assets/effects/reverse_push_blue.png" alt="逆押し7狙い" decoding="async" draggable="false">
+          <img src="assets/effects/reverse_push_blue.png" alt="逆押し狙え" decoding="async" draggable="false">
+        </div>
+        <div class="devilRushEntryLayer" id="devilRushEntryLayer" aria-hidden="true">
+          <img id="devilRushEntryImage" src="assets/effects/devil_rush_entry_start.png" alt="DEVIL RUSH" decoding="async" draggable="false">
         </div>
         <div class="battleIntroLayer" id="battleIntroLayer" aria-hidden="true">
           <img class="battleIntroLogo" id="battleIntroLogo" alt="BATTLE" decoding="async" draggable="false">
@@ -4348,6 +4408,7 @@ body{
   const STORAGE_KEY = "white_devil_gorai_rebuild_v2";
 
   const DEFAULT_NORMAL_BGM_SRC = "assets/media/normal_bgm.mp3";
+  const HIGH_MODE_BGM_SRC = "assets/media/high_mode_bgm.wav";
 
   const BAR_BGM_SRC = "assets/media/bar_bgm.mp3";
 
@@ -4415,7 +4476,7 @@ body{
     DEVIL_ZONE:{name:"DEVIL ZONE", reel:["7","7","BAR"], label:"DZ", cls:"purple", kind:"payadd"},
     SUPER_DEVIL_ZONE:{name:"SUPER DEVIL ZONE", reel:["7","7","7"], label:"SUPER DZ", cls:"red", kind:"payadd"},
     BELL:{name:"ベル揃い", reel:["🔔","🔔","🔔"], label:"BELL", cls:"gold", kind:"pay"},
-    BELL3:{name:"斜めベル", reel:["🔔","🔔","🔔"], label:"斜めBELL", cls:"gold", kind:"pay"},
+    BELL3:{name:"斜めベル", reel:["🔔","🔔","🔔"], label:"", cls:"gold", kind:"pay"},
     REPLAY:{name:"リプレイ", reel:["REPLAY","REPLAY","REPLAY"], label:"REPLAY", cls:"blue", kind:"pay"},
     SUICA:{name:"スイカ揃い", reel:["🍋","🍋","🍋"], label:"SUICA", cls:"green", kind:"pay"},
     CHERRY_ANY:{name:"チェリーANY", reel:["🍒","🍋","🔔"], label:"CHERRY", cls:"red", kind:"payadd"},
@@ -4598,6 +4659,10 @@ body{
     blue:"assets/effects/reverse_push_blue.png",
     red:"assets/effects/reverse_push_red.png"
   });
+  const DEVIL_RUSH_ENTRY_IMAGE_SRCS = Object.freeze({
+    start:"assets/effects/devil_rush_entry_start.png",
+    continue:"assets/effects/devil_rush_entry_continue.png"
+  });
   const REVERSE_PUSH_RED_EXPECTATION = 0.80;
   const REVERSE_PUSH_BLUE_EXPECTATION = 0.30;
   const REVERSE_PUSH_HIT_RED_RATE = 0.70;
@@ -4626,7 +4691,8 @@ body{
     uwanose:"assets/voice/uwanose.wav"
   };
   const ZAKO_ADD_EFFECT_CHANCE = 0.30;
-  const GEKIATSU_CHANCE_ON_BIG = 0.10;
+  const ZAKO_ZONE_ADD_EFFECT_CHANCE = 0.05;
+  const GEKIATSU_CHANCE_ON_BIG = 0.03;
   const BATTLE_INTRO_LOGO_SRC = "assets/battle/battle.png";
   const BATTLE_ROUND_IMAGE_SRCS = Array.from({length:10}, (_,i)=>i ? `assets/battle/round_${i}.png` : "");
   const BATTLE_CHARACTER_SRCS = Array.from({length:6}, (_,i)=>`assets/battle/character_${i + 1}.png`);
@@ -4756,6 +4822,7 @@ body{
   let sessionStartGuard = false;
   let pendingAtStartTimer = null;
   let devilZoneConfirmIntroPending = false;
+  let pendingDevilRushEntryEffect = "";
   let audioCtx = null;
   let spinIntervals = [];
   let reelSpinOffsets = [0, 0, 0];
@@ -4779,6 +4846,8 @@ body{
   const bonusConfirmLayer = $("bonusConfirmLayer");
   const devilZoneConfirmLayer = $("devilZoneConfirmLayer");
   const reversePushGuideLayer = $("reversePushGuideLayer");
+  const devilRushEntryLayer = $("devilRushEntryLayer");
+  const devilRushEntryImage = $("devilRushEntryImage");
   const rogiBlackoutLayer = $("rogiBlackoutLayer");
   const battleIntroLayer = $("battleIntroLayer");
   const battleIntroLogo = $("battleIntroLogo");
@@ -5455,6 +5524,22 @@ body{
     return {sets:1, games:0, hit:true};
   }
 
+  function isReversePushGuidedMiss(spin=currentSpin){
+    return !!(spin && spin.zoneActiveAtStart && spin.reversePushGuide && spin.result === "MISS");
+  }
+
+
+  function buildReversePushMissGrid(){
+    const miss = RESULT.MISS.reel[0];
+    const bell = RESULT.BELL.reel[0];
+    const suika = RESULT.SUICA.reel[0];
+    return [
+      [bell, suika, "BAR"],
+      [miss, "7", "7"],
+      ["BAR", bell, suika]
+    ];
+  }
+
   function expectedZoneSevenStock(type="devil"){
     return zoneSevenChance(type) * (type === "super" ? 1.5 : 1);
   }
@@ -5671,8 +5756,13 @@ body{
     });
   }
 
+  function shouldShowDevilZoneFireVideos(){
+    const highNormal = !session.active && isHighMode();
+    return !debugFastSpinActive && (isGoraiZoneActive() || highNormal);
+  }
+
   function updateDevilZoneFireVideos(){
-    if(isGoraiZoneActive() && !debugFastSpinActive){
+    if(shouldShowDevilZoneFireVideos()){
       showDevilZoneFireVideos();
     }else{
       hideDevilZoneFireVideos();
@@ -5861,7 +5951,8 @@ body{
   function decideZakoEffect(result, resolved, normalActiveAtStart){
     if(normalActiveAtStart || result === "BELL3") return {active:false, bell:false, add:false};
     const bell = result === "BELL";
-    const add = hasZakoAddTrigger(resolved) && Math.random() < ZAKO_ADD_EFFECT_CHANCE;
+    const addChance = resolved && resolved.zoneGame ? ZAKO_ZONE_ADD_EFFECT_CHANCE : ZAKO_ADD_EFFECT_CHANCE;
+    const add = hasZakoAddTrigger(resolved) && Math.random() < addChance;
     return {active:bell || add, bell, add};
   }
 
@@ -5948,6 +6039,10 @@ body{
     const maxStopOrder = Number(spin.rogiStopEffectMax) || 0;
     const hasStopVideo = !!ROGI_STOP_VIDEO_SRCS[stopOrder];
     return stopOrder > maxStopOrder || (stopOrder <= maxStopOrder && !hasStopVideo);
+  }
+
+  function shouldBlackoutReversePushMissStop(stopOrder, spin=currentSpin){
+    return !!(isReversePushGuidedMiss(spin) && stopOrder === 3 && !spin.reversePushMissBlackoutShown);
   }
 
   function hideRogiContinuationBlackout(){
@@ -6323,15 +6418,20 @@ body{
     if(image && image.getAttribute("src") !== src){
       image.setAttribute("src", src);
     }
-    reversePushGuideLayer.classList.remove("fading");
+    reversePushGuideLayer.classList.remove("fading", "translucent");
     reversePushGuideLayer.classList.add("show");
     reversePushGuideLayer.setAttribute("aria-hidden", "false");
   }
 
   function hideReversePushGuide(){
     if(!reversePushGuideLayer) return;
-    reversePushGuideLayer.classList.remove("show", "fading");
+    reversePushGuideLayer.classList.remove("show", "fading", "translucent");
     reversePushGuideLayer.setAttribute("aria-hidden", "true");
+  }
+
+  function setReversePushGuideTranslucent(){
+    if(!reversePushGuideLayer || !reversePushGuideLayer.classList.contains("show")) return;
+    reversePushGuideLayer.classList.add("translucent");
   }
 
   function fadeOutReversePushGuide(){
@@ -6342,7 +6442,44 @@ body{
       if(reversePushGuideLayer && reversePushGuideLayer.classList.contains("fading")){
         hideReversePushGuide();
       }
-    }, 620);
+    }, 420);
+  }
+
+  function queueDevilRushEntryEffect(type){
+    if(DEVIL_RUSH_ENTRY_IMAGE_SRCS[type]) pendingDevilRushEntryEffect = type;
+  }
+
+  function consumeDevilRushEntryEffect(){
+    const type = pendingDevilRushEntryEffect;
+    pendingDevilRushEntryEffect = "";
+    return DEVIL_RUSH_ENTRY_IMAGE_SRCS[type] ? type : "";
+  }
+
+  function clearDevilRushEntryEffect(){
+    pendingDevilRushEntryEffect = "";
+    hideDevilRushEntryEffect();
+  }
+
+  function showDevilRushEntryEffect(type){
+    if(!devilRushEntryLayer || !devilRushEntryImage || !DEVIL_RUSH_ENTRY_IMAGE_SRCS[type]) return;
+    const src = DEVIL_RUSH_ENTRY_IMAGE_SRCS[type];
+    if(devilRushEntryImage.getAttribute("src") !== src){
+      devilRushEntryImage.setAttribute("src", src);
+    }
+    devilRushEntryLayer.classList.remove("translucent");
+    devilRushEntryLayer.classList.add("show");
+    devilRushEntryLayer.setAttribute("aria-hidden", "false");
+  }
+
+  function hideDevilRushEntryEffect(){
+    if(!devilRushEntryLayer) return;
+    devilRushEntryLayer.classList.remove("show", "translucent");
+    devilRushEntryLayer.setAttribute("aria-hidden", "true");
+  }
+
+  function setDevilRushEntryEffectTranslucent(){
+    if(!devilRushEntryLayer || !devilRushEntryLayer.classList.contains("show")) return;
+    devilRushEntryLayer.classList.add("translucent");
   }
 
   function shouldFadeReversePushAtZoneEnd(spin=currentSpin){
@@ -7368,6 +7505,7 @@ body{
         endSignal:null
       };
       stats.totalSessions++;
+      queueDevilRushEntryEffect("start");
       recordSlumpPoint();
       $("spinBtn").textContent = "BET";
       showMessage("BATTLE BONUS", `継続率${formatRate(continuationRate)} / 1SET ${setGameCount()}G`);
@@ -7463,6 +7601,7 @@ body{
     showMessage(label, `${session.setNo}SET / 残り${session.remain}G / STOCK${session.stockSets || 0} / 継続${formatRate(session.continuationRate)}`);
     log(`${label}：${session.setNo}SET目 / 残りSTOCK${session.stockSets || 0}`);
     showOverlay(overlayText || label);
+    queueDevilRushEntryEffect("continue");
     if(useGuaranteedLight) flashGuaranteedSetStart();
     else flashReelLight("rainbow", 1800);
     playWinSound(false);
@@ -7651,6 +7790,7 @@ body{
 
   function normalBgmSrc(){
     if(speedToBonusActive) return SPEED_BGM_SRC;
+    if(!session.active && isHighMode()) return HIGH_MODE_BGM_SRC;
     return DEFAULT_NORMAL_BGM_SRC;
   }
 
@@ -7934,7 +8074,6 @@ body{
     if(result === "BELL3"){
       flashReelLight("blue", 1200);
       showMessage(info.name, `${normalModeLabel()} / 天井まで${ceilingRemain()}G${lineText ? " / " + lineText : ""}${normalRewardText || " / +3pt"}`);
-      showOverlay("斜めBELL");
       return;
     }
 
@@ -8067,7 +8206,7 @@ body{
         if(reward <= 0) playWinSound(false);
       }else if(result === "BELL3"){
         flashReelLight("blue", 1200);
-        showOverlay(bonusOverlayText || "斜めBELL");
+        if(bonusOverlayText) showOverlay(bonusOverlayText);
       }else if(result === "REPLAY"){
         flashReelLight("blue", 1200);
         showOverlay(bonusOverlayText || "REPLAY");
@@ -8198,6 +8337,8 @@ body{
       setMirrorCell("wdMirrorBig", "BIG", stats.bigCount || 0);
       setMirrorCell("wdMirrorReg", "REG", stats.midCount || 0);
     }
+    const mirrorStCell = $("wdMirrorSt") ? $("wdMirrorSt").parentElement : null;
+    if(mirrorStCell) mirrorStCell.classList.toggle("zoneHold", active && isGoraiZoneActive());
     setText("wdMirrorSpin", `${stats.totalSpins || 0}G`);
     setText("wdMirrorProfit", formatSigned(profit));
 
@@ -8346,6 +8487,7 @@ body{
       spinWaitTimer = null;
     }
     clearPendingAtStart();
+    clearDevilRushEntryEffect();
     spinCanStop = false;
     resetReelSpinOffsets();
     reels.forEach(r=>r.classList.remove("spinning"));
@@ -8393,6 +8535,7 @@ body{
       spinWaitTimer = null;
     }
     clearPendingAtStart();
+    clearDevilRushEntryEffect();
     spinCanStop = false;
     resetReelSpinOffsets();
     reels.forEach(r=>r.classList.remove("spinning"));
@@ -8932,18 +9075,24 @@ body{
     $("spinBtn").textContent = "ストップ";
 
     stopGekiatsuEffect(true);
-    if(!zoneActiveAtSpinStart) hideReversePushGuide();
+    hideReversePushGuide();
+    hideDevilRushEntryEffect();
+    const devilRushEntryEffect = atSpinAtStart ? consumeDevilRushEntryEffect() : "";
+    if(devilRushEntryEffect) showDevilRushEntryEffect(devilRushEntryEffect);
     const result = normalActiveAtSpinStart ? drawNormalResult() : drawResult();
     const spec = RESULT[result];
     const lineRow = resultLineRow(result);
     const resolved = normalActiveAtSpinStart ? resolveNormalOutcome(result) : resolveOutcome(result);
-    const grid = buildGrid(result, lineRow);
+    const reversePushGuide = zoneActiveAtSpinStart ? decideReversePushGuide(result, zoneActiveAtSpinStart ? currentGoraiZoneType() : "") : "";
+    const grid = zoneActiveAtSpinStart && reversePushGuide && result === "MISS"
+      ? buildReversePushMissGrid()
+      : buildGrid(result, lineRow);
     const bar3LeverEffect = !speedModeSpinAtStart && result === "BAR3";
     const bigPremiumEffect = !bar3LeverEffect && decideBigPremiumEffect(result, resolved, premiumForced);
     const speedModeBonusRogiEffect = speedModeSpinAtStart && !bigPremiumEffect && shouldPlaySpeedModeBonusRogi(result, resolved);
     const gekiatsuChance = bigPremiumEffect;
     const zakoEffect = decideZakoEffect(result, resolved, normalActiveAtSpinStart);
-    const reversePushGuide = zoneActiveAtSpinStart ? decideReversePushGuide(result, zoneActiveAtSpinStart ? currentGoraiZoneType() : "") : "";
+
 
     currentSpin = {
       result,
@@ -8961,6 +9110,7 @@ body{
       battleActiveAtStart:battleActiveAtSpinStart,
       normalActiveAtStart:normalActiveAtSpinStart,
       speedModeAtStart:speedModeSpinAtStart,
+      devilRushEntryEffect,
       battleRound:battleRoundAtSpinStart,
       stopped:[false,false,false],
       effectsSkipped:false,
@@ -8970,6 +9120,7 @@ body{
       rogiStopEffectStarted:false,
       rogiLastStopEffectOrder:0,
       rogiBlackoutShown:false,
+      reversePushMissBlackoutShown:false,
       zakoEffectActive:zakoEffect.active,
       zakoBellEffect:zakoEffect.bell,
       zakoAddEffect:zakoEffect.add,
@@ -9033,8 +9184,9 @@ body{
 
     // オート/SPEED中だけ自動停止。手動時はストップ/左中右を押すまで止まらない。
     if(autoPlay || speedModeSpinAtStart){
-      [0,1,2].forEach(i=>{
-        const delay = speedModeSpinAtStart ? speedModeStopDelay(i) : (MIN_SPIN_WAIT_MS + 120 + i*360);
+      const stopOrder = zoneActiveAtSpinStart ? [2,1,0] : [0,1,2];
+      stopOrder.forEach((i,idx)=>{
+        const delay = speedModeSpinAtStart ? speedModeStopDelay(i) : (MIN_SPIN_WAIT_MS + 120 + idx*360);
         setTimeout(()=>stopSingleReel(i), delay);
       });
     }
@@ -9051,11 +9203,27 @@ body{
 
     const {grid, spec, result, lineRow} = currentSpin;
     const stopOrder = currentSpin.stopped.filter(Boolean).length + 1;
+    const reversePushWrongFirst = isReversePushGuidedMiss(currentSpin) && stopOrder === 1 && i !== 2;
     const col = [grid[0][i], grid[1][i], grid[2][i]];
     const label = i === 1 ? spec.label : "";
 
     stopReel(i, col, label, spec.cls, result === "MISS" ? null : lineRow);
     currentSpin.stopped[i] = true;
+    if(stopOrder === 1 && currentSpin.reversePushGuide){
+      setReversePushGuideTranslucent();
+    }
+    if(stopOrder === 1 && currentSpin.devilRushEntryEffect){
+      setDevilRushEntryEffectTranslucent();
+    }
+    if(reversePushWrongFirst){
+      currentSpin.reversePushWrongOrder = true;
+      $("resultText").textContent = "押し順ミス / 77ハズレ";
+      [2,1,0].forEach((next,idx)=>{
+        if(next !== i && !currentSpin.stopped[next]){
+          setTimeout(()=>stopSingleReel(next), 80 + idx * 120);
+        }
+      });
+    }
     if(i === 1 && (result === "BIG" || result === "MID" || isZoneEntryResult(result))){
       playVoiceSound(VOICE_SRC.reach);
     }
@@ -9067,8 +9235,13 @@ body{
         fadeOutReversePushGuide();
       }
     }
+    const reversePushMissBlackout = shouldBlackoutReversePushMissStop(stopOrder, currentSpin);
+    if(reversePushMissBlackout){
+      currentSpin.reversePushMissBlackoutShown = true;
+      flashRogiContinuationBlackout();
+    }
     const rogiPlayed = playRogiStopEffect(stopOrder);
-    if(!rogiPlayed && shouldBlackoutRogiContinuationStop(stopOrder, currentSpin)){
+    if(!reversePushMissBlackout && !rogiPlayed && shouldBlackoutRogiContinuationStop(stopOrder, currentSpin)){
       currentSpin.rogiBlackoutShown = true;
       flashRogiContinuationBlackout();
     }
@@ -9096,8 +9269,10 @@ body{
       return;
     }
 
-    // まだ止まっていないリールを左→中→右の順で止める
-    [0,1,2].forEach((i,idx)=>{
+
+    // DZ/超DZ中は右→中→左、それ以外は左→中→右で全停止する。
+    const stopOrder = currentSpin.zoneActiveAtStart ? [2,1,0] : [0,1,2];
+    stopOrder.forEach((i,idx)=>{
       if(!currentSpin.stopped[i]){
         setTimeout(()=>stopSingleReel(i), idx * 180);
       }
@@ -9165,6 +9340,7 @@ body{
       }else{
         stopGekiatsuEffect(true);
       }
+      hideDevilRushEntryEffect();
       pendingForceResult = "";
       currentSpin = null;
       updateDisplay();
@@ -9203,6 +9379,7 @@ body{
     if(!shouldEnterBattle){
       hideBattleIntro();
     }
+    hideDevilRushEntryEffect();
     pendingForceResult = "";
     currentSpin = null;
     updateDisplay();
@@ -9723,8 +9900,15 @@ body{
     return PAYOUT_SOUND_SRC;
   }
 
-  function playPayoutSound(result="", reward=0){
+  function shouldSuppressPayoutSound(result="", reward=0, spin=currentSpin){
+    if(result === "BELL3") return true;
+    if(spin && spin.zoneActiveAtStart && result === "MISS" && Number(reward) > 0) return true;
+    return false;
+  }
+
+  function playPayoutSound(result="", reward=0, spin=currentSpin){
     if(debugFastSpinActive || speedToBonusActive) return;
+    if(shouldSuppressPayoutSound(result, reward, spin)) return;
     if(!payoutSound) return;
     try{
       const src = payoutSoundSrcFor(result, reward);
