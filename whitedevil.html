@@ -4410,6 +4410,7 @@ body{
   const DEFAULT_NORMAL_BGM_SRC = "assets/media/normal_bgm.mp3";
   const HIGH_MODE_BGM_SRC = "assets/media/high_mode_bgm.wav";
 
+  const AT_BGM_SRC = "assets/media/at_bgm.wav";
   const BAR_BGM_SRC = "assets/media/bar_bgm.mp3";
 
   const BIG_SOUND_SRC = "assets/media/big_sound.wav";
@@ -4418,7 +4419,12 @@ body{
   const PAYOUT_SOUND_SRC = "assets/payout.wav";
   const PAYOUT_3PT_BELL_SOUND_SRC = "assets/pay1.wav";
   const REPLAY_SOUND_SRC = "assets/rep.wav";
-  const BATTLE_BGM_SRC = "assets/battle_bgm.wav";
+  const SPIN_SOUND_SRC = "assets/media/spin_start.wav";
+  const STOP_SOUND_SRC = "assets/media/reel_stop.wav";
+  const SEVEN_CONFIRM_SOUND_SRC = "assets/media/seven_confirm.wav";
+  const REG_CONFIRM_SOUND_SRC = "assets/media/77bar_confirm.wav";
+  const BONUS_CONFIRM_SOUND_SRC = "assets/media/bonus_confirm.wav";
+  const BATTLE_BGM_SRC = "assets/media/battle_part_bgm.wav";
   const SPEED_BGM_SRC = "assets/media/speed_bgm.wav";
 
   const SETTING = {
@@ -4598,6 +4604,9 @@ body{
     addedGames:0,
     setNo:0,
     stockSets:0,
+    barBgmSets:0,
+    nextSetBarBgm:false,
+    currentSetBarBgm:false,
     continuationRate:0,
     bigZone:0,
     phase:"idle",
@@ -4898,6 +4907,8 @@ body{
   let guaranteedSetStartLight = false;
   let guaranteedSetLightTimer = null;
   let barBgmActive = false;
+  let bonusConfirmBgmHold = false;
+  let barBgmMode = "";
   let battleBgmActive = false;
   let rogiBgmMuted = false;
   let rogiThirdStopHold = false;
@@ -4905,6 +4916,7 @@ body{
   let bellZakoLayer = null;
   const bellZakoTimers = [null, null, null];
   let zakoVoiceSound = null;
+  const oneShotSoundCache = new Map();
   let gekiatsuActive = false;
   let gekiatsuHideTimer = null;
   let speedBonusRogiHoldActive = false;
@@ -6358,6 +6370,24 @@ body{
     return (Number(normalState.bonusWaitGames) || 0) >= 1;
   }
 
+  function isPendingSevenBonusBet(){
+    return !!(
+      !session.active &&
+      normalState.bonusPending &&
+      pendingBonusWaitDone() &&
+      normalState.bonusKind !== "MID" &&
+      normalState.bonusKind !== "BAR3"
+    );
+  }
+
+  function triggerBonusConfirmBetSoundIfNeeded(){
+    if(!isPendingSevenBonusBet()) return false;
+    bonusConfirmBgmHold = true;
+    pauseNormalBgm();
+    playBonusConfirmSound();
+    return true;
+  }
+
   function showBonusConfirmScreen(mode="solid"){
     if(!bonusConfirmLayer) return;
     bonusConfirmLayer.classList.toggle("translucent", mode === "translucent");
@@ -6520,6 +6550,7 @@ body{
   }
 
   function resetNormalModeAfterBonus(){
+    bonusConfirmBgmHold = false;
     normalState.mode = "normal";
     normalState.highRemain = 0;
     normalState.sinceBonus = 0;
@@ -7410,7 +7441,7 @@ body{
       voiceSound.volume = sfxOutputVolume();
     }
     if(barBgm){
-      if(!barBgmActive && barBgm.getAttribute("src") !== BAR_BGM_SRC) barBgm.setAttribute("src", BAR_BGM_SRC);
+      if(!barBgmActive && barBgm.getAttribute("src") !== AT_BGM_SRC) barBgm.setAttribute("src", AT_BGM_SRC);
       barBgm.loop = true;
       barBgm.volume = bgmOutputVolume(BAR_BGM_OUTPUT_SCALE);
       ensureBarBgmContinuing();
@@ -7478,12 +7509,14 @@ body{
       hideDevilZoneConfirmScreen();
       readSettings();
       const premiumStockSets = Math.max(0, Number(options.stockSets) || 0);
+      const premiumBarBgmSets = Math.max(0, Number(options.barBgmSets) || 0);
       const initialPaid = Math.max(0, Number(options.initialPaid) || 0);
       const continuationRate = Math.max(
         pickContinuationRate(settings.setting),
         Number(options.continuationRateMin) || 0
       );
       resetNormalModeAfterBonus();
+      pauseNormalBgm();
       session = {
         active:true,
         remain:setGameCount(),
@@ -7495,6 +7528,9 @@ body{
         addedGames:0,
         setNo:1,
         stockSets:premiumStockSets,
+        barBgmSets:premiumBarBgmSets,
+        nextSetBarBgm:false,
+        currentSetBarBgm:premiumBarBgmSets > 0,
         continuationRate,
         bigZone:0,
         phase:"st",
@@ -7511,7 +7547,8 @@ body{
       showMessage("BATTLE BONUS", `継続率${formatRate(continuationRate)} / 1SET ${setGameCount()}G`);
       log(`白い悪魔BB開始：継続率${formatRate(continuationRate)} / 設定${settings.setting}`);
       updateDisplay();
-      playNormalBgm();
+      if(session.currentSetBarBgm) playBarBgm();
+      else playAtBgm();
       playWinSound(false);
       return true;
     } finally {
@@ -7569,6 +7606,9 @@ body{
     session.active = false;
     session.remain = 0;
     session.stockSets = 0;
+    session.barBgmSets = 0;
+    session.nextSetBarBgm = false;
+    session.currentSetBarBgm = false;
     session.bigZone = 0;
     session.bigZoneType = "";
     session.phase = "ended";
@@ -7590,8 +7630,22 @@ body{
     updateDisplay();
   }
 
+  function consumeContinuationStockForBattle(){
+    if(!session.active || (session.stockSets || 0) <= 0) return false;
+    session.stockSets--;
+    if((Number(session.barBgmSets) || 0) > 0){
+      session.barBgmSets--;
+      session.nextSetBarBgm = true;
+    }else{
+      session.nextSetBarBgm = false;
+    }
+    return true;
+  }
+
   function beginNextSet(label, overlayText, useGuaranteedLight=false){
-    stopBattleBgm(true);
+    const useBarBgmForSet = !!session.nextSetBarBgm;
+    session.nextSetBarBgm = false;
+    stopBattleBgm(false);
     session.setNo = (session.setNo || 1) + 1;
     session.remain = setGameCount();
     session.phase = "st";
@@ -7604,6 +7658,9 @@ body{
     queueDevilRushEntryEffect("continue");
     if(useGuaranteedLight) flashGuaranteedSetStart();
     else flashReelLight("rainbow", 1800);
+    session.currentSetBarBgm = useBarBgmForSet;
+    if(useBarBgmForSet) playBarBgm();
+    else playAtBgm();
     playWinSound(false);
     updateDisplay();
     return true;
@@ -7614,14 +7671,14 @@ body{
     session.phase = "battle";
     session.battleRemain = CONTINUATION_BATTLE_GAMES;
     session.battleSource = "";
+    session.nextSetBarBgm = false;
     if(predecidedOutcome && typeof predecidedOutcome.win === "boolean"){
       session.battleWin = !!predecidedOutcome.win;
       session.battleSource = predecidedOutcome.source || "";
-      if(session.battleSource === "stock" && (session.stockSets || 0) > 0){
-        session.stockSets--;
+      if(session.battleSource === "stock"){
+        consumeContinuationStockForBattle();
       }
-    }else if((session.stockSets || 0) > 0){
-      session.stockSets--;
+    }else if(consumeContinuationStockForBattle()){
       session.battleWin = true;
       session.battleSource = "stock";
     }else if(Math.random() < (session.continuationRate || 0)){
@@ -7649,8 +7706,7 @@ body{
       }
     }
 
-    if(!session.battleWin && (session.stockSets || 0) > 0){
-      session.stockSets--;
+    if(!session.battleWin && consumeContinuationStockForBattle()){
       session.battleWin = true;
       session.battleSource = "stock";
     }
@@ -7806,6 +7862,8 @@ body{
 
   function playNormalBgm(){
     if(debugFastSpinActive) return;
+    if(session.active) return;
+    if(bonusConfirmBgmHold && !session.active) return;
     // ブラウザの自動再生制限により、初回クリック/操作後に再生される
     if(!bgm || barBgmActive || battleBgmActive) return;
     try{
@@ -7826,26 +7884,44 @@ body{
     }catch(e){}
   }
 
-  function playBarBgm(){
+  function playBarAudioSource(src, mode, logLabel){
     if(debugFastSpinActive) return;
     if(!barBgm) return;
     if(isContinuationBattleActive() || battleBgmActive) return;
     try{
       pauseNormalBgm();
       barBgmActive = true;
-      if(barBgm.getAttribute("src") !== BAR_BGM_SRC){
-        barBgm.setAttribute("src", BAR_BGM_SRC);
+      barBgmMode = mode || "";
+      if(barBgm.getAttribute("src") !== src){
+        barBgm.setAttribute("src", src);
         try{ barBgm.load(); }catch(e){}
       }
       barBgm.loop = true;
       barBgm.volume = bgmOutputVolume(BAR_BGM_OUTPUT_SCALE);
-      // すでに再生中なら頭出ししない。BAR揃い後は常時流し続ける。
       if(barBgm.paused){
         barBgm.play().catch(()=>{});
-        log("BAR揃いBGM再生");
+        if(logLabel) log(logLabel);
       }
     }catch(e){}
     updateDevilStatusLamp();
+  }
+
+  function playAtBgm(){
+    playBarAudioSource(AT_BGM_SRC, "at", "AT BGM再生");
+  }
+
+  function playBarBgm(){
+    playBarAudioSource(BAR_BGM_SRC, "bar", "BAR揃いBGM再生");
+  }
+
+  function resumeSessionBgm(){
+    if(!session.active) return;
+    if(session.currentSetBarBgm) playBarBgm();
+    else playAtBgm();
+  }
+
+  function activeBarBgmSrc(){
+    return barBgmMode === "bar" ? BAR_BGM_SRC : AT_BGM_SRC;
   }
 
   function playBattleBgm(){
@@ -7855,6 +7931,7 @@ body{
       pauseNormalBgm();
       if(barBgmActive && barBgm){
         barBgmActive = false;
+        barBgmMode = "";
         barBgm.pause();
         barBgm.currentTime = 0;
         updateDevilStatusLamp();
@@ -7880,7 +7957,10 @@ body{
         battleBgm.currentTime = 0;
       }catch(e){}
     }
-    if(resumeNormal) playNormalBgm();
+    if(resumeNormal){
+      if(session.active) resumeSessionBgm();
+      else playNormalBgm();
+    }
     updateDevilStatusLamp();
   }
 
@@ -7900,6 +7980,7 @@ body{
 
   function stopBarBgm(resumeNormal=false){
     barBgmActive = false;
+    barBgmMode = "";
     stopBarRainbowHold();
     if(barBgm){
       try{
@@ -7914,6 +7995,7 @@ body{
   function resetBonusEndSpecialEffects(resumeNormal=true){
     restoreBgmAfterRogiStopEffect();
     barBgmActive = false;
+    barBgmMode = "";
     battleBgmActive = false;
     barRainbowHold = false;
     devilZoneConfirmIntroPending = false;
@@ -7939,8 +8021,9 @@ body{
   function ensureBarBgmContinuing(){
     if(!barBgmActive || !barBgm || battleBgmActive || isContinuationBattleActive()) return;
     try{
-      if(barBgm.getAttribute("src") !== BAR_BGM_SRC){
-        barBgm.setAttribute("src", BAR_BGM_SRC);
+      const src = activeBarBgmSrc();
+      if(barBgm.getAttribute("src") !== src){
+        barBgm.setAttribute("src", src);
         try{ barBgm.load(); }catch(e){}
       }
       barBgm.loop = true;
@@ -8021,7 +8104,7 @@ body{
       flashReelLight("rainbow", 2200);
       showOverlay("AT突入");
       confetti(90);
-      playWinSound(true);
+      playSevenConfirmSound();
       return;
     }
 
@@ -8034,7 +8117,7 @@ body{
       showOverlay(`REG +${normalReward}pt`);
       playVoiceSound(VOICE_SRC.reg);
       confetti(35);
-      playWinSound(false);
+      playRegConfirmSound();
       return;
     }
 
@@ -8136,6 +8219,10 @@ body{
     if(stockAdd > 0){
       session.stockSets = (session.stockSets || 0) + stockAdd;
       session.added = (session.added || 0) + stockAdd;
+      if(result === "BAR3"){
+        session.barBgmSets = (session.barBgmSets || 0) + stockAdd;
+        session.currentSetBarBgm = true;
+      }
     }
     const hasVoiceAdd = stockAdd > 0 || stGameAdd > 0 || zoneGameAdd > 0;
     if(result === "MID"){
@@ -8182,14 +8269,17 @@ body{
         flashReelLight("rainbow", 2200);
         showOverlay(bonusOverlayText || "777");
         confetti(95);
+        playSevenConfirmSound();
       }else if(result === "BIG" || result === "MID" || isZoneEntryResult(result) || result === "SMALL"){
         flashReelLight("rainbow", 2200);
         if(result === "BIG" || result === "SUPER_DEVIL_ZONE"){
           showOverlay("SUPER DEVIL ZONE");
           confetti(95);
+          playSevenConfirmSound();
         }else if(result === "MID" || result === "DEVIL_ZONE"){
           showOverlay("DEVIL ZONE");
           confetti(70);
+          playRegConfirmSound();
         }else{
           showOverlay(stockText || rewardText || "砂時計");
           confetti(45);
@@ -8495,8 +8585,9 @@ body{
     currentSpin = null;
     stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
+    bonusConfirmBgmHold = false;
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",bonusWaitGames:0,morningCeilingActive:false};
-    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
+    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     completeTrialState = {locked:false,lockedSetting:0,rescueActive:false,completeProfit:0};
     setSpeedFrameOffHold(false);
     forceResult = "";
@@ -8543,8 +8634,9 @@ body{
     currentSpin = null;
     stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
+    bonusConfirmBgmHold = false;
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",bonusWaitGames:0,morningCeilingActive:true};
-    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
+    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     completeTrialState = {locked:false,lockedSetting:0,rescueActive:false,completeProfit:0};
     setSpeedFrameOffHold(false);
     forceResult = "";
@@ -8990,6 +9082,7 @@ body{
       startBonusSessionNow();
       return;
     }
+    triggerBonusConfirmBetSoundIfNeeded();
     hideBattleIntro();
     hideRogiContinuationBlackout();
     hideBonusConfirmScreen();
@@ -9351,6 +9444,7 @@ body{
         queueBonusSessionStart(180, {
           continuationRateMin:BAR3_CONTINUATION_RATE,
           stockSets:stockSetsForResult("BAR3"),
+          barBgmSets:stockSetsForResult("BAR3"),
           initialPaid:Number(resolved.reward) || 0
         });
       }else if(resolved.bonusReady){
@@ -9828,6 +9922,7 @@ body{
         startBonusSessionNow({
           continuationRateMin:BAR3_CONTINUATION_RATE,
           stockSets:stockSetsForResult("BAR3"),
+          barBgmSets:stockSetsForResult("BAR3"),
           initialPaid:Number(resolved.reward) || 0
         });
       }else if(resolved.bonusReady){
@@ -9871,6 +9966,32 @@ body{
     o.start(ctx.currentTime+delay);
     o.stop(ctx.currentTime+delay+dur+.04);
   }
+
+  function playOneShotSound(src, volume=sfxOutputVolume()){
+    if(debugFastSpinActive || speedToBonusActive) return;
+    if(!src) return;
+    try{
+      let audio = oneShotSoundCache.get(src);
+      if(!audio){
+        audio = new Audio(src);
+        audio.preload = "auto";
+        oneShotSoundCache.set(src, audio);
+      }
+      audio.pause();
+      if(audio.getAttribute("src") !== src){
+        audio.setAttribute("src", src);
+        try{ audio.load(); }catch(e){}
+      }
+      audio.currentTime = 0;
+      audio.volume = volume;
+      const p = audio.play();
+      if(p && typeof p.catch === "function") p.catch(()=>{});
+    }catch(e){}
+  }
+
+  function playSevenConfirmSound(){ playOneShotSound(SEVEN_CONFIRM_SOUND_SRC); }
+  function playRegConfirmSound(){ playOneShotSound(REG_CONFIRM_SOUND_SRC); }
+  function playBonusConfirmSound(){ playOneShotSound(BONUS_CONFIRM_SOUND_SRC); }
 
   function playKoatariSound(){
     if(!koatariSound) return;
@@ -9990,8 +10111,8 @@ body{
     }
   }
 
-  function playSpinSound(){ if(debugFastSpinActive || speedToBonusActive) return; for(let i=0;i<8;i++) beep(180+i*36,.055,"sawtooth",.045,i*.045); }
-  function playStopSound(i){ if(debugFastSpinActive || speedToBonusActive) return; beep(380+i*80,.07,"square",.075); }
+  function playSpinSound(){ playOneShotSound(SPIN_SOUND_SRC); }
+  function playStopSound(i){ playOneShotSound(STOP_SOUND_SRC); }
   function playWinSound(big){
     if(debugFastSpinActive || speedToBonusActive) return;
     const notes = big ? [523,659,784,1046,1318] : [440,554,659,880];
