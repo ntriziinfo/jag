@@ -1,0 +1,3 @@
+﻿path,status,target_lufs,true_peak_db,target_lra,before_input_i,before_input_tp,before_input_lra,applied_offset,after_input_i,after_input_tp,after_input_lra,backup
+assets\media\seven_confirm.wav,normalized,-18,-1,11,-3.14,2.26,12.00,0.70,-18.00,-12.65,11.40,C:\Users\RIZI1\Documents\Codex\2026-05-15\new-chat\whitedevil-current\_audio_backup\normalize_bonus_confirm_20260616_212518\assets\media\seven_confirm.wav
+assets\media\77bar_confirm.wav,normalized,-18,-1,11,-2.23,-0.95,0.00,-0.01,-17.99,-16.72,0.00,C:\Users\RIZI1\Documents\Codex\2026-05-15\new-chat\whitedevil-current\_audio_backup\normalize_bonus_confirm_20260616_212518\assets\media\77bar_confirm.wav

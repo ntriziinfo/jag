@@ -372,6 +372,23 @@ h1{
 .audioPanel input{
   width:100%;
 }
+.audioVolumeControl{
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) 72px;
+  gap:8px;
+  align-items:center;
+}
+.audioVolumeNumber{
+  height:30px;
+  padding:5px 6px;
+  text-align:right;
+  font-size:13px;
+  font-weight:900;
+}
+.audioVolumeNumber::-webkit-outer-spin-button,
+.audioVolumeNumber::-webkit-inner-spin-button{
+  margin:0;
+}
 
 .lcd{
   position:relative;
@@ -3929,24 +3946,46 @@ body{
             <button class="ghostBtn" id="audioMuteBtn" type="button">ミュート</button>
           </div>
           <div class="field">
+            <label>マスター音量</label>
+            <div class="audioVolumeControl">
+              <input id="masterVolume" type="range" min="0" max="1" step="0.01" value="0.70" />
+              <input id="masterVolumeNumber" class="audioVolumeNumber" type="number" min="0" max="100" step="1" value="70" inputmode="numeric" aria-label="マスター音量 %" />
+            </div>
+          </div>
+          <div class="field">
             <label>BGM音量</label>
-            <input id="bgmVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
+            <div class="audioVolumeControl">
+              <input id="bgmVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
+              <input id="bgmVolumeNumber" class="audioVolumeNumber" type="number" min="0" max="100" step="1" value="50" inputmode="numeric" aria-label="BGM音量 %" />
+            </div>
           </div>
           <div class="field">
             <label>効果音音量</label>
-            <input id="sfxVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
+            <div class="audioVolumeControl">
+              <input id="sfxVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
+              <input id="sfxVolumeNumber" class="audioVolumeNumber" type="number" min="0" max="100" step="1" value="50" inputmode="numeric" aria-label="効果音音量 %" />
+            </div>
           </div>
           <div class="field">
             <label>払い出し音量</label>
-            <input id="payoutVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
+            <div class="audioVolumeControl">
+              <input id="payoutVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
+              <input id="payoutVolumeNumber" class="audioVolumeNumber" type="number" min="0" max="100" step="1" value="50" inputmode="numeric" aria-label="払い出し音量 %" />
+            </div>
           </div>
           <div class="field">
             <label>動画音量</label>
-            <input id="movieVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
+            <div class="audioVolumeControl">
+              <input id="movieVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
+              <input id="movieVolumeNumber" class="audioVolumeNumber" type="number" min="0" max="100" step="1" value="50" inputmode="numeric" aria-label="動画音量 %" />
+            </div>
           </div>
           <div class="field">
             <label>CZ動画音量</label>
-            <input id="rogiMovieVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
+            <div class="audioVolumeControl">
+              <input id="rogiMovieVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
+              <input id="rogiMovieVolumeNumber" class="audioVolumeNumber" type="number" min="0" max="100" step="1" value="50" inputmode="numeric" aria-label="CZ動画音量 %" />
+            </div>
           </div>
         </div>
       </div>
@@ -4511,6 +4550,7 @@ body{
 
   const symbols = ["🍒","🍋","🔔","REPLAY","⭐","🍇","7","BAR",USER_FACE];
   const AUDIO_BALANCE_VERSION = 4;
+  const DEFAULT_MASTER_VOLUME = 0.70;
   const DEFAULT_BGM_VOLUME = 0.50;
   const DEFAULT_SFX_VOLUME = 0.50;
   const DEFAULT_PAYOUT_VOLUME = 0.50;
@@ -4520,7 +4560,10 @@ body{
   const BGM_OUTPUT_SCALE = dbToGain(MATCHED_BGM_GAIN_DB);
   const BAR_BGM_OUTPUT_SCALE = dbToGain(MATCHED_BGM_GAIN_DB);
   const SFX_OUTPUT_SCALE = 0.65;
+  const CONFIRM_SOUND_OUTPUT_SCALE = 1.20;
+  const BONUS_CONFIRM_SOUND_OUTPUT_SCALE = 1.05;
   const PAYOUT_SOUND_OUTPUT_SCALE = 0.25;
+  const BELL_PAYOUT_SOUND_OUTPUT_SCALE = 0.35;
   const BATTLE_BGM_OUTPUT_SCALE = dbToGain(MATCHED_BGM_GAIN_DB);
   const MOVIE_OUTPUT_SCALE = 0.50;
   const ROGI_MOVIE_OUTPUT_SCALE = dbToGain(-3);
@@ -4533,7 +4576,9 @@ body{
     if(typeof settings !== "undefined" && settings.audioMuted) return 0;
     const raw = Number(value);
     if(!Number.isFinite(raw) || raw <= 0) return 0;
-    return Math.max(0, Math.min(1, raw * scale));
+    const masterRaw = typeof settings !== "undefined" ? Number(settings.masterVolume) : DEFAULT_MASTER_VOLUME;
+    const master = Number.isFinite(masterRaw) ? clamp(masterRaw, 0, 1) : DEFAULT_MASTER_VOLUME;
+    return Math.max(0, Math.min(1, raw * scale * master));
   }
 
   let settings = {
@@ -4553,6 +4598,7 @@ body{
     bellAdd:0,
     
     autoDelay:0.5,
+    masterVolume:DEFAULT_MASTER_VOLUME,
     bgmVolume:DEFAULT_BGM_VOLUME,
     sfxVolume:DEFAULT_SFX_VOLUME,
     payoutVolume:DEFAULT_PAYOUT_VOLUME,
@@ -4692,6 +4738,7 @@ body{
     at2:"assets/voice/at_2.wav",
     at3:"assets/voice/at_3.wav",
     last:"assets/voice/last.wav",
+    reach:"assets/voice/reach.wav",
     reg:"assets/voice/reg.wav",
     hyahha:"assets/voice/hyahha.wav",
     abeshi:"assets/voice/abeshi.wav",
@@ -4840,6 +4887,14 @@ body{
   let clickTimer = null;
 
   const $ = id => document.getElementById(id);
+  const AUDIO_VOLUME_FIELDS = Object.freeze([
+    {rangeId:"masterVolume", numberId:"masterVolumeNumber"},
+    {rangeId:"bgmVolume", numberId:"bgmVolumeNumber"},
+    {rangeId:"sfxVolume", numberId:"sfxVolumeNumber"},
+    {rangeId:"payoutVolume", numberId:"payoutVolumeNumber"},
+    {rangeId:"movieVolume", numberId:"movieVolumeNumber"},
+    {rangeId:"rogiMovieVolume", numberId:"rogiMovieVolumeNumber"}
+  ]);
   const machine = $("machine");
   const reels = [...document.querySelectorAll(".reel")];
   const stopBtns = [0,1,2].map(i => $("stop"+i));
@@ -6141,6 +6196,38 @@ body{
 
 
   function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
+
+  function volumePercentFromValue(value){
+    const raw = Number(value);
+    const normalized = Number.isFinite(raw) ? clamp(raw, 0, 1) : 0;
+    return Math.round(normalized * 100);
+  }
+
+  function syncVolumeNumberInput(rangeId, numberId){
+    const range = $(rangeId);
+    const number = $(numberId);
+    if(!range || !number) return;
+    number.value = String(volumePercentFromValue(range.value));
+  }
+
+  function syncAllVolumeNumberInputs(){
+    AUDIO_VOLUME_FIELDS.forEach(({rangeId, numberId})=>syncVolumeNumberInput(rangeId, numberId));
+  }
+
+  function syncVolumeRangeFromNumber(numberId){
+    const field = AUDIO_VOLUME_FIELDS.find(item=>item.numberId === numberId);
+    if(!field) return false;
+    const number = $(field.numberId);
+    const range = $(field.rangeId);
+    if(!number || !range) return false;
+    const raw = String(number.value || "").trim();
+    if(raw === "") return false;
+    const percent = Math.round(clamp(Number(raw) || 0, 0, 100));
+    number.value = String(percent);
+    range.value = (percent / 100).toFixed(2);
+    return true;
+  }
+
   function currentSetting(){ return SETTING[settings.setting] || SETTING[1]; }
   function targetRtp(){ return targetRtpFor(settings.setting); }
 
@@ -7171,6 +7258,8 @@ body{
           settings.movieVolume = Object.prototype.hasOwnProperty.call(data.settings, "movieVolume") && Number.isFinite(savedMovieVolume) ? clamp(savedMovieVolume, 0, 1) : inheritedSfxVolume;
           settings.rogiMovieVolume = Object.prototype.hasOwnProperty.call(data.settings, "rogiMovieVolume") && Number.isFinite(savedRogiMovieVolume) ? clamp(savedRogiMovieVolume, 0, 1) : inheritedSfxVolume;
         }
+        const savedMasterVolume = Number(settings.masterVolume);
+        settings.masterVolume = Object.prototype.hasOwnProperty.call(data.settings, "masterVolume") && Number.isFinite(savedMasterVolume) ? clamp(savedMasterVolume, 0, 1) : DEFAULT_MASTER_VOLUME;
         settings.audioBalanceVersion = AUDIO_BALANCE_VERSION;
       }
       settings.title = normalizeMachineTitle(settings.title);
@@ -7241,6 +7330,7 @@ body{
         stSpins: settings.stSpins,
         oddsMultiplier: settings.oddsMultiplier,
         autoDelay: settings.autoDelay,
+        masterVolume: settings.masterVolume,
         bgmVolume: settings.bgmVolume,
         sfxVolume: settings.sfxVolume,
         payoutVolume: settings.payoutVolume,
@@ -7293,6 +7383,7 @@ body{
     setValue("stSpinsInput", nextSettings.stSpins);
     setValue("oddsMultiplierInput", nextSettings.oddsMultiplier);
     setValue("autoDelayInput", nextSettings.autoDelay);
+    setValue("masterVolume", nextSettings.masterVolume);
     setValue("bgmVolume", nextSettings.bgmVolume);
     setValue("sfxVolume", nextSettings.sfxVolume);
     setValue("payoutVolume", nextSettings.payoutVolume);
@@ -7398,6 +7489,7 @@ body{
     settings.bigMul = ROLE_PAYOUTS.BIG / PAYOUT_BASE;
     settings.bigAdd = 5;
     settings.autoDelay = clamp(Number($("autoDelayInput").value) || 0.5, 0.1, 10);
+    if($("masterVolume")) settings.masterVolume = clamp(Number($("masterVolume").value) || 0, 0, 1);
     if($("bgmVolume")) settings.bgmVolume = clamp(Number($("bgmVolume").value) || 0, 0, 1);
     if($("sfxVolume")) settings.sfxVolume = clamp(Number($("sfxVolume").value) || 0, 0, 1);
     if($("payoutVolume")) settings.payoutVolume = clamp(Number($("payoutVolume").value) || 0, 0, 1);
@@ -7483,11 +7575,13 @@ body{
     if($("bigMulInput")) $("bigMulInput").value = ROLE_PAYOUTS.BIG / PAYOUT_BASE;
     if($("bigAddInput")) $("bigAddInput").value = 5;
     $("autoDelayInput").value = settings.autoDelay;
+    if($("masterVolume")) $("masterVolume").value = settings.masterVolume;
     if($("bgmVolume")) $("bgmVolume").value = settings.bgmVolume;
     if($("sfxVolume")) $("sfxVolume").value = settings.sfxVolume;
     if($("payoutVolume")) $("payoutVolume").value = settings.payoutVolume;
     if($("movieVolume")) $("movieVolume").value = settings.movieVolume;
     if($("rogiMovieVolume")) $("rogiMovieVolume").value = settings.rogiMovieVolume;
+    syncAllVolumeNumberInputs();
     readSettings();
   }
 
@@ -9989,9 +10083,9 @@ body{
     }catch(e){}
   }
 
-  function playSevenConfirmSound(){ playOneShotSound(SEVEN_CONFIRM_SOUND_SRC); }
-  function playRegConfirmSound(){ playOneShotSound(REG_CONFIRM_SOUND_SRC); }
-  function playBonusConfirmSound(){ playOneShotSound(BONUS_CONFIRM_SOUND_SRC); }
+  function playSevenConfirmSound(){ playOneShotSound(SEVEN_CONFIRM_SOUND_SRC, sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE)); }
+  function playRegConfirmSound(){ playOneShotSound(REG_CONFIRM_SOUND_SRC, sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE)); }
+  function playBonusConfirmSound(){ playOneShotSound(BONUS_CONFIRM_SOUND_SRC, sfxOutputVolume(BONUS_CONFIRM_SOUND_OUTPUT_SCALE)); }
 
   function playKoatariSound(){
     if(!koatariSound) return;
@@ -10021,8 +10115,11 @@ body{
     return PAYOUT_SOUND_SRC;
   }
 
+  function payoutSoundScaleFor(result="", reward=0){
+    return result === "BELL" ? BELL_PAYOUT_SOUND_OUTPUT_SCALE : PAYOUT_SOUND_OUTPUT_SCALE;
+  }
+
   function shouldSuppressPayoutSound(result="", reward=0, spin=currentSpin){
-    if(result === "BELL3") return true;
     if(spin && spin.zoneActiveAtStart && result === "MISS" && Number(reward) > 0) return true;
     return false;
   }
@@ -10038,7 +10135,7 @@ body{
         payoutSound.setAttribute("src", src);
       }
       payoutSound.currentTime = 0;
-      payoutSound.volume = payoutOutputVolume();
+      payoutSound.volume = payoutOutputVolume(payoutSoundScaleFor(result, reward));
       const p = payoutSound.play();
       if(p && typeof p.catch === "function") p.catch(()=>{});
     }catch(e){}
@@ -10192,9 +10289,20 @@ body{
       [...document.querySelectorAll(".side > .card:not(.oddsPublic):not(.slumpPublic)")].forEach(card => drawer.appendChild(card));
       if(drawer.parentElement !== document.body) document.body.appendChild(drawer);
     }
-    ["titleInput","settingSelect","feeInput","stSpinsInput","oddsMultiplierInput","smallMulInput","midMulInput","crownMulInput","cherryMulInput","bigMulInput","bigAddInput","autoDelayInput","bgmVolume","sfxVolume","payoutVolume","movieVolume","rogiMovieVolume"].forEach(id=>{
+    ["titleInput","settingSelect","feeInput","stSpinsInput","oddsMultiplierInput","smallMulInput","midMulInput","crownMulInput","cherryMulInput","bigMulInput","bigAddInput","autoDelayInput","masterVolume","bgmVolume","sfxVolume","payoutVolume","movieVolume","rogiMovieVolume"].forEach(id=>{
       const el = $(id);
       if(el) el.addEventListener("input", ()=>{ readSettings(); updateDisplay(); });
+    });
+    AUDIO_VOLUME_FIELDS.forEach(({numberId})=>{
+      const el = $(numberId);
+      if(!el) return;
+      const handler = ()=>{
+        if(!syncVolumeRangeFromNumber(numberId)) return;
+        readSettings();
+        updateDisplay();
+      };
+      el.addEventListener("input", handler);
+      el.addEventListener("change", handler);
     });
 
     const onClick = (id, handler)=>{
