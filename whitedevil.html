@@ -4841,10 +4841,6 @@ body{
   const COMPLETE_TRIAL_ENABLED = true;
   const COMPLETE_LOCK_ENABLED = false;
   const COMPLETE_LIMIT_PT = 2000;
-  const COMPLETE_RESCUE_THRESHOLD_PT = -2000;
-  const COMPLETE_RESCUE_MIN_CONTINUATION_RATE = 0.50;
-  const COMPLETE_RESCUE_RATE_BOOST_CHANCE = 0.50;
-  const COMPLETE_RESCUE_BAR3_DENOM = 2000;
   const SLUMP_MAX_HISTORY_POINTS = 20000;
   const SLUMP_MAX_DRAW_POINTS = 1400;
   let autoPlay = false;
@@ -6776,15 +6772,10 @@ body{
   }
 
   function completeTrialRescueMinRate(){
-    if(!COMPLETE_TRIAL_ENABLED || isCompleteTrialLocked()) return 0;
-    if(!completeTrialState.rescueActive) return 0;
-    return Math.random() < COMPLETE_RESCUE_RATE_BOOST_CHANCE ? COMPLETE_RESCUE_MIN_CONTINUATION_RATE : 0;
+    return 0;
   }
 
   function bar3PremiumDenominator(){
-    if(COMPLETE_TRIAL_ENABLED && completeTrialState.rescueActive && !isCompleteTrialLocked()){
-      return COMPLETE_RESCUE_BAR3_DENOM;
-    }
     return BAR3_PREMIUM_DENOM;
   }
 
@@ -6805,14 +6796,6 @@ body{
   function updateCompleteTrialState(reason=""){
     if(!COMPLETE_TRIAL_ENABLED) return false;
     const profit = completeTrialProfit();
-
-    if(!completeTrialState.rescueActive && profit <= COMPLETE_RESCUE_THRESHOLD_PT){
-      completeTrialState.rescueActive = true;
-      showOverlay("救済発動");
-      showMessage("救済発動", `差枚${formatSigned(profit)}pt / 次回ATから50%で継続率50%以上 / フリーズ1/${COMPLETE_RESCUE_BAR3_DENOM}`);
-      log(`[COMPLETE] 救済発動：${formatSigned(profit)}pt${reason ? " / " + reason : ""}`);
-      persistState();
-    }
 
     if(isCompleteLockEnabled() && !completeTrialState.locked && profit >= COMPLETE_LIMIT_PT){
       completeTrialState.locked = true;
@@ -7286,7 +7269,7 @@ body{
           ...data.completeTrialState,
           locked:!!data.completeTrialState.locked,
           lockedSetting:clamp(Number(data.completeTrialState.lockedSetting) || 0, 0, 6),
-          rescueActive:!!data.completeTrialState.rescueActive,
+          rescueActive:false,
           completeProfit:Number(data.completeTrialState.completeProfit) || 0
         };
         if(!COMPLETE_LOCK_ENABLED){
