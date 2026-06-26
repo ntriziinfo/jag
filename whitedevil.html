@@ -3897,7 +3897,7 @@ body{
 
   <div class="header">
     <div class="titleBox">
-      <div class="badge">AT ONLY / 7・BAR MIDLINE</div>
+      <div class="badge">A-TYPE / BIG・REG BONUS</div>
       <h1 id="titleView">白い悪魔 SLOT</h1>
     </div>
     <div class="notice">配信・RP・ゲーム内ポイント専用。現金・換金・景品交換・実利益化には使用しないでください。</div>
@@ -4000,27 +4000,27 @@ body{
           <div class="modeTag normal" id="modeTag">受付中</div>
           <div class="settingInfo">
             設定 <b id="settingViewLegacy">1</b><br>
-            機械割 <b id="targetRtpViewLegacy">80%</b><br>
-            AT <b id="stInfoViewLegacy">10回転</b><br>
+            機械割 <b id="targetRtpViewLegacy">97.0%</b><br>
+            Aタイプ <b id="stInfoViewLegacy">通常</b><br>
             払出補正 <b id="payoutScaleViewLegacy">なし</b>
           </div>
         </div>
         <div class="stLampWrap">
-          <div class="stLamp" id="stLamp">AT</div>
+          <div class="stLamp" id="stLamp">BONUS</div>
         </div>
 
         <div class="message" id="message">READY</div>
-        <div class="subMessage" id="subMessage">利用料を払ってATスタート / 王冠なし・奇数はBIG寄り・偶数はREG寄り・6は均等</div>
+        <div class="subMessage" id="subMessage">3pt BET / BIG・REG完全告知 / 設定1〜6でボーナス確率が変化</div>
 
         <div class="sevenSegPanel">
-          <div class="sevenSegLabel">残りAT</div>
+          <div class="sevenSegLabel">BONUS</div>
           <img class="dzHoldBadge" id="dzHoldBadge" src="assets/effects/dz_hold_badge_custom.png" alt="HOLD" decoding="async" draggable="false" aria-hidden="true">
           <div class="sevenSegValue" id="stRemainBigView">--</div>
         </div>
 
         <div class="stats">
           <div class="stat"><div class="k">回転数</div><div class="v" id="totalSpinsView">0</div></div>
-          <div class="stat"><div class="k">AT</div><div class="v" id="totalSessionsView">0</div></div>
+          <div class="stat"><div class="k">A-TYPE</div><div class="v" id="totalSessionsView">0</div></div>
           <div class="stat"><div class="k">BIG</div><div class="v" id="bigCountView">0</div></div>
           <div class="stat"><div class="k">REG</div><div class="v" id="midCountView">0</div></div>
           <div class="stat"><div class="k">砂時計</div><div class="v" id="smallCountView">0</div></div>
@@ -4033,7 +4033,7 @@ body{
       </div>
 
       <section class="wd-info-strip" id="data-area">
-        <div><span>AT</span><b id="wdMirrorSt">--G</b></div>
+        <div><span>TYPE</span><b id="wdMirrorSt">A</b></div>
         <div><span>BIG</span><b id="wdMirrorBig">0</b></div>
         <div><span>REG</span><b id="wdMirrorReg">0</b></div>
         <div><span>総回転数</span><b id="wdMirrorSpin">0G</b></div>
@@ -4043,7 +4043,7 @@ body{
       <div class="reelArea">
         <img class="reelFrameOnOverlay" src="assets/frames/slot_cabinet_frame_data_windows_on.png" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false">
         <div class="wd-public-panels wd-st-status-panel wd-reel-data-panel" id="bonus-info">
-          <div class="wd-st-emblem" id="wdStEmblem">DEVIL<br>RUSH</div>
+          <div class="wd-st-emblem" id="wdStEmblem">A-TYPE<br>BONUS</div>
           <div class="wd-st-readout">
             <span>BIG確率</span>
             <b id="wdBigOdds">-</b>
@@ -4060,7 +4060,7 @@ body{
             <button class="wd-counter-action" id="reelDataToggleBtn" type="button" aria-expanded="false">データカウンター</button>
           </div>
           <div class="wd-counter-rows">
-            <div><span>AT</span><b id="wdCounterSt">--G</b></div>
+            <div><span>TYPE</span><b id="wdCounterSt">A</b></div>
             <div><span>BIG</span><b id="wdCounterBig">0</b></div>
             <div><span>REG</span><b id="wdCounterReg">0</b></div>
             <div><span>砂時計</span><b id="wdCounterSmall">0</b></div>
@@ -4140,9 +4140,9 @@ body{
       <div class="resultBox resultBoxWide" id="resultText">-</div>
       <div class="sessionResultLayer" id="sessionResultLayer" aria-hidden="true">
         <div class="sessionResultContent">
-          <div class="sessionResultTitle">ATバトルが終了しました。</div>
+          <div class="sessionResultTitle">ボーナス消化が終了しました。</div>
           <div class="sessionResultStats">
-            <div class="sessionResultLine"><span>継続SET数</span><b id="resultSetCountView">0回</b></div>
+            <div class="sessionResultLine"><span>ボーナス回数</span><b id="resultSetCountView">0回</b></div>
             <div class="sessionResultLine"><span>獲得pt</span><b id="resultPayoutView">0pt</b></div>
           </div>
         </div>
@@ -4194,12 +4194,12 @@ body{
         <div class="field">
           <label>設定</label>
           <select id="settingSelect">
-            <option value="1">設定1 / 目標80%</option>
-            <option value="2">設定2 / 目標88%</option>
-            <option value="3">設定3 / 目標95%</option>
-            <option value="4">設定4 / 目標101%</option>
-            <option value="5">設定5 / 目標107%</option>
-            <option value="6">設定6 / 目標114%</option>
+            <option value="1">設定1 / 97.0%</option>
+            <option value="2">設定2 / 98.0%</option>
+            <option value="3">設定3 / 99.5%</option>
+            <option value="4">設定4 / 101.1%</option>
+            <option value="5">設定5 / 103.3%</option>
+            <option value="6">設定6 / 105.5%</option>
           </select>
         </div>
         <div class="field">
@@ -4207,8 +4207,8 @@ body{
           <input id="feeInput" type="number" min="1" max="10000000" step="1" value="100" />
         </div>
         <div class="field">
-          <label>AT回転数</label>
-          <input id="stSpinsInput" type="number" min="1" max="100" step="1" value="10" />
+          <label>Aタイプ固定（AT未使用）</label>
+          <input id="stSpinsInput" type="number" min="1" max="100" step="1" value="1" readonly />
         </div>
         <div class="field">
           <label>確率倍率（テスト用・本番は1推奨）</label>
@@ -4218,13 +4218,13 @@ body{
           <label>管理用：適用設定情報</label>
           <div class="settingInfo">
             設定 <b id="adminSettingView">1</b><br>
-            表記割 <b id="adminTargetRtpView">80%</b><br>
+            表記割 <b id="adminTargetRtpView">97.0%</b><br>
             状態 <b id="adminStInfoView">10G/SET</b><br>
             内部確率 <b id="adminPayoutScaleView">固定</b>
           </div>
         </div>
         <div class="field">
-          <label>オートAT間隔（秒）</label>
+          <label>オート間隔（秒）</label>
           <input id="autoDelayInput" type="number" min="0.1" max="10" step="0.1" value="0.5" />
         </div>
         <div class="row">
@@ -4242,7 +4242,7 @@ body{
           <button class="dangerBtn" id="resetBtn">初期化</button>
         </div>
         <div class="help" style="margin-top:10px">
-          1プレイごとに3ptを消費します。通常・高確中はベル8pt、スイカ3pt、チェリー各種3pt、リプレイ3ptを払い出します。777確定時は7揃い後すぐAT、REG確定時は50pt払い出しと天井リセットです。奇数は初当たり重め・高継続寄り、偶数は初当たり軽め・安定寄りです。
+          1プレイごとに3ptを消費します。設定1〜6のBIG/REG確率で直接ボーナスを抽選し、BIGは252pt、REGは96ptを払い出します。通常小役はベル8pt、スイカ3pt、チェリー各種3pt、リプレイ3ptです。
         </div>
       </div>
 
@@ -4265,46 +4265,46 @@ body{
           <input id="suikaMulInput" type="number" min="0" max="100" step="0.01" value="0.01" readonly />
         </div>
         <div class="field">
-          <label>REG払い出し（通常50pt / AT中15pt）</label>
+          <label>REG払い出し（96pt固定）</label>
           <input id="midMulInput" type="number" min="0" max="100" step="0.01" value="0.15" readonly />
         </div>
         <div class="field">
-          <label>BIG倍率（7揃い）</label>
+          <label>BIG払い出し（252pt固定）</label>
           <input id="bigMulInput" type="number" min="0" max="100" step="0.01" value="0.15" readonly />
         </div>
         <div class="help">
-          AT・ボーナス中も1Gごとに3ptを消費します。払い出しはベル15pt、チェリー全種5pt、スイカ3pt、リプレイ3pt、7揃い・REGは15pt固定、砂時計は15pt固定、BAR揃いは出玉なしです。通常・高確中の777確定後は7揃い停止後すぐATへ突入し、REG確定後はREG揃いで50pt払い出しと天井リセットを行います。
+          Aタイプ中はAT・継続バトルへ移行しません。BIG/REGは当選ゲームで確定告知し、払い出し後は通常ゲームへ戻ります。
         </div>
       </div>
 
       <div class="card">
-        <h2>報酬・AT加算ルール</h2>
+        <h2>Aタイプ払い出しルール</h2>
         <div class="field">
           <label>砂時計画像揃い</label>
-          <input type="text" value="15pt + SET抽選" readonly />
+          <input type="text" value="15pt固定" readonly />
         </div>
         <div class="field">
           <label>REG 77BAR</label>
-          <input type="text" value="通常50pt / AT中15pt + SET+1" readonly />
+          <input type="text" value="96pt固定 / AT加算なし" readonly />
         </div>
         <div class="field">
           <label>BAR揃い</label>
-          <input type="text" value="出玉なし + SET+5 / 継続80%" readonly />
+          <input type="text" value="Aタイプでは通常役扱いなし" readonly />
         </div>
         <div class="field">
-          <label>BIG 7揃い デビルゾーンG数</label>
-          <input id="bigAddInput" type="number" min="0" max="1000" step="1" value="5" readonly />
+          <label>BIG 7揃い 払い出し</label>
+          <input id="bigAddInput" type="number" min="0" max="1000" step="1" value="252" readonly />
         </div>
         <div class="field">
           <label>チェリー・ANY・ANY 加算</label>
-          <input id="cherryAnyAddInput" type="text" value="出玉0.05倍 / デビルゾーン中はAT+1G" readonly />
+          <input id="cherryAnyAddInput" type="text" value="3pt固定 / AT加算なし" readonly />
         </div>
         <div class="field">
           <label>チェリー・チェリー・チェリー 加算</label>
-          <input id="cherryTripleAddInput" type="text" value="出玉0.05倍 / 通常AT中SET50%" readonly />
+          <input id="cherryTripleAddInput" type="text" value="3pt固定 / AT加算なし" readonly />
         </div>
         <div class="help">
-          AT中BIGは5Gの超デビルゾーン、AT中REGは5Gのデビルゾーン、通常REGは50pt払い出しと天井リセットです。砂時計は15pt払い出し+設定別SET抽選、BAR揃いは出玉なしで+5SETと継続率80%昇格。通常・高確中はベル8pt、スイカ3pt、2連/3連チェリー各3pt、リプレイ3pt、AT中はベル15ptと砂時計・2連チェリー・3連チェリー・スイカのSETストック抽選、デビルゾーン/超デビルゾーン中は7揃いでSET上乗せを行います。
+          BIGは252pt、REGは96pt。AT・SET・継続率・天井・高確はAタイプでは使用しません。小役はベル8pt、スイカ3pt、チェリー各種3pt、リプレイ3pt、砂時計15ptです。
         </div>
       </div>
 
@@ -4315,13 +4315,13 @@ body{
           <select id="forceResult">
             <option value="">ランダム</option>
             <option value="MISS">ハズレ</option>
-          <option value="SMALL">砂時計（画像/AT+10/15pt）</option>
-          <option value="MID">REG（77BAR/15pt/デビルゾーン5G）</option>
-            <option value="BAR3">BAR揃い（SET+5/出玉なし）</option>
-            <option value="BIG">BIG（777/15pt/超デビルゾーン5G）</option>
+          <option value="SMALL">砂時計（15pt）</option>
+          <option value="MID">REG（77BAR/96pt）</option>
+            <option value="BAR3">BAR揃い（Aタイプでは未使用）</option>
+            <option value="BIG">BIG（777/252pt）</option>
             <option value="BELL">ベル揃い</option>
-            <option value="BELL3">斜めベル（AT中+3pt）</option>
-            <option value="REPLAY">リプレイ（AT中+3pt）</option>
+            <option value="BELL3">斜めベル</option>
+            <option value="REPLAY">リプレイ</option>
             <option value="SUICA">スイカ揃い</option>
             <option value="CHERRY_DOUBLE">チェリー2連</option>
             <option value="CHERRY_TRIPLE">チェリー3つ</option>
@@ -4340,7 +4340,7 @@ body{
           <input id="premiumForceStatus" type="text" value="OFF" readonly />
         </div>
         <div class="field" style="margin-top:12px">
-          <label>高確フラグ</label>
+          <label>高確フラグ（Aタイプでは未使用）</label>
           <div class="row">
             <button class="subBtn" id="debugHighBtn">即高確10G</button>
           </div>
@@ -4369,7 +4369,7 @@ body{
           </div>
         </div>
         <div class="help" style="margin-top:10px">
-          このメニューは液晶5回クリックで開閉します。直行操作はAT中のみ反映します。
+          このメニューは液晶5回クリックで開閉します。直行操作はAタイプの次ゲーム結果として反映します。
         </div>
       </div>
 
@@ -4411,10 +4411,10 @@ body{
             <tr><th>回転数</th><th>当選</th><th>種別</th></tr>
             <tr><td>1234G</td><td>777</td><td class="red">BIG</td></tr>
             <tr><td>112G</td><td>77BAR</td><td class="blue">REG</td></tr>
-            <tr><td>45G</td><td>白い悪魔</td><td>DEVIL RUSH</td></tr>
+            <tr><td>45G</td><td>777</td><td class="red">BIG</td></tr>
             <tr><td>789G</td><td>777</td><td class="red">BIG</td></tr>
             <tr><td>33G</td><td>77BAR</td><td class="blue">REG</td></tr>
-            <tr><td>256G</td><td>白い悪魔</td><td>DEVIL RUSH</td></tr>
+            <tr><td>256G</td><td>77BAR</td><td class="blue">REG</td></tr>
             <tr><td>654G</td><td>777</td><td class="red">BIG</td></tr>
           </table>
           <div class="wd-history-more">もっと見る</div>
@@ -4467,13 +4467,27 @@ body{
   const SPEED_BGM_SRC = "assets/media/speed_bgm.wav";
 
   const SETTING = {
-    1:{target:0.88},
-    2:{target:0.93},
-    3:{target:0.96},
-    4:{target:1.01},
-    5:{target:1.07},
-    6:{target:1.15}
+    1:{target:0.970},
+    2:{target:0.980},
+    3:{target:0.995},
+    4:{target:1.011},
+    5:{target:1.033},
+    6:{target:1.055}
   };
+
+  const A_TYPE_MODE = true;
+  const A_TYPE_BONUS_TABLE = Object.freeze({
+    1:{big:273.1, reg:439.8, total:168.5, payout:97.0},
+    2:{big:269.7, reg:399.6, total:161.0, payout:98.0},
+    3:{big:269.7, reg:331.0, total:148.6, payout:99.5},
+    4:{big:259.0, reg:315.1, total:142.2, payout:101.1},
+    5:{big:259.0, reg:255.0, total:128.5, payout:103.3},
+    6:{big:255.0, reg:255.0, total:127.5, payout:105.5}
+  });
+  const A_TYPE_PAYOUTS = Object.freeze({
+    BIG:252,
+    MID:96
+  });
 
   const USER_FACE = "__USER_FACE__";
   const SUICA_IMAGE_SRC = "assets/symbols/sym_suika.png";
@@ -6226,6 +6240,10 @@ body{
 
   function currentSetting(){ return SETTING[settings.setting] || SETTING[1]; }
   function targetRtp(){ return targetRtpFor(settings.setting); }
+  function targetRtpText(settingNo = settings.setting){
+    const value = (targetRtpFor(settingNo) || 0) * 100;
+    return A_TYPE_MODE ? `${value.toFixed(1)}%` : `${Math.round(value)}%`;
+  }
 
   function rewardMultiplier(result){
     return (ROLE_PAYOUTS[result] || 0) / PAYOUT_BASE;
@@ -6236,6 +6254,7 @@ body{
   }
 
   function normalRewardFor(result){
+    if(A_TYPE_MODE && A_TYPE_PAYOUTS[result]) return A_TYPE_PAYOUTS[result];
     return NORMAL_ROLE_PAYOUTS[result] || 0;
   }
 
@@ -7151,6 +7170,26 @@ body{
   }
 
   function drawNormalResult(){
+    if(A_TYPE_MODE){
+      if(pendingForceResult && RESULT[pendingForceResult]){
+        return pendingForceResult;
+      }
+
+      const table = A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1];
+      let roll = Math.random();
+      const multiplier = clamp(Number(settings.oddsMultiplier) || 1, 0.1, 100);
+      const bigP = clamp((1 / table.big) * multiplier, 0, 0.98);
+      const regP = clamp((1 / table.reg) * multiplier, 0, 0.98 - bigP);
+      if(roll < bigP) return "BIG";
+      roll -= bigP;
+      if(roll < regP) return "MID";
+
+      if(Math.random() < normalRoleProbability()){
+        return weightedPick(normalEventWeights());
+      }
+      return "MISS";
+    }
+
     if(normalState.bonusPending){
       if(!pendingBonusWaitDone()) return "MISS";
       if(normalState.bonusKind === "BAR3") return "BAR3";
@@ -7169,6 +7208,36 @@ body{
   }
 
   function resolveNormalOutcome(result){
+    if(A_TYPE_MODE){
+      const isBig = result === "BIG";
+      const isReg = result === "MID";
+      const isBonus = isBig || isReg;
+      return {
+        normalGame:true,
+        reward:normalRewardFor(result),
+        add:0,
+        sets:0,
+        bigZone:0,
+        zoneGame:false,
+        zoneSets:0,
+        zoneStGames:0,
+        zoneGameAdd:0,
+        highAtStart:false,
+        bonusPendingAtStart:false,
+        bonusWaitSpin:false,
+        bonusWaitGamesAtStart:0,
+        highAdd:0,
+        ceilingAfter:isBonus ? 0 : clamp((Number(normalState.sinceBonus) || 0) + 1, 0, NORMAL_CEILING_GAMES),
+        bonusHit:false,
+        bonusReady:isBig,
+        regReady:isReg,
+        bar3PremiumReady:false,
+        bonusKind:isReg ? "MID" : isBig ? "BIG" : "",
+        bonusSource:isBonus ? "Aタイプ直撃" : "",
+        aTypeBonusReady:isBonus
+      };
+    }
+
     const highAtStart = isHighMode();
     const bonusPending = !!normalState.bonusPending;
     const bonusWaitSpin = bonusPending && !pendingBonusWaitDone();
@@ -7405,7 +7474,7 @@ body{
     }else if(command.type === "startAuto"){
       startAutoPlay();
     }else if(command.type === "stopAuto"){
-      stopAutoPlay("管理画面：オートAT停止");
+      stopAutoPlay(A_TYPE_MODE ? "管理画面：オート停止" : "管理画面：オートAT停止");
     }
     scheduleAdminStatePush(50);
   }
@@ -7464,13 +7533,13 @@ body{
     settings.stSpins = clamp(Number($("stSpinsInput").value) || 10, 1, 100);
     settings.oddsMultiplier = clamp(Number($("oddsMultiplierInput").value) || 1, 0.1, 100);
     settings.smallMul = ROLE_PAYOUTS.SMALL / PAYOUT_BASE;
-    settings.midMul = ROLE_PAYOUTS.MID / PAYOUT_BASE;
+    settings.midMul = (A_TYPE_MODE ? A_TYPE_PAYOUTS.MID : ROLE_PAYOUTS.MID) / PAYOUT_BASE;
     settings.crownMul = 0.0;
     settings.cherryMul = ROLE_PAYOUTS.CHERRY_ANY / PAYOUT_BASE;
     settings.bellMul = ROLE_PAYOUTS.BELL / PAYOUT_BASE;
     settings.suikaMul = ROLE_PAYOUTS.SUICA / PAYOUT_BASE;
-    settings.bigMul = ROLE_PAYOUTS.BIG / PAYOUT_BASE;
-    settings.bigAdd = 5;
+    settings.bigMul = (A_TYPE_MODE ? A_TYPE_PAYOUTS.BIG : ROLE_PAYOUTS.BIG) / PAYOUT_BASE;
+    settings.bigAdd = A_TYPE_MODE ? A_TYPE_PAYOUTS.BIG : 5;
     settings.autoDelay = clamp(Number($("autoDelayInput").value) || 0.5, 0.1, 10);
     if($("masterVolume")) settings.masterVolume = clamp(Number($("masterVolume").value) || 0, 0, 1);
     if($("bgmVolume")) settings.bgmVolume = clamp(Number($("bgmVolume").value) || 0, 0, 1);
@@ -7483,12 +7552,15 @@ body{
 
     $("titleView").textContent = settings.title;
     if($("settingView")) $("settingView").textContent = settings.setting;
-    if($("targetRtpView")) $("targetRtpView").textContent = Math.round(targetRtp() * 100) + "%";
+    if($("targetRtpView")) $("targetRtpView").textContent = targetRtpText();
+    if($("targetRtpViewLegacy")) $("targetRtpViewLegacy").textContent = targetRtpText();
     if($("adminSettingView")) $("adminSettingView").textContent = settings.setting;
-    if($("adminTargetRtpView")) $("adminTargetRtpView").textContent = Math.round(targetRtp() * 100) + "%";
+    if($("adminTargetRtpView")) $("adminTargetRtpView").textContent = targetRtpText();
     const setting6Option = document.querySelector('#settingSelect option[value="6"]');
-    if(setting6Option) setting6Option.textContent = "設定6 / 目標115%";
-    const adminStInfoText = session.active ? setGameCount() + "G/SET" : (normalState.bonusPending ? `BONUS確定 / ${pendingBonusLabel()}待ち` : `${normalModeLabel()} / 天井まで${ceilingRemain()}G`);
+    if(setting6Option) setting6Option.textContent = A_TYPE_MODE ? "設定6 / 105.5%" : "設定6 / 目標115%";
+    const adminStInfoText = A_TYPE_MODE
+      ? `Aタイプ / BIG ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).big)} / REG ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).reg)}`
+      : session.active ? setGameCount() + "G/SET" : (normalState.bonusPending ? `BONUS確定 / ${pendingBonusLabel()}待ち` : `${normalModeLabel()} / 天井まで${ceilingRemain()}G`);
     if($("stInfoView")) $("stInfoView").textContent = adminStInfoText;
     if($("adminStInfoView")) $("adminStInfoView").textContent = adminStInfoText;
 
@@ -7547,16 +7619,17 @@ body{
     $("feeInput").value = SPIN_COST;
     $("feeInput").readOnly = true;
     if($("feeInput").previousElementSibling) $("feeInput").previousElementSibling.textContent = "1回転コスト";
-    $("stSpinsInput").value = settings.stSpins;
+    $("stSpinsInput").value = A_TYPE_MODE ? 1 : settings.stSpins;
+    $("stSpinsInput").readOnly = !!A_TYPE_MODE;
     $("oddsMultiplierInput").value = settings.oddsMultiplier;
     if($("smallMulInput")) $("smallMulInput").value = ROLE_PAYOUTS.SMALL / PAYOUT_BASE;
-    if($("midMulInput")) $("midMulInput").value = ROLE_PAYOUTS.MID / PAYOUT_BASE;
+    if($("midMulInput")) $("midMulInput").value = (A_TYPE_MODE ? A_TYPE_PAYOUTS.MID : ROLE_PAYOUTS.MID) / PAYOUT_BASE;
     if($("crownMulInput")) $("crownMulInput").value = 0;
     if($("cherryMulInput")) $("cherryMulInput").value = ROLE_PAYOUTS.CHERRY_ANY / PAYOUT_BASE;
     if($("bellMulInput")) $("bellMulInput").value = ROLE_PAYOUTS.BELL / PAYOUT_BASE;
     if($("suikaMulInput")) $("suikaMulInput").value = ROLE_PAYOUTS.SUICA / PAYOUT_BASE;
-    if($("bigMulInput")) $("bigMulInput").value = ROLE_PAYOUTS.BIG / PAYOUT_BASE;
-    if($("bigAddInput")) $("bigAddInput").value = 5;
+    if($("bigMulInput")) $("bigMulInput").value = (A_TYPE_MODE ? A_TYPE_PAYOUTS.BIG : ROLE_PAYOUTS.BIG) / PAYOUT_BASE;
+    if($("bigAddInput")) $("bigAddInput").value = A_TYPE_MODE ? A_TYPE_PAYOUTS.BIG : 5;
     $("autoDelayInput").value = settings.autoDelay;
     if($("masterVolume")) $("masterVolume").value = settings.masterVolume;
     if($("bgmVolume")) $("bgmVolume").value = settings.bgmVolume;
@@ -8154,6 +8227,25 @@ body{
       return;
     }
 
+    if(resolved.aTypeBonusReady){
+      resetNormalModeAfterBonus();
+      $("stLamp").classList.add("on");
+      const bonusLabel = result === "MID" ? "REG" : "BIG";
+      showMessage(bonusLabel, `Aタイプ直撃 / +${normalReward}pt${lineText ? " / " + lineText : ""}`);
+      log(`${bonusLabel}：Aタイプ直撃 / +${normalReward}pt`);
+      flashReelLight("rainbow", result === "BIG" ? 2200 : 1800);
+      showOverlay(`${bonusLabel} +${normalReward}pt`);
+      if(result === "MID"){
+        playVoiceSound(VOICE_SRC.reg);
+        playRegConfirmSound();
+        confetti(45);
+      }else{
+        playSevenConfirmSound();
+        confetti(90);
+      }
+      return;
+    }
+
     if(resolved.bar3PremiumReady){
       resetNormalModeAfterBonus();
       $("stLamp").classList.add("on");
@@ -8417,23 +8509,31 @@ body{
     syncDevilZoneConfirmScreen();
     machine.className = "machine " + (active ? "active" : "normal") + (session.paid > 0 ? " win" : "");
     $("modeTag").className = "modeTag " + (active ? "active" : "");
-    $("modeTag").textContent = active ? (isContinuationBattleActive() ? "継続BATTLE" : "BATTLE") : normalModeLabel();
+    $("modeTag").textContent = A_TYPE_MODE ? "A-TYPE" : active ? (isContinuationBattleActive() ? "継続BATTLE" : "BATTLE") : normalModeLabel();
 
     if($("settingView")) $("settingView").textContent = settings.setting;
-    if($("targetRtpView")) $("targetRtpView").textContent = Math.round(targetRtp() * 100) + "%";
+    if($("settingViewLegacy")) $("settingViewLegacy").textContent = settings.setting;
+    if($("targetRtpView")) $("targetRtpView").textContent = targetRtpText();
+    if($("targetRtpViewLegacy")) $("targetRtpViewLegacy").textContent = targetRtpText();
     if($("adminSettingView")) $("adminSettingView").textContent = settings.setting;
-    if($("adminTargetRtpView")) $("adminTargetRtpView").textContent = Math.round(targetRtp() * 100) + "%";
-    const stInfoText = active
-      ? (isContinuationBattleActive()
-        ? `継続BATTLE ${session.battleRemain}G / 継続${formatRate(session.continuationRate)} STOCK${session.stockSets || 0}`
-        : `${setGameCount()}G/SET 継続${formatRate(session.continuationRate)} STOCK${session.stockSets || 0}`)
-      : normalState.bonusPending
-        ? `BONUS確定 / ${pendingBonusLabel()}待ち / 1G ${SPIN_COST}pt`
-        : `${normalModeLabel()} / 天井まで${ceilingRemain()}G / 1G ${SPIN_COST}pt`;
+    if($("adminTargetRtpView")) $("adminTargetRtpView").textContent = targetRtpText();
+    const stInfoText = A_TYPE_MODE
+      ? `Aタイプ / BIG ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).big)} / REG ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).reg)} / 1G ${SPIN_COST}pt`
+      : active
+        ? (isContinuationBattleActive()
+          ? `継続BATTLE ${session.battleRemain}G / 継続${formatRate(session.continuationRate)} STOCK${session.stockSets || 0}`
+          : `${setGameCount()}G/SET 継続${formatRate(session.continuationRate)} STOCK${session.stockSets || 0}`)
+        : normalState.bonusPending
+          ? `BONUS確定 / ${pendingBonusLabel()}待ち / 1G ${SPIN_COST}pt`
+          : `${normalModeLabel()} / 天井まで${ceilingRemain()}G / 1G ${SPIN_COST}pt`;
     if($("stInfoView")) $("stInfoView").textContent = stInfoText;
+    if($("stInfoViewLegacy")) $("stInfoViewLegacy").textContent = stInfoText;
     if($("adminStInfoView")) $("adminStInfoView").textContent = stInfoText;
-    const payoutScaleText = `通常:ベル${NORMAL_ROLE_PAYOUTS.BELL}pt/スイカ${NORMAL_ROLE_PAYOUTS.SUICA}pt/チェリー${NORMAL_ROLE_PAYOUTS.CHERRY_ANY}pt/リプレイ${NORMAL_ROLE_PAYOUTS.REPLAY}pt/REG${NORMAL_ROLE_PAYOUTS.MID}pt / 通常小役${Math.round(NORMAL_ROLE_RATE * 100)}% / 高確小役${Math.round(HIGH_ROLE_RATE * 100)}% / ATベル${ROLE_PAYOUTS.BELL}pt/斜めベル${ROLE_PAYOUTS.BELL3}pt / 平均継続${formatRate(averageContinuationRate(settings.setting))}`;
+    const payoutScaleText = A_TYPE_MODE
+      ? `Aタイプ:BIG${A_TYPE_PAYOUTS.BIG}pt/REG${A_TYPE_PAYOUTS.MID}pt/ベル${NORMAL_ROLE_PAYOUTS.BELL}pt/スイカ${NORMAL_ROLE_PAYOUTS.SUICA}pt/チェリー${NORMAL_ROLE_PAYOUTS.CHERRY_ANY}pt/リプレイ${NORMAL_ROLE_PAYOUTS.REPLAY}pt`
+      : `通常:ベル${NORMAL_ROLE_PAYOUTS.BELL}pt/スイカ${NORMAL_ROLE_PAYOUTS.SUICA}pt/チェリー${NORMAL_ROLE_PAYOUTS.CHERRY_ANY}pt/リプレイ${NORMAL_ROLE_PAYOUTS.REPLAY}pt/REG${NORMAL_ROLE_PAYOUTS.MID}pt / 通常小役${Math.round(NORMAL_ROLE_RATE * 100)}% / 高確小役${Math.round(HIGH_ROLE_RATE * 100)}% / ATベル${ROLE_PAYOUTS.BELL}pt/斜めベル${ROLE_PAYOUTS.BELL3}pt / 平均継続${formatRate(averageContinuationRate(settings.setting))}`;
     if($("payoutScaleView")) $("payoutScaleView").textContent = payoutScaleText;
+    if($("payoutScaleViewLegacy")) $("payoutScaleViewLegacy").textContent = payoutScaleText;
     if($("adminPayoutScaleView")) $("adminPayoutScaleView").textContent = payoutScaleText;
 
     if($("totalSpinsView")) $("totalSpinsView").textContent = stats.totalSpins || 0;
@@ -8469,7 +8569,9 @@ body{
       stEmblem.classList.toggle("is-ceiling", !active && !normalState.bonusPending);
       stEmblem.classList.toggle("is-bonus-pending", !active && normalState.bonusPending);
       stEmblem.classList.toggle("is-profit", active && profit > 0);
-      if(active){
+      if(A_TYPE_MODE){
+        stEmblem.innerHTML = "A-TYPE<br>BONUS";
+      }else if(active){
         stEmblem.innerHTML = "DEVIL<br>RUSH";
       }else if(normalState.bonusPending){
         stEmblem.innerHTML = "BONUS<br>確定";
@@ -8478,7 +8580,7 @@ body{
       }
       updateDevilStatusLamp();
     }
-    setText("wdCounterSt", atCountText);
+    setText("wdCounterSt", A_TYPE_MODE ? "A" : atCountText);
     setText("wdCounterBig", stats.bigCount || 0);
     setText("wdCounterReg", stats.midCount || 0);
     setText("wdCounterSmall", stats.smallCount || 0);
@@ -8494,7 +8596,11 @@ body{
       if(labelEl) labelEl.textContent = label;
       valueEl.textContent = value;
     };
-    if(active){
+    if(A_TYPE_MODE){
+      setMirrorCell("wdMirrorSt", "TYPE", "A");
+      setMirrorCell("wdMirrorBig", "BIG", stats.bigCount || 0);
+      setMirrorCell("wdMirrorReg", "REG", stats.midCount || 0);
+    }else if(active){
       const zoneRemain = Math.max(0, session.bigZone || 0);
       setMirrorCell("wdMirrorSt", "AT残", `${Math.max(0, session.remain || 0)}G`);
       setMirrorCell("wdMirrorBig", "DZ残", currentGoraiZoneType() === "devil" && isGoraiZoneActive() ? `${zoneRemain}G` : "0G");
@@ -8514,7 +8620,11 @@ body{
       const sevenSegPanel = remainBig.closest(".sevenSegPanel");
       if(sevenSegPanel) sevenSegPanel.classList.toggle("zoneHold", active && isGoraiZoneActive());
       const label = document.querySelector(".sevenSegLabel");
-      if(active){
+      if(A_TYPE_MODE){
+        if(label) label.textContent = "BONUS";
+        remainBig.textContent = "A";
+        remainBig.classList.remove("idle");
+      }else if(active){
         if(label) label.textContent = isGoraiZoneActive() ? goraiZoneLabel() : isContinuationBattleActive() ? "BATTLE" : "残りAT";
         if(isGoraiZoneActive()){
           remainBig.textContent = String(Math.max(0, session.bigZone)).padStart(2, "0");
@@ -8593,6 +8703,34 @@ body{
     const table = $("settingTable");
     if(!table) return;
 
+    if(A_TYPE_MODE){
+      let html = `<tr><td>設定</td><td>機械割</td><td>BIG</td><td>REG</td><td>ボーナス合算</td><td>ベル</td><td>リプレイ</td><td>スイカ</td><td>チェリー合算</td></tr>`;
+      for(const i of [1,2,3,4,5,6]){
+        const bonus = A_TYPE_BONUS_TABLE[i];
+        const weights = normalEventWeights(i);
+        const total = weights.reduce((a,b)=>a+b.w,0);
+        const roleP = normalRoleProbability();
+        const weightOf = (name)=>weights.find(x=>x.result === name)?.w || 0;
+        const bellP = roleP * (weightOf("BELL") / total);
+        const replayP = roleP * (weightOf("REPLAY") / total);
+        const suikaP = roleP * (weightOf("SUICA") / total);
+        const cherryP = roleP * ((weightOf("CHERRY_ANY") + weightOf("CHERRY_DOUBLE") + weightOf("CHERRY_TRIPLE")) / total);
+        html += `<tr>
+          <td>${i}</td>
+          <td>${bonus.payout.toFixed(1)}%</td>
+          <td>1/${bonus.big.toFixed(1)}</td>
+          <td>1/${bonus.reg.toFixed(1)}</td>
+          <td>1/${bonus.total.toFixed(1)}</td>
+          <td>${oddsText(bellP)}</td>
+          <td>${oddsText(replayP)}</td>
+          <td>${oddsText(suikaP)}</td>
+          <td>${oddsText(cherryP)}</td>
+        </tr>`;
+      }
+      table.innerHTML = html;
+      return;
+    }
+
     let html = `<tr><td>設定</td><td>表記割</td><td>BIG/超デビルゾーン</td><td>REG/デビルゾーン</td><td>砂時計</td><td>ベル</td><td>斜めベル</td><td>スイカ</td><td>チェリー合算</td><td>BAR</td><td>平均SET</td></tr>`;
     const settingList = [1,2,3,4,5,6];
 
@@ -8634,7 +8772,7 @@ body{
   function resetGame(confirmFirst=true){
     stopDebugFastSpin("初期化のため高速停止");
     stopSpeedToBonus("初期化のためSPEED停止");
-    if(!confirm("統計と現在のAT状態を初期化しますか？")) return;
+    if(!confirm("統計と現在の状態を初期化しますか？")) return;
     stopAutoPlay("初期化のためオート停止");
     pauseNormalBgm();
     stopBattleBgm(false);
@@ -8674,7 +8812,7 @@ body{
     if($("premiumForceStatus")) $("premiumForceStatus").value = "OFF";
     $("stLamp").classList.remove("on");
     setMorningBarReels();
-    showMessage("READY",`1回転${SPIN_COST}pt / 通常・高確からBONUSを目指す`);
+    showMessage("READY",`1回転${SPIN_COST}pt / BIG・REG完全告知 / 設定${settings.setting}`);
     $("resultText").textContent = "-";
     updateDisplay();
     log("統計を初期化しました");
@@ -8712,7 +8850,7 @@ body{
     stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
-    normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",bonusWaitGames:0,morningCeilingActive:true};
+    normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",bonusWaitGames:0,morningCeilingActive:!A_TYPE_MODE};
     session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     completeTrialState = {locked:false,lockedSetting:0,rescueActive:false,completeProfit:0};
     setSpeedFrameOffHold(false);
@@ -8723,16 +8861,19 @@ body{
     if($("premiumForceStatus")) $("premiumForceStatus").value = "OFF";
     $("stLamp").classList.remove("on");
     setMorningBarReels();
-    showMessage(reason, `設定${settings.setting}据え置き / 初回天井${MORNING_CEILING_GAMES}G / COMPLETE解除`);
-    $("resultText").textContent = `朝一モード / 天井まで${ceilingRemain()}G`;
+    showMessage(reason, A_TYPE_MODE ? `設定${settings.setting}据え置き / Aタイプ通常へリセット` : `設定${settings.setting}据え置き / 初回天井${MORNING_CEILING_GAMES}G / COMPLETE解除`);
+    $("resultText").textContent = A_TYPE_MODE ? "Aタイプ通常" : `朝一モード / 天井まで${ceilingRemain()}G`;
     persistState();
     updateDisplay();
-    log(`[RESET] ${reason} / 設定${settings.setting} / 初回天井${MORNING_CEILING_GAMES}G / COMPLETE解除`);
+    log(A_TYPE_MODE ? `[RESET] ${reason} / 設定${settings.setting} / Aタイプ通常` : `[RESET] ${reason} / 設定${settings.setting} / 初回天井${MORNING_CEILING_GAMES}G / COMPLETE解除`);
     return true;
   }
 
   function morningResetGame(confirmFirst=true, reason="朝一リセット"){
-    if(confirmFirst && !confirm(`設定はそのままでCOMPLETEを解除し、朝一モード（初回天井${MORNING_CEILING_GAMES}G）にしますか？`)) return false;
+    const message = A_TYPE_MODE
+      ? "設定はそのままでCOMPLETEを解除し、Aタイプ通常状態に戻しますか？"
+      : `設定はそのままでCOMPLETEを解除し、朝一モード（初回天井${MORNING_CEILING_GAMES}G）にしますか？`;
+    if(confirmFirst && !confirm(message)) return false;
     return resetRuntimeForMorning(reason);
   }
 
@@ -8743,7 +8884,7 @@ body{
     const row = document.createElement("div");
     row.className = "row";
     row.style.marginBottom = "8px";
-    row.innerHTML = `<button class="subBtn" id="morningResetBtn" type="button">朝一リセット</button>`;
+    row.innerHTML = `<button class="subBtn" id="morningResetBtn" type="button">${A_TYPE_MODE ? "Aタイプ通常リセット" : "朝一リセット"}</button>`;
     const simBtn = document.createElement("button");
     simBtn.className = "subBtn";
     simBtn.id = "tenKSimBtn";
@@ -8753,7 +8894,9 @@ body{
     const help = document.createElement("div");
     help.className = "help";
     help.style.margin = "-2px 0 10px";
-    help.textContent = `朝一リセット：設定はそのまま、COMPLETE解除、初回BIG/REGまで天井${MORNING_CEILING_GAMES}G。`;
+    help.textContent = A_TYPE_MODE
+      ? "Aタイプリセット：設定はそのまま、COMPLETE解除、通常状態へ戻します。"
+      : `朝一リセット：設定はそのまま、COMPLETE解除、初回BIG/REGまで天井${MORNING_CEILING_GAMES}G。`;
     anchor.insertAdjacentElement("afterend", help);
     anchor.insertAdjacentElement("afterend", row);
   }
@@ -9515,7 +9658,7 @@ body{
       currentSpin = null;
       updateDisplay();
       setTimeout(()=>clearReelVideos(), 900);
-      if(resolved.bar3PremiumReady){
+      if(!A_TYPE_MODE && resolved.bar3PremiumReady){
         stopSpeedToBonus("ボーナス確定のためSPEED停止");
         setSpeedFrameOffHold(true);
         queueBonusSessionStart(180, {
@@ -9524,7 +9667,7 @@ body{
           barBgmSets:stockSetsForResult("BAR3"),
           initialPaid:Number(resolved.reward) || 0
         });
-      }else if(resolved.bonusReady){
+      }else if(!A_TYPE_MODE && resolved.bonusReady){
         stopSpeedToBonus("ボーナス確定のためSPEED停止");
         setSpeedFrameOffHold(true);
         queueBonusSessionStart(180);
@@ -9596,7 +9739,7 @@ body{
       stats.totalSpins++;
       chargeSpinCost();
       applyNormalResult(result, resolved, lineRow);
-      if(resolved.bonusReady){
+      if(!A_TYPE_MODE && resolved.bonusReady){
         setTimeout(()=>startSession(), 700);
       }
     }else{
@@ -9607,6 +9750,11 @@ body{
   }
 
   function forceHighModeNow(){
+    if(A_TYPE_MODE){
+      showMessage("Aタイプ固定", "高確は使用しません");
+      log("高確強制：Aタイプでは未使用");
+      return;
+    }
     if(isSpinning){
       showMessage("高確強制", "回転停止後に使用してください");
       log("高確強制：回転中のため不可");
@@ -9645,7 +9793,7 @@ body{
     }
 
     if(autoPlay){
-      status.textContent = `オート中：ATを自動消化`;
+      status.textContent = A_TYPE_MODE ? "オート中：Aタイプを自動消化" : `オート中：ATを自動消化`;
       status.style.color = "var(--green)";
     }else{
       status.textContent = "オート停止中";
@@ -9666,7 +9814,7 @@ body{
     readSettings();
     autoPlay = true;
     updateAutoUi();
-    log("オートAT開始");
+    log(A_TYPE_MODE ? "オート開始" : "オートAT開始");
     runAutoStep();
   }
 
@@ -10409,7 +10557,7 @@ body{
       });
     }
     onClick("autoStartBtn", startAutoPlay);
-    onClick("autoStopBtn", ()=>stopAutoPlay("オートAT停止"));
+    onClick("autoStopBtn", ()=>stopAutoPlay(A_TYPE_MODE ? "オート停止" : "オートAT停止"));
     if($("debugFastStartBtn")) $("debugFastStartBtn").addEventListener("click", startDebugFastSpin);
     if($("debugFastStopBtn")) $("debugFastStopBtn").addEventListener("click", ()=>stopDebugFastSpin());
     if(slumpSeekRange){
@@ -10438,7 +10586,7 @@ body{
     }
     if($("quickAutoBtn")){
       $("quickAutoBtn").addEventListener("click", ()=>{
-        if(autoPlay) stopAutoPlay("オートAT停止");
+        if(autoPlay) stopAutoPlay(A_TYPE_MODE ? "オート停止" : "オートAT停止");
         else startAutoPlay();
       });
     }
@@ -10580,7 +10728,7 @@ body{
   setup();
   connectAdminCommands();
   reels.forEach((_,i)=>setRandomReel(i));
-  showMessage("READY",`1回転${SPIN_COST}pt / 通常・高確からBONUSを目指す`);
+  showMessage("READY",`1回転${SPIN_COST}pt / BIG・REG完全告知 / 設定${settings.setting}`);
   updateDisplay();
   updateAutoUi();
   updateDebugFastUi();
