@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 270" role="img" aria-label="Rising logo">
   <defs>
     <linearGradient id="letterFill" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#ffffff"/>
-      <stop offset="0.45" stop-color="#f8f8f8"/>
-      <stop offset="0.52" stop-color="#c8ccd8"/>
-      <stop offset="0.76" stop-color="#ffffff"/>
-      <stop offset="1" stop-color="#d9dde8"/>
+      <stop offset="0" stop-color="#ff5a45"/>
+      <stop offset="0.34" stop-color="#ff1717"/>
+      <stop offset="0.58" stop-color="#b40008"/>
+      <stop offset="0.78" stop-color="#f01818"/>
+      <stop offset="1" stop-color="#720008"/>
     </linearGradient>
     <linearGradient id="goldStroke" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#fff37a"/>
@@ -19,7 +19,7 @@
     </linearGradient>
     <filter id="dropShadow" x="-20%" y="-35%" width="140%" height="180%">
       <feDropShadow dx="0" dy="11" stdDeviation="4" flood-color="#000000" flood-opacity="0.58"/>
-      <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#ffd843" flood-opacity="0.45"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#000000" flood-opacity="0.50"/>
     </filter>
     <filter id="shine" x="-20%" y="-25%" width="140%" height="150%">
       <feGaussianBlur in="SourceAlpha" stdDeviation="1.4" result="blur"/>
@@ -32,12 +32,11 @@
   </defs>
 
   <g transform="translate(460 145) skewX(-7)" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="900" font-size="132" letter-spacing="1">
-    <text x="7" y="7" fill="none" stroke="#05070d" stroke-width="34" stroke-linejoin="round" filter="url(#dropShadow)">Rising</text>
-    <text x="0" y="0" fill="none" stroke="url(#redStroke)" stroke-width="30" stroke-linejoin="round">Rising</text>
-    <text x="0" y="0" fill="none" stroke="#ffffff" stroke-width="22" stroke-linejoin="round" opacity="0.95">Rising</text>
-    <text x="0" y="0" fill="none" stroke="url(#goldStroke)" stroke-width="15" stroke-linejoin="round">Rising</text>
-    <text x="0" y="0" fill="none" stroke="#11131a" stroke-width="6" stroke-linejoin="round">Rising</text>
-    <text x="0" y="0" fill="url(#letterFill)" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" filter="url(#shine)">Rising</text>
+    <text x="7" y="7" fill="none" stroke="#05070d" stroke-width="38" stroke-linejoin="round" filter="url(#dropShadow)">Rising</text>
+    <text x="0" y="0" fill="none" stroke="#05070d" stroke-width="34" stroke-linejoin="round">Rising</text>
+    <text x="0" y="0" fill="none" stroke="url(#goldStroke)" stroke-width="23" stroke-linejoin="round">Rising</text>
+    <text x="0" y="0" fill="none" stroke="#4d2500" stroke-width="11" stroke-linejoin="round" opacity="0.86">Rising</text>
+    <text x="0" y="0" fill="url(#letterFill)" stroke="#ffdf55" stroke-width="2.4" stroke-linejoin="round" filter="url(#shine)">Rising</text>
   </g>
 
   <g opacity="0.95">
