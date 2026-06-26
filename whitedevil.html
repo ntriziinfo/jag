@@ -4020,14 +4020,8 @@ body{
 
         <div class="stats">
           <div class="stat"><div class="k">回転数</div><div class="v" id="totalSpinsView">0</div></div>
-          <div class="stat"><div class="k">A-TYPE</div><div class="v" id="totalSessionsView">0</div></div>
           <div class="stat"><div class="k">BIG</div><div class="v" id="bigCountView">0</div></div>
           <div class="stat"><div class="k">REG</div><div class="v" id="midCountView">0</div></div>
-          <div class="stat"><div class="k">砂時計</div><div class="v" id="smallCountView">0</div></div>
-          <div class="stat"><div class="k">ベル</div><div class="v" id="bellCountView">0</div></div>
-          <div class="stat"><div class="k">斜めベル</div><div class="v" id="diagonalBellCountView">0</div></div>
-          <div class="stat"><div class="k">スイカ</div><div class="v" id="suikaCountView">0</div></div>
-          <div class="stat"><div class="k">チェリー</div><div class="v" id="cherryCountView">0</div></div>
           <div class="stat"><div class="k">損益</div><div class="v" id="totalProfitView">0</div></div>
         </div>
       </div>
@@ -4063,12 +4057,6 @@ body{
             <div><span>TYPE</span><b id="wdCounterSt">A</b></div>
             <div><span>BIG</span><b id="wdCounterBig">0</b></div>
             <div><span>REG</span><b id="wdCounterReg">0</b></div>
-            <div><span>砂時計</span><b id="wdCounterSmall">0</b></div>
-            <div><span>ベル</span><b id="wdCounterBell">0</b></div>
-            <div><span>斜めベル</span><b id="wdCounterDiagonalBell">0</b></div>
-            <div><span>スイカ</span><b id="wdCounterSuika">0</b></div>
-            <div><span>チェリー</span><b id="wdCounterCherry">0</b></div>
-            <div><span>リプレイ</span><b id="wdCounterReplay">0</b></div>
           </div>
         </div>
         <div class="payline"></div>
@@ -4242,69 +4230,37 @@ body{
           <button class="dangerBtn" id="resetBtn">初期化</button>
         </div>
         <div class="help" style="margin-top:10px">
-          1プレイごとに3ptを消費します。設定1〜6のBIG/REG確率で直接ボーナスを抽選し、BIGは252pt、REGは96ptを払い出します。通常小役はベル8pt、スイカ3pt、チェリー各種3pt、リプレイ3ptです。
+          1プレイごとに3ptを消費します。Aタイプ中は画像の設定別確率でBIG/REGのみを抽選し、ハズレは払い出しなしです。
         </div>
       </div>
 
       <div class="card">
-        <h2>報酬</h2>
-        <div class="field">
-          <label>砂時計倍率（15pt固定）</label>
-          <input id="smallMulInput" type="number" min="0" max="100" step="0.01" value="0.15" readonly />
-        </div>
-        <div class="field">
-          <label>チェリー倍率（0.05倍固定）</label>
-          <input id="cherryMulInput" type="number" min="0" max="100" step="0.01" value="0.05" readonly />
-        </div>
-        <div class="field">
-          <label>ベル払い出し（0.01倍固定）</label>
-          <input id="bellMulInput" type="number" min="0" max="100" step="0.01" value="0.01" readonly />
-        </div>
-        <div class="field">
-          <label>スイカ払い出し（0.01倍固定）</label>
-          <input id="suikaMulInput" type="number" min="0" max="100" step="0.01" value="0.01" readonly />
-        </div>
+        <h2>ボーナス払い出し</h2>
         <div class="field">
           <label>REG払い出し（96pt固定）</label>
-          <input id="midMulInput" type="number" min="0" max="100" step="0.01" value="0.15" readonly />
+          <input id="midMulInput" type="number" min="0" max="1000" step="1" value="96" readonly />
         </div>
         <div class="field">
           <label>BIG払い出し（252pt固定）</label>
-          <input id="bigMulInput" type="number" min="0" max="100" step="0.01" value="0.15" readonly />
+          <input id="bigMulInput" type="number" min="0" max="1000" step="1" value="252" readonly />
         </div>
         <div class="help">
-          Aタイプ中はAT・継続バトルへ移行しません。BIG/REGは当選ゲームで確定告知し、払い出し後は通常ゲームへ戻ります。
+          Aタイプ中はAT・継続バトル・小役抽選へ移行しません。BIG/REGは当選ゲームで確定告知し、払い出し後は通常ゲームへ戻ります。
         </div>
       </div>
 
       <div class="card">
-        <h2>Aタイプ払い出しルール</h2>
-        <div class="field">
-          <label>砂時計画像揃い</label>
-          <input type="text" value="15pt固定" readonly />
-        </div>
+        <h2>Aタイプ当選役</h2>
         <div class="field">
           <label>REG 77BAR</label>
           <input type="text" value="96pt固定 / AT加算なし" readonly />
         </div>
         <div class="field">
-          <label>BAR揃い</label>
-          <input type="text" value="Aタイプでは通常役扱いなし" readonly />
-        </div>
-        <div class="field">
           <label>BIG 7揃い 払い出し</label>
           <input id="bigAddInput" type="number" min="0" max="1000" step="1" value="252" readonly />
         </div>
-        <div class="field">
-          <label>チェリー・ANY・ANY 加算</label>
-          <input id="cherryAnyAddInput" type="text" value="3pt固定 / AT加算なし" readonly />
-        </div>
-        <div class="field">
-          <label>チェリー・チェリー・チェリー 加算</label>
-          <input id="cherryTripleAddInput" type="text" value="3pt固定 / AT加算なし" readonly />
-        </div>
         <div class="help">
-          BIGは252pt、REGは96pt。AT・SET・継続率・天井・高確はAタイプでは使用しません。小役はベル8pt、スイカ3pt、チェリー各種3pt、リプレイ3pt、砂時計15ptです。
+          BIGは252pt、REGは96pt。AT・SET・継続率・天井・高確・小役はAタイプでは使用しません。
         </div>
       </div>
 
@@ -4315,16 +4271,8 @@ body{
           <select id="forceResult">
             <option value="">ランダム</option>
             <option value="MISS">ハズレ</option>
-          <option value="SMALL">砂時計（15pt）</option>
-          <option value="MID">REG（77BAR/96pt）</option>
-            <option value="BAR3">BAR揃い（Aタイプでは未使用）</option>
+            <option value="MID">REG（77BAR/96pt）</option>
             <option value="BIG">BIG（777/252pt）</option>
-            <option value="BELL">ベル揃い</option>
-            <option value="BELL3">斜めベル</option>
-            <option value="REPLAY">リプレイ</option>
-            <option value="SUICA">スイカ揃い</option>
-            <option value="CHERRY_DOUBLE">チェリー2連</option>
-            <option value="CHERRY_TRIPLE">チェリー3つ</option>
           </select>
         </div>
         <div class="row">
@@ -4340,31 +4288,10 @@ body{
           <input id="premiumForceStatus" type="text" value="OFF" readonly />
         </div>
         <div class="field" style="margin-top:12px">
-          <label>高確フラグ（Aタイプでは未使用）</label>
-          <div class="row">
-            <button class="subBtn" id="debugHighBtn">即高確10G</button>
-          </div>
-        </div>
-        <div class="field" style="margin-top:12px">
           <label>直行操作</label>
-          <div class="row">
-            <button class="subBtn" id="debugSmallBtn">即砂時計</button>
-          </div>
           <div class="row" style="margin-top:8px">
             <button class="subBtn" id="debugMidBtn">即REG</button>
-            <button class="subBtn" id="debugBar3Btn">即BAR揃い</button>
-            <button class="subBtn" id="debugBigBtn">即7</button>
-          </div>
-          <div class="row" style="margin-top:8px">
-            <button class="subBtn" id="debugBellPayBtn">即ベル</button>
-            <button class="subBtn" id="debugBell3Btn">即斜めベル</button>
-            <button class="subBtn" id="debugReplayBtn">即リプレイ</button>
-            <button class="subBtn" id="debugSuikaBtn">即スイカ</button>
-            <button class="subBtn" id="debugCherryBtn">即チェリーANY</button>
-            <button class="subBtn" id="debugCherryDoubleBtn">即チェリー2連</button>
-            <button class="subBtn" id="debugBellBtn">即チェリー3つ</button>
-          </div>
-          <div class="row" style="margin-top:8px">
+            <button class="subBtn" id="debugBigBtn">即BIG</button>
             <button class="subBtn" id="debugMissBtn">即ハズレ</button>
           </div>
         </div>
@@ -4488,6 +4415,7 @@ body{
     BIG:252,
     MID:96
   });
+  const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID"]);
 
   const USER_FACE = "__USER_FACE__";
   const SUICA_IMAGE_SRC = "assets/symbols/sym_suika.png";
@@ -6258,6 +6186,10 @@ body{
     return NORMAL_ROLE_PAYOUTS[result] || 0;
   }
 
+  function normalizeATypeResult(result){
+    return A_TYPE_RESULT_SET.has(result) ? result : "MISS";
+  }
+
   function randomInt(min, max){
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
@@ -7172,7 +7104,7 @@ body{
   function drawNormalResult(){
     if(A_TYPE_MODE){
       if(pendingForceResult && RESULT[pendingForceResult]){
-        return pendingForceResult;
+        return normalizeATypeResult(pendingForceResult);
       }
 
       const table = A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1];
@@ -7183,10 +7115,6 @@ body{
       if(roll < bigP) return "BIG";
       roll -= bigP;
       if(roll < regP) return "MID";
-
-      if(Math.random() < normalRoleProbability()){
-        return weightedPick(normalEventWeights());
-      }
       return "MISS";
     }
 
@@ -7455,7 +7383,8 @@ body{
     }else if(command.type === "reset"){
       morningResetGame(false, "管理リセット");
     }else if(command.type === "forceResult"){
-      forceResult = command.result && RESULT[command.result] ? command.result : "";
+      const requested = command.result && RESULT[command.result] ? command.result : "";
+      forceResult = A_TYPE_MODE && requested ? normalizeATypeResult(requested) : requested;
       if($("forceResult")) $("forceResult").value = forceResult;
       log(forceResult ? `管理画面：次回転指定 ${RESULT[forceResult].name}` : "管理画面：次回転指定を解除");
       updateDisplay();
@@ -7623,12 +7552,12 @@ body{
     $("stSpinsInput").readOnly = !!A_TYPE_MODE;
     $("oddsMultiplierInput").value = settings.oddsMultiplier;
     if($("smallMulInput")) $("smallMulInput").value = ROLE_PAYOUTS.SMALL / PAYOUT_BASE;
-    if($("midMulInput")) $("midMulInput").value = (A_TYPE_MODE ? A_TYPE_PAYOUTS.MID : ROLE_PAYOUTS.MID) / PAYOUT_BASE;
+    if($("midMulInput")) $("midMulInput").value = A_TYPE_MODE ? A_TYPE_PAYOUTS.MID : ROLE_PAYOUTS.MID / PAYOUT_BASE;
     if($("crownMulInput")) $("crownMulInput").value = 0;
     if($("cherryMulInput")) $("cherryMulInput").value = ROLE_PAYOUTS.CHERRY_ANY / PAYOUT_BASE;
     if($("bellMulInput")) $("bellMulInput").value = ROLE_PAYOUTS.BELL / PAYOUT_BASE;
     if($("suikaMulInput")) $("suikaMulInput").value = ROLE_PAYOUTS.SUICA / PAYOUT_BASE;
-    if($("bigMulInput")) $("bigMulInput").value = (A_TYPE_MODE ? A_TYPE_PAYOUTS.BIG : ROLE_PAYOUTS.BIG) / PAYOUT_BASE;
+    if($("bigMulInput")) $("bigMulInput").value = A_TYPE_MODE ? A_TYPE_PAYOUTS.BIG : ROLE_PAYOUTS.BIG / PAYOUT_BASE;
     if($("bigAddInput")) $("bigAddInput").value = A_TYPE_MODE ? A_TYPE_PAYOUTS.BIG : 5;
     $("autoDelayInput").value = settings.autoDelay;
     if($("masterVolume")) $("masterVolume").value = settings.masterVolume;
@@ -8530,7 +8459,7 @@ body{
     if($("stInfoViewLegacy")) $("stInfoViewLegacy").textContent = stInfoText;
     if($("adminStInfoView")) $("adminStInfoView").textContent = stInfoText;
     const payoutScaleText = A_TYPE_MODE
-      ? `Aタイプ:BIG${A_TYPE_PAYOUTS.BIG}pt/REG${A_TYPE_PAYOUTS.MID}pt/ベル${NORMAL_ROLE_PAYOUTS.BELL}pt/スイカ${NORMAL_ROLE_PAYOUTS.SUICA}pt/チェリー${NORMAL_ROLE_PAYOUTS.CHERRY_ANY}pt/リプレイ${NORMAL_ROLE_PAYOUTS.REPLAY}pt`
+      ? `Aタイプ:BIG${A_TYPE_PAYOUTS.BIG}pt/REG${A_TYPE_PAYOUTS.MID}pt/ハズレ0pt`
       : `通常:ベル${NORMAL_ROLE_PAYOUTS.BELL}pt/スイカ${NORMAL_ROLE_PAYOUTS.SUICA}pt/チェリー${NORMAL_ROLE_PAYOUTS.CHERRY_ANY}pt/リプレイ${NORMAL_ROLE_PAYOUTS.REPLAY}pt/REG${NORMAL_ROLE_PAYOUTS.MID}pt / 通常小役${Math.round(NORMAL_ROLE_RATE * 100)}% / 高確小役${Math.round(HIGH_ROLE_RATE * 100)}% / ATベル${ROLE_PAYOUTS.BELL}pt/斜めベル${ROLE_PAYOUTS.BELL3}pt / 平均継続${formatRate(averageContinuationRate(settings.setting))}`;
     if($("payoutScaleView")) $("payoutScaleView").textContent = payoutScaleText;
     if($("payoutScaleViewLegacy")) $("payoutScaleViewLegacy").textContent = payoutScaleText;
@@ -8704,27 +8633,15 @@ body{
     if(!table) return;
 
     if(A_TYPE_MODE){
-      let html = `<tr><td>設定</td><td>機械割</td><td>BIG</td><td>REG</td><td>ボーナス合算</td><td>ベル</td><td>リプレイ</td><td>スイカ</td><td>チェリー合算</td></tr>`;
+      let html = `<tr><td>設定</td><td>BIG</td><td>REG</td><td>ボーナス合算</td><td>機械割</td></tr>`;
       for(const i of [1,2,3,4,5,6]){
         const bonus = A_TYPE_BONUS_TABLE[i];
-        const weights = normalEventWeights(i);
-        const total = weights.reduce((a,b)=>a+b.w,0);
-        const roleP = normalRoleProbability();
-        const weightOf = (name)=>weights.find(x=>x.result === name)?.w || 0;
-        const bellP = roleP * (weightOf("BELL") / total);
-        const replayP = roleP * (weightOf("REPLAY") / total);
-        const suikaP = roleP * (weightOf("SUICA") / total);
-        const cherryP = roleP * ((weightOf("CHERRY_ANY") + weightOf("CHERRY_DOUBLE") + weightOf("CHERRY_TRIPLE")) / total);
         html += `<tr>
           <td>${i}</td>
-          <td>${bonus.payout.toFixed(1)}%</td>
           <td>1/${bonus.big.toFixed(1)}</td>
           <td>1/${bonus.reg.toFixed(1)}</td>
           <td>1/${bonus.total.toFixed(1)}</td>
-          <td>${oddsText(bellP)}</td>
-          <td>${oddsText(replayP)}</td>
-          <td>${oddsText(suikaP)}</td>
-          <td>${oddsText(cherryP)}</td>
+          <td>${bonus.payout.toFixed(1)}%</td>
         </tr>`;
       }
       table.innerHTML = html;
@@ -9718,6 +9635,7 @@ body{
   function direct(result){
     if(isSpinning) return;
     if(!canPlayCompleteTrial()) return;
+    if(A_TYPE_MODE) result = normalizeATypeResult(result);
     readSettings();
     const normalDirect = !session.active;
     const spec = RESULT[result];
