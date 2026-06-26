@@ -5379,8 +5379,15 @@ body{
 
   function syncBackgroundLogoToReelCenter(){
     const root = document.documentElement;
-    root.style.setProperty("--wd-bg-sync-size", "100% auto");
-    root.style.setProperty("--wd-bg-sync-x", "center top");
+    const viewW = window.innerWidth || document.documentElement.clientWidth || PAGE_STAGE_WIDTH;
+    const wrapEl = document.querySelector(".wrap");
+    const wrapRect = wrapEl ? wrapEl.getBoundingClientRect() : null;
+    const bgWidth = wrapRect && Number.isFinite(wrapRect.width) && wrapRect.width > 0 ? wrapRect.width : viewW;
+    const reelCenter = reelCenterScreenX();
+    const centerX = Number.isFinite(reelCenter) ? reelCenter : viewW / 2;
+    const bgLeft = Math.round((centerX - bgWidth / 2) * 100) / 100;
+    root.style.setProperty("--wd-bg-sync-size", `${Math.round(bgWidth * 100) / 100}px auto`);
+    root.style.setProperty("--wd-bg-sync-x", `${bgLeft}px top`);
   }
 
   function requestBackgroundLogoSync(){
@@ -5420,6 +5427,7 @@ body{
     document.documentElement.style.setProperty("--wd-cabinet-x-offset", `${Math.round(cabinetXOffsetForPageZoom() * 100) / 100}px`);
     document.body.style.minWidth = "100%";
     requestPageScrollBoundsUpdate();
+    requestBackgroundLogoSync();
     if(pageZoomView) pageZoomView.textContent = `${Math.round(pageZoom * 100)}%`;
     if(pageZoomOutBtn) pageZoomOutBtn.disabled = pageZoom <= PAGE_ZOOM_MIN + 0.001;
     if(pageZoomInBtn) pageZoomInBtn.disabled = pageZoom >= PAGE_ZOOM_MAX - 0.001;
@@ -10820,9 +10828,13 @@ body{
     window.addEventListener("resize", ()=>{
       syncZoomAnchorToSlotTop();
       requestPageScrollBoundsUpdate();
+      requestBackgroundLogoSync();
       syncInfoPanelPositionIfOpen();
     }, {passive:true});
-    window.addEventListener("load", requestPageScrollBoundsUpdate, {once:true});
+    window.addEventListener("load", ()=>{
+      requestPageScrollBoundsUpdate();
+      requestBackgroundLogoSync();
+    }, {once:true});
     window.addEventListener("scroll", ()=>{
       syncInfoPanelPositionIfOpen();
     }, {passive:true});
@@ -11027,6 +11039,7 @@ body{
   updateDisplay();
   updateAutoUi();
   updateDebugFastUi();
+  requestBackgroundLogoSync();
 })();
 </script>
 </body>
