@@ -1,0 +1,56 @@
+<svg width="1679" height="937" viewBox="0 0 1679 937" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="goldFlash" cx="50%" cy="50%" r="62%">
+      <stop offset="0" stop-color="#fff8bf" stop-opacity=".95"/>
+      <stop offset=".35" stop-color="#ffcb26" stop-opacity=".75"/>
+      <stop offset=".78" stop-color="#ff6b00" stop-opacity=".24"/>
+      <stop offset="1" stop-color="#ff0000" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="greenFlash" cx="50%" cy="50%" r="70%">
+      <stop offset="0" stop-color="#f2ffd7" stop-opacity=".95"/>
+      <stop offset=".26" stop-color="#52ff3b" stop-opacity=".85"/>
+      <stop offset=".68" stop-color="#12b820" stop-opacity=".32"/>
+      <stop offset="1" stop-color="#00ff2a" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="hotGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <g filter="url(#hotGlow)" opacity=".96">
+    <ellipse cx="839" cy="88" rx="590" ry="66" fill="url(#greenFlash)"/>
+    <ellipse cx="839" cy="500" rx="720" ry="345" fill="url(#goldFlash)" opacity=".28"/>
+    <path d="M132 102 C338 66 523 77 694 100 L839 119 L984 100 C1155 77 1341 66 1547 102" fill="none" stroke="#ffe86a" stroke-width="16" stroke-linecap="round" opacity=".82"/>
+    <path d="M136 810 C324 850 509 838 663 818 L839 794 L1015 818 C1169 838 1355 850 1543 810" fill="none" stroke="#ffe86a" stroke-width="16" stroke-linecap="round" opacity=".74"/>
+    <rect x="213" y="101" width="1253" height="106" rx="20" fill="none" stroke="#fff1a6" stroke-width="9" opacity=".72"/>
+    <rect x="210" y="258" width="401" height="508" rx="25" fill="none" stroke="#fff1a6" stroke-width="13" opacity=".68"/>
+    <rect x="637" y="258" width="401" height="508" rx="25" fill="none" stroke="#fff1a6" stroke-width="13" opacity=".68"/>
+    <rect x="1064" y="258" width="401" height="508" rx="25" fill="none" stroke="#fff1a6" stroke-width="13" opacity=".68"/>
+  </g>
+
+  <g filter="url(#hotGlow)" opacity=".98">
+    <circle cx="406" cy="77" r="21" fill="url(#greenFlash)"/>
+    <circle cx="457" cy="77" r="21" fill="url(#greenFlash)"/>
+    <circle cx="508" cy="77" r="21" fill="url(#greenFlash)"/>
+    <circle cx="559" cy="77" r="21" fill="url(#greenFlash)"/>
+    <circle cx="1120" cy="77" r="21" fill="url(#greenFlash)"/>
+    <circle cx="1171" cy="77" r="21" fill="url(#greenFlash)"/>
+    <circle cx="1222" cy="77" r="21" fill="url(#greenFlash)"/>
+    <circle cx="1273" cy="77" r="21" fill="url(#greenFlash)"/>
+    <circle cx="180" cy="830" r="62" fill="url(#goldFlash)" opacity=".78"/>
+    <circle cx="494" cy="834" r="54" fill="url(#goldFlash)" opacity=".7"/>
+    <circle cx="839" cy="839" r="60" fill="url(#goldFlash)" opacity=".82"/>
+    <circle cx="1184" cy="834" r="54" fill="url(#goldFlash)" opacity=".7"/>
+    <circle cx="1499" cy="830" r="62" fill="url(#goldFlash)" opacity=".78"/>
+  </g>
+
+  <g filter="url(#hotGlow)">
+    <path d="M839 42 L859 100 L920 100 L871 136 L890 194 L839 158 L788 194 L807 136 L758 100 L819 100 Z" fill="#fff0a4" opacity=".96"/>
+    <path d="M99 165 L117 218 L173 218 L128 251 L145 305 L99 272 L53 305 L70 251 L25 218 L81 218 Z" fill="#ffd445" opacity=".82"/>
+    <path d="M1580 165 L1598 218 L1654 218 L1609 251 L1626 305 L1580 272 L1534 305 L1551 251 L1506 218 L1562 218 Z" fill="#ffd445" opacity=".82"/>
+  </g>
+</svg>
