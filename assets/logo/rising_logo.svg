@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 270" role="img" aria-label="Rising logo">
+  <defs>
+    <linearGradient id="letterFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.45" stop-color="#f8f8f8"/>
+      <stop offset="0.52" stop-color="#c8ccd8"/>
+      <stop offset="0.76" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#d9dde8"/>
+    </linearGradient>
+    <linearGradient id="goldStroke" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff37a"/>
+      <stop offset="0.45" stop-color="#f7bf28"/>
+      <stop offset="1" stop-color="#9b5b00"/>
+    </linearGradient>
+    <linearGradient id="redStroke" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff322c"/>
+      <stop offset="0.55" stop-color="#c30010"/>
+      <stop offset="1" stop-color="#720008"/>
+    </linearGradient>
+    <filter id="dropShadow" x="-20%" y="-35%" width="140%" height="180%">
+      <feDropShadow dx="0" dy="11" stdDeviation="4" flood-color="#000000" flood-opacity="0.58"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#ffd843" flood-opacity="0.45"/>
+    </filter>
+    <filter id="shine" x="-20%" y="-25%" width="140%" height="150%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.4" result="blur"/>
+      <feSpecularLighting in="blur" surfaceScale="4" specularConstant="0.95" specularExponent="28" lighting-color="#ffffff" result="spec">
+        <fePointLight x="-180" y="-120" z="170"/>
+      </feSpecularLighting>
+      <feComposite in="spec" in2="SourceAlpha" operator="in" result="specOut"/>
+      <feComposite in="SourceGraphic" in2="specOut" operator="arithmetic" k1="0" k2="1" k3="0.32" k4="0"/>
+    </filter>
+  </defs>
+
+  <g transform="translate(460 145) skewX(-7)" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="900" font-size="132" letter-spacing="1">
+    <text x="7" y="7" fill="none" stroke="#05070d" stroke-width="34" stroke-linejoin="round" filter="url(#dropShadow)">Rising</text>
+    <text x="0" y="0" fill="none" stroke="url(#redStroke)" stroke-width="30" stroke-linejoin="round">Rising</text>
+    <text x="0" y="0" fill="none" stroke="#ffffff" stroke-width="22" stroke-linejoin="round" opacity="0.95">Rising</text>
+    <text x="0" y="0" fill="none" stroke="url(#goldStroke)" stroke-width="15" stroke-linejoin="round">Rising</text>
+    <text x="0" y="0" fill="none" stroke="#11131a" stroke-width="6" stroke-linejoin="round">Rising</text>
+    <text x="0" y="0" fill="url(#letterFill)" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" filter="url(#shine)">Rising</text>
+  </g>
+
+  <g opacity="0.95">
+    <path d="M120 82 l13 30 33 4 -25 21 7 32 -28 -17 -28 17 7 -32 -25 -21 33 -4z" fill="#ffe65b" stroke="#7d120b" stroke-width="5"/>
+    <path d="M790 82 l13 30 33 4 -25 21 7 32 -28 -17 -28 17 7 -32 -25 -21 33 -4z" fill="#ffe65b" stroke="#7d120b" stroke-width="5"/>
+    <path d="M459 205 l9 21 23 3 -17 15 5 23 -20 -12 -20 12 5 -23 -17 -15 23 -3z" fill="#fff16f" stroke="#7d120b" stroke-width="4"/>
+  </g>
+
+  <path d="M95 213 C235 250 692 250 825 213" fill="none" stroke="#11131a" stroke-width="10" stroke-linecap="round" opacity="0.72"/>
+  <path d="M108 205 C245 238 678 238 812 205" fill="none" stroke="#f5c02b" stroke-width="5" stroke-linecap="round"/>
+</svg>
