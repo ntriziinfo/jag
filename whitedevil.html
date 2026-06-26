@@ -4022,6 +4022,7 @@ body{
           <div class="stat"><div class="k">回転数</div><div class="v" id="totalSpinsView">0</div></div>
           <div class="stat"><div class="k">BIG</div><div class="v" id="bigCountView">0</div></div>
           <div class="stat"><div class="k">REG</div><div class="v" id="midCountView">0</div></div>
+          <div class="stat"><div class="k">ブドウ</div><div class="v" id="grapeCountView">0</div></div>
           <div class="stat"><div class="k">損益</div><div class="v" id="totalProfitView">0</div></div>
         </div>
       </div>
@@ -4057,6 +4058,7 @@ body{
             <div><span>TYPE</span><b id="wdCounterSt">A</b></div>
             <div><span>BIG</span><b id="wdCounterBig">0</b></div>
             <div><span>REG</span><b id="wdCounterReg">0</b></div>
+            <div><span>ブドウ</span><b id="wdCounterGrape">0</b></div>
           </div>
         </div>
         <div class="payline"></div>
@@ -4230,7 +4232,7 @@ body{
           <button class="dangerBtn" id="resetBtn">初期化</button>
         </div>
         <div class="help" style="margin-top:10px">
-          1プレイごとに3ptを消費します。Aタイプ中は画像の設定別確率でBIG/REGのみを抽選し、ハズレは払い出しなしです。
+          1プレイごとに3ptを消費します。Aタイプ中は画像の設定別確率でBIG/REG/ブドウを抽選し、ハズレは払い出しなしです。
         </div>
       </div>
 
@@ -4245,7 +4247,7 @@ body{
           <input id="bigMulInput" type="number" min="0" max="1000" step="1" value="252" readonly />
         </div>
         <div class="help">
-          Aタイプ中はAT・継続バトル・小役抽選へ移行しません。BIG/REGは当選ゲームで確定告知し、払い出し後は通常ゲームへ戻ります。
+          Aタイプ中はAT・継続バトルへ移行しません。BIG/REGは当選ゲームで確定告知し、払い出し後は通常ゲームへ戻ります。ブドウは設定別確率で通常払い出しします。
         </div>
       </div>
 
@@ -4260,7 +4262,7 @@ body{
           <input id="bigAddInput" type="number" min="0" max="1000" step="1" value="252" readonly />
         </div>
         <div class="help">
-          BIGは252pt、REGは96pt。AT・SET・継続率・天井・高確・小役はAタイプでは使用しません。
+          BIGは252pt、REGは96pt、ブドウは8pt。AT・SET・継続率・天井・高確はAタイプでは使用しません。
         </div>
       </div>
 
@@ -4271,6 +4273,7 @@ body{
           <select id="forceResult">
             <option value="">ランダム</option>
             <option value="MISS">ハズレ</option>
+            <option value="GRAPE">ブドウ（8pt）</option>
             <option value="MID">REG（77BAR/96pt）</option>
             <option value="BIG">BIG（777/252pt）</option>
           </select>
@@ -4292,6 +4295,7 @@ body{
           <div class="row" style="margin-top:8px">
             <button class="subBtn" id="debugMidBtn">即REG</button>
             <button class="subBtn" id="debugBigBtn">即BIG</button>
+            <button class="subBtn" id="debugGrapeBtn">即ブドウ</button>
             <button class="subBtn" id="debugMissBtn">即ハズレ</button>
           </div>
         </div>
@@ -4411,11 +4415,20 @@ body{
     5:{big:259.0, reg:255.0, total:128.5, payout:103.3},
     6:{big:255.0, reg:255.0, total:127.5, payout:105.5}
   });
+  const A_TYPE_GRAPE_TABLE = Object.freeze({
+    1:6.02,
+    2:6.02,
+    3:6.02,
+    4:6.02,
+    5:6.02,
+    6:5.78
+  });
   const A_TYPE_PAYOUTS = Object.freeze({
     BIG:252,
-    MID:96
+    MID:96,
+    GRAPE:8
   });
-  const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID"]);
+  const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID", "GRAPE"]);
 
   const USER_FACE = "__USER_FACE__";
   const SUICA_IMAGE_SRC = "assets/symbols/sym_suika.png";
@@ -4458,6 +4471,7 @@ body{
     MISS:{name:"ハズレ", reel:["🍋","🔔","⭐"], label:"MISS", cls:"", kind:"miss"},
     SMALL:{name:"砂時計", reel:[USER_FACE,USER_FACE,USER_FACE], label:"砂時計", cls:"blue", kind:"payadd"},
     MID:{name:"REG", reel:["7","7","BAR"], label:"REG", cls:"purple", kind:"payadd"},
+    GRAPE:{name:"ブドウ", reel:["🍇","🍇","🍇"], label:"ブドウ", cls:"green", kind:"pay"},
     BAR3:{name:"BAR揃い", reel:["BAR","BAR","BAR"], label:"BAR", cls:"purple", kind:"add"},
     BIG:{name:"BIG", reel:["7","7","7"], label:"BIG", cls:"red", kind:"payadd"},
     DEVIL_ZONE:{name:"DEVIL ZONE", reel:["7","7","BAR"], label:"DZ", cls:"purple", kind:"payadd"},
@@ -4559,6 +4573,7 @@ body{
     highSpins:0,
     bigCount:0,
     midCount:0,
+    grapeCount:0,
     smallCount:0,
     bellCount:0,
     diagonalBellCount:0,
@@ -6658,6 +6673,8 @@ body{
       stats.bigCount++;
     }else if(includeBonus && result === "MID"){
       stats.midCount++;
+    }else if(result === "GRAPE"){
+      stats.grapeCount = (Number(stats.grapeCount) || 0) + 1;
     }else if(result === "SMALL"){
       stats.smallCount++;
     }else if(result === "BELL"){
@@ -7108,13 +7125,17 @@ body{
       }
 
       const table = A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1];
+      const grape = A_TYPE_GRAPE_TABLE[settings.setting] || A_TYPE_GRAPE_TABLE[1];
       let roll = Math.random();
       const multiplier = clamp(Number(settings.oddsMultiplier) || 1, 0.1, 100);
       const bigP = clamp((1 / table.big) * multiplier, 0, 0.98);
       const regP = clamp((1 / table.reg) * multiplier, 0, 0.98 - bigP);
+      const grapeP = clamp((1 / grape) * multiplier, 0, 0.98 - bigP - regP);
       if(roll < bigP) return "BIG";
       roll -= bigP;
       if(roll < regP) return "MID";
+      roll -= regP;
+      if(roll < grapeP) return "GRAPE";
       return "MISS";
     }
 
@@ -8459,7 +8480,7 @@ body{
     if($("stInfoViewLegacy")) $("stInfoViewLegacy").textContent = stInfoText;
     if($("adminStInfoView")) $("adminStInfoView").textContent = stInfoText;
     const payoutScaleText = A_TYPE_MODE
-      ? `Aタイプ:BIG${A_TYPE_PAYOUTS.BIG}pt/REG${A_TYPE_PAYOUTS.MID}pt/ハズレ0pt`
+      ? `Aタイプ:BIG${A_TYPE_PAYOUTS.BIG}pt/REG${A_TYPE_PAYOUTS.MID}pt/ブドウ${A_TYPE_PAYOUTS.GRAPE}pt/ハズレ0pt`
       : `通常:ベル${NORMAL_ROLE_PAYOUTS.BELL}pt/スイカ${NORMAL_ROLE_PAYOUTS.SUICA}pt/チェリー${NORMAL_ROLE_PAYOUTS.CHERRY_ANY}pt/リプレイ${NORMAL_ROLE_PAYOUTS.REPLAY}pt/REG${NORMAL_ROLE_PAYOUTS.MID}pt / 通常小役${Math.round(NORMAL_ROLE_RATE * 100)}% / 高確小役${Math.round(HIGH_ROLE_RATE * 100)}% / ATベル${ROLE_PAYOUTS.BELL}pt/斜めベル${ROLE_PAYOUTS.BELL3}pt / 平均継続${formatRate(averageContinuationRate(settings.setting))}`;
     if($("payoutScaleView")) $("payoutScaleView").textContent = payoutScaleText;
     if($("payoutScaleViewLegacy")) $("payoutScaleViewLegacy").textContent = payoutScaleText;
@@ -8469,6 +8490,7 @@ body{
     if($("totalSessionsView")) $("totalSessionsView").textContent = stats.totalSessions || 0;
     if($("bigCountView")) $("bigCountView").textContent = stats.bigCount || 0;
     if($("midCountView")) $("midCountView").textContent = stats.midCount || 0;
+    if($("grapeCountView")) $("grapeCountView").textContent = countOddsText(stats.grapeCount);
     if($("smallCountView")) $("smallCountView").textContent = stats.smallCount || 0;
     if($("bellCountView")) $("bellCountView").textContent = countOddsText(stats.bellCount);
     if($("diagonalBellCountView")) $("diagonalBellCountView").textContent = countOddsText(stats.diagonalBellCount);
@@ -8512,6 +8534,7 @@ body{
     setText("wdCounterSt", A_TYPE_MODE ? "A" : atCountText);
     setText("wdCounterBig", stats.bigCount || 0);
     setText("wdCounterReg", stats.midCount || 0);
+    setText("wdCounterGrape", stats.grapeCount || 0);
     setText("wdCounterSmall", stats.smallCount || 0);
     setText("wdCounterBell", stats.bellCount || 0);
     setText("wdCounterDiagonalBell", stats.diagonalBellCount || 0);
@@ -8633,14 +8656,16 @@ body{
     if(!table) return;
 
     if(A_TYPE_MODE){
-      let html = `<tr><td>設定</td><td>BIG</td><td>REG</td><td>ボーナス合算</td><td>機械割</td></tr>`;
+      let html = `<tr><td>設定</td><td>BIG</td><td>REG</td><td>ボーナス合算</td><td>ブドウ</td><td>機械割</td></tr>`;
       for(const i of [1,2,3,4,5,6]){
         const bonus = A_TYPE_BONUS_TABLE[i];
+        const grape = A_TYPE_GRAPE_TABLE[i] || A_TYPE_GRAPE_TABLE[1];
         html += `<tr>
           <td>${i}</td>
           <td>1/${bonus.big.toFixed(1)}</td>
           <td>1/${bonus.reg.toFixed(1)}</td>
           <td>1/${bonus.total.toFixed(1)}</td>
+          <td>1/${grape.toFixed(2)}</td>
           <td>${bonus.payout.toFixed(1)}%</td>
         </tr>`;
       }
@@ -8715,7 +8740,7 @@ body{
     reels.forEach(r=>r.classList.remove("spinning"));
     isSpinning = false;
     currentSpin = null;
-    stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
+    stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,grapeCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",bonusWaitGames:0,morningCeilingActive:false};
@@ -8764,7 +8789,7 @@ body{
     reels.forEach(r=>r.classList.remove("spinning"));
     isSpinning = false;
     currentSpin = null;
-    stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
+    stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,grapeCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",bonusWaitGames:0,morningCeilingActive:!A_TYPE_MODE};
@@ -9055,6 +9080,7 @@ body{
     if(rows.some(row => row[0] === "🔔" && row[1] === "🔔" && row[2] === "🔔")) return "BELL";
     if(hasBellDiagonal(rows)) return "BELL3";
     if(rows.some(row => row[0] === "REPLAY" && row[1] === "REPLAY" && row[2] === "REPLAY")) return "REPLAY";
+    if(rows.some(row => row[0] === "🍇" && row[1] === "🍇" && row[2] === "🍇")) return "GRAPE";
     if(rows.some(row => row[0] === "🍋" && row[1] === "🍋" && row[2] === "🍋")) return "SUICA";
     if(rows.some(row => row[0] === "🍒" && row[1] === "🍒" && row[2] === "🍒")) return "CHERRY_TRIPLE";
     if(rows.some(row => row[0] === "🍒" && row[1] === "🍒" && row[2] !== "🍒")) return "CHERRY_DOUBLE";
@@ -9064,7 +9090,7 @@ body{
   function displayedResultFromRow(row){
     if(!Array.isArray(row) || row.length < 3) return "MISS";
     const cherry = RESULT.CHERRY_TRIPLE.reel[0];
-    const exactResults = ["BIG","MID","BAR3","SMALL","BELL","REPLAY","SUICA","CHERRY_TRIPLE"];
+    const exactResults = ["BIG","MID","BAR3","SMALL","BELL","REPLAY","GRAPE","SUICA","CHERRY_TRIPLE"];
 
     for(const result of exactResults){
       const reel = RESULT[result].reel;
@@ -10548,7 +10574,8 @@ body{
     }
 
     onClick("applyForceBtn", ()=>{
-      forceResult = $("forceResult").value;
+      const requested = $("forceResult").value;
+      forceResult = A_TYPE_MODE && requested ? normalizeATypeResult(requested) : requested;
       log(forceResult ? `次回転指定：${RESULT[forceResult].name}` : "次回転指定なし");
     });
     onClick("clearForceBtn", ()=>{
@@ -10580,6 +10607,7 @@ body{
     onClick("debugMidBtn", ()=>direct("MID"));
     onClick("debugBar3Btn", ()=>direct("BAR3"));
     onClick("debugBigBtn", ()=>direct("BIG"));
+    onClick("debugGrapeBtn", ()=>direct("GRAPE"));
     onClick("debugBellPayBtn", ()=>direct("BELL"));
     onClick("debugBell3Btn", ()=>direct("BELL3"));
     onClick("debugReplayBtn", ()=>direct("REPLAY"));
