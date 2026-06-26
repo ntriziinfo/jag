@@ -3887,6 +3887,178 @@ body{
   width:31% !important;
   max-height:96% !important;
 }
+
+/* Rising unified reel/background skin. Visual only. */
+.reelArea{
+  filter:drop-shadow(0 0 18px rgba(255,199,54,.22)) drop-shadow(0 18px 28px rgba(0,0,0,.48)) !important;
+}
+.reelArea::before{
+  filter:saturate(1.14) brightness(1.04) drop-shadow(0 0 15px rgba(255,194,38,.22)) !important;
+}
+.reelArea.reelFrameOn .reelFrameOnOverlay{
+  filter:saturate(1.18) brightness(1.04) !important;
+}
+.payline{
+  border-color:rgba(255,220,96,.42) !important;
+  background:linear-gradient(90deg,rgba(255,0,0,.08),rgba(255,220,90,.12),rgba(255,0,0,.08)) !important;
+  box-shadow:0 0 18px rgba(255,199,54,.26), inset 0 0 16px rgba(255,238,161,.10) !important;
+}
+.reels{
+  filter:drop-shadow(0 0 16px rgba(255,210,70,.16)) !important;
+}
+.reel{
+  position:relative !important;
+  overflow:hidden !important;
+  background:
+    linear-gradient(90deg,rgba(255,220,82,.18),transparent 8%,transparent 92%,rgba(255,220,82,.18)),
+    radial-gradient(circle at 50% 10%,rgba(255,245,170,.18),transparent 34%),
+    radial-gradient(circle at 50% 86%,rgba(255,78,22,.18),transparent 58%),
+    repeating-linear-gradient(0deg,transparent 0 16px,rgba(255,214,86,.055) 16px 17px),
+    repeating-linear-gradient(90deg,transparent 0 16px,rgba(255,214,86,.050) 16px 17px),
+    linear-gradient(180deg,#7e0809 0%,#270005 49%,#680609 100%) !important;
+  border:1px solid rgba(255,218,83,.44) !important;
+  box-shadow:
+    inset 0 0 0 2px rgba(40,0,0,.72),
+    inset 0 14px 30px rgba(255,235,150,.13),
+    inset 0 -20px 30px rgba(0,0,0,.62),
+    0 0 14px rgba(255,194,38,.16) !important;
+}
+.reel::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.16),transparent 16%,transparent 78%,rgba(255,235,130,.10)),
+    radial-gradient(circle at 50% 50%,transparent 42%,rgba(0,0,0,.22) 100%);
+  pointer-events:none;
+  z-index:1;
+}
+.window{
+  position:relative !important;
+  z-index:2 !important;
+}
+.cell{
+  border-radius:4px !important;
+  border:1px solid rgba(255,215,88,.16) !important;
+  background:
+    radial-gradient(circle at 50% 28%,rgba(255,241,164,.12),transparent 42%),
+    linear-gradient(180deg,rgba(255,255,255,.12),rgba(55,0,0,.16)) !important;
+  box-shadow:inset 0 1px 0 rgba(255,248,205,.16), inset 0 -1px 0 rgba(0,0,0,.28) !important;
+}
+.cell.center{
+  background:
+    linear-gradient(90deg,rgba(255,222,93,.10),transparent 20%,transparent 80%,rgba(255,222,93,.10)),
+    radial-gradient(circle at 50% 40%,rgba(255,244,176,.16),transparent 46%),
+    linear-gradient(180deg,rgba(255,255,255,.14),rgba(75,0,0,.14)) !important;
+}
+.reelArea .wd-reel-data-panel,
+.reelArea .wd-reel-counter-panel{
+  border-radius:14px !important;
+  background:
+    linear-gradient(180deg,rgba(255,228,111,.26),rgba(255,228,111,0) 12%,rgba(0,0,0,0) 82%,rgba(255,206,57,.18)),
+    radial-gradient(circle at 50% 20%,rgba(255,40,28,.34),transparent 34%),
+    linear-gradient(180deg,rgba(116,6,8,.96),rgba(17,0,4,.98) 46%,rgba(89,5,7,.96)) !important;
+  border:1px solid rgba(255,218,83,.52) !important;
+  box-shadow:
+    inset 0 0 0 2px rgba(0,0,0,.62),
+    inset 0 0 24px rgba(255,225,102,.12),
+    0 0 18px rgba(255,194,38,.24),
+    0 10px 18px rgba(0,0,0,.48) !important;
+}
+.reelArea .wd-reel-data-panel::before,
+.reelArea .wd-reel-counter-panel::before{
+  content:"";
+  position:absolute;
+  inset:7%;
+  border:1px solid rgba(255,230,116,.24);
+  border-radius:10px;
+  pointer-events:none;
+}
+.reelArea .wd-reel-data-panel::after{
+  content:"RISING DATA" !important;
+  left:9% !important;
+  right:9% !important;
+  top:4.8% !important;
+  height:8.6% !important;
+  border:1px solid rgba(255,218,83,.36);
+  border-radius:8px;
+  background:linear-gradient(180deg,rgba(94,5,6,.96),rgba(13,0,3,.92)) !important;
+  color:#fff4b5 !important;
+  font-family:Georgia, "Times New Roman", serif !important;
+  text-shadow:0 0 8px rgba(255,202,45,.85),0 0 16px rgba(255,30,18,.44) !important;
+}
+.reelArea .wd-reel-counter-panel::after{
+  content:"INFORMATION";
+  position:absolute;
+  left:9%;
+  right:9%;
+  top:4.8%;
+  height:8.6%;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(255,218,83,.36);
+  border-radius:8px;
+  background:linear-gradient(180deg,rgba(94,5,6,.96),rgba(13,0,3,.92));
+  color:#fff4b5;
+  font-family:Georgia, "Times New Roman", serif;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.10em;
+  text-shadow:0 0 8px rgba(255,202,45,.85),0 0 16px rgba(255,30,18,.44);
+  pointer-events:none;
+}
+.reelArea .wd-reel-data-panel .wd-st-emblem{
+  color:rgba(255,243,180,.62) !important;
+  background:radial-gradient(circle at 50% 38%,rgba(255,231,119,.18),rgba(79,0,0,.32) 50%,rgba(0,0,0,.24) 76%) !important;
+  box-shadow:
+    inset 0 0 17px rgba(255,224,82,.18),
+    inset 0 0 28px rgba(0,0,0,.54),
+    0 0 10px rgba(255,194,38,.16) !important;
+}
+.reelArea .wd-reel-data-panel .wd-st-emblem.status-lit,
+.reelArea .wd-reel-data-panel .wd-st-emblem.is-bonus-pending,
+.reelArea .wd-reel-data-panel .wd-st-emblem.is-profit{
+  color:#fff8c8 !important;
+  background:radial-gradient(circle at 50% 38%,rgba(255,244,186,.38),rgba(255,52,30,.32) 48%,rgba(49,0,0,.20) 74%) !important;
+  text-shadow:0 0 8px rgba(255,255,255,.88),0 0 16px rgba(255,203,50,.9),0 0 28px rgba(255,47,25,.55) !important;
+}
+.reelArea .wd-reel-data-panel .wd-st-readout span,
+.reelArea .wd-reel-counter-panel .wd-counter-rows span{
+  color:#ffe27b !important;
+  text-shadow:0 0 7px rgba(255,199,54,.46) !important;
+}
+.reelArea .wd-reel-data-panel .wd-st-readout b,
+.reelArea .wd-reel-data-panel #wdBigOdds,
+.reelArea .wd-reel-data-panel #wdRegOdds,
+.reelArea .wd-reel-counter-panel .wd-counter-rows b{
+  color:#fff9da !important;
+  text-shadow:0 0 8px rgba(255,231,130,.72),0 0 13px rgba(255,0,0,.38) !important;
+}
+.reelArea .wd-reel-counter-panel .wd-counter-action{
+  display:grid !important;
+  place-items:center !important;
+  padding:0 5px !important;
+  border:1px solid rgba(255,218,83,.36) !important;
+  border-radius:7px !important;
+  color:#fff6c8 !important;
+  background:
+    linear-gradient(180deg,rgba(255,237,150,.18),rgba(255,237,150,0) 36%),
+    linear-gradient(180deg,#7a0608,#130003 64%,#4b0405) !important;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.54),0 0 8px rgba(255,194,38,.18) !important;
+  font-size:clamp(7px, .52vw, 10px) !important;
+  font-weight:900 !important;
+  letter-spacing:.02em !important;
+  line-height:1.05 !important;
+  text-shadow:0 0 7px rgba(255,220,96,.64),0 0 10px rgba(255,0,0,.32) !important;
+  filter:none !important;
+}
+.reelArea .wd-reel-counter-panel .wd-counter-action.is-open,
+.reelArea .wd-reel-counter-panel .wd-counter-action:hover{
+  background:
+    linear-gradient(180deg,rgba(255,246,184,.32),rgba(255,220,78,.10) 36%),
+    linear-gradient(180deg,#a40a0c,#210004 64%,#6a0507) !important;
+  box-shadow:inset 0 0 0 1px rgba(255,229,127,.24),0 0 12px rgba(255,199,54,.34) !important;
+}
 @supports not (zoom:1){
   .wrap{
     transform:scale(var(--wd-page-zoom));
