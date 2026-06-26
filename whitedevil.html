@@ -4280,7 +4280,7 @@ body{
           <input id="bigAddInput" type="number" min="0" max="1000" step="1" value="252" readonly />
         </div>
         <div class="help">
-          BBは252pt、RBは96pt、ブドウは8pt。AT・SET・継続率・天井・高確はAタイプでは使用しません。
+          BBは252pt、RBは96pt、ブドウは8pt、リプレイは3pt。AT・SET・継続率・天井・高確はAタイプでは使用しません。
         </div>
       </div>
 
@@ -4291,6 +4291,7 @@ body{
           <select id="forceResult">
             <option value="">ランダム</option>
             <option value="MISS">ハズレ</option>
+            <option value="REPLAY">リプレイ（3pt）</option>
             <option value="GRAPE">ブドウ（8pt）</option>
             <option value="MID">RB（77BAR/96pt）</option>
             <option value="MID_CHERRY">RBチェリー同時（77BAR/96pt）</option>
@@ -4442,6 +4443,14 @@ body{
     5:6.02,
     6:5.80
   });
+  const A_TYPE_REPLAY_TABLE = Object.freeze({
+    1:6.816710,
+    2:6.872990,
+    3:6.949485,
+    4:7.035033,
+    5:7.131655,
+    6:7.126048
+  });
   const A_TYPE_REG_DETAIL_TABLE = Object.freeze({
     1:{solo:630.15, cherry:1456.36},
     2:{solo:574.88, cherry:1310.72},
@@ -4453,9 +4462,10 @@ body{
   const A_TYPE_PAYOUTS = Object.freeze({
     BIG:252,
     MID:96,
-    GRAPE:8
+    GRAPE:8,
+    REPLAY:3
   });
-  const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID", "MID_CHERRY", "GRAPE"]);
+  const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID", "MID_CHERRY", "GRAPE", "REPLAY"]);
 
   const USER_FACE = "__USER_FACE__";
   const ELEPHANT_SYMBOL = "🐘";
@@ -4500,7 +4510,7 @@ body{
 
   const RESULT = {
     MISS:{name:"ハズレ", reel:[ELEPHANT_SYMBOL,PIERROT_SYMBOL,GRAPE_SYMBOL], label:"MISS", cls:"", kind:"miss"},
-    SMALL:{name:"ピエロ", reel:[PIERROT_SYMBOL,PIERROT_SYMBOL,PIERROT_SYMBOL], label:"ピエロ", cls:"blue", kind:"payadd"},
+    SMALL:{name:"ピエロ", reel:[ELEPHANT_SYMBOL,PIERROT_SYMBOL,ELEPHANT_SYMBOL], label:"ピエロ", cls:"blue", kind:"payadd"},
     MID:{name:"RB", reel:["7","7","BAR"], label:"RB", cls:"purple", kind:"payadd"},
     MID_CHERRY:{name:"RB（チェリー同時）", reel:["7","7","BAR"], label:"RB", cls:"purple", kind:"payadd"},
     GRAPE:{name:"ブドウ", reel:[GRAPE_SYMBOL,GRAPE_SYMBOL,GRAPE_SYMBOL], label:"ブドウ", cls:"green", kind:"pay"},
@@ -4510,7 +4520,7 @@ body{
     SUPER_DEVIL_ZONE:{name:"SUPER DEVIL ZONE", reel:["7","7","7"], label:"SUPER DZ", cls:"red", kind:"payadd"},
     BELL:{name:"ゾウ揃い", reel:[ELEPHANT_SYMBOL,ELEPHANT_SYMBOL,ELEPHANT_SYMBOL], label:"ゾウ", cls:"gold", kind:"pay"},
     BELL3:{name:"斜めゾウ", reel:[ELEPHANT_SYMBOL,ELEPHANT_SYMBOL,ELEPHANT_SYMBOL], label:"", cls:"gold", kind:"pay"},
-    REPLAY:{name:"リプレイ", reel:["REPLAY","REPLAY","REPLAY"], label:"REPLAY", cls:"blue", kind:"pay"},
+    REPLAY:{name:"リプレイ", reel:[PIERROT_SYMBOL,PIERROT_SYMBOL,PIERROT_SYMBOL], label:"REPLAY", cls:"blue", kind:"pay"},
     SUICA:{name:"スイカ揃い", reel:["🍋","🍋","🍋"], label:"SUICA", cls:"green", kind:"pay"},
     CHERRY_ANY:{name:"チェリーANY", reel:[CHERRY_SYMBOL,ELEPHANT_SYMBOL,PIERROT_SYMBOL], label:"CHERRY", cls:"red", kind:"payadd"},
     CHERRY_DOUBLE:{name:"チェリー2連", reel:[CHERRY_SYMBOL,CHERRY_SYMBOL,ELEPHANT_SYMBOL], label:"CHERRY×2", cls:"red", kind:"add"},
@@ -7160,6 +7170,7 @@ body{
 
       const table = A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1];
       const grape = A_TYPE_GRAPE_TABLE[settings.setting] || A_TYPE_GRAPE_TABLE[1];
+      const replay = A_TYPE_REPLAY_TABLE[settings.setting] || A_TYPE_REPLAY_TABLE[1];
       const regDetail = A_TYPE_REG_DETAIL_TABLE[settings.setting] || A_TYPE_REG_DETAIL_TABLE[1];
       let roll = Math.random();
       const multiplier = clamp(Number(settings.oddsMultiplier) || 1, 0.1, 100);
@@ -7167,6 +7178,7 @@ body{
       const regSoloP = clamp((1 / regDetail.solo) * multiplier, 0, 0.98 - bigP);
       const regCherryP = clamp((1 / regDetail.cherry) * multiplier, 0, 0.98 - bigP - regSoloP);
       const grapeP = clamp((1 / grape) * multiplier, 0, 0.98 - bigP - regSoloP - regCherryP);
+      const replayP = clamp((1 / replay) * multiplier, 0, 0.98 - bigP - regSoloP - regCherryP - grapeP);
       if(roll < bigP) return "BIG";
       roll -= bigP;
       if(roll < regSoloP) return "MID";
@@ -7174,6 +7186,8 @@ body{
       if(roll < regCherryP) return "MID_CHERRY";
       roll -= regCherryP;
       if(roll < grapeP) return "GRAPE";
+      roll -= grapeP;
+      if(roll < replayP) return "REPLAY";
       return "MISS";
     }
 
@@ -8525,7 +8539,7 @@ body{
     if($("stInfoViewLegacy")) $("stInfoViewLegacy").textContent = stInfoText;
     if($("adminStInfoView")) $("adminStInfoView").textContent = stInfoText;
     const payoutScaleText = A_TYPE_MODE
-      ? `Aタイプ:BB${A_TYPE_PAYOUTS.BIG}pt/RB${A_TYPE_PAYOUTS.MID}pt/ブドウ${A_TYPE_PAYOUTS.GRAPE}pt/ハズレ0pt`
+      ? `Aタイプ:BB${A_TYPE_PAYOUTS.BIG}pt/RB${A_TYPE_PAYOUTS.MID}pt/ブドウ${A_TYPE_PAYOUTS.GRAPE}pt/リプレイ${A_TYPE_PAYOUTS.REPLAY}pt/ハズレ0pt`
       : `通常:ベル${NORMAL_ROLE_PAYOUTS.BELL}pt/スイカ${NORMAL_ROLE_PAYOUTS.SUICA}pt/チェリー${NORMAL_ROLE_PAYOUTS.CHERRY_ANY}pt/リプレイ${NORMAL_ROLE_PAYOUTS.REPLAY}pt/REG${NORMAL_ROLE_PAYOUTS.MID}pt / 通常小役${Math.round(NORMAL_ROLE_RATE * 100)}% / 高確小役${Math.round(HIGH_ROLE_RATE * 100)}% / ATベル${ROLE_PAYOUTS.BELL}pt/斜めベル${ROLE_PAYOUTS.BELL3}pt / 平均継続${formatRate(averageContinuationRate(settings.setting))}`;
     if($("payoutScaleView")) $("payoutScaleView").textContent = payoutScaleText;
     if($("payoutScaleViewLegacy")) $("payoutScaleViewLegacy").textContent = payoutScaleText;
@@ -8722,16 +8736,18 @@ body{
     if(!table) return;
 
     if(A_TYPE_MODE){
-      let html = `<tr><td>設定</td><td>BB</td><td>RB</td><td>合算</td><td>ぶどう</td><td>機械割</td></tr>`;
+      let html = `<tr><td>設定</td><td>BB</td><td>RB</td><td>合算</td><td>ぶどう</td><td>リプレイ</td><td>機械割</td></tr>`;
       for(const i of [1,2,3,4,5,6]){
         const bonus = A_TYPE_BONUS_TABLE[i];
         const grape = A_TYPE_GRAPE_TABLE[i] || A_TYPE_GRAPE_TABLE[1];
+        const replay = A_TYPE_REPLAY_TABLE[i] || A_TYPE_REPLAY_TABLE[1];
         html += `<tr>
           <td>${i}</td>
           <td>1/${bonus.big.toFixed(1)}</td>
           <td>1/${bonus.reg.toFixed(1)}</td>
           <td>1/${bonus.total.toFixed(1)}</td>
           <td>1/${grape.toFixed(2)}</td>
+          <td>1/${replay.toFixed(2)}</td>
           <td>${bonus.payout.toFixed(1)}%</td>
         </tr>`;
       }
