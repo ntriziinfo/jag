@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>白い悪魔</title>
+<title>Rising</title>
 <link rel="preload" as="image" href="assets/symbols/sym_hourglass.png">
 <link rel="preload" as="image" href="assets/symbols/sym_cherry.png">
 <link rel="preload" as="image" href="assets/symbols/sym_bell.png">
@@ -11,7 +11,8 @@
 <link rel="preload" as="image" href="assets/symbols/sym_coin.webp">
 <link rel="preload" as="image" href="assets/symbols/sym_grape.webp">
 <link rel="preload" as="image" href="assets/symbols/sym_seven.png">
-<link rel="preload" as="image" href="assets/logo/white_devil_logo.png">
+<link rel="preload" as="image" href="assets/backgrounds/bg_rising_jag.png">
+<link rel="preload" as="image" href="assets/logo/rising_logo.svg">
 <link rel="preload" as="image" href="assets/frames/slot_cabinet_frame_data_windows_off.png">
 <link rel="preload" as="image" href="assets/frames/slot_cabinet_frame_data_windows_on.png">
 <link rel="preload" as="image" href="assets/buttons/btn_auto_half_blue.png">
@@ -2435,7 +2436,7 @@ body.debugOpen .debugDrawer{
 
 
 /* =========================================================
-   WHITE DEVIL visual skin
+   Rising visual skin
    見た目のみ変更。抽選・確率・払い出しロジックには触れていません。
 ========================================================= */
 :root{
@@ -2448,7 +2449,7 @@ body.debugOpen .debugDrawer{
 }
 html{scroll-behavior:smooth;}
 body{
-  background:url("assets/backgrounds/bg_fire_ice.png") center top/cover fixed no-repeat #030307 !important;
+  background:url("assets/backgrounds/bg_rising_jag.png") center top/cover fixed no-repeat #030307 !important;
   color:var(--wd-white);
 }
 body::before{
@@ -2478,7 +2479,7 @@ body::after{
   content:"";
   position:absolute;
   inset:-80px -40px -20px;
-  background:url("assets/backgrounds/bg_fire_ice.png") center/cover no-repeat;
+  background:url("assets/backgrounds/bg_rising_jag.png") center/cover no-repeat;
   filter:saturate(1.25) contrast(1.1) brightness(.74);
   z-index:-2;
 }
@@ -2668,7 +2669,7 @@ body::after{
 }
 
 /* No-top-tabs cabinet layout. Visual-only overrides; slot logic stays in the script below. */
-body{background:url("assets/backgrounds/bg_fire_ice.png") center top/cover fixed no-repeat #020307 !important;}
+body{background:url("assets/backgrounds/bg_rising_jag.png") center top/cover fixed no-repeat #020307 !important;}
 body::before,
 body::after{display:none !important;content:none !important;}
 .wrap{
@@ -3659,7 +3660,7 @@ body.debugOpen .debugToggleBtn{
 /* Full-page KV background. Keep it attached to the page so it scrolls with the cabinet. */
 body{
   background-color:#020307 !important;
-  background-image:url("assets/backgrounds/bg_fire_ice.png") !important;
+  background-image:url("assets/backgrounds/bg_rising_jag.png") !important;
   background-position:center top !important;
   background-size:1360px auto !important;
   background-repeat:no-repeat !important;
@@ -3721,7 +3722,7 @@ html{
 html{
   min-height:100% !important;
   background-color:#020307 !important;
-  background-image:url("assets/backgrounds/bg_fire_ice.png") !important;
+  background-image:url("assets/backgrounds/bg_rising_jag.png") !important;
   background-position:var(--wd-bg-sync-x) !important;
   background-size:var(--wd-bg-sync-size) !important;
   background-attachment:scroll !important;
@@ -3903,18 +3904,18 @@ body{
 <div class="wrap">
   <section class="wd-hero" id="top">
     <div class="wd-vertical-copy">
-      <img src="assets/hero/kv_vertical_copy_white_devil.png" alt="その悪魔、白く輝く。">
+      <img src="assets/hero/kv_vertical_copy_rising.svg" alt="光れば、Rising。">
     </div>
     <div class="wd-hero-center">
-      <img class="wd-logo" src="assets/logo/white_devil_logo.png" alt="白い悪魔">
-      <div class="wd-subtitle">WHITE DEVIL <b>SLOT</b></div>
+      <img class="wd-logo" src="assets/logo/rising_logo.svg" alt="Rising">
+      <div class="wd-subtitle">JAG A-TYPE <b>SLOT</b></div>
     </div>
   </section>
 
   <div class="header">
     <div class="titleBox">
       <div class="badge">A-TYPE / BB・RB BONUS</div>
-      <h1 id="titleView">白い悪魔 SLOT</h1>
+      <h1 id="titleView">Rising SLOT</h1>
     </div>
     <div class="notice">配信・RP・ゲーム内ポイント専用。現金・換金・景品交換・実利益化には使用しないでください。</div>
   </div>
@@ -4197,7 +4198,7 @@ body{
         <h2>基本設定</h2>
         <div class="field">
           <label>台名</label>
-          <input id="titleInput" value="白い悪魔" />
+          <input id="titleInput" value="Rising" />
         </div>
         <div class="field">
           <label>設定</label>
@@ -4351,7 +4352,7 @@ body{
           <div class="wd-news">
             <div class="wd-news-title">NEWS</div>
             <div class="wd-news-lines">
-              <div><span>2024.05.25</span>「白い悪魔」公式サイトオープン！</div>
+              <div><span>2024.05.25</span>「Rising」公式サイトオープン！</div>
               <div><span>2024.05.25</span>機種情報ページを更新しました。</div>
             </div>
           </div>
@@ -4478,7 +4479,7 @@ body{
   const SEVEN_IMAGE_SRC = "assets/symbols/sym_seven.png";
   const MISS_IMAGE_SRC = "assets/symbols/sym_coin.webp";
   const GRAPE_IMAGE_SRC = "assets/symbols/sym_grape.webp";
-  const BAR_IMAGE_SRC = "assets/logo/white_devil_logo.png";
+  const BAR_IMAGE_SRC = "assets/logo/rising_logo.svg";
   const USER_FACE_SRC = "assets/symbols/sym_hourglass.png";
   const REPLAY_IMAGE_SRC = "assets/replay.png";
   const SYMBOL_IMAGE_SRCS = Object.freeze([
@@ -4580,7 +4581,7 @@ body{
   }
 
   let settings = {
-    title:"白い悪魔",
+    title:"Rising",
     setting:1,
     fee:100,
     stSpins:10,
@@ -7524,7 +7525,7 @@ body{
 
   function normalizeMachineTitle(value){
     const title = String(value || "").trim();
-    if(!title || /白い悪魔\s*(轟雷|疾風)/.test(title)) return "白い悪魔";
+    if(!title || /^白い悪魔(?:\s*(轟雷|疾風))?$/.test(title)) return "Rising";
     return title;
   }
 
@@ -7702,7 +7703,7 @@ body{
       recordSlumpPoint();
       $("spinBtn").textContent = "BET";
       showMessage("BATTLE BONUS", `継続率${formatRate(continuationRate)} / 1SET ${setGameCount()}G`);
-      log(`白い悪魔BB開始：継続率${formatRate(continuationRate)} / 設定${settings.setting}`);
+      log(`Rising BB開始：継続率${formatRate(continuationRate)} / 設定${settings.setting}`);
       updateDisplay();
       if(session.currentSetBarBgm) playBarBgm();
       else playAtBgm();
@@ -7752,7 +7753,7 @@ body{
     const endedSets = session.setNo || 0;
     if(autoPlay) stopAutoPlay("ATバトル終了のためオート停止");
     showMessage("ATバトルが終了しました。", `継続SET数 ${endedSets}回 / 獲得pt ${session.paid}pt`);
-    log(`白い悪魔BB終了：獲得${session.paid}pt / 損益${formatSigned(profit)}pt / ${endedSets}SET / STOCK獲得${session.added || 0}SET / G上乗せ${session.addedGames || 0}G`);
+    log(`Rising BB終了：獲得${session.paid}pt / 損益${formatSigned(profit)}pt / ${endedSets}SET / STOCK獲得${session.added || 0}SET / G上乗せ${session.addedGames || 0}G`);
     stopGekiatsuEffect(true);
     hideBattleIntro();
     devilZoneConfirmIntroPending = false;
