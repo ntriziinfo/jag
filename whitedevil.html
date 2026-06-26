@@ -1429,6 +1429,22 @@ h1{
 .sym.blue{color:#4de7ff;text-shadow:0 0 15px rgba(77,231,255,.85)}
 .sym.gold{color:#fff2a6;text-shadow:0 0 18px rgba(255,211,106,.85)}
 .sym.green{color:#62ff9a;text-shadow:0 0 15px rgba(98,255,154,.75)}
+.sym.barText{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:1.55em;
+  min-height:1.08em;
+  padding:.06em .12em;
+  border:3px solid #10131b;
+  border-radius:8px;
+  background:linear-gradient(180deg,#fff,#d8dce4);
+  color:#12151d;
+  font-size:clamp(28px,4.8vw,60px);
+  font-family:Impact, "Arial Black", sans-serif;
+  text-shadow:0 1px 0 rgba(255,255,255,.85);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.45), 0 5px 10px rgba(0,0,0,.32);
+}
 .label{
   margin-top:6px;
   font-size:clamp(13px,1.4vw,20px);
@@ -4066,19 +4082,19 @@ body{
         <div class="payline"></div>
         <div class="reels">
           <div class="reel" data-reel="0"><div class="window">
-            <div class="cell"><img class="symImg barSymImg" src="assets/logo/white_devil_logo.png" alt="BAR symbol" loading="eager" decoding="sync" draggable="false"></div>
+            <div class="cell"><div class="sym barText">BAR</div></div>
             <div class="cell center"><img class="symImg sevenSymImg" src="assets/symbols/sym_seven.png" alt="7 symbol" loading="eager" decoding="sync" draggable="false"></div>
             <div class="cell"><img class="symImg grapeSymImg" src="assets/symbols/sym_grape.webp" alt="grape symbol" loading="eager" decoding="sync" draggable="false"></div>
           </div></div>
           <div class="reel" data-reel="1"><div class="window">
-            <div class="cell"><img class="symImg suikaSymImg" src="assets/symbols/sym_suika.png" alt="suika symbol" loading="eager" decoding="sync" draggable="false"></div>
-            <div class="cell center"><img class="symImg bellSymImg" src="assets/symbols/sym_bell.png" alt="bell symbol" loading="eager" decoding="sync" draggable="false"></div>
-            <div class="cell"><img class="symImg missSymImg" src="assets/symbols/sym_coin.webp" alt="miss symbol" loading="eager" decoding="sync" draggable="false"></div>
+            <div class="cell"><div class="sym">🐘</div></div>
+            <div class="cell center"><img class="symImg grapeSymImg" src="assets/symbols/sym_grape.webp" alt="grape symbol" loading="eager" decoding="sync" draggable="false"></div>
+            <div class="cell"><div class="sym">🤡</div></div>
           </div></div>
           <div class="reel" data-reel="2"><div class="window">
             <div class="cell"><img class="symImg cherrySymImg" src="assets/symbols/sym_cherry.png" alt="cherry symbol" loading="eager" decoding="sync" draggable="false"></div>
-            <div class="cell center"><img class="symImg barSymImg" src="assets/logo/white_devil_logo.png" alt="BAR symbol" loading="eager" decoding="sync" draggable="false"></div>
-            <div class="cell"><img class="symImg suikaSymImg" src="assets/symbols/sym_suika.png" alt="suika symbol" loading="eager" decoding="sync" draggable="false"></div>
+            <div class="cell center"><div class="sym barText">BAR</div></div>
+            <div class="cell"><div class="sym">🐘</div></div>
           </div></div>
         </div>
         <div class="gekiatsuLayer" id="gekiatsuLayer" aria-hidden="true">
@@ -4442,6 +4458,10 @@ body{
   const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID", "MID_CHERRY", "GRAPE"]);
 
   const USER_FACE = "__USER_FACE__";
+  const ELEPHANT_SYMBOL = "🐘";
+  const PIERROT_SYMBOL = "🤡";
+  const CHERRY_SYMBOL = "🍒";
+  const GRAPE_SYMBOL = "🍇";
   const SUICA_IMAGE_SRC = "assets/symbols/sym_suika.png";
   const CHERRY_IMAGE_SRC = "assets/symbols/sym_cherry.png";
   const BELL_IMAGE_SRC = "assets/symbols/sym_bell.png";
@@ -4479,22 +4499,22 @@ body{
   preloadSymbolImages();
 
   const RESULT = {
-    MISS:{name:"ハズレ", reel:["🍋","🔔","⭐"], label:"MISS", cls:"", kind:"miss"},
-    SMALL:{name:"砂時計", reel:[USER_FACE,USER_FACE,USER_FACE], label:"砂時計", cls:"blue", kind:"payadd"},
+    MISS:{name:"ハズレ", reel:[ELEPHANT_SYMBOL,PIERROT_SYMBOL,GRAPE_SYMBOL], label:"MISS", cls:"", kind:"miss"},
+    SMALL:{name:"ピエロ", reel:[PIERROT_SYMBOL,PIERROT_SYMBOL,PIERROT_SYMBOL], label:"ピエロ", cls:"blue", kind:"payadd"},
     MID:{name:"RB", reel:["7","7","BAR"], label:"RB", cls:"purple", kind:"payadd"},
     MID_CHERRY:{name:"RB（チェリー同時）", reel:["7","7","BAR"], label:"RB", cls:"purple", kind:"payadd"},
-    GRAPE:{name:"ブドウ", reel:["🍇","🍇","🍇"], label:"ブドウ", cls:"green", kind:"pay"},
+    GRAPE:{name:"ブドウ", reel:[GRAPE_SYMBOL,GRAPE_SYMBOL,GRAPE_SYMBOL], label:"ブドウ", cls:"green", kind:"pay"},
     BAR3:{name:"BAR揃い", reel:["BAR","BAR","BAR"], label:"BAR", cls:"purple", kind:"add"},
     BIG:{name:"BB", reel:["7","7","7"], label:"BB", cls:"red", kind:"payadd"},
     DEVIL_ZONE:{name:"DEVIL ZONE", reel:["7","7","BAR"], label:"DZ", cls:"purple", kind:"payadd"},
     SUPER_DEVIL_ZONE:{name:"SUPER DEVIL ZONE", reel:["7","7","7"], label:"SUPER DZ", cls:"red", kind:"payadd"},
-    BELL:{name:"ベル揃い", reel:["🔔","🔔","🔔"], label:"BELL", cls:"gold", kind:"pay"},
-    BELL3:{name:"斜めベル", reel:["🔔","🔔","🔔"], label:"", cls:"gold", kind:"pay"},
+    BELL:{name:"ゾウ揃い", reel:[ELEPHANT_SYMBOL,ELEPHANT_SYMBOL,ELEPHANT_SYMBOL], label:"ゾウ", cls:"gold", kind:"pay"},
+    BELL3:{name:"斜めゾウ", reel:[ELEPHANT_SYMBOL,ELEPHANT_SYMBOL,ELEPHANT_SYMBOL], label:"", cls:"gold", kind:"pay"},
     REPLAY:{name:"リプレイ", reel:["REPLAY","REPLAY","REPLAY"], label:"REPLAY", cls:"blue", kind:"pay"},
     SUICA:{name:"スイカ揃い", reel:["🍋","🍋","🍋"], label:"SUICA", cls:"green", kind:"pay"},
-    CHERRY_ANY:{name:"チェリーANY", reel:["🍒","🍋","🔔"], label:"CHERRY", cls:"red", kind:"payadd"},
-    CHERRY_DOUBLE:{name:"チェリー2連", reel:["🍒","🍒","🍋"], label:"CHERRY×2", cls:"red", kind:"add"},
-    CHERRY_TRIPLE:{name:"チェリー3つ", reel:["🍒","🍒","🍒"], label:"CHERRY×3", cls:"red", kind:"payadd"}
+    CHERRY_ANY:{name:"チェリーANY", reel:[CHERRY_SYMBOL,ELEPHANT_SYMBOL,PIERROT_SYMBOL], label:"CHERRY", cls:"red", kind:"payadd"},
+    CHERRY_DOUBLE:{name:"チェリー2連", reel:[CHERRY_SYMBOL,CHERRY_SYMBOL,ELEPHANT_SYMBOL], label:"CHERRY×2", cls:"red", kind:"add"},
+    CHERRY_TRIPLE:{name:"チェリー3つ", reel:[CHERRY_SYMBOL,CHERRY_SYMBOL,CHERRY_SYMBOL], label:"CHERRY×3", cls:"red", kind:"payadd"}
   };
 
   const SETTING_PROFILE = {
@@ -4516,7 +4536,7 @@ body{
     6:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:70},{result:"REPLAY",w:366},{result:"SUICA",w:3},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]}
   });
 
-  const symbols = ["🍒","🍋","🔔","REPLAY","⭐","🍇","7","BAR",USER_FACE];
+  const symbols = ["7","BAR",ELEPHANT_SYMBOL,GRAPE_SYMBOL,CHERRY_SYMBOL,PIERROT_SYMBOL];
   const AUDIO_BALANCE_VERSION = 4;
   const DEFAULT_MASTER_VOLUME = 0.70;
   const DEFAULT_BGM_VOLUME = 0.50;
@@ -8942,28 +8962,23 @@ body{
   }
 
   function cellHtml(symbol, label, cls){
-    const cherrySymbol = Array.isArray(symbols) ? symbols[0] : RESULT.CHERRY_TRIPLE.reel[0];
-    const suikaSymbol = Array.isArray(symbols) ? symbols[1] : RESULT.SUICA.reel[0];
-    const bellSymbol = Array.isArray(symbols) ? symbols[2] : RESULT.BELL.reel[0];
-    const missSymbol = Array.isArray(symbols) ? symbols[4] : RESULT.MISS.reel[2];
-    const grapeSymbol = Array.isArray(symbols) ? symbols[5] : RESULT.MISS.reel[0];
     const inner =
       (typeof USER_FACE !== "undefined" && symbol === USER_FACE)
         ? `<img class="symImg" src="${USER_FACE_SRC}" alt="small hit symbol" loading="eager" decoding="sync" draggable="false">`
-        : (symbol === cherrySymbol)
+        : (symbol === CHERRY_SYMBOL)
           ? `<img class="symImg cherrySymImg" src="${CHERRY_IMAGE_SRC}" alt="cherry symbol" loading="eager" decoding="sync" draggable="false">`
-          : (symbol === bellSymbol)
+          : (symbol === "🔔")
             ? `<img class="symImg bellSymImg" src="${BELL_IMAGE_SRC}" alt="bell symbol" loading="eager" decoding="sync" draggable="false">`
             : (symbol === "REPLAY")
               ? `<img class="symImg replaySymImg" src="${REPLAY_IMAGE_SRC}" alt="replay symbol" loading="eager" decoding="sync" draggable="false">`
-              : (symbol === suikaSymbol)
+              : (symbol === "🍋")
                 ? `<img class="symImg suikaSymImg" src="${SUICA_IMAGE_SRC}" alt="suika symbol" loading="eager" decoding="sync" draggable="false">`
-                : (symbol === missSymbol)
+                : (symbol === "⭐")
                   ? `<img class="symImg missSymImg" src="${MISS_IMAGE_SRC}" alt="miss symbol" loading="eager" decoding="sync" draggable="false">`
-                  : (symbol === grapeSymbol)
+                  : (symbol === GRAPE_SYMBOL)
                     ? `<img class="symImg grapeSymImg" src="${GRAPE_IMAGE_SRC}" alt="grape symbol" loading="eager" decoding="sync" draggable="false">`
                     : (symbol === "BAR")
-                      ? `<img class="symImg barSymImg" src="${BAR_IMAGE_SRC}" alt="BAR symbol" loading="eager" decoding="sync" draggable="false">`
+                      ? `<div class="sym barText">BAR</div>`
                       : (symbol === "7")
                         ? `<img class="symImg sevenSymImg" src="${SEVEN_IMAGE_SRC}" alt="7 symbol" loading="eager" decoding="sync" draggable="false">`
                         : `<div class="sym ${cls || ""}">${escapeHtml(symbol)}</div>`;
@@ -8995,12 +9010,12 @@ body{
   }
 
   const REEL_STRIPS = [
-    // 左リール：王冠なし
-    ["7","🍒","🍋","BAR","🔔","REPLAY","🍇",USER_FACE,"⭐","7","🍒","🍇","REPLAY","🍋","🔔","BAR"],
-    // 中リール：王冠なし
-    ["7","🍋","🔔","REPLAY","🍇","BAR",USER_FACE,"⭐","7","🍒","🍋","🔔","REPLAY","🍇","BAR","🍒"],
-    // 右リール：王冠なし
-    ["BAR","⭐","🍇","7","🔔","REPLAY","🍋",USER_FACE,"🍇","🍒","7","BAR","🔔","🍋","REPLAY","⭐"]
+    // 左リール：7 / BAR / ゾウ / ブドウ / チェリー / ピエロ
+    ["7",CHERRY_SYMBOL,ELEPHANT_SYMBOL,"BAR",GRAPE_SYMBOL,PIERROT_SYMBOL,"7",GRAPE_SYMBOL,CHERRY_SYMBOL,"BAR",ELEPHANT_SYMBOL,PIERROT_SYMBOL],
+    // 中リール：7 / BAR / ゾウ / ブドウ / チェリー / ピエロ
+    ["7",ELEPHANT_SYMBOL,GRAPE_SYMBOL,"BAR",PIERROT_SYMBOL,CHERRY_SYMBOL,"7",CHERRY_SYMBOL,ELEPHANT_SYMBOL,GRAPE_SYMBOL,"BAR",PIERROT_SYMBOL],
+    // 右リール：7 / BAR / ゾウ / ブドウ / チェリー / ピエロ
+    ["BAR",PIERROT_SYMBOL,GRAPE_SYMBOL,"7",ELEPHANT_SYMBOL,CHERRY_SYMBOL,GRAPE_SYMBOL,"BAR",CHERRY_SYMBOL,"7",PIERROT_SYMBOL,ELEPHANT_SYMBOL]
   ];
 
   function mod(n, m){
@@ -9048,36 +9063,36 @@ body{
   function randomSymbol(options={}){
     const {excludeCherry=false, reelIndex=null} = options;
     const basePool = reelIndex !== null && REEL_STRIPS[reelIndex] ? REEL_STRIPS[reelIndex] : symbols;
-    const pool = excludeCherry ? basePool.filter(s => s !== "🍒") : basePool;
+    const pool = excludeCherry ? basePool.filter(s => s !== CHERRY_SYMBOL) : basePool;
     return pool[Math.floor(Math.random()*pool.length)];
   }
 
   const SAFE_ROW_PATTERNS = [
-    ["🍋","🔔","⭐"],
-    ["🍇","BAR","🍋"],
-    ["⭐","🍇","🔔"],
-    ["BAR","🍋","⭐"],
-    ["🔔","⭐","🍇"],
-    ["🍋","BAR","⭐"]
+    [ELEPHANT_SYMBOL,GRAPE_SYMBOL,PIERROT_SYMBOL],
+    [GRAPE_SYMBOL,"BAR",ELEPHANT_SYMBOL],
+    [PIERROT_SYMBOL,GRAPE_SYMBOL,CHERRY_SYMBOL],
+    ["BAR",ELEPHANT_SYMBOL,PIERROT_SYMBOL],
+    [CHERRY_SYMBOL,PIERROT_SYMBOL,GRAPE_SYMBOL],
+    [ELEPHANT_SYMBOL,"BAR",PIERROT_SYMBOL]
   ];
 
   const MISS_GRID_PATTERNS = [
-    [["🍋","🍇","BAR"],["7","🔔","🍇"],["BAR","🍇","⭐"]],
-    [["🍇","🍋","BAR"],["🔔","7","🍇"],["🍇","BAR","⭐"]],
-    [["BAR","🍇","🍋"],["⭐","🍇","7"],["🍇","🔔","BAR"]],
-    [["🍇","BAR","🍇"],["🍋","7","⭐"],["BAR","🍇","🔔"]],
-    [["🍇","BAR","⭐"],["7","🍋","🍇"],["🔔","BAR","🍇"]],
-    [["BAR","⭐","🍇"],["🍇","🔔","7"],["🍋","🍇","BAR"]],
-    [["7","7","🍇"],["🍋","BAR","🔔"],["🍇","🍇","⭐"]],
-    [["🍇","7","7"],["BAR","🍋","🍇"],["⭐","🔔","🍇"]],
-    [["🍋","BAR","🍇"],["7","7","⭐"],["⭐","🍇","🔔"]],
-    [["BAR","🍇","🍇"],["🍋","7","7"],["🍇","⭐","BAR"]],
-    [["⭐","🍇","7"],["BAR","🍇","🍋"],["7","🔔","BAR"]],
-    [["BAR","🍋","7"],["🍇","BAR","⭐"],["7","🍇","🔔"]],
-    [["🍇","🔔","BAR"],["⭐","7","🍋"],["BAR","🍇","🍇"]],
-    [["BAR","7","🍇"],["🍇","🍋","⭐"],["🍇","🔔","7"]],
-    [["BAR","🍇","🍇"],["🔔","⭐","🍋"],["7","BAR","7"]],
-    [["🍇","BAR","🔔"],["7","🍇","⭐"],["🍋","7","BAR"]]
+    [[ELEPHANT_SYMBOL,GRAPE_SYMBOL,"BAR"],["7",PIERROT_SYMBOL,GRAPE_SYMBOL],["BAR",GRAPE_SYMBOL,CHERRY_SYMBOL]],
+    [[GRAPE_SYMBOL,ELEPHANT_SYMBOL,"BAR"],[PIERROT_SYMBOL,"7",GRAPE_SYMBOL],[GRAPE_SYMBOL,"BAR",CHERRY_SYMBOL]],
+    [["BAR",GRAPE_SYMBOL,ELEPHANT_SYMBOL],[CHERRY_SYMBOL,GRAPE_SYMBOL,"7"],[GRAPE_SYMBOL,PIERROT_SYMBOL,"BAR"]],
+    [[GRAPE_SYMBOL,"BAR",GRAPE_SYMBOL],[ELEPHANT_SYMBOL,"7",PIERROT_SYMBOL],["BAR",GRAPE_SYMBOL,CHERRY_SYMBOL]],
+    [[GRAPE_SYMBOL,"BAR",PIERROT_SYMBOL],["7",ELEPHANT_SYMBOL,GRAPE_SYMBOL],[CHERRY_SYMBOL,"BAR",GRAPE_SYMBOL]],
+    [["BAR",PIERROT_SYMBOL,GRAPE_SYMBOL],[GRAPE_SYMBOL,ELEPHANT_SYMBOL,"7"],[ELEPHANT_SYMBOL,GRAPE_SYMBOL,"BAR"]],
+    [["7","7",GRAPE_SYMBOL],[ELEPHANT_SYMBOL,"BAR",PIERROT_SYMBOL],[GRAPE_SYMBOL,GRAPE_SYMBOL,CHERRY_SYMBOL]],
+    [[GRAPE_SYMBOL,"7","7"],["BAR",ELEPHANT_SYMBOL,GRAPE_SYMBOL],[PIERROT_SYMBOL,CHERRY_SYMBOL,GRAPE_SYMBOL]],
+    [[ELEPHANT_SYMBOL,"BAR",GRAPE_SYMBOL],["7","7",PIERROT_SYMBOL],[PIERROT_SYMBOL,GRAPE_SYMBOL,CHERRY_SYMBOL]],
+    [["BAR",GRAPE_SYMBOL,GRAPE_SYMBOL],[ELEPHANT_SYMBOL,"7","7"],[GRAPE_SYMBOL,PIERROT_SYMBOL,"BAR"]],
+    [[PIERROT_SYMBOL,GRAPE_SYMBOL,"7"],["BAR",GRAPE_SYMBOL,ELEPHANT_SYMBOL],["7",CHERRY_SYMBOL,"BAR"]],
+    [["BAR",ELEPHANT_SYMBOL,"7"],[GRAPE_SYMBOL,"BAR",PIERROT_SYMBOL],["7",GRAPE_SYMBOL,CHERRY_SYMBOL]],
+    [[GRAPE_SYMBOL,PIERROT_SYMBOL,"BAR"],[CHERRY_SYMBOL,"7",ELEPHANT_SYMBOL],["BAR",GRAPE_SYMBOL,GRAPE_SYMBOL]],
+    [["BAR","7",GRAPE_SYMBOL],[GRAPE_SYMBOL,ELEPHANT_SYMBOL,PIERROT_SYMBOL],[GRAPE_SYMBOL,CHERRY_SYMBOL,"7"]],
+    [["BAR",GRAPE_SYMBOL,GRAPE_SYMBOL],[PIERROT_SYMBOL,CHERRY_SYMBOL,ELEPHANT_SYMBOL],["7","BAR","7"]],
+    [[GRAPE_SYMBOL,"BAR",PIERROT_SYMBOL],["7",GRAPE_SYMBOL,CHERRY_SYMBOL],[ELEPHANT_SYMBOL,"7","BAR"]]
   ];
 
 
@@ -9118,19 +9133,20 @@ body{
   function displayedResultFromGrid(grid){
     const rows = Array.isArray(grid) ? grid : [];
     const middle = rows[1] || [];
+    const rowMatches = (reel)=>rows.some(row => row[0] === reel[0] && row[1] === reel[1] && row[2] === reel[2]);
 
     // 7揃い・77BAR・BAR揃いは中段だけを成立ラインとして扱う。
     if(middle[0] === "7" && middle[1] === "7" && middle[2] === "7") return "BIG";
     if(middle[0] === "7" && middle[1] === "7" && middle[2] === "BAR") return "MID";
     if(middle[0] === "BAR" && middle[1] === "BAR" && middle[2] === "BAR") return "BAR3";
-    if(rows.some(row => row[0] === USER_FACE && row[1] === USER_FACE && row[2] === USER_FACE)) return "SMALL";
-    if(rows.some(row => row[0] === "🔔" && row[1] === "🔔" && row[2] === "🔔")) return "BELL";
+    if(rowMatches(RESULT.SMALL.reel)) return "SMALL";
+    if(rowMatches(RESULT.BELL.reel)) return "BELL";
     if(hasBellDiagonal(rows)) return "BELL3";
-    if(rows.some(row => row[0] === "REPLAY" && row[1] === "REPLAY" && row[2] === "REPLAY")) return "REPLAY";
-    if(rows.some(row => row[0] === "🍇" && row[1] === "🍇" && row[2] === "🍇")) return "GRAPE";
-    if(rows.some(row => row[0] === "🍋" && row[1] === "🍋" && row[2] === "🍋")) return "SUICA";
-    if(rows.some(row => row[0] === "🍒" && row[1] === "🍒" && row[2] === "🍒")) return "CHERRY_TRIPLE";
-    if(rows.some(row => row[0] === "🍒" && row[1] === "🍒" && row[2] !== "🍒")) return "CHERRY_DOUBLE";
+    if(rowMatches(RESULT.REPLAY.reel)) return "REPLAY";
+    if(rowMatches(RESULT.GRAPE.reel)) return "GRAPE";
+    if(rowMatches(RESULT.SUICA.reel)) return "SUICA";
+    if(rowMatches(RESULT.CHERRY_TRIPLE.reel)) return "CHERRY_TRIPLE";
+    if(rows.some(row => row[0] === CHERRY_SYMBOL && row[1] === CHERRY_SYMBOL && row[2] !== CHERRY_SYMBOL)) return "CHERRY_DOUBLE";
     return "MISS";
   }
 
@@ -9166,9 +9182,9 @@ body{
 
   function safeGridForResult(result, winRow=1){
     const grid = [
-      ["🍇","🍋","⭐"],
-      ["⭐","🍇","🍋"],
-      ["🍋","⭐","🍇"]
+      [GRAPE_SYMBOL,ELEPHANT_SYMBOL,PIERROT_SYMBOL],
+      [PIERROT_SYMBOL,GRAPE_SYMBOL,ELEPHANT_SYMBOL],
+      [ELEPHANT_SYMBOL,PIERROT_SYMBOL,CHERRY_SYMBOL]
     ];
     const row = clamp(winRow, 0, 2);
     grid[row] = (RESULT[result] || RESULT.MISS).reel.slice();
@@ -9187,8 +9203,8 @@ body{
     const bell = RESULT.BELL.reel[0];
     const down = Array.isArray(winRows) ? winRows[0] === 0 : Math.random() < 0.5;
     return down
-      ? [[bell,"7","REPLAY"],["7",bell,"BAR"],["REPLAY","BAR",bell]]
-      : [["REPLAY","BAR",bell],["7",bell,"BAR"],[bell,"7","REPLAY"]];
+      ? [[bell,"7",PIERROT_SYMBOL],["7",bell,"BAR"],[PIERROT_SYMBOL,"BAR",bell]]
+      : [[PIERROT_SYMBOL,"BAR",bell],["7",bell,"BAR"],[bell,"7",PIERROT_SYMBOL]];
   }
 
     if(result === "BELL3") return buildDiagonalBellGrid(winRow);
@@ -9203,7 +9219,7 @@ body{
         guard++;
       }
       if(displayedResultFromGrid(picked) !== "MISS" || hasBarDiagonal(picked) || hasCrownVisible(picked)){
-        picked = [["7","7","🍇"],["🍋","BAR","🔔"],["🍇","🍇","⭐"]];
+        picked = [["7","7",GRAPE_SYMBOL],[ELEPHANT_SYMBOL,"BAR",PIERROT_SYMBOL],[GRAPE_SYMBOL,GRAPE_SYMBOL,CHERRY_SYMBOL]];
       }
       return picked;
     }
@@ -9259,9 +9275,9 @@ body{
   function setMorningBarReels(){
     if(!reels || reels.length < 3) return;
     const grid = [
-      ["7", USER_FACE, "REPLAY"],
+      ["7", PIERROT_SYMBOL, ELEPHANT_SYMBOL],
       ["BAR", "BAR", "BAR"],
-      [RESULT.BELL.reel[0], RESULT.SUICA.reel[0], RESULT.CHERRY_TRIPLE.reel[0]]
+      [RESULT.BELL.reel[0], GRAPE_SYMBOL, RESULT.CHERRY_TRIPLE.reel[0]]
     ];
     for(let i=0;i<3;i++){
       setReelColumn(i, [grid[0][i], grid[1][i], grid[2][i]], "", "", null);
