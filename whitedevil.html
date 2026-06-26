@@ -3897,7 +3897,7 @@ body{
 
   <div class="header">
     <div class="titleBox">
-      <div class="badge">A-TYPE / BIG・REG BONUS</div>
+      <div class="badge">A-TYPE / BB・RB BONUS</div>
       <h1 id="titleView">白い悪魔 SLOT</h1>
     </div>
     <div class="notice">配信・RP・ゲーム内ポイント専用。現金・換金・景品交換・実利益化には使用しないでください。</div>
@@ -4010,7 +4010,7 @@ body{
         </div>
 
         <div class="message" id="message">READY</div>
-        <div class="subMessage" id="subMessage">3pt BET / BIG・REG完全告知 / 設定1〜6でボーナス確率が変化</div>
+        <div class="subMessage" id="subMessage">3pt BET / BB・RB完全告知 / 設定1〜6でボーナス確率が変化</div>
 
         <div class="sevenSegPanel">
           <div class="sevenSegLabel">BONUS</div>
@@ -4020,8 +4020,8 @@ body{
 
         <div class="stats">
           <div class="stat"><div class="k">回転数</div><div class="v" id="totalSpinsView">0</div></div>
-          <div class="stat"><div class="k">BIG</div><div class="v" id="bigCountView">0</div></div>
-          <div class="stat"><div class="k">REG</div><div class="v" id="midCountView">0</div></div>
+          <div class="stat"><div class="k">BB</div><div class="v" id="bigCountView">0</div></div>
+          <div class="stat"><div class="k">RB</div><div class="v" id="midCountView">0</div></div>
           <div class="stat"><div class="k">ブドウ</div><div class="v" id="grapeCountView">0</div></div>
           <div class="stat"><div class="k">損益</div><div class="v" id="totalProfitView">0</div></div>
         </div>
@@ -4029,8 +4029,8 @@ body{
 
       <section class="wd-info-strip" id="data-area">
         <div><span>TYPE</span><b id="wdMirrorSt">A</b></div>
-        <div><span>BIG</span><b id="wdMirrorBig">0</b></div>
-        <div><span>REG</span><b id="wdMirrorReg">0</b></div>
+        <div><span>BB</span><b id="wdMirrorBig">0</b></div>
+        <div><span>RB</span><b id="wdMirrorReg">0</b></div>
         <div><span>総回転数</span><b id="wdMirrorSpin">0G</b></div>
         <div><span>損益</span><b id="wdMirrorProfit">+0</b></div>
       </section>
@@ -4040,11 +4040,11 @@ body{
         <div class="wd-public-panels wd-st-status-panel wd-reel-data-panel" id="bonus-info">
           <div class="wd-st-emblem" id="wdStEmblem">A-TYPE<br>BONUS</div>
           <div class="wd-st-readout">
-            <span>BIG確率</span>
+            <span>BB確率</span>
             <b id="wdBigOdds">-</b>
           </div>
           <div class="wd-st-readout">
-            <span>REG確率</span>
+            <span>RB確率</span>
             <b id="wdRegOdds">-</b>
           </div>
         </div>
@@ -4056,8 +4056,8 @@ body{
           </div>
           <div class="wd-counter-rows">
             <div><span>TYPE</span><b id="wdCounterSt">A</b></div>
-            <div><span>BIG</span><b id="wdCounterBig">0</b></div>
-            <div><span>REG</span><b id="wdCounterReg">0</b></div>
+            <div><span>BB</span><b id="wdCounterBig">0</b></div>
+            <div><span>RB</span><b id="wdCounterReg">0</b></div>
             <div><span>ブドウ</span><b id="wdCounterGrape">0</b></div>
           </div>
         </div>
@@ -4232,37 +4232,37 @@ body{
           <button class="dangerBtn" id="resetBtn">初期化</button>
         </div>
         <div class="help" style="margin-top:10px">
-          1プレイごとに3ptを消費します。Aタイプ中は画像の設定別確率でBIG/REG/ブドウを抽選し、ハズレは払い出しなしです。
+          1プレイごとに3ptを消費します。Aタイプ中は画像の設定別確率でBB/RB/ブドウを抽選し、ハズレは払い出しなしです。
         </div>
       </div>
 
       <div class="card">
         <h2>ボーナス払い出し</h2>
         <div class="field">
-          <label>REG払い出し（96pt固定）</label>
+          <label>RB払い出し（96pt固定）</label>
           <input id="midMulInput" type="number" min="0" max="1000" step="1" value="96" readonly />
         </div>
         <div class="field">
-          <label>BIG払い出し（252pt固定）</label>
+          <label>BB払い出し（252pt固定）</label>
           <input id="bigMulInput" type="number" min="0" max="1000" step="1" value="252" readonly />
         </div>
         <div class="help">
-          Aタイプ中はAT・継続バトルへ移行しません。BIG/REGは当選ゲームで確定告知し、払い出し後は通常ゲームへ戻ります。ブドウは設定別確率で通常払い出しします。
+          Aタイプ中はAT・継続バトルへ移行しません。BB/RBは当選ゲームで確定告知し、払い出し後は通常ゲームへ戻ります。ブドウは設定別確率で通常払い出しします。
         </div>
       </div>
 
       <div class="card">
         <h2>Aタイプ当選役</h2>
         <div class="field">
-          <label>REG 77BAR</label>
+          <label>RB 77BAR</label>
           <input type="text" value="96pt固定 / AT加算なし" readonly />
         </div>
         <div class="field">
-          <label>BIG 7揃い 払い出し</label>
+          <label>BB 7揃い 払い出し</label>
           <input id="bigAddInput" type="number" min="0" max="1000" step="1" value="252" readonly />
         </div>
         <div class="help">
-          BIGは252pt、REGは96pt、ブドウは8pt。AT・SET・継続率・天井・高確はAタイプでは使用しません。
+          BBは252pt、RBは96pt、ブドウは8pt。AT・SET・継続率・天井・高確はAタイプでは使用しません。
         </div>
       </div>
 
@@ -4274,8 +4274,8 @@ body{
             <option value="">ランダム</option>
             <option value="MISS">ハズレ</option>
             <option value="GRAPE">ブドウ（8pt）</option>
-            <option value="MID">REG（77BAR/96pt）</option>
-            <option value="BIG">BIG（777/252pt）</option>
+            <option value="MID">RB（77BAR/96pt）</option>
+            <option value="BIG">BB（777/252pt）</option>
           </select>
         </div>
         <div class="row">
@@ -4293,8 +4293,8 @@ body{
         <div class="field" style="margin-top:12px">
           <label>直行操作</label>
           <div class="row" style="margin-top:8px">
-            <button class="subBtn" id="debugMidBtn">即REG</button>
-            <button class="subBtn" id="debugBigBtn">即BIG</button>
+            <button class="subBtn" id="debugMidBtn">即RB</button>
+            <button class="subBtn" id="debugBigBtn">即BB</button>
             <button class="subBtn" id="debugGrapeBtn">即ブドウ</button>
             <button class="subBtn" id="debugMissBtn">即ハズレ</button>
           </div>
@@ -4340,13 +4340,13 @@ body{
           <div class="wd-history-title">BONUS HISTORY</div>
           <table class="wd-history-table">
             <tr><th>回転数</th><th>当選</th><th>種別</th></tr>
-            <tr><td>1234G</td><td>777</td><td class="red">BIG</td></tr>
-            <tr><td>112G</td><td>77BAR</td><td class="blue">REG</td></tr>
-            <tr><td>45G</td><td>777</td><td class="red">BIG</td></tr>
-            <tr><td>789G</td><td>777</td><td class="red">BIG</td></tr>
-            <tr><td>33G</td><td>77BAR</td><td class="blue">REG</td></tr>
-            <tr><td>256G</td><td>77BAR</td><td class="blue">REG</td></tr>
-            <tr><td>654G</td><td>777</td><td class="red">BIG</td></tr>
+            <tr><td>1234G</td><td>777</td><td class="red">BB</td></tr>
+            <tr><td>112G</td><td>77BAR</td><td class="blue">RB</td></tr>
+            <tr><td>45G</td><td>777</td><td class="red">BB</td></tr>
+            <tr><td>789G</td><td>777</td><td class="red">BB</td></tr>
+            <tr><td>33G</td><td>77BAR</td><td class="blue">RB</td></tr>
+            <tr><td>256G</td><td>77BAR</td><td class="blue">RB</td></tr>
+            <tr><td>654G</td><td>777</td><td class="red">BB</td></tr>
           </table>
           <div class="wd-history-more">もっと見る</div>
         </div>
@@ -4421,7 +4421,7 @@ body{
     3:6.02,
     4:6.02,
     5:6.02,
-    6:5.78
+    6:5.80
   });
   const A_TYPE_PAYOUTS = Object.freeze({
     BIG:252,
@@ -4470,10 +4470,10 @@ body{
   const RESULT = {
     MISS:{name:"ハズレ", reel:["🍋","🔔","⭐"], label:"MISS", cls:"", kind:"miss"},
     SMALL:{name:"砂時計", reel:[USER_FACE,USER_FACE,USER_FACE], label:"砂時計", cls:"blue", kind:"payadd"},
-    MID:{name:"REG", reel:["7","7","BAR"], label:"REG", cls:"purple", kind:"payadd"},
+    MID:{name:"RB", reel:["7","7","BAR"], label:"RB", cls:"purple", kind:"payadd"},
     GRAPE:{name:"ブドウ", reel:["🍇","🍇","🍇"], label:"ブドウ", cls:"green", kind:"pay"},
     BAR3:{name:"BAR揃い", reel:["BAR","BAR","BAR"], label:"BAR", cls:"purple", kind:"add"},
-    BIG:{name:"BIG", reel:["7","7","7"], label:"BIG", cls:"red", kind:"payadd"},
+    BIG:{name:"BB", reel:["7","7","7"], label:"BB", cls:"red", kind:"payadd"},
     DEVIL_ZONE:{name:"DEVIL ZONE", reel:["7","7","BAR"], label:"DZ", cls:"purple", kind:"payadd"},
     SUPER_DEVIL_ZONE:{name:"SUPER DEVIL ZONE", reel:["7","7","7"], label:"SUPER DZ", cls:"red", kind:"payadd"},
     BELL:{name:"ベル揃い", reel:["🔔","🔔","🔔"], label:"BELL", cls:"gold", kind:"pay"},
@@ -7509,7 +7509,7 @@ body{
     const setting6Option = document.querySelector('#settingSelect option[value="6"]');
     if(setting6Option) setting6Option.textContent = A_TYPE_MODE ? "設定6 / 105.5%" : "設定6 / 目標115%";
     const adminStInfoText = A_TYPE_MODE
-      ? `Aタイプ / BIG ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).big)} / REG ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).reg)}`
+      ? `Aタイプ / BB ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).big)} / RB ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).reg)}`
       : session.active ? setGameCount() + "G/SET" : (normalState.bonusPending ? `BONUS確定 / ${pendingBonusLabel()}待ち` : `${normalModeLabel()} / 天井まで${ceilingRemain()}G`);
     if($("stInfoView")) $("stInfoView").textContent = adminStInfoText;
     if($("adminStInfoView")) $("adminStInfoView").textContent = adminStInfoText;
@@ -8180,7 +8180,7 @@ body{
     if(resolved.aTypeBonusReady){
       resetNormalModeAfterBonus();
       $("stLamp").classList.add("on");
-      const bonusLabel = result === "MID" ? "REG" : "BIG";
+      const bonusLabel = result === "MID" ? "RB" : "BB";
       showMessage(bonusLabel, `Aタイプ直撃 / +${normalReward}pt${lineText ? " / " + lineText : ""}`);
       log(`${bonusLabel}：Aタイプ直撃 / +${normalReward}pt`);
       flashReelLight("rainbow", result === "BIG" ? 2200 : 1800);
@@ -8468,7 +8468,7 @@ body{
     if($("adminSettingView")) $("adminSettingView").textContent = settings.setting;
     if($("adminTargetRtpView")) $("adminTargetRtpView").textContent = targetRtpText();
     const stInfoText = A_TYPE_MODE
-      ? `Aタイプ / BIG ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).big)} / REG ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).reg)} / 1G ${SPIN_COST}pt`
+      ? `Aタイプ / BB ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).big)} / RB ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).reg)} / 1G ${SPIN_COST}pt`
       : active
         ? (isContinuationBattleActive()
           ? `継続BATTLE ${session.battleRemain}G / 継続${formatRate(session.continuationRate)} STOCK${session.stockSets || 0}`
@@ -8480,7 +8480,7 @@ body{
     if($("stInfoViewLegacy")) $("stInfoViewLegacy").textContent = stInfoText;
     if($("adminStInfoView")) $("adminStInfoView").textContent = stInfoText;
     const payoutScaleText = A_TYPE_MODE
-      ? `Aタイプ:BIG${A_TYPE_PAYOUTS.BIG}pt/REG${A_TYPE_PAYOUTS.MID}pt/ブドウ${A_TYPE_PAYOUTS.GRAPE}pt/ハズレ0pt`
+      ? `Aタイプ:BB${A_TYPE_PAYOUTS.BIG}pt/RB${A_TYPE_PAYOUTS.MID}pt/ブドウ${A_TYPE_PAYOUTS.GRAPE}pt/ハズレ0pt`
       : `通常:ベル${NORMAL_ROLE_PAYOUTS.BELL}pt/スイカ${NORMAL_ROLE_PAYOUTS.SUICA}pt/チェリー${NORMAL_ROLE_PAYOUTS.CHERRY_ANY}pt/リプレイ${NORMAL_ROLE_PAYOUTS.REPLAY}pt/REG${NORMAL_ROLE_PAYOUTS.MID}pt / 通常小役${Math.round(NORMAL_ROLE_RATE * 100)}% / 高確小役${Math.round(HIGH_ROLE_RATE * 100)}% / ATベル${ROLE_PAYOUTS.BELL}pt/斜めベル${ROLE_PAYOUTS.BELL3}pt / 平均継続${formatRate(averageContinuationRate(settings.setting))}`;
     if($("payoutScaleView")) $("payoutScaleView").textContent = payoutScaleText;
     if($("payoutScaleViewLegacy")) $("payoutScaleViewLegacy").textContent = payoutScaleText;
@@ -8550,8 +8550,8 @@ body{
     };
     if(A_TYPE_MODE){
       setMirrorCell("wdMirrorSt", "TYPE", "A");
-      setMirrorCell("wdMirrorBig", "BIG", stats.bigCount || 0);
-      setMirrorCell("wdMirrorReg", "REG", stats.midCount || 0);
+      setMirrorCell("wdMirrorBig", "BB", stats.bigCount || 0);
+      setMirrorCell("wdMirrorReg", "RB", stats.midCount || 0);
     }else if(active){
       const zoneRemain = Math.max(0, session.bigZone || 0);
       setMirrorCell("wdMirrorSt", "AT残", `${Math.max(0, session.remain || 0)}G`);
@@ -8559,8 +8559,8 @@ body{
       setMirrorCell("wdMirrorReg", "超DZ残", isSuperGoraiZoneActive() ? `${zoneRemain}G` : "0G");
     }else{
       setMirrorCell("wdMirrorSt", "AT", atCountText);
-      setMirrorCell("wdMirrorBig", "BIG", stats.bigCount || 0);
-      setMirrorCell("wdMirrorReg", "REG", stats.midCount || 0);
+      setMirrorCell("wdMirrorBig", "BB", stats.bigCount || 0);
+      setMirrorCell("wdMirrorReg", "RB", stats.midCount || 0);
     }
     const mirrorStCell = $("wdMirrorSt") ? $("wdMirrorSt").parentElement : null;
     if(mirrorStCell) mirrorStCell.classList.toggle("zoneHold", active && isGoraiZoneActive());
@@ -8656,7 +8656,7 @@ body{
     if(!table) return;
 
     if(A_TYPE_MODE){
-      let html = `<tr><td>設定</td><td>BIG</td><td>REG</td><td>ボーナス合算</td><td>ブドウ</td><td>機械割</td></tr>`;
+      let html = `<tr><td>設定</td><td>BB</td><td>RB</td><td>合算</td><td>ぶどう</td><td>機械割</td></tr>`;
       for(const i of [1,2,3,4,5,6]){
         const bonus = A_TYPE_BONUS_TABLE[i];
         const grape = A_TYPE_GRAPE_TABLE[i] || A_TYPE_GRAPE_TABLE[1];
@@ -8754,7 +8754,7 @@ body{
     if($("premiumForceStatus")) $("premiumForceStatus").value = "OFF";
     $("stLamp").classList.remove("on");
     setMorningBarReels();
-    showMessage("READY",`1回転${SPIN_COST}pt / BIG・REG完全告知 / 設定${settings.setting}`);
+    showMessage("READY",`1回転${SPIN_COST}pt / BB・RB完全告知 / 設定${settings.setting}`);
     $("resultText").textContent = "-";
     updateDisplay();
     log("統計を初期化しました");
@@ -8838,7 +8838,7 @@ body{
     help.style.margin = "-2px 0 10px";
     help.textContent = A_TYPE_MODE
       ? "Aタイプリセット：設定はそのまま、COMPLETE解除、通常状態へ戻します。"
-      : `朝一リセット：設定はそのまま、COMPLETE解除、初回BIG/REGまで天井${MORNING_CEILING_GAMES}G。`;
+      : `朝一リセット：設定はそのまま、COMPLETE解除、初回BB/RBまで天井${MORNING_CEILING_GAMES}G。`;
     anchor.insertAdjacentElement("afterend", help);
     anchor.insertAdjacentElement("afterend", row);
   }
@@ -10674,7 +10674,7 @@ body{
   setup();
   connectAdminCommands();
   reels.forEach((_,i)=>setRandomReel(i));
-  showMessage("READY",`1回転${SPIN_COST}pt / BIG・REG完全告知 / 設定${settings.setting}`);
+  showMessage("READY",`1回転${SPIN_COST}pt / BB・RB完全告知 / 設定${settings.setting}`);
   updateDisplay();
   updateAutoUi();
   updateDebugFastUi();
