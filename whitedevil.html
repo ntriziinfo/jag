@@ -3935,6 +3935,8 @@ body{
           <div id="oddsPanelBody">
             <h2>設定別確率（分数表記）</h2>
             <table class="oddsTable" id="settingTable"></table>
+            <h2>REG確率詳細</h2>
+            <table class="oddsTable" id="regDetailTable"></table>
           </div>
         </div>
         <div class="audioPanel" id="audioPanel">
@@ -4275,6 +4277,7 @@ body{
             <option value="MISS">ハズレ</option>
             <option value="GRAPE">ブドウ（8pt）</option>
             <option value="MID">RB（77BAR/96pt）</option>
+            <option value="MID_CHERRY">RBチェリー同時（77BAR/96pt）</option>
             <option value="BIG">BB（777/252pt）</option>
           </select>
         </div>
@@ -4423,12 +4426,20 @@ body{
     5:6.02,
     6:5.80
   });
+  const A_TYPE_REG_DETAIL_TABLE = Object.freeze({
+    1:{solo:630.15, cherry:1456.36},
+    2:{solo:574.88, cherry:1310.72},
+    3:{solo:474.90, cherry:1092.27},
+    4:{solo:448.88, cherry:1057.03},
+    5:{solo:364.09, cherry:851.12},
+    6:{solo:364.09, cherry:851.12}
+  });
   const A_TYPE_PAYOUTS = Object.freeze({
     BIG:252,
     MID:96,
     GRAPE:8
   });
-  const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID", "GRAPE"]);
+  const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID", "MID_CHERRY", "GRAPE"]);
 
   const USER_FACE = "__USER_FACE__";
   const SUICA_IMAGE_SRC = "assets/symbols/sym_suika.png";
@@ -4471,6 +4482,7 @@ body{
     MISS:{name:"ハズレ", reel:["🍋","🔔","⭐"], label:"MISS", cls:"", kind:"miss"},
     SMALL:{name:"砂時計", reel:[USER_FACE,USER_FACE,USER_FACE], label:"砂時計", cls:"blue", kind:"payadd"},
     MID:{name:"RB", reel:["7","7","BAR"], label:"RB", cls:"purple", kind:"payadd"},
+    MID_CHERRY:{name:"RB（チェリー同時）", reel:["7","7","BAR"], label:"RB", cls:"purple", kind:"payadd"},
     GRAPE:{name:"ブドウ", reel:["🍇","🍇","🍇"], label:"ブドウ", cls:"green", kind:"pay"},
     BAR3:{name:"BAR揃い", reel:["BAR","BAR","BAR"], label:"BAR", cls:"purple", kind:"add"},
     BIG:{name:"BB", reel:["7","7","7"], label:"BB", cls:"red", kind:"payadd"},
@@ -5492,6 +5504,7 @@ body{
   }
 
   function displayResultFor(result){
+    if(result === "MID_CHERRY") return "MID";
     if(result === "DEVIL_ZONE") return "MID";
     if(result === "SUPER_DEVIL_ZONE") return "BIG";
     return result;
@@ -6197,6 +6210,7 @@ body{
   }
 
   function normalRewardFor(result){
+    if(A_TYPE_MODE && result === "MID_CHERRY") return A_TYPE_PAYOUTS.MID;
     if(A_TYPE_MODE && A_TYPE_PAYOUTS[result]) return A_TYPE_PAYOUTS[result];
     return NORMAL_ROLE_PAYOUTS[result] || 0;
   }
@@ -6671,7 +6685,7 @@ body{
   function countRoleStat(result, includeBonus=false){
     if(includeBonus && result === "BIG"){
       stats.bigCount++;
-    }else if(includeBonus && result === "MID"){
+    }else if(includeBonus && (result === "MID" || result === "MID_CHERRY")){
       stats.midCount++;
     }else if(result === "GRAPE"){
       stats.grapeCount = (Number(stats.grapeCount) || 0) + 1;
@@ -7126,15 +7140,19 @@ body{
 
       const table = A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1];
       const grape = A_TYPE_GRAPE_TABLE[settings.setting] || A_TYPE_GRAPE_TABLE[1];
+      const regDetail = A_TYPE_REG_DETAIL_TABLE[settings.setting] || A_TYPE_REG_DETAIL_TABLE[1];
       let roll = Math.random();
       const multiplier = clamp(Number(settings.oddsMultiplier) || 1, 0.1, 100);
       const bigP = clamp((1 / table.big) * multiplier, 0, 0.98);
-      const regP = clamp((1 / table.reg) * multiplier, 0, 0.98 - bigP);
-      const grapeP = clamp((1 / grape) * multiplier, 0, 0.98 - bigP - regP);
+      const regSoloP = clamp((1 / regDetail.solo) * multiplier, 0, 0.98 - bigP);
+      const regCherryP = clamp((1 / regDetail.cherry) * multiplier, 0, 0.98 - bigP - regSoloP);
+      const grapeP = clamp((1 / grape) * multiplier, 0, 0.98 - bigP - regSoloP - regCherryP);
       if(roll < bigP) return "BIG";
       roll -= bigP;
-      if(roll < regP) return "MID";
-      roll -= regP;
+      if(roll < regSoloP) return "MID";
+      roll -= regSoloP;
+      if(roll < regCherryP) return "MID_CHERRY";
+      roll -= regCherryP;
       if(roll < grapeP) return "GRAPE";
       return "MISS";
     }
@@ -7159,8 +7177,13 @@ body{
   function resolveNormalOutcome(result){
     if(A_TYPE_MODE){
       const isBig = result === "BIG";
-      const isReg = result === "MID";
+      const isReg = result === "MID" || result === "MID_CHERRY";
       const isBonus = isBig || isReg;
+      const bonusSource = result === "MID_CHERRY"
+        ? "チェリー同時当選"
+        : isBonus
+          ? "単独当選"
+          : "";
       return {
         normalGame:true,
         reward:normalRewardFor(result),
@@ -7182,7 +7205,7 @@ body{
         regReady:isReg,
         bar3PremiumReady:false,
         bonusKind:isReg ? "MID" : isBig ? "BIG" : "",
-        bonusSource:isBonus ? "Aタイプ直撃" : "",
+        bonusSource,
         aTypeBonusReady:isBonus
       };
     }
@@ -8180,12 +8203,14 @@ body{
     if(resolved.aTypeBonusReady){
       resetNormalModeAfterBonus();
       $("stLamp").classList.add("on");
-      const bonusLabel = result === "MID" ? "RB" : "BB";
-      showMessage(bonusLabel, `Aタイプ直撃 / +${normalReward}pt${lineText ? " / " + lineText : ""}`);
-      log(`${bonusLabel}：Aタイプ直撃 / +${normalReward}pt`);
+      const isRegBonus = result === "MID" || result === "MID_CHERRY";
+      const bonusLabel = isRegBonus ? "RB" : "BB";
+      const sourceText = resolved.bonusSource || "単独当選";
+      showMessage(bonusLabel, `${sourceText} / +${normalReward}pt${lineText ? " / " + lineText : ""}`);
+      log(`${bonusLabel}：${sourceText} / +${normalReward}pt`);
       flashReelLight("rainbow", result === "BIG" ? 2200 : 1800);
       showOverlay(`${bonusLabel} +${normalReward}pt`);
-      if(result === "MID"){
+      if(isRegBonus){
         playVoiceSound(VOICE_SRC.reg);
         playRegConfirmSound();
         confetti(45);
@@ -8651,6 +8676,27 @@ body{
     return `${n} / 1/${(total / n).toFixed(1)}`;
   }
 
+  function renderRegDetailTable(){
+    const table = $("regDetailTable");
+    if(!table) return;
+
+    if(!A_TYPE_MODE){
+      table.innerHTML = "";
+      return;
+    }
+
+    let html = `<tr><td>設定</td><td>単独当選</td><td>チェリー同時当選</td></tr>`;
+    for(const i of [1,2,3,4,5,6]){
+      const detail = A_TYPE_REG_DETAIL_TABLE[i];
+      html += `<tr>
+        <td>${i}</td>
+        <td>1/${detail.solo.toFixed(2)}</td>
+        <td>1/${detail.cherry.toFixed(2)}</td>
+      </tr>`;
+    }
+    table.innerHTML = html;
+  }
+
   function renderSettingTable(){
     const table = $("settingTable");
     if(!table) return;
@@ -8670,6 +8716,7 @@ body{
         </tr>`;
       }
       table.innerHTML = html;
+      renderRegDetailTable();
       return;
     }
 
