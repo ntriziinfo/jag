@@ -6240,13 +6240,16 @@ body{
   width:auto !important;
   height:38% !important;
   z-index:2 !important;
-  display:grid !important;
-  place-items:center !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
   font-family:"DSEG7Classic","Courier New",monospace !important;
   font-size:min(60cqh, 24cqw) !important;
   font-weight:400 !important;
   line-height:1 !important;
   letter-spacing:.00em !important;
+  text-align:right !important;
+  font-variant-numeric:tabular-nums !important;
   color:#ff1d28 !important;
   text-shadow:
     0 0 5px rgba(255,0,16,.90),
@@ -6260,6 +6263,7 @@ body{
   z-index:-1;
   display:grid;
   place-items:center;
+  text-align:center;
   color:rgba(255,28,35,.16);
   text-shadow:
     0 0 3px rgba(255,0,20,.24),
