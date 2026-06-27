@@ -1,0 +1,224 @@
+{
+  "source": "assets/cabinet/rising_cabinet_v1.png",
+  "source_size": {
+    "width": 968,
+    "height": 1624
+  },
+  "notes": [
+    "HTML???????????????? assets/cabinet/parts ?5????",
+    "???????????????????????PNG???",
+    "?????? rising_cabinet_v1.png ??? x1,y1,x2,y2 ???"
+  ],
+  "parts": [
+    {
+      "file": "00_full_reference.png",
+      "key": "full_reference",
+      "label": "????????",
+      "box": {
+        "x1": 0,
+        "y1": 0,
+        "x2": 968,
+        "y2": 1624
+      },
+      "size": {
+        "width": 968,
+        "height": 1624
+      }
+    },
+    {
+      "file": "01_top_lamp_full.png",
+      "key": "top_lamp_full",
+      "label": "???????",
+      "box": {
+        "x1": 0,
+        "y1": 0,
+        "x2": 968,
+        "y2": 188
+      },
+      "size": {
+        "width": 968,
+        "height": 188
+      }
+    },
+    {
+      "file": "02_big_chance_panel_full.png",
+      "key": "big_chance_panel_full",
+      "label": "BIG CHANCE / 777 ???",
+      "box": {
+        "x1": 0,
+        "y1": 188,
+        "x2": 968,
+        "y2": 350
+      },
+      "size": {
+        "width": 968,
+        "height": 162
+      }
+    },
+    {
+      "file": "03_rising_logo_bridge_full.png",
+      "key": "rising_logo_bridge_full",
+      "label": "RISING?????????",
+      "box": {
+        "x1": 0,
+        "y1": 350,
+        "x2": 968,
+        "y2": 470
+      },
+      "size": {
+        "width": 968,
+        "height": 120
+      }
+    },
+    {
+      "file": "04_reel_panel_back_full.png",
+      "key": "reel_panel_back_full",
+      "label": "???????",
+      "box": {
+        "x1": 0,
+        "y1": 470,
+        "x2": 968,
+        "y2": 952
+      },
+      "size": {
+        "width": 968,
+        "height": 482
+      }
+    },
+    {
+      "file": "06_control_deck_full.png",
+      "key": "control_deck_full",
+      "label": "???????????",
+      "box": {
+        "x1": 0,
+        "y1": 952,
+        "x2": 968,
+        "y2": 1138
+      },
+      "size": {
+        "width": 968,
+        "height": 186
+      }
+    },
+    {
+      "file": "07_lower_panel_full.png",
+      "key": "lower_panel_full",
+      "label": "??RISING???",
+      "box": {
+        "x1": 0,
+        "y1": 1138,
+        "x2": 968,
+        "y2": 1461
+      },
+      "size": {
+        "width": 968,
+        "height": 323
+      }
+    },
+    {
+      "file": "08_bottom_base_full.png",
+      "key": "bottom_base_full",
+      "label": "????????????",
+      "box": {
+        "x1": 0,
+        "y1": 1461,
+        "x2": 968,
+        "y2": 1624
+      },
+      "size": {
+        "width": 968,
+        "height": 163
+      }
+    },
+    {
+      "file": "05_reel_front_frame_overlay.png",
+      "key": "reel_front_frame_overlay",
+      "label": "???????????????",
+      "box": {
+        "x1": 0,
+        "y1": 470,
+        "x2": 968,
+        "y2": 952
+      },
+      "transparent_windows_relative": [
+        {
+          "x1": 200,
+          "y1": 120,
+          "x2": 365,
+          "y2": 361
+        },
+        {
+          "x1": 398,
+          "y1": 120,
+          "x2": 559,
+          "y2": 361
+        },
+        {
+          "x1": 592,
+          "y1": 120,
+          "x2": 758,
+          "y2": 361
+        }
+      ],
+      "size": {
+        "width": 968,
+        "height": 482
+      }
+    },
+    {
+      "file": "09_start_lever_cutout.png",
+      "key": "start_lever_cutout",
+      "label": "?????????????????",
+      "source_file": "assets/controls/start_lever_cut.png",
+      "size": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "file": "10_stop_button_red_cutout.png",
+      "key": "stop_button_red_cutout",
+      "label": "?????? ??????????",
+      "source_file": "assets/controls/stop_button_red_cut.png",
+      "size": {
+        "width": 180,
+        "height": 180
+      }
+    },
+    {
+      "file": "11_stop_button_blue_cutout.png",
+      "key": "stop_button_blue_cutout",
+      "label": "?????? ??????????",
+      "source_file": "assets/controls/stop_button_blue_cut.png",
+      "size": {
+        "width": 180,
+        "height": 180
+      }
+    },
+    {
+      "file": "12_rising_chance_lamp.png",
+      "key": "rising_chance_lamp",
+      "label": "RISING CHANCE???",
+      "source_file": "assets/ui/rising_gogo_chance.png",
+      "size": {
+        "width": 728,
+        "height": 514
+      }
+    },
+    {
+      "file": "13_reel_window_guide.png",
+      "key": "reel_window_guide",
+      "label": "???????????????",
+      "box": {
+        "x1": 0,
+        "y1": 470,
+        "x2": 968,
+        "y2": 952
+      },
+      "size": {
+        "width": 968,
+        "height": 482
+      }
+    }
+  ]
+}
