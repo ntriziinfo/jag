@@ -6276,17 +6276,7 @@ body{
     1px 1px 0 #220000 !important;
 }
 .jagPayoutMeter b::before{
-  content:"8888";
-  position:absolute;
-  inset:0;
-  z-index:-1;
-  display:grid;
-  place-items:center end;
-  text-align:right;
-  color:rgba(255,28,35,.16);
-  text-shadow:
-    0 0 3px rgba(255,0,20,.24),
-    0 0 10px rgba(255,0,20,.16);
+  display:none;
 }
 .jagGogoChance{
   left:var(--layout-chance-x) !important;
@@ -6842,15 +6832,15 @@ body{
         </div>
         <div class="jagPayoutMeters" aria-label="払い出し表示">
           <div class="jagPayoutMeter jagPayoutMeterCredit">
-            <b id="jagCreditMeter">50</b>
+            <b id="jagCreditMeter">0050</b>
             <span>CREDIT</span>
           </div>
           <div class="jagPayoutMeter jagPayoutMeterCount">
-            <b id="jagCountMeter">0</b>
+            <b id="jagCountMeter">0000</b>
             <span>COUNT</span>
           </div>
           <div class="jagPayoutMeter jagPayoutMeterPayout">
-            <b id="jagGamePayoutMeter">0</b>
+            <b id="jagGamePayoutMeter">0000</b>
             <span>PAYOUT</span>
           </div>
         </div>
