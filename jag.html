@@ -6349,6 +6349,8 @@ body{
     GRAPE:8,
     REPLAY:3
   });
+  const A_TYPE_BONUS_PAY_PER_GAME = 15;
+  const A_TYPE_BONUS_MAIN_RESULT = "GRAPE";
   const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID", "MID_CHERRY", "GRAPE", "REPLAY"]);
 
   const USER_FACE = "__USER_FACE__";
@@ -6538,7 +6540,10 @@ body{
     currentSetBarBgm:false,
     continuationRate:0,
     bigZone:0,
+    bigZoneType:"",
     phase:"idle",
+    bonusKind:"",
+    bonusTarget:0,
     battleRemain:0,
     battleWin:false,
     battleSource:"",
@@ -7677,6 +7682,7 @@ body{
 
   function willEnterBattleAfterCurrentSpin(spin){
     if(!spin || !session.active || session.phase === "battle") return false;
+    if(spin.aTypeBonusActiveAtStart || isATypeBonusActive()) return false;
     if(spin.zoneActiveAtStart || spin.battleActiveAtStart) return false;
     const resolved = spin.resolved || {};
     const nextRemain = (Number(session.remain) || 0) + (Number(resolved.add) || 0) + (Number(resolved.zoneStGames) || 0);
@@ -8184,13 +8190,64 @@ body{
   }
 
   function normalRewardFor(result){
-    if(A_TYPE_MODE && result === "MID_CHERRY") return A_TYPE_PAYOUTS.MID;
+    if(A_TYPE_MODE && (result === "BIG" || result === "MID" || result === "MID_CHERRY")) return 0;
     if(A_TYPE_MODE && A_TYPE_PAYOUTS[result]) return A_TYPE_PAYOUTS[result];
     return NORMAL_ROLE_PAYOUTS[result] || 0;
   }
 
   function normalizeATypeResult(result){
     return A_TYPE_RESULT_SET.has(result) ? result : "MISS";
+  }
+
+  function normalizeATypeBonusKind(kind){
+    return kind === "MID" || kind === "REG" || kind === "RB" ? "MID" : "BIG";
+  }
+
+  function aTypeBonusLabel(kind=session.bonusKind){
+    return normalizeATypeBonusKind(kind) === "MID" ? "RB" : "BB";
+  }
+
+  function aTypeBonusTarget(kind=session.bonusKind){
+    return normalizeATypeBonusKind(kind) === "MID" ? A_TYPE_PAYOUTS.MID : A_TYPE_PAYOUTS.BIG;
+  }
+
+  function isATypeBonusActive(){
+    return !!(A_TYPE_MODE && session.active && session.phase === "a_type_bonus");
+  }
+
+  function aTypeBonusNet(){
+    return Math.max(0, (Number(session.paid) || 0) - (Number(session.cost) || 0));
+  }
+
+  function aTypeBonusRemainingNet(){
+    return Math.max(0, (Number(session.bonusTarget) || aTypeBonusTarget()) - aTypeBonusNet());
+  }
+
+  function isATypeBonusComplete(){
+    return isATypeBonusActive() && aTypeBonusRemainingNet() <= 0;
+  }
+
+  function drawATypeBonusResult(){
+    return A_TYPE_BONUS_MAIN_RESULT;
+  }
+
+  function resolveATypeBonusOutcome(result){
+    const remainingNet = aTypeBonusRemainingNet();
+    const reward = remainingNet > 0 ? Math.min(A_TYPE_BONUS_PAY_PER_GAME, SPIN_COST + remainingNet) : 0;
+    return {
+      reward,
+      add:0,
+      sets:0,
+      bigZone:0,
+      bigZoneType:"",
+      zoneGame:false,
+      zoneType:"",
+      zoneSets:0,
+      zoneStGames:0,
+      zoneGameAdd:0,
+      zoneSevenHit:false,
+      aTypeBonusGame:true
+    };
   }
 
   function randomInt(min, max){
@@ -9088,6 +9145,9 @@ body{
   }
 
   function drawResult(){
+    if(isATypeBonusActive()){
+      return drawATypeBonusResult();
+    }
     if(pendingForceResult && RESULT[pendingForceResult]){
       return atInternalResult(pendingForceResult);
     }
@@ -9609,6 +9669,50 @@ body{
       devilZoneConfirmIntroPending = false;
       hideDevilZoneConfirmScreen();
       readSettings();
+      if(A_TYPE_MODE){
+        const bonusKind = normalizeATypeBonusKind(options.bonusKind || normalState.bonusKind || "BIG");
+        const bonusTarget = aTypeBonusTarget(bonusKind);
+        const bonusLabel = aTypeBonusLabel(bonusKind);
+        resetNormalModeAfterBonus();
+        pauseNormalBgm();
+        session = {
+          active:true,
+          remain:0,
+          fee:0,
+          cost:0,
+          paid:0,
+          hits:0,
+          added:0,
+          addedGames:0,
+          setNo:1,
+          stockSets:0,
+          barBgmSets:0,
+          nextSetBarBgm:false,
+          currentSetBarBgm:false,
+          continuationRate:0,
+          bigZone:0,
+          bigZoneType:"",
+          phase:"a_type_bonus",
+          bonusKind,
+          bonusTarget,
+          battleRemain:0,
+          battleWin:false,
+          battleSource:"",
+          resultPayout:null,
+          endSignal:null
+        };
+        jagLastBonusPayout = 0;
+        jagLastGamePayout = 0;
+        jagChanceHold = true;
+        stats.totalSessions++;
+        recordSlumpPoint();
+        $("spinBtn").textContent = "BET";
+        showMessage(`${bonusLabel} BONUS`, `純増${bonusTarget}ptまで小役入賞`);
+        log(`${bonusLabel} BONUS開始：純増${bonusTarget}ptまで小役入賞 / 設定${settings.setting}`);
+        updateDisplay();
+        playWinSound(false);
+        return true;
+      }
       const premiumStockSets = Math.max(0, Number(options.stockSets) || 0);
       const premiumBarBgmSets = Math.max(0, Number(options.barBgmSets) || 0);
       const initialPaid = Math.max(0, Number(options.initialPaid) || 0);
@@ -9634,7 +9738,10 @@ body{
         currentSetBarBgm:premiumBarBgmSets > 0,
         continuationRate,
         bigZone:0,
+        bigZoneType:"",
         phase:"st",
+        bonusKind:"",
+        bonusTarget:0,
         battleRemain:0,
         battleWin:false,
         battleSource:"",
@@ -9695,6 +9802,9 @@ body{
   }
 
   function finishSession(){
+    const aTypeEnd = isATypeBonusActive();
+    const aTypeNet = aTypeEnd ? aTypeBonusNet() : 0;
+    const resultPayout = aTypeEnd ? Math.min(Number(session.bonusTarget) || aTypeBonusTarget(), aTypeNet) : session.paid;
     const profit = session.paid - (Number(session.cost) || 0);
     const endedSets = session.setNo || 0;
     if(autoPlay) stopAutoPlay("ATバトル終了のためオート停止");
@@ -9704,8 +9814,13 @@ body{
     hideBattleIntro();
     devilZoneConfirmIntroPending = false;
     hideDevilZoneConfirmScreen();
-    const endSignal = pickAtEndSignal(settings.setting);
-    session.resultPayout = session.paid;
+    if(aTypeEnd){
+      const bonusLabel = aTypeBonusLabel(session.bonusKind);
+      showMessage(`${bonusLabel}終了`, `純増${resultPayout}pt / 払出${session.paid}pt / BET${session.cost}pt`);
+      log(`${bonusLabel}終了：純増${resultPayout}pt / 払出${session.paid}pt / BET${session.cost}pt`);
+    }
+    const endSignal = aTypeEnd ? null : pickAtEndSignal(settings.setting);
+    session.resultPayout = resultPayout;
     session.endSignal = endSignal;
     session.active = false;
     session.remain = 0;
@@ -9715,6 +9830,8 @@ body{
     session.currentSetBarBgm = false;
     session.bigZone = 0;
     session.bigZoneType = "";
+    session.bonusKind = "";
+    session.bonusTarget = 0;
     session.phase = "ended";
     session.battleRemain = 0;
     session.battleWin = false;
@@ -9723,10 +9840,11 @@ body{
     resetBonusEndSpecialEffects(true);
     setSpeedFrameOffHold(false);
     $("spinBtn").textContent = "BET";
-    showSessionResultScreen(endedSets, session.paid, endSignal);
+    jagLastBonusPayout = resultPayout;
+    showSessionResultScreen(endedSets, resultPayout, aTypeEnd ? null : endSignal);
     if(endSignal) log(`AT終了画面示唆：${endSignal.label} / ${endSignal.name}`);
-    showOverlay("ATバトル終了");
-    if(profit > 0){
+    showOverlay(aTypeEnd ? `${aTypeBonusLabel()}終了` : "ATバトル終了");
+    if(resultPayout > 0){
       confetti(70);
       playWinSound(true);
     }else{
@@ -9772,6 +9890,7 @@ body{
   }
 
   function startContinuationBattlePart(predecidedOutcome=null){
+    if(isATypeBonusActive()) return false;
     if(!session.active || session.phase === "battle" || session.remain > 0 || isGoraiZoneActive()) return false;
     session.phase = "battle";
     session.battleRemain = CONTINUATION_BATTLE_GAMES;
@@ -9835,6 +9954,9 @@ body{
   }
 
   function resolveOutcome(result){
+    if(isATypeBonusActive()){
+      return resolveATypeBonusOutcome(result);
+    }
     const inGoraiZone = session.active && session.bigZone > 0;
     const zoneType = inGoraiZone ? currentGoraiZoneType() : "";
     const startZone = inGoraiZone ? {games:0, type:""} : startZoneForResult(result, zoneType);
@@ -10189,16 +10311,17 @@ body{
 
     if(resolved.aTypeBonusReady){
       jagChanceHold = true;
-      jagLastBonusPayout = normalReward;
+      jagLastBonusPayout = 0;
       resetNormalModeAfterBonus();
       $("stLamp").classList.add("on");
       const isRegBonus = result === "MID" || result === "MID_CHERRY";
       const bonusLabel = isRegBonus ? "RB" : "BB";
+      const bonusTarget = aTypeBonusTarget(isRegBonus ? "MID" : "BIG");
       const sourceText = resolved.bonusSource || "単独当選";
-      showMessage(bonusLabel, `${sourceText} / +${normalReward}pt${lineText ? " / " + lineText : ""}`);
-      log(`${bonusLabel}：${sourceText} / +${normalReward}pt`);
+      showMessage(`${bonusLabel}確定`, `${sourceText} / 純増${bonusTarget}ptまで小役入賞${lineText ? " / " + lineText : ""}`);
+      log(`${bonusLabel}確定：${sourceText} / 純増${bonusTarget}ptまで小役入賞`);
       flashReelLight("rainbow", result === "BIG" ? 2200 : 1800);
-      showOverlay(`${bonusLabel} +${normalReward}pt`);
+      showOverlay(`${bonusLabel} BONUS`);
       if(isRegBonus){
         playVoiceSound(VOICE_SRC.reg);
         playRegConfirmSound();
@@ -10314,6 +10437,7 @@ body{
     const stGameAdd = (resolved.add || 0) + (resolved.zoneStGames || 0);
     const zoneGameAdd = resolved.zoneGameAdd || 0;
     const zoneWasActive = !!resolved.zoneGame;
+    const aTypeBonusSpin = currentSpin && currentSpin.aTypeBonusActiveAtStart;
 
     if(reward > 0){
       session.paid += reward;
@@ -10399,7 +10523,9 @@ body{
       const joinText = [rewardText, stockText, continuationBoostText, stGameText, zoneGameAddText, zoneStartText, zoneRollText].filter(Boolean).join(" / ");
       const lineText = result !== "MISS" ? `${lineName(lineRow)}ライン` : "";
       const phaseText = session.phase === "battle" ? battleRemainText() : `残り${session.remain}G`;
-      const battleText = `${session.setNo || 1}SET / ${phaseText} / STOCK${session.stockSets || 0} / 継続${formatRate(session.continuationRate)}`;
+      const battleText = aTypeBonusSpin
+        ? `${aTypeBonusLabel(session.bonusKind)} BONUS / 純増${aTypeBonusNet()}/${Number(session.bonusTarget) || aTypeBonusTarget()}pt / 残り${aTypeBonusRemainingNet()}pt`
+        : `${session.setNo || 1}SET / ${phaseText} / STOCK${session.stockSets || 0} / 継続${formatRate(session.continuationRate)}`;
       const subText = [joinText, lineText, battleText].filter(Boolean).join(" / ");
       const bonusOverlayText = [stockText, continuationBoostText, stGameText, zoneGameAddText].filter(Boolean).join(" ");
       showMessage(info.name, subText);
@@ -10465,7 +10591,9 @@ body{
     $("stLamp").classList.remove("on");
     const zoneRollText = zoneWasActive ? goraiZoneRemainText(session.bigZone, session.bigZoneType || resolved.zoneType) : "";
     const phaseText = session.phase === "battle" ? battleRemainText() : `残り${session.remain}G`;
-    const battleText = `${session.setNo || 1}SET / ${phaseText} / STOCK${session.stockSets || 0} / 継続${formatRate(session.continuationRate)}`;
+    const battleText = aTypeBonusSpin
+      ? `${aTypeBonusLabel(session.bonusKind)} BONUS / 純増${aTypeBonusNet()}/${Number(session.bonusTarget) || aTypeBonusTarget()}pt / 残り${aTypeBonusRemainingNet()}pt`
+      : `${session.setNo || 1}SET / ${phaseText} / STOCK${session.stockSets || 0} / 継続${formatRate(session.continuationRate)}`;
     showMessage("ハズレ", [zoneRollText, battleText].filter(Boolean).join(" / "));
     playLoseSound();
   }
@@ -10480,7 +10608,7 @@ body{
     syncDevilZoneConfirmScreen();
     machine.className = "machine " + (active ? "active" : "normal") + (session.paid > 0 ? " win" : "");
     $("modeTag").className = "modeTag " + (active ? "active" : "");
-    $("modeTag").textContent = A_TYPE_MODE ? "A-TYPE" : active ? (isContinuationBattleActive() ? "継続BATTLE" : "BATTLE") : normalModeLabel();
+    $("modeTag").textContent = A_TYPE_MODE ? (active ? `${aTypeBonusLabel(session.bonusKind)} BONUS` : "A-TYPE") : active ? (isContinuationBattleActive() ? "継続BATTLE" : "BATTLE") : normalModeLabel();
 
     if($("settingView")) $("settingView").textContent = settings.setting;
     if($("settingViewLegacy")) $("settingViewLegacy").textContent = settings.setting;
@@ -10489,7 +10617,9 @@ body{
     if($("adminSettingView")) $("adminSettingView").textContent = settings.setting;
     if($("adminTargetRtpView")) $("adminTargetRtpView").textContent = targetRtpText();
     const stInfoText = A_TYPE_MODE
-      ? `Aタイプ / BB ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).big)} / RB ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).reg)} / 1G ${SPIN_COST}pt`
+      ? active
+        ? `${aTypeBonusLabel(session.bonusKind)} BONUS / 純増${aTypeBonusNet()}/${Number(session.bonusTarget) || aTypeBonusTarget()}pt / 小役${A_TYPE_BONUS_PAY_PER_GAME}pt`
+        : `Aタイプ / BB ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).big)} / RB ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).reg)} / 1G ${SPIN_COST}pt`
       : active
         ? (isContinuationBattleActive()
           ? `継続BATTLE ${session.battleRemain}G / 継続${formatRate(session.continuationRate)} STOCK${session.stockSets || 0}`
@@ -10501,7 +10631,7 @@ body{
     if($("stInfoViewLegacy")) $("stInfoViewLegacy").textContent = stInfoText;
     if($("adminStInfoView")) $("adminStInfoView").textContent = stInfoText;
     const payoutScaleText = A_TYPE_MODE
-      ? `Aタイプ:BB${A_TYPE_PAYOUTS.BIG}pt/RB${A_TYPE_PAYOUTS.MID}pt/ブドウ${A_TYPE_PAYOUTS.GRAPE}pt/リプレイ${A_TYPE_PAYOUTS.REPLAY}pt/ハズレ0pt`
+      ? `Aタイプ:BB純増${A_TYPE_PAYOUTS.BIG}pt/RB純増${A_TYPE_PAYOUTS.MID}pt/通常ブドウ${A_TYPE_PAYOUTS.GRAPE}pt/ボーナス小役${A_TYPE_BONUS_PAY_PER_GAME}pt/リプレイ${A_TYPE_PAYOUTS.REPLAY}pt`
       : `通常:ベル${NORMAL_ROLE_PAYOUTS.BELL}pt/スイカ${NORMAL_ROLE_PAYOUTS.SUICA}pt/チェリー${NORMAL_ROLE_PAYOUTS.CHERRY_ANY}pt/リプレイ${NORMAL_ROLE_PAYOUTS.REPLAY}pt/REG${NORMAL_ROLE_PAYOUTS.MID}pt / 通常小役${Math.round(NORMAL_ROLE_RATE * 100)}% / 高確小役${Math.round(HIGH_ROLE_RATE * 100)}% / ATベル${ROLE_PAYOUTS.BELL}pt/斜めベル${ROLE_PAYOUTS.BELL3}pt / 平均継続${formatRate(averageContinuationRate(settings.setting))}`;
     if($("payoutScaleView")) $("payoutScaleView").textContent = payoutScaleText;
     if($("payoutScaleViewLegacy")) $("payoutScaleViewLegacy").textContent = payoutScaleText;
@@ -10549,7 +10679,7 @@ body{
     }
     const displayCredit = 50;
     const displayCount = active
-      ? Math.max(0, Number(session.paid) || 0)
+      ? (isATypeBonusActive() ? aTypeBonusNet() : Math.max(0, Number(session.paid) || 0))
       : session.resultPayout !== null && session.resultPayout !== undefined
         ? Math.max(0, Number(session.resultPayout) || 0)
         : Math.max(0, Number(jagLastBonusPayout) || 0);
@@ -10615,8 +10745,13 @@ body{
       if(sevenSegPanel) sevenSegPanel.classList.toggle("zoneHold", active && isGoraiZoneActive());
       const label = document.querySelector(".sevenSegLabel");
       if(A_TYPE_MODE){
-        if(label) label.textContent = "BONUS";
-        remainBig.textContent = "A";
+        if(active){
+          if(label) label.textContent = "残り";
+          remainBig.textContent = String(Math.max(0, Math.min(999, Math.round(aTypeBonusRemainingNet()))));
+        }else{
+          if(label) label.textContent = "BONUS";
+          remainBig.textContent = "A";
+        }
         remainBig.classList.remove("idle");
       }else if(active){
         if(label) label.textContent = isGoraiZoneActive() ? goraiZoneLabel() : isContinuationBattleActive() ? "BATTLE" : "残りAT";
@@ -10810,7 +10945,7 @@ body{
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",bonusWaitGames:0,morningCeilingActive:false};
-    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
+    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     jagLastGamePayout = 0;
     jagLastBonusPayout = 0;
     jagChanceHold = false;
@@ -10862,7 +10997,7 @@ body{
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",bonusWaitGames:0,morningCeilingActive:!A_TYPE_MODE};
-    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
+    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     jagLastGamePayout = 0;
     jagLastBonusPayout = 0;
     jagChanceHold = false;
@@ -11332,18 +11467,24 @@ body{
     }
 
     const zoneActiveAtSpinStart = session.active && isGoraiZoneActive();
+    const aTypeBonusActiveAtSpinStart = isATypeBonusActive();
+    if(aTypeBonusActiveAtSpinStart && isATypeBonusComplete()){
+      finishSession();
+      scheduleNextAuto();
+      return;
+    }
     if(zoneActiveAtSpinStart){
       devilZoneConfirmIntroPending = false;
       showDevilZoneConfirmScreen("translucent");
     }else{
       syncDevilZoneConfirmScreen();
     }
-    if(session.active && session.remain <= 0 && session.phase !== "battle" && !zoneActiveAtSpinStart){
+    if(session.active && !aTypeBonusActiveAtSpinStart && session.remain <= 0 && session.phase !== "battle" && !zoneActiveAtSpinStart){
       startContinuationBattlePart();
       scheduleNextAuto();
       return;
     }
-    if(session.active && session.phase === "battle" && session.battleRemain <= 0 && !zoneActiveAtSpinStart){
+    if(session.active && !aTypeBonusActiveAtSpinStart && session.phase === "battle" && session.battleRemain <= 0 && !zoneActiveAtSpinStart){
       advanceBattleSetIfNeeded();
       return;
     }
@@ -11383,11 +11524,13 @@ body{
     if($("premiumForceStatus")) $("premiumForceStatus").value = "OFF";
     if(premiumForced && !pendingForceResult) pendingForceResult = "BIG";
 
-    const atSpinAtStart = session.active && !zoneActiveAtSpinStart && !battleActiveAtSpinStart;
+    const atSpinAtStart = session.active && !aTypeBonusActiveAtSpinStart && !zoneActiveAtSpinStart && !battleActiveAtSpinStart;
     if(normalActiveAtSpinStart){
       // 通常・高確中は天井ゲーム数だけ進める。AT残りは減算しない。
     }else if(zoneActiveAtSpinStart){
       // デビルゾーン中はATも継続バトルも減算しない。
+    }else if(aTypeBonusActiveAtSpinStart){
+      // A-type bonus consumes a BET but has no fixed game counter.
     }else if(battleActiveAtSpinStart){
       session.battleRemain = Math.max(0, (session.battleRemain || 0) - 1);
     }else{
@@ -11432,6 +11575,7 @@ body{
       bar3LeverEffect,
       speedModeBonusRogiEffect,
       zoneActiveAtStart:zoneActiveAtSpinStart,
+      aTypeBonusActiveAtStart:aTypeBonusActiveAtSpinStart,
       zoneType:zoneActiveAtSpinStart ? currentGoraiZoneType() : "",
       battleActiveAtStart:battleActiveAtSpinStart,
       normalActiveAtStart:normalActiveAtSpinStart,
@@ -11671,7 +11815,12 @@ body{
       currentSpin = null;
       updateDisplay();
       setTimeout(()=>clearReelVideos(), 900);
-      if(!A_TYPE_MODE && resolved.bar3PremiumReady){
+      if(A_TYPE_MODE && resolved.aTypeBonusReady){
+        startBonusSessionNow({
+          bonusKind:resolved.bonusKind || (resolved.regReady ? "MID" : "BIG"),
+          bonusSource:resolved.bonusSource || ""
+        });
+      }else if(!A_TYPE_MODE && resolved.bar3PremiumReady){
         stopSpeedToBonus("ボーナス確定のためSPEED停止");
         setSpeedFrameOffHold(true);
         queueBonusSessionStart(180, {
@@ -11701,7 +11850,8 @@ body{
       stopGekiatsuEffect(true);
     }
     const finishedBattleFinalGame = currentSpin && currentSpin.battleActiveAtStart && session.battleRemain <= 0;
-    const shouldEnterBattle = session.active && session.phase !== "battle" && session.remain <= 0 && !isGoraiZoneActive();
+    const shouldFinishATypeBonus = currentSpin && currentSpin.aTypeBonusActiveAtStart && isATypeBonusComplete();
+    const shouldEnterBattle = session.active && !shouldFinishATypeBonus && session.phase !== "battle" && session.remain <= 0 && !isGoraiZoneActive();
     const pendingBattleOutcome = currentSpin ? currentSpin.pendingBattleOutcome : null;
     if(!shouldEnterBattle){
       hideBattleIntro();
@@ -11713,7 +11863,12 @@ body{
     ensureBarBgmContinuing();
     setTimeout(()=>clearReelVideos(), 900);
 
-    if(finishedBattleFinalGame){
+    if(shouldFinishATypeBonus){
+      setTimeout(()=>{
+        finishSession();
+        scheduleNextAuto();
+      }, 700);
+    }else if(finishedBattleFinalGame){
       setTimeout(()=>{
         const continued = completeContinuationBattle(result);
         if(continued) scheduleNextAuto();
@@ -11753,7 +11908,12 @@ body{
       stats.totalSpins++;
       chargeSpinCost();
       applyNormalResult(result, resolved, lineRow);
-      if(!A_TYPE_MODE && resolved.bonusReady){
+      if(A_TYPE_MODE && resolved.aTypeBonusReady){
+        setTimeout(()=>startBonusSessionNow({
+          bonusKind:resolved.bonusKind || (resolved.regReady ? "MID" : "BIG"),
+          bonusSource:resolved.bonusSource || ""
+        }), 700);
+      }else if(!A_TYPE_MODE && resolved.bonusReady){
         setTimeout(()=>startSession(), 700);
       }
     }else{
@@ -12119,18 +12279,23 @@ body{
     }
 
     const zoneActiveAtSpinStart = session.active && isGoraiZoneActive();
-    if(session.active && session.remain <= 0 && session.phase !== "battle" && !zoneActiveAtSpinStart){
+    const aTypeBonusActiveAtSpinStart = isATypeBonusActive();
+    if(aTypeBonusActiveAtSpinStart && isATypeBonusComplete()){
+      finishSession();
+      return false;
+    }
+    if(session.active && !aTypeBonusActiveAtSpinStart && session.remain <= 0 && session.phase !== "battle" && !zoneActiveAtSpinStart){
       startContinuationBattlePart();
       return false;
     }
-    if(session.active && session.phase === "battle" && session.battleRemain <= 0 && !zoneActiveAtSpinStart){
+    if(session.active && !aTypeBonusActiveAtSpinStart && session.phase === "battle" && session.battleRemain <= 0 && !zoneActiveAtSpinStart){
       advanceBattleSetIfNeeded();
       return false;
     }
 
     const normalActiveAtSpinStart = !session.active;
     const battleActiveAtSpinStart = isContinuationBattleActive() && !zoneActiveAtSpinStart;
-    const atSpinAtStart = session.active && !zoneActiveAtSpinStart && !battleActiveAtSpinStart;
+    const atSpinAtStart = session.active && !aTypeBonusActiveAtSpinStart && !zoneActiveAtSpinStart && !battleActiveAtSpinStart;
 
     pendingForceResult = forceResult;
     const premiumForced = forcePremiumEffect;
@@ -12142,6 +12307,8 @@ body{
 
     if(battleActiveAtSpinStart){
       session.battleRemain = Math.max(0, (session.battleRemain || 0) - 1);
+    }else if(aTypeBonusActiveAtSpinStart){
+      // A-type bonus has no fixed remaining-game counter.
     }else if(session.active && !zoneActiveAtSpinStart){
       session.remain = Math.max(0, (session.remain || 0) - 1);
     }
@@ -12159,14 +12326,19 @@ body{
     if(normalActiveAtSpinStart){
       applyNormalResult(result, resolved, lineRow);
       pendingForceResult = "";
-      if(resolved.bar3PremiumReady){
+      if(A_TYPE_MODE && resolved.aTypeBonusReady){
+        startBonusSessionNow({
+          bonusKind:resolved.bonusKind || (resolved.regReady ? "MID" : "BIG"),
+          bonusSource:resolved.bonusSource || ""
+        });
+      }else if(!A_TYPE_MODE && resolved.bar3PremiumReady){
         startBonusSessionNow({
           continuationRateMin:BAR3_CONTINUATION_RATE,
           stockSets:stockSetsForResult("BAR3"),
           barBgmSets:stockSetsForResult("BAR3"),
           initialPaid:Number(resolved.reward) || 0
         });
-      }else if(resolved.bonusReady){
+      }else if(!A_TYPE_MODE && resolved.bonusReady){
         startBonusSessionNow();
       }
       return true;
@@ -12174,10 +12346,13 @@ body{
 
     applyResult(result, resolved, lineRow);
     const shouldResolveBattle = battleActiveAtSpinStart && session.active && session.battleRemain <= 0;
-    const shouldEnterBattle = session.active && session.phase !== "battle" && session.remain <= 0 && !isGoraiZoneActive();
+    const shouldFinishATypeBonus = aTypeBonusActiveAtSpinStart && isATypeBonusComplete();
+    const shouldEnterBattle = session.active && !shouldFinishATypeBonus && session.phase !== "battle" && session.remain <= 0 && !isGoraiZoneActive();
     pendingForceResult = "";
 
-    if(shouldResolveBattle){
+    if(shouldFinishATypeBonus){
+      finishSession();
+    }else if(shouldResolveBattle){
       completeContinuationBattle(result);
     }else if(shouldEnterBattle){
       startContinuationBattlePart();
