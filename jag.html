@@ -5427,25 +5427,25 @@ body{
   place-items:center;
   pointer-events:none;
   transform:rotate(-8deg);
-  opacity:.78;
+  opacity:1;
   isolation:isolate;
-  filter:grayscale(.92) brightness(.42) contrast(1.18) drop-shadow(0 5px 5px rgba(0,0,0,.70));
-  transition:filter .22s ease, opacity .22s ease, transform .22s ease;
+  filter:none;
+  transition:opacity .22s ease, transform .22s ease;
 }
 .jagGogoChance::after{
   content:"";
   position:absolute;
   left:50%;
   top:50%;
-  width:126%;
-  height:126%;
+  width:134%;
+  height:134%;
   transform:translate(-50%,-50%);
   z-index:0;
-  background:linear-gradient(180deg,#2b0758 0%,#140022 68%,#07000f 100%);
+  background:linear-gradient(180deg,#4a1189 0%,#220044 52%,#090010 100%);
   -webkit-mask:url("assets/ui/rising_gogo_chance.png") center / contain no-repeat;
   mask:url("assets/ui/rising_gogo_chance.png") center / contain no-repeat;
-  opacity:.92;
-  filter:drop-shadow(0 7px 7px rgba(0,0,0,.86)) drop-shadow(0 0 10px rgba(41,0,91,.55));
+  opacity:1;
+  filter:drop-shadow(0 8px 8px rgba(0,0,0,.90)) drop-shadow(0 0 12px rgba(61,0,126,.72));
 }
 .jagGogoChance::before{
   content:"";
@@ -5462,6 +5462,8 @@ body{
   height:auto;
   position:relative;
   z-index:2;
+  filter:grayscale(.92) brightness(.42) contrast(1.18) drop-shadow(0 5px 5px rgba(0,0,0,.70));
+  transition:filter .22s ease;
 }
 .jagGogoChance span{
   position:absolute;
@@ -5478,11 +5480,17 @@ body{
 }
 .reelArea.jagChanceLit .jagGogoChance{
   opacity:1;
-  filter:saturate(1.24) brightness(1.15) contrast(1.08) drop-shadow(0 0 14px rgba(255,224,56,.88)) drop-shadow(0 0 28px rgba(255,60,24,.62));
+  filter:none;
   transform:rotate(-8deg) scale(1.04);
+}
+.reelArea.jagChanceLit .jagGogoChance::after{
+  opacity:.26;
 }
 .reelArea.jagChanceLit .jagGogoChance::before{
   background:radial-gradient(circle,rgba(255,251,150,.82),rgba(255,88,24,.46) 46%,transparent 74%);
+}
+.reelArea.jagChanceLit .jagGogoChance img{
+  filter:saturate(1.24) brightness(1.15) contrast(1.08) drop-shadow(0 0 14px rgba(255,224,56,.88)) drop-shadow(0 0 28px rgba(255,60,24,.62));
 }
 .jagFrameLamps{
   position:absolute;
@@ -6021,10 +6029,10 @@ body{
     linear-gradient(180deg,rgba(255,255,255,.56),rgba(255,250,230,.06) 46%,rgba(75,60,42,.10)),
     linear-gradient(90deg,rgba(70,60,42,.06),transparent 18%,transparent 82%,rgba(70,60,42,.06)) !important;
 }
-.jagGogoChance{
+.jagGogoChance img{
   filter:grayscale(.94) brightness(.34) contrast(1.28) drop-shadow(0 5px 7px rgba(0,0,0,.82)) !important;
 }
-.reelArea.jagChanceLit .jagGogoChance{
+.reelArea.jagChanceLit .jagGogoChance img{
   filter:saturate(1.05) brightness(1.03) contrast(1.14) drop-shadow(0 0 12px rgba(255,224,56,.76)) drop-shadow(0 0 24px rgba(255,60,24,.48)) !important;
 }
 .jagFrameLamps span,
@@ -6216,7 +6224,7 @@ body{
   top:var(--layout-chance-y) !important;
   width:var(--layout-chance-w) !important;
   height:var(--layout-chance-h) !important;
-  opacity:.80 !important;
+  opacity:1 !important;
   z-index:42 !important;
 }
 .playControls{
