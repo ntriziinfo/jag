@@ -23,7 +23,15 @@
 <link rel="preload" as="image" href="assets/controls/start_lever_ball.png">
 <link rel="preload" as="image" href="assets/controls/stop_button_red_cut.png">
 <link rel="preload" as="image" href="assets/controls/stop_button_blue_cut.png">
+<link rel="preload" as="font" href="assets/fonts/DSEG7Classic-Regular.woff2" type="font/woff2" crossorigin>
 <style>
+@font-face{
+  font-family:"DSEG7Classic";
+  src:url("assets/fonts/DSEG7Classic-Regular.woff2") format("woff2");
+  font-weight:400;
+  font-style:normal;
+  font-display:block;
+}
 :root{
   --bg:#05060c;
   --panel:#101321;
@@ -1864,11 +1872,11 @@ body.debugOpen .debugDrawer .secret{
 .sevenSegValue{
   position:relative;
   z-index:1;
-  font-family:"Consolas","Courier New",monospace;
+  font-family:"DSEG7Classic","Consolas","Courier New",monospace;
   font-size:clamp(56px,9vw,124px);
   line-height:.9;
-  font-weight:1000;
-  letter-spacing:.08em;
+  font-weight:400;
+  letter-spacing:.04em;
   color:#ff365d;
   text-shadow:
     0 0 8px rgba(255,54,93,.85),
@@ -3459,6 +3467,9 @@ body::after{display:none !important;content:none !important;}
   min-width:0;
   text-align:right;
   white-space:nowrap;
+  font-family:"DSEG7Classic","Courier New",monospace;
+  font-weight:400;
+  letter-spacing:.02em;
   color:#fff;
   font-size:clamp(11px, .86vw, 13px);
   font-variant-numeric:tabular-nums;
@@ -4174,6 +4185,9 @@ body{
 .reelArea .wd-reel-data-panel #wdBigOdds,
 .reelArea .wd-reel-data-panel #wdRegOdds,
 .reelArea .wd-reel-counter-panel .wd-counter-rows b{
+  font-family:"DSEG7Classic","Courier New",monospace !important;
+  font-weight:400 !important;
+  letter-spacing:.02em !important;
   color:#fff9da !important;
   text-shadow:0 0 8px rgba(255,231,130,.72),0 0 13px rgba(255,0,0,.38) !important;
 }
@@ -5418,11 +5432,11 @@ body{
   display:grid;
   place-items:center;
   color:#ff2434;
-  font-family:"Courier New", monospace;
+  font-family:"DSEG7Classic","Courier New", monospace;
   font-size:17px;
-  font-weight:1000;
+  font-weight:400;
   line-height:1;
-  letter-spacing:.03em;
+  letter-spacing:.01em;
   text-shadow:
     0 0 5px rgba(255,0,22,.98),
     0 0 14px rgba(255,0,22,.62),
@@ -6031,9 +6045,11 @@ body{
   inset:auto !important;
   height:auto !important;
   display:block !important;
+  font-family:"DSEG7Classic","Courier New",monospace !important;
   font-size:29px !important;
+  font-weight:400 !important;
   line-height:1 !important;
-  letter-spacing:.02em !important;
+  letter-spacing:.00em !important;
   color:#ff1d28 !important;
   text-shadow:
     0 0 5px rgba(255,0,16,.90),
