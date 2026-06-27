@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Rising</title>
+  <title>JAG</title>
 <link rel="preload" as="image" href="assets/symbols/sym_hourglass.png">
 <link rel="preload" as="image" href="assets/symbols/sym_cherry.png">
 <link rel="preload" as="image" href="assets/symbols/sym_bell.png">
@@ -4114,7 +4114,7 @@ body{
   pointer-events:none;
 }
 .reelArea .wd-reel-data-panel::after{
-  content:"RISING DATA" !important;
+  content:"JAG DATA" !important;
   left:9% !important;
   right:9% !important;
   top:4.8% !important;
@@ -4127,7 +4127,7 @@ body{
   text-shadow:0 0 8px rgba(255,202,45,.85),0 0 16px rgba(255,30,18,.44) !important;
 }
 .reelArea .wd-reel-counter-panel::after{
-  content:"INFORMATION";
+  content:"JAG STATUS";
   position:absolute;
   left:9%;
   right:9%;
@@ -4549,6 +4549,505 @@ body{
   }
 }
 
+/* Unified JAG cabinet: the full cabinet, reels, background panels, and tray share one frame. */
+:root{
+  --jag-cabinet-width:960px;
+  --jag-reel-width:790px;
+  --jag-reel-top:438px;
+}
+html{
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.88),rgba(220,224,232,.64) 32%,rgba(18,20,28,.96) 88%),
+    #11141b !important;
+  background-image:
+    radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.88),rgba(220,224,232,.64) 32%,rgba(18,20,28,.96) 88%) !important;
+  background-size:100% 100% !important;
+  background-position:center top !important;
+}
+body{
+  background:none !important;
+}
+.wd-hero{
+  height:28px !important;
+  min-height:28px !important;
+}
+.main{
+  grid-template-columns:1fr !important;
+  grid-template-areas:"machine" "bottom" !important;
+  justify-items:center !important;
+  gap:0 !important;
+  width:100% !important;
+  padding-top:0 !important;
+}
+.wrap{
+  width:100% !important;
+  min-width:100% !important;
+}
+.wd-info-strip{
+  display:none !important;
+}
+.machine{
+  width:var(--jag-cabinet-width) !important;
+  min-height:1665px !important;
+  margin:0 auto !important;
+  overflow:visible !important;
+}
+.jagCabinetShell{
+  position:absolute;
+  inset:0 auto auto 50%;
+  width:var(--jag-cabinet-width);
+  height:1660px;
+  transform:translateX(-50%);
+  z-index:0;
+  pointer-events:none;
+  border-radius:22px 22px 18px 18px;
+  filter:drop-shadow(0 22px 28px rgba(0,0,0,.62));
+}
+.jagCabinetShell::before{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  bottom:0;
+  border-radius:22px 22px 18px 18px;
+  background:
+    linear-gradient(90deg,#181c24 0 2.8%,#f8fbff 3.4%,#a8b1be 5.8%,transparent 8.2%,transparent 91.8%,#a8b1be 94.2%,#f8fbff 96.6%,#181c24 97.2% 100%),
+    linear-gradient(180deg,rgba(255,255,255,.18),transparent 11%,transparent 86%,rgba(0,0,0,.42));
+  border:2px solid rgba(0,0,0,.72);
+  box-shadow:
+    inset 0 0 0 4px rgba(255,255,255,.22),
+    inset 30px 0 30px rgba(255,255,255,.24),
+    inset -30px 0 30px rgba(0,0,0,.36);
+}
+.jagSideRail{
+  position:absolute;
+  top:12px;
+  bottom:16px;
+  width:34px;
+  z-index:4;
+  border-radius:14px;
+  background:
+    linear-gradient(90deg,#161920,#f8fbff 24%,#9ca6b4 48%,#f7faff 74%,#2b3038),
+    linear-gradient(180deg,#f8fbff,#717b8a);
+  border:1px solid rgba(0,0,0,.72);
+  box-shadow:inset 0 0 11px rgba(255,255,255,.56),0 0 8px rgba(0,0,0,.42);
+}
+.jagSideRailLeft{left:7px;}
+.jagSideRailRight{right:7px;}
+.jagTopBeacon{
+  position:absolute;
+  left:30px;
+  right:30px;
+  top:10px;
+  height:168px;
+  border-radius:14px 14px 6px 6px;
+  overflow:hidden;
+  background:
+    linear-gradient(180deg,#f5f8ff,#9fa9b8 48%,#20242d);
+  border:2px solid rgba(0,0,0,.78);
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.34),0 8px 10px rgba(0,0,0,.42);
+}
+.jagTopRed{
+  position:absolute;
+  left:19px;
+  right:19px;
+  height:47px;
+  border-radius:8px;
+  background:
+    radial-gradient(circle at 50% 50%,rgba(255,255,255,.34),transparent 30%),
+    radial-gradient(circle at 8px 8px,rgba(255,255,255,.26) 0 1.2px,transparent 1.6px) 0 0 / 7px 7px,
+    linear-gradient(180deg,#ff4b3f,#e10e18 50%,#8a0008);
+  box-shadow:inset 0 4px 14px rgba(255,255,255,.38), inset 0 -9px 12px rgba(0,0,0,.28),0 0 18px rgba(255,33,20,.28);
+}
+.jagTopRedUpper{top:10px;}
+.jagTopRedLower{bottom:10px;}
+.jagTopGreen{
+  position:absolute;
+  left:17.8%;
+  right:17.8%;
+  top:57px;
+  height:54px;
+  border-radius:50% / 60%;
+  background:
+    radial-gradient(ellipse at 50% 44%,rgba(255,255,255,.64),transparent 22%),
+    radial-gradient(circle at 8px 8px,rgba(255,255,255,.22) 0 1.2px,transparent 1.6px) 0 0 / 6px 6px,
+    linear-gradient(180deg,#afffc6,#19e352 50%,#029319);
+  border:4px solid rgba(231,238,245,.92);
+  box-shadow:inset 0 8px 14px rgba(255,255,255,.38), inset 0 -11px 18px rgba(0,0,0,.32),0 0 20px rgba(68,255,113,.38);
+}
+.jagTopStar{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:38px;
+  height:38px;
+  transform:translate(-50%, -50%) rotate(45deg);
+  background:linear-gradient(135deg,#fff6b8,#ffb300 48%,#7a3b00);
+  clip-path:polygon(50% 0,61% 36%,100% 50%,61% 64%,50% 100%,39% 64%,0 50%,39% 36%);
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.44));
+}
+.jagSideLamps{
+  position:absolute;
+  top:66px;
+  display:flex;
+  gap:7px;
+}
+.jagSideLampsLeft{left:31px;}
+.jagSideLampsRight{right:31px;}
+.jagSideLamps span{
+  width:36px;
+  height:21px;
+  border-radius:999px;
+  background:radial-gradient(circle at 35% 30%,#fff,#74ff92 36%,#02a527 78%);
+  border:2px solid rgba(229,237,245,.92);
+  box-shadow:inset 0 3px 7px rgba(255,255,255,.46),0 0 10px rgba(62,255,103,.55);
+}
+.jagTopSevenPanel{
+  position:absolute;
+  left:43px;
+  right:43px;
+  top:188px;
+  height:156px;
+  overflow:hidden;
+  border:4px solid rgba(219,226,237,.96);
+  background:
+    radial-gradient(circle at 8% 26%,rgba(255,238,101,.94) 0 6px,transparent 7px),
+    radial-gradient(circle at 93% 27%,rgba(255,238,101,.94) 0 6px,transparent 7px),
+    repeating-linear-gradient(135deg,rgba(255,218,60,.18) 0 2px,transparent 2px 23px),
+    linear-gradient(180deg,#d10a14,#8d000d 70%,#540006);
+  box-shadow:inset 0 0 0 3px rgba(0,0,0,.42), inset 0 15px 28px rgba(255,255,255,.12),0 8px 10px rgba(0,0,0,.34);
+}
+.jagBigChanceText{
+  position:absolute;
+  left:0;
+  right:0;
+  top:14px;
+  z-index:3;
+  text-align:center;
+  color:#ffd64d;
+  font-family:Georgia, "Times New Roman", serif;
+  font-size:32px;
+  font-weight:1000;
+  letter-spacing:.04em;
+  text-shadow:-2px -2px 0 #451400,2px -2px 0 #451400,-2px 2px 0 #451400,2px 2px 0 #451400,0 0 10px rgba(255,218,73,.74);
+}
+.jagSevenMarquee{
+  position:absolute;
+  left:13%;
+  right:13%;
+  top:48px;
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:18px;
+}
+.jagSevenMarquee span{
+  display:block;
+  color:#e81718;
+  font-family:Impact, "Arial Black", sans-serif;
+  font-size:92px;
+  font-style:italic;
+  line-height:.8;
+  text-align:center;
+  -webkit-text-stroke:5px #210000;
+  text-shadow:0 0 0 #fff,6px 5px 0 #fff5ae,10px 8px 0 #5e0000,0 0 12px rgba(255,211,66,.68);
+}
+.jagSevenMarquee span::after{
+  content:"";
+  display:inline-block;
+  width:22px;
+  height:22px;
+  margin-left:-11px;
+  background:linear-gradient(135deg,#fff8bb,#ffbf19 55%,#7b3300);
+  clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.48));
+}
+.jagMiniMascot{
+  position:absolute;
+  top:58px;
+  width:50px;
+  height:62px;
+  border-radius:50% 50% 44% 44%;
+  background:
+    radial-gradient(circle at 38% 36%,#111 0 4px,transparent 5px),
+    radial-gradient(circle at 62% 36%,#111 0 4px,transparent 5px),
+    radial-gradient(circle at 50% 55%,#f21c22 0 6px,transparent 7px),
+    radial-gradient(circle at 50% 42%,#fff 0 26px,transparent 27px),
+    linear-gradient(180deg,#171717 0 34%,#f4d150 34% 68%,#b8060d 68%);
+  border:3px solid #160000;
+  box-shadow:0 4px 8px rgba(0,0,0,.45);
+}
+.jagMiniMascot::before,
+.jagMiniMascot::after{
+  content:"";
+  position:absolute;
+  top:-9px;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:#111;
+  border:3px solid #e2b529;
+}
+.jagMiniMascot::before{left:-8px;}
+.jagMiniMascot::after{right:-8px;}
+.jagMiniMascotLeft{left:32px;}
+.jagMiniMascotRight{right:32px;}
+.jagNameBridge{
+  position:absolute;
+  left:36px;
+  right:36px;
+  top:354px;
+  height:102px;
+  border-radius:7px;
+  background:
+    linear-gradient(90deg,#12151c 0 22%,#d9dee7 23%,#8792a1 38%,#f7faff 50%,#8792a1 62%,#d9dee7 77%,#12151c 78% 100%),
+    linear-gradient(180deg,#f8fbff,#858f9f 58%,#303641);
+  border:3px solid rgba(0,0,0,.76);
+  box-shadow:inset 0 12px 16px rgba(255,255,255,.48), inset 0 -12px 16px rgba(0,0,0,.40),0 8px 10px rgba(0,0,0,.34);
+}
+.jagBridgeSpeaker{
+  position:absolute;
+  top:21px;
+  width:205px;
+  height:55px;
+  border-radius:5px;
+  background:
+    repeating-linear-gradient(0deg,rgba(255,255,255,.10) 0 2px,transparent 2px 9px),
+    linear-gradient(180deg,#1c2029,#020305);
+  border:3px solid rgba(0,0,0,.78);
+  box-shadow:inset 0 7px 10px rgba(255,255,255,.12);
+}
+.jagBridgeSpeakerLeft{left:20px;clip-path:polygon(0 0,100% 0,86% 100%,0 100%);}
+.jagBridgeSpeakerRight{right:20px;clip-path:polygon(0 0,100% 0,100% 100%,14% 100%);}
+.jagBridgeLogo{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%, -50%);
+  color:#e81718;
+  font-family:Georgia, "Times New Roman", serif;
+  font-size:82px;
+  font-weight:1000;
+  line-height:.8;
+  letter-spacing:.03em;
+  -webkit-text-stroke:4px #381000;
+  text-shadow:0 0 0 #fff0a0,6px 6px 0 #ffc13a,9px 9px 0 #3a0000,0 0 18px rgba(255,198,47,.52);
+}
+.jagBridgeLogo::after{
+  content:"";
+  display:inline-block;
+  width:24px;
+  height:24px;
+  margin-left:-53px;
+  margin-right:28px;
+  transform:translateY(-18px) rotate(45deg);
+  background:linear-gradient(135deg,#fff8bb,#ffbf19 55%,#7b3300);
+  clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);
+}
+.jagMainFace{
+  position:absolute;
+  left:48px;
+  right:48px;
+  top:466px;
+  height:454px;
+  overflow:hidden;
+  border:4px solid rgba(219,226,237,.96);
+  background:
+    radial-gradient(circle at 12% 12%,rgba(255,235,92,.96) 0 5px,transparent 6px),
+    radial-gradient(circle at 90% 14%,rgba(255,235,92,.90) 0 4px,transparent 5px),
+    radial-gradient(circle at 86% 86%,rgba(255,235,92,.86) 0 5px,transparent 6px),
+    repeating-linear-gradient(135deg,rgba(255,218,60,.16) 0 2px,transparent 2px 26px),
+    radial-gradient(ellipse at 50% 48%,rgba(255,70,32,.34),transparent 58%),
+    linear-gradient(180deg,#b70610,#6c0008 72%,#280003);
+  box-shadow:inset 0 0 0 3px rgba(0,0,0,.42), inset 0 18px 30px rgba(255,255,255,.11),0 9px 12px rgba(0,0,0,.34);
+}
+.jagMainHeader{
+  position:absolute;
+  left:34%;
+  right:34%;
+  top:18px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  color:#ffe071;
+  font-family:Georgia, "Times New Roman", serif;
+  font-size:20px;
+  font-weight:1000;
+  border-top:2px solid rgba(255,207,61,.76);
+  border-bottom:2px solid rgba(255,207,61,.36);
+  text-shadow:0 0 8px rgba(255,207,61,.78),2px 2px 0 #330000;
+}
+.jagStageNumbers{
+  position:absolute;
+  left:25px;
+  top:90px;
+  display:grid;
+  gap:12px;
+}
+.jagStageNumbers span{
+  width:62px;
+  height:70px;
+  display:grid;
+  place-items:center;
+  color:#fff;
+  font-family:Impact, "Arial Black", sans-serif;
+  font-size:55px;
+  -webkit-text-stroke:3px #280000;
+  text-shadow:4px 4px 0 #ffc62d,0 0 12px rgba(255,207,61,.66);
+}
+.jagStatusLamps{
+  position:absolute;
+  right:22px;
+  top:68px;
+  display:grid;
+  gap:18px;
+}
+.jagStatusLamps span{
+  width:76px;
+  height:44px;
+  display:grid;
+  place-items:center;
+  border-radius:6px;
+  color:#fff8d3;
+  font-size:14px;
+  font-weight:1000;
+  background:linear-gradient(180deg,#110004,#5e0009 52%,#100004);
+  border:2px solid #ffbf2d;
+  box-shadow:inset 0 0 8px rgba(255,211,65,.26),0 0 9px rgba(255,207,61,.24);
+  text-shadow:0 0 8px rgba(255,255,255,.58);
+}
+.jagStatusLamps span:nth-child(2){color:#54caff;border-color:#58b8ff;}
+.jagStatusLamps span:nth-child(3){color:#70ff7c;border-color:#63f06f;}
+.jagChanceSplash{
+  position:absolute;
+  left:22px;
+  bottom:28px;
+  width:145px;
+  height:105px;
+  display:grid;
+  place-items:end center;
+  padding-bottom:17px;
+  color:#c8ecff;
+  font-size:22px;
+  font-weight:1000;
+  line-height:.85;
+  background:
+    radial-gradient(circle at 50% 50%,rgba(77,154,255,.42),transparent 50%),
+    conic-gradient(from 18deg,#1140b0 0 14deg,#06122d 14deg 27deg,#1f6bff 27deg 39deg,#06122d 39deg 52deg,#1140b0 52deg 360deg);
+  clip-path:polygon(50% 0,59% 32%,91% 14%,72% 45%,100% 50%,72% 58%,92% 88%,61% 71%,50% 100%,39% 71%,8% 88%,28% 58%,0 50%,28% 45%,9% 14%,41% 32%);
+  text-shadow:2px 2px 0 #00112c,0 0 9px rgba(72,177,255,.80);
+}
+.jagControlDeck{
+  position:absolute;
+  left:36px;
+  right:36px;
+  top:926px;
+  height:146px;
+  border-radius:8px;
+  background:
+    radial-gradient(circle at 16% 50%,rgba(255,255,255,.46),transparent 9%),
+    radial-gradient(circle at 88% 50%,rgba(255,255,255,.35),transparent 7%),
+    linear-gradient(108deg,transparent 0 30%,rgba(255,255,255,.82) 31%,rgba(255,255,255,.28) 34%,transparent 35%),
+    linear-gradient(252deg,transparent 0 30%,rgba(255,255,255,.82) 31%,rgba(255,255,255,.28) 34%,transparent 35%),
+    linear-gradient(90deg,#11151d 0 13%,#dde3ed 14%,#8893a1 28%,#11151d 29% 71%,#8893a1 72%,#dde3ed 86%,#11151d 87% 100%),
+    linear-gradient(180deg,#f8fbff,#7f8998 52%,#303640);
+  border:3px solid rgba(0,0,0,.78);
+  box-shadow:inset 0 13px 17px rgba(255,255,255,.42), inset 0 -15px 18px rgba(0,0,0,.38),0 8px 11px rgba(0,0,0,.35);
+}
+.jagControlDeck::before{
+  content:"";
+  position:absolute;
+  left:30%;
+  right:30%;
+  top:22px;
+  bottom:22px;
+  border-radius:12px;
+  background:linear-gradient(180deg,#1b1d25,#050507);
+  border:3px solid rgba(0,0,0,.84);
+  box-shadow:inset 0 8px 12px rgba(255,255,255,.12);
+}
+.reelArea{
+  width:var(--jag-reel-width) !important;
+  margin:var(--jag-reel-top) auto 0 !important;
+  z-index:20 !important;
+}
+.playControls{
+  top:var(--jag-reel-top) !important;
+  width:var(--jag-reel-width) !important;
+  z-index:32 !important;
+}
+.playControls .betArea,
+.playControls .autoArea{
+  top:89.3% !important;
+}
+.centerStopBtns button:nth-child(1),
+.centerStopBtns button:nth-child(2),
+.centerStopBtns button:nth-child(3){
+  top:90.1% !important;
+}
+.risingLowerCabinet{
+  width:calc(var(--jag-cabinet-width) - 76px) !important;
+  height:450px !important;
+  margin:36px auto 78px !important;
+  z-index:14 !important;
+}
+.risingLowerCabinet::before{
+  top:-22px !important;
+}
+.risingLowerCabinet::after{
+  top:250px !important;
+}
+.risingLowerPanel{
+  top:18px !important;
+  height:245px !important;
+  border-width:4px !important;
+}
+.risingLowerLogo{
+  min-width:360px !important;
+  font-size:142px !important;
+  padding:16px 54px 14px !important;
+  text-transform:uppercase;
+}
+.risingLowerLogo::after{
+  content:"LET'S PLAY EXCITING GAME WITH JAG";
+  position:absolute;
+  left:50%;
+  bottom:-34px;
+  transform:translateX(-50%) rotate(-2deg);
+  width:430px;
+  height:32px;
+  display:grid;
+  place-items:center;
+  color:#2f1600;
+  font-size:16px;
+  font-family:Impact, "Arial Black", sans-serif;
+  letter-spacing:.04em;
+  background:linear-gradient(180deg,#ffe38a,#c18410);
+  border:2px solid #4b1b00;
+  border-radius:4px 4px 14px 14px;
+  text-shadow:none;
+}
+.risingMedalTray{
+  top:280px !important;
+  height:98px !important;
+}
+.risingCabinetBase{
+  height:96px !important;
+}
+.risingBaseLabel{
+  opacity:.88;
+}
+.machine .resultBoxWide{
+  margin:-178px auto 140px !important;
+}
+@media(max-width:760px){
+  :root{
+    --jag-cabinet-width:930px;
+    --jag-reel-width:760px;
+    --jag-reel-top:424px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4559,10 +5058,10 @@ body{
 <div class="wrap">
   <section class="wd-hero" id="top">
     <div class="wd-vertical-copy">
-      <img src="assets/hero/kv_vertical_copy_rising.svg" alt="光れば、Rising。">
+      <img src="assets/hero/kv_vertical_copy_rising.svg" alt="光れば、JAG。">
     </div>
     <div class="wd-hero-center">
-      <img class="wd-logo" src="assets/logo/rising_logo.svg" alt="Rising">
+      <img class="wd-logo" src="assets/logo/rising_logo.svg" alt="JAG">
       <div class="wd-subtitle">JAG A-TYPE <b>SLOT</b></div>
     </div>
   </section>
@@ -4570,13 +5069,46 @@ body{
   <div class="header">
     <div class="titleBox">
       <div class="badge">A-TYPE / BB・RB BONUS</div>
-      <h1 id="titleView">Rising SLOT</h1>
+      <h1 id="titleView">JAG SLOT</h1>
     </div>
     <div class="notice">配信・RP・ゲーム内ポイント専用。現金・換金・景品交換・実利益化には使用しないでください。</div>
   </div>
 
   <div class="main">
     <section class="machine normal" id="machine">
+      <div class="jagCabinetShell" aria-hidden="true">
+        <div class="jagSideRail jagSideRailLeft"></div>
+        <div class="jagSideRail jagSideRailRight"></div>
+        <div class="jagTopBeacon">
+          <div class="jagTopRed jagTopRedUpper"></div>
+          <div class="jagTopGreen">
+            <span class="jagTopStar"></span>
+          </div>
+          <div class="jagTopRed jagTopRedLower"></div>
+          <div class="jagSideLamps jagSideLampsLeft"><span></span><span></span><span></span></div>
+          <div class="jagSideLamps jagSideLampsRight"><span></span><span></span><span></span></div>
+        </div>
+        <div class="jagTopSevenPanel">
+          <div class="jagBigChanceText">BIG CHANCE</div>
+          <div class="jagSevenMarquee">
+            <span>7</span><span>7</span><span>7</span>
+          </div>
+          <div class="jagMiniMascot jagMiniMascotLeft"></div>
+          <div class="jagMiniMascot jagMiniMascotRight"></div>
+        </div>
+        <div class="jagNameBridge">
+          <div class="jagBridgeSpeaker jagBridgeSpeakerLeft"></div>
+          <div class="jagBridgeLogo">JAG</div>
+          <div class="jagBridgeSpeaker jagBridgeSpeakerRight"></div>
+        </div>
+        <div class="jagMainFace">
+          <div class="jagMainHeader">BONUS GAME</div>
+          <div class="jagStageNumbers"><span>3</span><span>2</span><span>1</span></div>
+          <div class="jagStatusLamps"><span>START</span><span>REPLAY</span><span>WAIT</span><span>INSERT</span></div>
+          <div class="jagChanceSplash">CHANCE</div>
+        </div>
+        <div class="jagControlDeck"></div>
+      </div>
       <div class="audioDock" id="audioDock">
         <button class="utilityToggleBtn" id="slumpToggleBtn" type="button" aria-label="スランプグラフを開く" aria-expanded="false" title="スランプグラフ">
           <img src="assets/ui/icon_slump_graph_blue.png" alt="">
@@ -4809,7 +5341,7 @@ body{
       </div>
       <div class="risingLowerCabinet" aria-hidden="true">
         <div class="risingLowerPanel">
-          <div class="risingLowerLogo">Rising</div>
+          <div class="risingLowerLogo">JAG</div>
           <div class="risingPanelRibbon risingPanelRibbonLeft"></div>
           <div class="risingPanelRibbon risingPanelRibbonRight"></div>
         </div>
@@ -4821,7 +5353,7 @@ body{
         <div class="risingCabinetBase">
           <div class="risingBasePocket risingBasePocketLeft"></div>
           <div class="risingBaseLabel">JAG SLOT</div>
-          <div class="risingBaseBadge">Rising</div>
+          <div class="risingBaseBadge">JAG</div>
         </div>
       </div>
       <div class="resultBox resultBoxWide" id="resultText">-</div>
@@ -4876,7 +5408,7 @@ body{
         <h2>基本設定</h2>
         <div class="field">
           <label>台名</label>
-          <input id="titleInput" value="Rising" />
+          <input id="titleInput" value="JAG" />
         </div>
         <div class="field">
           <label>設定</label>
@@ -5259,7 +5791,7 @@ body{
   }
 
   let settings = {
-    title:"Rising",
+    title:"JAG",
     setting:1,
     fee:100,
     stSpins:10,
@@ -5676,20 +6208,20 @@ body{
   let adminPushTimer = null;
   let adminCommandStream = null;
   let adminCommandReconnectTimer = null;
-  const PAGE_ZOOM_STORAGE_KEY = "jag_page_zoom";
-  const PAGE_PAN_STORAGE_KEY = "jag_page_pan_x";
+  const PAGE_ZOOM_STORAGE_KEY = "jag_unified_page_zoom";
+  const PAGE_PAN_STORAGE_KEY = "jag_unified_page_pan_x";
   const PAGE_STAGE_WIDTH = 1360;
   const PAGE_ZOOM_MIN = 0.75;
   const PAGE_ZOOM_MAX = 1.30;
   const PAGE_ZOOM_STEP = 0.05;
   const PAGE_PAN_MIN = -260;
   const PAGE_PAN_MAX = 260;
-  const PAGE_ZOOM_BASE = 1.20;
+  const PAGE_ZOOM_BASE = 1.00;
   const CABINET_X_OFFSET_AT_75 = 0;
-  const CABINET_X_OFFSET_AT_100 = -15;
-  const CABINET_X_OFFSET_AT_130 = -32;
-  const SLOT_ZOOM_ANCHOR_X = 610;
-  const SLOT_ZOOM_ANCHOR_Y = 570;
+  const CABINET_X_OFFSET_AT_100 = 0;
+  const CABINET_X_OFFSET_AT_130 = 0;
+  const SLOT_ZOOM_ANCHOR_X = 680;
+  const SLOT_ZOOM_ANCHOR_Y = 500;
   const BG_IMAGE_WIDTH = 1881;
   const BG_IMAGE_HEIGHT = 3344;
   const BG_ORANGE_LOGO_ANCHOR_X = 964;
@@ -5761,6 +6293,20 @@ body{
   function syncZoomAnchorToSlotTop(){
     const root = document.documentElement;
     if(!root) return;
+    const wrapEl = document.querySelector(".wrap");
+    const reelWindow = document.querySelector(".reelArea") || document.querySelector(".jagCabinetShell") || machine;
+    if(wrapEl && reelWindow){
+      const wrapRect = wrapEl.getBoundingClientRect();
+      const reelRect = reelWindow.getBoundingClientRect();
+      const zoom = Number.isFinite(renderedPageZoom()) && renderedPageZoom() > 0 ? renderedPageZoom() : 1;
+      const layoutLeft = wrapRect.left - (1 - zoom) * SLOT_ZOOM_ANCHOR_X;
+      const layoutTop = wrapRect.top - (1 - zoom) * SLOT_ZOOM_ANCHOR_Y;
+      const x = (reelRect.left + reelRect.width / 2 - layoutLeft) / zoom;
+      const y = (reelRect.top - layoutTop) / zoom;
+      if(Number.isFinite(x)) root.style.setProperty("--wd-stage-focus-x", `${Math.round(x * 100) / 100}px`);
+      if(Number.isFinite(y)) root.style.setProperty("--wd-reel-top-anchor-y", `${Math.round(y * 100) / 100}px`);
+      return;
+    }
     root.style.setProperty("--wd-stage-focus-x", `${SLOT_ZOOM_ANCHOR_X}px`);
     root.style.setProperty("--wd-reel-top-anchor-y", `${SLOT_ZOOM_ANCHOR_Y}px`);
   }
@@ -8246,7 +8792,7 @@ body{
 
   function normalizeMachineTitle(value){
     const title = String(value || "").trim();
-    if(!title || /^白い悪魔(?:\s*(轟雷|疾風))?$/.test(title)) return "Rising";
+    if(!title || /^白い悪魔(?:\s*(轟雷|疾風))?$/.test(title)) return "JAG";
     return title;
   }
 
