@@ -322,6 +322,127 @@ h1{
   border:1px solid rgba(255,211,106,.42);
   box-shadow:inset 0 0 10px rgba(255,255,255,.06), 0 0 10px rgba(255,211,106,.14);
 }
+.layoutEditToggleBtn{
+  width:42px;
+  height:42px;
+  min-width:42px;
+  padding:0;
+  border-radius:16px;
+  color:#fff7c8;
+  font-size:12px;
+  font-weight:1000;
+  letter-spacing:0;
+  background:linear-gradient(180deg, rgba(124,31,18,.98), rgba(12,8,24,.98));
+  border:1px solid rgba(255,211,106,.42);
+  box-shadow:inset 0 0 10px rgba(255,255,255,.07), 0 0 12px rgba(255,72,42,.20);
+}
+.layoutEditToggleBtn.active{
+  color:#1b0700;
+  background:linear-gradient(180deg,#fff4a8,#ffb223 70%,#cf4b00);
+  box-shadow:0 0 18px rgba(255,211,106,.38), inset 0 0 8px rgba(255,255,255,.28);
+}
+.layoutEditorPanel{
+  position:fixed;
+  right:14px;
+  top:72px;
+  z-index:150;
+  width:min(460px, calc(100vw - 28px));
+  max-height:calc(100vh - 92px);
+  overflow:auto;
+  padding:12px;
+  border-radius:18px;
+  background:rgba(4,8,18,.94);
+  border:1px solid rgba(255,211,106,.32);
+  box-shadow:0 18px 36px rgba(0,0,0,.58), inset 0 0 18px rgba(255,211,106,.06);
+  display:none;
+}
+.layoutEditorPanel.open{
+  display:block;
+}
+.layoutEditorHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+.layoutEditorTitle{
+  color:#fff2b8;
+  font-size:14px;
+  font-weight:1000;
+  text-shadow:0 0 9px rgba(255,211,106,.44);
+}
+.layoutEditorActions{
+  display:flex;
+  gap:6px;
+}
+.layoutEditorAction{
+  height:28px;
+  padding:0 10px;
+  border-radius:10px;
+  color:#ffeaa8;
+  font-size:11px;
+  font-weight:1000;
+  background:linear-gradient(180deg,rgba(29,45,86,.98),rgba(4,8,24,.98));
+  border:1px solid rgba(77,231,255,.30);
+}
+.layoutEditorGroups{
+  display:grid;
+  gap:10px;
+}
+.layoutEditGroup{
+  padding:10px;
+  border-radius:14px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.10);
+}
+.layoutEditGroupTitle{
+  margin-bottom:8px;
+  color:#8fefff;
+  font-size:12px;
+  font-weight:1000;
+  letter-spacing:.08em;
+}
+.layoutEditRows{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px 10px;
+}
+.layoutEditRow{
+  display:grid;
+  grid-template-columns:22px minmax(0, 1fr) 44px;
+  gap:6px;
+  align-items:center;
+}
+.layoutEditRow span{
+  color:#fff4c8;
+  font-size:11px;
+  font-weight:1000;
+  text-align:center;
+}
+.layoutEditRow input[type="range"]{
+  width:100%;
+  accent-color:#ffd36a;
+}
+.layoutEditValue{
+  color:#fff;
+  font-size:11px;
+  font-weight:1000;
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+body.layoutEditOpen .reels,
+body.layoutEditOpen .jagGogoChance,
+body.layoutEditOpen .jagPayoutMeters{
+  outline:2px dashed rgba(77,231,255,.88);
+  outline-offset:3px;
+}
+body.layoutEditOpen .jagGogoChance{
+  outline-color:rgba(255,211,106,.92);
+}
+body.layoutEditOpen .jagPayoutMeters{
+  outline-color:rgba(255,54,93,.92);
+}
 @media(max-width:640px){
   .pageZoomControls{
     flex-wrap:wrap;
@@ -5919,6 +6040,18 @@ body{
   --jag-cabinet-height:1610px;
   --jag-reel-top:466px;
   --jag-reel-height:478px;
+  --layout-reels-x:20.7%;
+  --layout-reels-y:24.9%;
+  --layout-reels-w:57.6%;
+  --layout-reels-h:50%;
+  --layout-chance-x:6.1%;
+  --layout-chance-y:64.8%;
+  --layout-chance-w:16.3%;
+  --layout-chance-h:21.8%;
+  --layout-sevenseg-x:29.4%;
+  --layout-sevenseg-y:80.4%;
+  --layout-sevenseg-w:41.2%;
+  --layout-sevenseg-h:8.2%;
 }
 .machine{
   min-height:1670px !important;
@@ -5988,10 +6121,12 @@ body{
   z-index:25 !important;
 }
 .reels{
-  left:20.7% !important;
-  right:21.7% !important;
-  top:24.9% !important;
-  bottom:25.1% !important;
+  left:var(--layout-reels-x) !important;
+  right:auto !important;
+  top:var(--layout-reels-y) !important;
+  bottom:auto !important;
+  width:var(--layout-reels-w) !important;
+  height:var(--layout-reels-h) !important;
   gap:5.9% !important;
   z-index:3 !important;
   filter:drop-shadow(0 4px 5px rgba(0,0,0,.34)) !important;
@@ -6022,9 +6157,11 @@ body{
   z-index:18 !important;
 }
 .jagPayoutMeters{
-  top:80.4% !important;
-  width:41.2% !important;
-  height:8.2% !important;
+  left:var(--layout-sevenseg-x) !important;
+  top:var(--layout-sevenseg-y) !important;
+  width:var(--layout-sevenseg-w) !important;
+  height:var(--layout-sevenseg-h) !important;
+  transform:none !important;
   grid-template-columns:1fr 1fr 1fr !important;
   gap:7.0% !important;
   opacity:.98 !important;
@@ -6057,10 +6194,10 @@ body{
     1px 1px 0 #220000 !important;
 }
 .jagGogoChance{
-  left:6.1% !important;
-  top:64.8% !important;
-  width:16.3% !important;
-  height:21.8% !important;
+  left:var(--layout-chance-x) !important;
+  top:var(--layout-chance-y) !important;
+  width:var(--layout-chance-w) !important;
+  height:var(--layout-chance-h) !important;
   opacity:.80 !important;
   z-index:42 !important;
 }
@@ -6373,6 +6510,45 @@ body{
           <span class="pagePanLabel">X</span>
           <input class="pagePanRange" id="pagePanRange" type="range" min="-260" max="260" step="1" value="0" aria-label="Horizontal position">
           <button class="pagePanResetBtn" id="pagePanResetBtn" type="button" title="Reset X" aria-label="Reset horizontal position"><span id="pagePanView">0</span></button>
+        </div>
+        <button class="layoutEditToggleBtn" id="layoutEditToggleBtn" type="button" aria-expanded="false" aria-controls="layoutEditorPanel" title="配置調整">配置</button>
+        <div class="layoutEditorPanel" id="layoutEditorPanel" aria-label="配置調整">
+          <div class="layoutEditorHead">
+            <div class="layoutEditorTitle">配置調整</div>
+            <div class="layoutEditorActions">
+              <button class="layoutEditorAction" id="layoutEditResetBtn" type="button">RESET</button>
+              <button class="layoutEditorAction" id="layoutEditCloseBtn" type="button">CLOSE</button>
+            </div>
+          </div>
+          <div class="layoutEditorGroups">
+            <div class="layoutEditGroup">
+              <div class="layoutEditGroupTitle">REEL</div>
+              <div class="layoutEditRows">
+                <label class="layoutEditRow"><span>X</span><input class="layoutEditInput" type="range" min="0" max="45" step="0.1" data-layout-target="reels" data-layout-prop="x"><b class="layoutEditValue" data-layout-view="reels-x"></b></label>
+                <label class="layoutEditRow"><span>Y</span><input class="layoutEditInput" type="range" min="0" max="55" step="0.1" data-layout-target="reels" data-layout-prop="y"><b class="layoutEditValue" data-layout-view="reels-y"></b></label>
+                <label class="layoutEditRow"><span>W</span><input class="layoutEditInput" type="range" min="30" max="90" step="0.1" data-layout-target="reels" data-layout-prop="w"><b class="layoutEditValue" data-layout-view="reels-w"></b></label>
+                <label class="layoutEditRow"><span>H</span><input class="layoutEditInput" type="range" min="25" max="75" step="0.1" data-layout-target="reels" data-layout-prop="h"><b class="layoutEditValue" data-layout-view="reels-h"></b></label>
+              </div>
+            </div>
+            <div class="layoutEditGroup">
+              <div class="layoutEditGroupTitle">RISING! CHANCE</div>
+              <div class="layoutEditRows">
+                <label class="layoutEditRow"><span>X</span><input class="layoutEditInput" type="range" min="0" max="90" step="0.1" data-layout-target="chance" data-layout-prop="x"><b class="layoutEditValue" data-layout-view="chance-x"></b></label>
+                <label class="layoutEditRow"><span>Y</span><input class="layoutEditInput" type="range" min="0" max="95" step="0.1" data-layout-target="chance" data-layout-prop="y"><b class="layoutEditValue" data-layout-view="chance-y"></b></label>
+                <label class="layoutEditRow"><span>W</span><input class="layoutEditInput" type="range" min="4" max="40" step="0.1" data-layout-target="chance" data-layout-prop="w"><b class="layoutEditValue" data-layout-view="chance-w"></b></label>
+                <label class="layoutEditRow"><span>H</span><input class="layoutEditInput" type="range" min="4" max="45" step="0.1" data-layout-target="chance" data-layout-prop="h"><b class="layoutEditValue" data-layout-view="chance-h"></b></label>
+              </div>
+            </div>
+            <div class="layoutEditGroup">
+              <div class="layoutEditGroupTitle">7SEG</div>
+              <div class="layoutEditRows">
+                <label class="layoutEditRow"><span>X</span><input class="layoutEditInput" type="range" min="0" max="90" step="0.1" data-layout-target="sevenseg" data-layout-prop="x"><b class="layoutEditValue" data-layout-view="sevenseg-x"></b></label>
+                <label class="layoutEditRow"><span>Y</span><input class="layoutEditInput" type="range" min="0" max="95" step="0.1" data-layout-target="sevenseg" data-layout-prop="y"><b class="layoutEditValue" data-layout-view="sevenseg-y"></b></label>
+                <label class="layoutEditRow"><span>W</span><input class="layoutEditInput" type="range" min="12" max="75" step="0.1" data-layout-target="sevenseg" data-layout-prop="w"><b class="layoutEditValue" data-layout-view="sevenseg-w"></b></label>
+                <label class="layoutEditRow"><span>H</span><input class="layoutEditInput" type="range" min="3" max="24" step="0.1" data-layout-target="sevenseg" data-layout-prop="h"><b class="layoutEditValue" data-layout-view="sevenseg-h"></b></label>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="infoPanel" id="slumpPanel">
           <div class="infoPanelHead">
@@ -7416,6 +7592,11 @@ body{
   const pagePanRange = $("pagePanRange");
   const pagePanResetBtn = $("pagePanResetBtn");
   const pagePanView = $("pagePanView");
+  const layoutEditToggleBtn = $("layoutEditToggleBtn");
+  const layoutEditorPanel = $("layoutEditorPanel");
+  const layoutEditResetBtn = $("layoutEditResetBtn");
+  const layoutEditCloseBtn = $("layoutEditCloseBtn");
+  const layoutEditInputs = [...document.querySelectorAll(".layoutEditInput")];
   const effectSkipBtn = $("effectSkipBtn");
 
   if(audioDock && audioDock.parentElement !== document.body){
@@ -7470,6 +7651,7 @@ body{
   let adminCommandReconnectTimer = null;
   const PAGE_ZOOM_STORAGE_KEY = "jag_unified_page_zoom";
   const PAGE_PAN_STORAGE_KEY = "jag_unified_page_pan_x";
+  const LAYOUT_EDIT_STORAGE_KEY = "jag_layout_editor_v1";
   const PAGE_STAGE_WIDTH = 1360;
   const PAGE_ZOOM_MIN = 0.75;
   const PAGE_ZOOM_MAX = 1.30;
@@ -7486,8 +7668,15 @@ body{
   const BG_IMAGE_HEIGHT = 3344;
   const BG_ORANGE_LOGO_ANCHOR_X = 964;
   const BG_LOGO_LOWER_ANCHOR_Y = 742;
+  const LAYOUT_DEFAULTS = Object.freeze({
+    reels:{x:20.7, y:24.9, w:57.6, h:50.0},
+    chance:{x:6.1, y:64.8, w:16.3, h:21.8},
+    sevenseg:{x:29.4, y:80.4, w:41.2, h:8.2}
+  });
   let pageZoom = 1;
   let pagePanX = 0;
+  let layoutEditOpen = false;
+  let layoutEditState = JSON.parse(JSON.stringify(LAYOUT_DEFAULTS));
   let backgroundSyncRaf = 0;
   let pageScrollBoundsRaf = 0;
 
@@ -7688,6 +7877,91 @@ body{
     const saved = Number(safeStorageGet(PAGE_PAN_STORAGE_KEY));
     if(Number.isFinite(saved)) pagePanX = saved;
     applyPagePan(false);
+  }
+
+  function cloneLayoutDefaults(){
+    return JSON.parse(JSON.stringify(LAYOUT_DEFAULTS));
+  }
+
+  function layoutInputFor(target, prop){
+    return layoutEditInputs.find(input => input.dataset.layoutTarget === target && input.dataset.layoutProp === prop);
+  }
+
+  function layoutValueLimit(target, prop, value){
+    const input = layoutInputFor(target, prop);
+    if(!input) return Number(value);
+    const min = Number(input.min);
+    const max = Number(input.max);
+    const numeric = Number(value);
+    return clamp(
+      Number.isFinite(numeric) ? numeric : LAYOUT_DEFAULTS[target][prop],
+      Number.isFinite(min) ? min : -999,
+      Number.isFinite(max) ? max : 999
+    );
+  }
+
+  function normalizeLayoutState(raw){
+    const next = cloneLayoutDefaults();
+    if(!raw || typeof raw !== "object") return next;
+    Object.keys(next).forEach(target=>{
+      if(!raw[target] || typeof raw[target] !== "object") return;
+      Object.keys(next[target]).forEach(prop=>{
+        next[target][prop] = Math.round(layoutValueLimit(target, prop, raw[target][prop]) * 10) / 10;
+      });
+    });
+    return next;
+  }
+
+  function setLayoutCssVariable(target, prop, value){
+    document.documentElement.style.setProperty(`--layout-${target}-${prop}`, `${Math.round(value * 10) / 10}%`);
+  }
+
+  function syncLayoutEditInputs(){
+    layoutEditInputs.forEach(input=>{
+      const target = input.dataset.layoutTarget;
+      const prop = input.dataset.layoutProp;
+      if(!layoutEditState[target] || !Object.prototype.hasOwnProperty.call(layoutEditState[target], prop)) return;
+      const value = Math.round(layoutEditState[target][prop] * 10) / 10;
+      input.value = String(value);
+      const view = document.querySelector(`[data-layout-view="${target}-${prop}"]`);
+      if(view) view.textContent = `${value.toFixed(1)}%`;
+    });
+  }
+
+  function applyLayoutEdit(saveValue=false){
+    layoutEditState = normalizeLayoutState(layoutEditState);
+    Object.keys(layoutEditState).forEach(target=>{
+      Object.keys(layoutEditState[target]).forEach(prop=>{
+        setLayoutCssVariable(target, prop, layoutEditState[target][prop]);
+      });
+    });
+    syncLayoutEditInputs();
+    if(saveValue) safeStorageSet(LAYOUT_EDIT_STORAGE_KEY, JSON.stringify(layoutEditState));
+  }
+
+  function loadLayoutEdit(){
+    try{
+      const saved = safeStorageGet(LAYOUT_EDIT_STORAGE_KEY);
+      layoutEditState = saved ? normalizeLayoutState(JSON.parse(saved)) : cloneLayoutDefaults();
+    }catch(e){
+      layoutEditState = cloneLayoutDefaults();
+    }
+    applyLayoutEdit(false);
+  }
+
+  function resetLayoutEdit(){
+    layoutEditState = cloneLayoutDefaults();
+    applyLayoutEdit(true);
+  }
+
+  function setLayoutEditorOpen(open){
+    layoutEditOpen = !!open;
+    if(layoutEditorPanel) layoutEditorPanel.classList.toggle("open", layoutEditOpen);
+    if(layoutEditToggleBtn){
+      layoutEditToggleBtn.classList.toggle("active", layoutEditOpen);
+      layoutEditToggleBtn.setAttribute("aria-expanded", layoutEditOpen ? "true" : "false");
+    }
+    document.body.classList.toggle("layoutEditOpen", layoutEditOpen);
   }
 
   function changePageZoom(delta){
@@ -13337,6 +13611,45 @@ body{
         applyPagePan(true);
       });
     }
+    if(layoutEditToggleBtn){
+      layoutEditToggleBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        setLayoutEditorOpen(!layoutEditOpen);
+      });
+    }
+    if(layoutEditCloseBtn){
+      layoutEditCloseBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        setLayoutEditorOpen(false);
+      });
+    }
+    if(layoutEditResetBtn){
+      layoutEditResetBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        resetLayoutEdit();
+      });
+    }
+    if(layoutEditorPanel){
+      layoutEditorPanel.addEventListener("click", e=>e.stopPropagation());
+    }
+    layoutEditInputs.forEach(input=>{
+      input.addEventListener("input", e=>{
+        e.stopPropagation();
+        const target = input.dataset.layoutTarget;
+        const prop = input.dataset.layoutProp;
+        if(!layoutEditState[target]) return;
+        layoutEditState[target][prop] = Number(input.value) || 0;
+        applyLayoutEdit(false);
+      });
+      input.addEventListener("change", e=>{
+        e.stopPropagation();
+        const target = input.dataset.layoutTarget;
+        const prop = input.dataset.layoutProp;
+        if(!layoutEditState[target]) return;
+        layoutEditState[target][prop] = Number(input.value) || 0;
+        applyLayoutEdit(true);
+      });
+    });
     if(audioDock){
       audioDock.addEventListener("click", e=>e.stopPropagation());
     }
@@ -13562,6 +13875,7 @@ body{
   load();
   loadPageZoom();
   loadPagePan();
+  loadLayoutEdit();
   applySettings();
   setup();
   connectAdminCommands();
