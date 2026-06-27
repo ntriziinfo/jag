@@ -3182,7 +3182,7 @@ body::after{display:none !important;content:none !important;}
   overflow:hidden !important;
 }
 .wd-st-status-panel::after{
-  content:"DEVIL DATA";
+  content:"JAG DATA";
   position:absolute;
   left:14%;
   right:14%;
@@ -5965,21 +5965,6 @@ body{
         <div class="bonusConfirmLayer" id="bonusConfirmLayer" aria-hidden="true">
           <img src="assets/effects/bonus_kakutei_gold.gif" alt="BONUS確定" decoding="async" draggable="false">
         </div>
-        <div class="devilZoneConfirmLayer" id="devilZoneConfirmLayer" aria-hidden="true">
-          <img src="assets/effects/devilzone_confirm_loop.gif" alt="DEVILZONE" decoding="async" draggable="false">
-        </div>
-        <div class="reversePushGuideLayer" id="reversePushGuideLayer" aria-hidden="true">
-          <img src="assets/effects/reverse_push_blue.png" alt="逆押し狙え" decoding="async" draggable="false">
-        </div>
-        <div class="devilRushEntryLayer" id="devilRushEntryLayer" aria-hidden="true">
-          <img id="devilRushEntryImage" src="assets/effects/devil_rush_entry_start.png" alt="DEVIL RUSH" decoding="async" draggable="false">
-        </div>
-        <div class="battleIntroLayer" id="battleIntroLayer" aria-hidden="true">
-          <img class="battleIntroLogo" id="battleIntroLogo" alt="BATTLE" decoding="async" draggable="false">
-          <img class="battleIntroCharacter" id="battleIntroCharacter" alt="" decoding="async" draggable="false">
-          <img class="battleIntroRound" id="battleIntroRound" alt="" decoding="async" draggable="false">
-        </div>
-        <div class="rogiBlackoutLayer" id="rogiBlackoutLayer" aria-hidden="true"></div>
       </div>
 
       <div class="buttonRow playControls">
@@ -6028,18 +6013,6 @@ body{
         </div>
       </div>
       <div class="resultBox resultBoxWide" id="resultText">-</div>
-      <div class="sessionResultLayer" id="sessionResultLayer" aria-hidden="true">
-        <div class="sessionResultContent">
-          <div class="sessionResultTitle">ボーナス消化が終了しました。</div>
-          <div class="sessionResultStats">
-            <div class="sessionResultLine"><span>ボーナス回数</span><b id="resultSetCountView">0回</b></div>
-            <div class="sessionResultLine"><span>獲得pt</span><b id="resultPayoutView">0pt</b></div>
-          </div>
-        </div>
-        <div class="sessionResultSignal" id="sessionResultSignal" hidden aria-hidden="true">
-          <img id="sessionResultSignalImage" alt="">
-        </div>
-      </div>
     </section>
 
     <aside class="side">
@@ -6097,7 +6070,7 @@ body{
           <input id="feeInput" type="number" min="1" max="10000000" step="1" value="100" />
         </div>
         <div class="field">
-          <label>Aタイプ固定（AT未使用）</label>
+          <label>Aタイプ固定</label>
           <input id="stSpinsInput" type="number" min="1" max="100" step="1" value="1" readonly />
         </div>
         <div class="field">
@@ -6147,7 +6120,7 @@ body{
           <input id="bigMulInput" type="number" min="0" max="1000" step="1" value="252" readonly />
         </div>
         <div class="help">
-          Aタイプ中はAT・継続バトルへ移行しません。BB/RBは当選ゲームで確定告知し、払い出し後は通常ゲームへ戻ります。ブドウは設定別確率で通常払い出しします。
+          BB/RBは当選ゲームで確定告知し、指定純増までボーナスゲームを消化してから通常ゲームへ戻ります。ブドウは設定別確率で通常払い出しします。
         </div>
       </div>
 
@@ -6155,14 +6128,14 @@ body{
         <h2>Aタイプ当選役</h2>
         <div class="field">
           <label>RB 77BAR</label>
-          <input type="text" value="96pt固定 / AT加算なし" readonly />
+          <input type="text" value="96pt固定" readonly />
         </div>
         <div class="field">
           <label>BB 7揃い 払い出し</label>
           <input id="bigAddInput" type="number" min="0" max="1000" step="1" value="252" readonly />
         </div>
         <div class="help">
-          BBは252pt、RBは96pt、ブドウは8pt、リプレイは3pt。AT・SET・継続率・天井・高確はAタイプでは使用しません。
+          BBは252pt、RBは96pt、ブドウは8pt、ゾウリプレイは3pt、ピエロ特殊役は15pt。
         </div>
       </div>
 
@@ -6271,7 +6244,6 @@ body{
 <audio id="bigSound" preload="auto"></audio>
 <audio id="payoutSound" preload="auto"></audio>
 <audio id="barBgm" loop preload="auto"></audio>
-<audio id="battleBgm" loop preload="auto"></audio>
 <audio id="voiceSound" preload="auto"></audio>
 
 <script>
@@ -6646,12 +6618,6 @@ body{
   const BATTLE_INTRO_LOGO_SRC = "assets/battle/battle.png";
   const BATTLE_ROUND_IMAGE_SRCS = Array.from({length:10}, (_,i)=>i ? `assets/battle/round_${i}.png` : "");
   const BATTLE_CHARACTER_SRCS = Array.from({length:6}, (_,i)=>`assets/battle/character_${i + 1}.png`);
-  const AT_END_SETTING_SIGNALS = Object.freeze([
-    {key:"rainbow", name:"レインボー", label:"設定6以上確定", minSetting:6, rate:0.02, src:"assets/result_signals/at_end_rainbow.png"},
-    {key:"gold", name:"金", label:"設定5以上確定", minSetting:5, rate:0.05, src:"assets/result_signals/at_end_gold.png"},
-    {key:"silver", name:"銀", label:"設定4以上確定", minSetting:4, rate:0.10, src:"assets/result_signals/at_end_silver.png"},
-    {key:"bronze", name:"銅", label:"設定2以上確定", minSetting:2, rate:0.20, src:"assets/result_signals/at_end_bronze.png"}
-  ]);
   const GORAI_CONTINUATION_RATES_BY_SETTING = Object.freeze({
     1:[{rate:0.10,w:24},{rate:0.30,w:24},{rate:0.50,w:22},{rate:0.60,w:12},{rate:0.80,w:18}],
     2:[{rate:0.10,w:18},{rate:0.30,w:30},{rate:0.50,w:34},{rate:0.60,w:15},{rate:0.80,w:3}],
@@ -7597,14 +7563,6 @@ body{
     if(battleIntroLayer) battleIntroLayer.classList.remove("show");
     setBattleIntroContinueConfirmed(false);
     if(battleIntroLayer) battleIntroLayer.setAttribute("aria-hidden", "true");
-  }
-
-  function pickAtEndSignal(settingNo=settings.setting){
-    const current = Number(settingNo) || 1;
-    for(const signal of AT_END_SETTING_SIGNALS){
-      if(current >= signal.minSetting && Math.random() < signal.rate) return signal;
-    }
-    return null;
   }
 
   function setSessionResultSignal(signal){
@@ -9660,9 +9618,14 @@ body{
     if(session.active) return false;
     if(sessionStartGuard) return false;
     if(session.phase === "ended" && session.resultPayout !== null && session.resultPayout !== undefined){
-      const ok = confirm("ATバトルが終了しました。\n新しいATをはじめますか？");
-      if(!ok) return false;
       hideSessionResultScreen();
+      session.phase = "idle";
+      session.resultPayout = null;
+      session.endSignal = null;
+      if(!A_TYPE_MODE){
+        const ok = confirm("ATバトルが終了しました。\n新しいATをはじめますか？");
+        if(!ok) return false;
+      }
     }
 
     sessionStartGuard = true;
@@ -9810,21 +9773,21 @@ body{
     const resultPayout = aTypeEnd ? Math.min(Number(session.bonusTarget) || aTypeBonusTarget(), aTypeNet) : session.paid;
     const profit = session.paid - (Number(session.cost) || 0);
     const endedSets = session.setNo || 0;
-    if(autoPlay) stopAutoPlay("ATバトル終了のためオート停止");
-    showMessage("ATバトルが終了しました。", `継続SET数 ${endedSets}回 / 獲得pt ${session.paid}pt`);
-    log(`Rising BB終了：獲得${session.paid}pt / 損益${formatSigned(profit)}pt / ${endedSets}SET / STOCK獲得${session.added || 0}SET / G上乗せ${session.addedGames || 0}G`);
+    const bonusLabel = aTypeEnd ? aTypeBonusLabel(session.bonusKind) : "";
+    if(autoPlay) stopAutoPlay(aTypeEnd ? "ボーナス終了のためオート停止" : "ATバトル終了のためオート停止");
+    if(aTypeEnd){
+      showMessage(`${bonusLabel}終了`, `純増${resultPayout}pt / 払出${session.paid}pt / BET${session.cost}pt`);
+      log(`${bonusLabel}終了：純増${resultPayout}pt / 払出${session.paid}pt / BET${session.cost}pt`);
+    }else{
+      showMessage("ATバトルが終了しました。", `継続SET数 ${endedSets}回 / 獲得pt ${session.paid}pt`);
+      log(`Rising BB終了：獲得${session.paid}pt / 損益${formatSigned(profit)}pt / ${endedSets}SET / STOCK獲得${session.added || 0}SET / G上乗せ${session.addedGames || 0}G`);
+    }
     stopGekiatsuEffect(true);
     hideBattleIntro();
     devilZoneConfirmIntroPending = false;
     hideDevilZoneConfirmScreen();
-    if(aTypeEnd){
-      const bonusLabel = aTypeBonusLabel(session.bonusKind);
-      showMessage(`${bonusLabel}終了`, `純増${resultPayout}pt / 払出${session.paid}pt / BET${session.cost}pt`);
-      log(`${bonusLabel}終了：純増${resultPayout}pt / 払出${session.paid}pt / BET${session.cost}pt`);
-    }
-    const endSignal = aTypeEnd ? null : pickAtEndSignal(settings.setting);
-    session.resultPayout = resultPayout;
-    session.endSignal = endSignal;
+    session.resultPayout = aTypeEnd ? null : resultPayout;
+    session.endSignal = null;
     session.active = false;
     session.remain = 0;
     session.stockSets = 0;
@@ -9835,7 +9798,7 @@ body{
     session.bigZoneType = "";
     session.bonusKind = "";
     session.bonusTarget = 0;
-    session.phase = "ended";
+    session.phase = aTypeEnd ? "idle" : "ended";
     session.battleRemain = 0;
     session.battleWin = false;
     session.battleSource = "";
@@ -9844,13 +9807,17 @@ body{
     setSpeedFrameOffHold(false);
     $("spinBtn").textContent = "BET";
     jagLastBonusPayout = resultPayout;
-    showSessionResultScreen(endedSets, resultPayout, aTypeEnd ? null : endSignal);
-    if(endSignal) log(`AT終了画面示唆：${endSignal.label} / ${endSignal.name}`);
-    showOverlay(aTypeEnd ? `${aTypeBonusLabel()}終了` : "ATバトル終了");
-    if(resultPayout > 0){
+    if(aTypeEnd){
+      hideSessionResultScreen();
+      if($("resultText")) $("resultText").textContent = `${bonusLabel}終了 / 純増${resultPayout}pt`;
+    }else{
+      showSessionResultScreen(endedSets, resultPayout, null);
+      showOverlay("ATバトル終了");
+    }
+    if(resultPayout > 0 && !aTypeEnd){
       confetti(70);
       playWinSound(true);
-    }else{
+    }else if(!aTypeEnd){
       playLoseSound();
     }
     updateDisplay();
@@ -11462,11 +11429,14 @@ body{
       setSpeedFrameOffHold(false);
     }
     if(normalActiveAtSpinStart && session.phase === "ended" && session.resultPayout !== null && session.resultPayout !== undefined){
-      const ok = confirm("ATバトルが終了しました。\n通常へ戻って新しい遊技を開始しますか？");
-      if(!ok) return;
       hideSessionResultScreen();
       session.phase = "idle";
       session.resultPayout = null;
+      session.endSignal = null;
+      if(!A_TYPE_MODE){
+        const ok = confirm("ATバトルが終了しました。\n通常へ戻って新しい遊技を開始しますか？");
+        if(!ok) return;
+      }
     }
 
     const zoneActiveAtSpinStart = session.active && isGoraiZoneActive();
@@ -12171,6 +12141,7 @@ body{
         hideSessionResultScreen();
         session.phase = "idle";
         session.resultPayout = null;
+        session.endSignal = null;
       }
 
       speedToBonusCount++;
@@ -12278,6 +12249,7 @@ body{
       hideSessionResultScreen();
       session.phase = "idle";
       session.resultPayout = null;
+      session.endSignal = null;
       return false;
     }
 
