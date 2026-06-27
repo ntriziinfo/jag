@@ -6232,11 +6232,11 @@ body{
 
   const STORAGE_KEY = "jag_slot_state_v1";
 
-  const DEFAULT_NORMAL_BGM_SRC = "assets/media/normal_bgm.mp3";
-  const HIGH_MODE_BGM_SRC = "assets/media/high_mode_bgm.wav";
+  const DEFAULT_NORMAL_BGM_SRC = "";
+  const HIGH_MODE_BGM_SRC = "";
 
-  const AT_BGM_SRC = "assets/media/at_bgm.wav";
-  const BAR_BGM_SRC = "assets/media/bar_bgm.mp3";
+  const AT_BGM_SRC = "";
+  const BAR_BGM_SRC = "";
 
   const BIG_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
 
@@ -6251,8 +6251,8 @@ body{
   const SEVEN_CONFIRM_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
   const REG_CONFIRM_SOUND_SRC = "assets/media/jag/special_symbol.wav";
   const BONUS_CONFIRM_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
-  const BATTLE_BGM_SRC = "assets/media/battle_part_bgm.wav";
-  const SPEED_BGM_SRC = "assets/media/speed_bgm.wav";
+  const BATTLE_BGM_SRC = "";
+  const SPEED_BGM_SRC = "";
 
   const SETTING = {
     1:{target:0.970},
@@ -9945,6 +9945,7 @@ body{
   function playBarAudioSource(src, mode, logLabel){
     if(debugFastSpinActive) return;
     if(!barBgm) return;
+    if(!src) return;
     if(isContinuationBattleActive() || battleBgmActive) return;
     try{
       pauseNormalBgm();
@@ -9985,6 +9986,7 @@ body{
   function playBattleBgm(){
     if(debugFastSpinActive) return;
     if(!battleBgm) return;
+    if(!BATTLE_BGM_SRC) return;
     try{
       pauseNormalBgm();
       if(barBgmActive && barBgm){
@@ -10024,6 +10026,7 @@ body{
 
   function ensureBattleBgmContinuing(){
     if(!battleBgmActive || !battleBgm) return;
+    if(!BATTLE_BGM_SRC) return;
     try{
       if(battleBgm.getAttribute("src") !== BATTLE_BGM_SRC){
         battleBgm.setAttribute("src", BATTLE_BGM_SRC);
