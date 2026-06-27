@@ -6263,7 +6263,7 @@ body{
   align-items:center !important;
   justify-content:flex-end !important;
   font-family:"DSEG7Classic","Courier New",monospace !important;
-  font-size:min(60cqh, 24cqw) !important;
+  font-size:min(60cqh, 21cqw) !important;
   font-weight:400 !important;
   line-height:1 !important;
   letter-spacing:.00em !important;
@@ -6276,13 +6276,13 @@ body{
     1px 1px 0 #220000 !important;
 }
 .jagPayoutMeter b::before{
-  content:"888";
+  content:"8888";
   position:absolute;
   inset:0;
   z-index:-1;
   display:grid;
-  place-items:center;
-  text-align:center;
+  place-items:center end;
+  text-align:right;
   color:rgba(255,28,35,.16);
   text-shadow:
     0 0 3px rgba(255,0,20,.24),
@@ -11753,9 +11753,9 @@ body{
       const el = $(id);
       if(el) el.textContent = value;
     };
-    const formatMeterNumber = (value, max=999)=>{
+    const formatMeterNumber = (value, max=9999)=>{
       const n = Math.max(0, Math.min(max, Math.round(Number(value) || 0)));
-      return String(n);
+      return String(n).padStart(4, "0");
     };
     const stLampOn = !!($("stLamp") && $("stLamp").classList.contains("on"));
     const jagChanceLit = !!(active || normalState.bonusPending || jagChanceHold || stLampOn || bonusConfirmBgmHold);
