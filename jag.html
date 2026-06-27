@@ -6175,6 +6175,7 @@ body{
             <option value="MISS">ハズレ</option>
             <option value="REPLAY">リプレイ（3pt）</option>
             <option value="GRAPE">ブドウ（8pt）</option>
+            <option value="SMALL">特殊役（ピエロ/15pt）</option>
             <option value="MID">RB（77BAR/96pt）</option>
             <option value="MID_CHERRY">RBチェリー同時（77BAR/96pt）</option>
             <option value="BIG">BB（777/252pt）</option>
@@ -6346,18 +6347,20 @@ body{
   const A_TYPE_PAYOUTS = Object.freeze({
     BIG:252,
     MID:96,
+    SMALL:15,
     GRAPE:8,
     REPLAY:3
   });
   const A_TYPE_BONUS_PAY_PER_GAME = 15;
-  const A_TYPE_BONUS_MAIN_RESULT = "GRAPE";
-  const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID", "MID_CHERRY", "GRAPE", "REPLAY"]);
+  const A_TYPE_BONUS_MAIN_RESULT = "SMALL";
+  const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID", "MID_CHERRY", "SMALL", "GRAPE", "REPLAY"]);
 
   const USER_FACE = "__USER_FACE__";
   const ELEPHANT_SYMBOL = "🐘";
   const PIERROT_SYMBOL = "🤡";
   const CHERRY_SYMBOL = "🍒";
   const GRAPE_SYMBOL = "🍇";
+  const BELL_SYMBOL = "粕";
   const SUICA_IMAGE_SRC = "assets/symbols/sym_suika.png";
   const CHERRY_IMAGE_SRC = "assets/symbols/sym_cherry.png";
   const BELL_IMAGE_SRC = "assets/symbols/sym_bell.png";
@@ -6396,7 +6399,7 @@ body{
 
   const RESULT = {
     MISS:{name:"ハズレ", reel:[ELEPHANT_SYMBOL,PIERROT_SYMBOL,GRAPE_SYMBOL], label:"MISS", cls:"", kind:"miss"},
-    SMALL:{name:"ピエロ", reel:[ELEPHANT_SYMBOL,PIERROT_SYMBOL,ELEPHANT_SYMBOL], label:"ピエロ", cls:"blue", kind:"payadd"},
+    SMALL:{name:"特殊役", reel:[PIERROT_SYMBOL,PIERROT_SYMBOL,PIERROT_SYMBOL], label:"SPECIAL", cls:"blue", kind:"payadd"},
     MID:{name:"RB", reel:["7","7","BAR"], label:"RB", cls:"purple", kind:"payadd"},
     MID_CHERRY:{name:"RB（チェリー同時）", reel:["7","7","BAR"], label:"RB", cls:"purple", kind:"payadd"},
     GRAPE:{name:"ブドウ", reel:[GRAPE_SYMBOL,GRAPE_SYMBOL,GRAPE_SYMBOL], label:"ブドウ", cls:"green", kind:"pay"},
@@ -6404,9 +6407,9 @@ body{
     BIG:{name:"BB", reel:["7","7","7"], label:"BB", cls:"red", kind:"payadd"},
     DEVIL_ZONE:{name:"DEVIL ZONE", reel:["7","7","BAR"], label:"DZ", cls:"purple", kind:"payadd"},
     SUPER_DEVIL_ZONE:{name:"SUPER DEVIL ZONE", reel:["7","7","7"], label:"SUPER DZ", cls:"red", kind:"payadd"},
-    BELL:{name:"ゾウ揃い", reel:[ELEPHANT_SYMBOL,ELEPHANT_SYMBOL,ELEPHANT_SYMBOL], label:"ゾウ", cls:"gold", kind:"pay"},
-    BELL3:{name:"斜めゾウ", reel:[ELEPHANT_SYMBOL,ELEPHANT_SYMBOL,ELEPHANT_SYMBOL], label:"", cls:"gold", kind:"pay"},
-    REPLAY:{name:"リプレイ", reel:[PIERROT_SYMBOL,PIERROT_SYMBOL,PIERROT_SYMBOL], label:"REPLAY", cls:"blue", kind:"pay"},
+    BELL:{name:"ベル", reel:[BELL_SYMBOL,BELL_SYMBOL,BELL_SYMBOL], label:"BELL", cls:"gold", kind:"pay"},
+    BELL3:{name:"斜めベル", reel:[BELL_SYMBOL,BELL_SYMBOL,BELL_SYMBOL], label:"", cls:"gold", kind:"pay"},
+    REPLAY:{name:"リプレイ", reel:[ELEPHANT_SYMBOL,ELEPHANT_SYMBOL,ELEPHANT_SYMBOL], label:"REPLAY", cls:"blue", kind:"pay"},
     SUICA:{name:"スイカ揃い", reel:["🍋","🍋","🍋"], label:"SUICA", cls:"green", kind:"pay"},
     CHERRY_ANY:{name:"チェリーANY", reel:[CHERRY_SYMBOL,ELEPHANT_SYMBOL,PIERROT_SYMBOL], label:"CHERRY", cls:"red", kind:"payadd"},
     CHERRY_DOUBLE:{name:"チェリー2連", reel:[CHERRY_SYMBOL,CHERRY_SYMBOL,ELEPHANT_SYMBOL], label:"CHERRY×2", cls:"red", kind:"add"},
@@ -10631,7 +10634,7 @@ body{
     if($("stInfoViewLegacy")) $("stInfoViewLegacy").textContent = stInfoText;
     if($("adminStInfoView")) $("adminStInfoView").textContent = stInfoText;
     const payoutScaleText = A_TYPE_MODE
-      ? `Aタイプ:BB純増${A_TYPE_PAYOUTS.BIG}pt/RB純増${A_TYPE_PAYOUTS.MID}pt/通常ブドウ${A_TYPE_PAYOUTS.GRAPE}pt/ボーナス小役${A_TYPE_BONUS_PAY_PER_GAME}pt/リプレイ${A_TYPE_PAYOUTS.REPLAY}pt`
+      ? `Aタイプ:BB純増${A_TYPE_PAYOUTS.BIG}pt/RB純増${A_TYPE_PAYOUTS.MID}pt/ブドウ${A_TYPE_PAYOUTS.GRAPE}pt/ゾウリプレイ${A_TYPE_PAYOUTS.REPLAY}pt/ピエロ特殊役${A_TYPE_PAYOUTS.SMALL}pt`
       : `通常:ベル${NORMAL_ROLE_PAYOUTS.BELL}pt/スイカ${NORMAL_ROLE_PAYOUTS.SUICA}pt/チェリー${NORMAL_ROLE_PAYOUTS.CHERRY_ANY}pt/リプレイ${NORMAL_ROLE_PAYOUTS.REPLAY}pt/REG${NORMAL_ROLE_PAYOUTS.MID}pt / 通常小役${Math.round(NORMAL_ROLE_RATE * 100)}% / 高確小役${Math.round(HIGH_ROLE_RATE * 100)}% / ATベル${ROLE_PAYOUTS.BELL}pt/斜めベル${ROLE_PAYOUTS.BELL3}pt / 平均継続${formatRate(averageContinuationRate(settings.setting))}`;
     if($("payoutScaleView")) $("payoutScaleView").textContent = payoutScaleText;
     if($("payoutScaleViewLegacy")) $("payoutScaleViewLegacy").textContent = payoutScaleText;
@@ -11417,7 +11420,7 @@ body{
     const grid = [
       ["7", PIERROT_SYMBOL, ELEPHANT_SYMBOL],
       ["BAR", "BAR", "BAR"],
-      [RESULT.BELL.reel[0], GRAPE_SYMBOL, RESULT.CHERRY_TRIPLE.reel[0]]
+      [ELEPHANT_SYMBOL, GRAPE_SYMBOL, RESULT.CHERRY_TRIPLE.reel[0]]
     ];
     for(let i=0;i<3;i++){
       setReelColumn(i, [grid[0][i], grid[1][i], grid[2][i]], "", "", null);
