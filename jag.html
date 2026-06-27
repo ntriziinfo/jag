@@ -5040,6 +5040,278 @@ body{
 .machine .resultBoxWide{
   margin:-178px auto 140px !important;
 }
+
+/* Detail illustration pass: richer red/gold artwork without changing game logic. */
+.jagTopSevenPanel::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  background:
+    radial-gradient(circle at 12% 78%,rgba(255,235,96,.88) 0 3px,transparent 4px),
+    radial-gradient(circle at 18% 18%,rgba(255,235,96,.70) 0 2px,transparent 3px),
+    radial-gradient(circle at 33% 75%,rgba(255,244,160,.62) 0 2px,transparent 3px),
+    radial-gradient(circle at 67% 72%,rgba(255,244,160,.62) 0 2px,transparent 3px),
+    radial-gradient(circle at 84% 18%,rgba(255,235,96,.70) 0 2px,transparent 3px),
+    radial-gradient(circle at 89% 78%,rgba(255,235,96,.88) 0 3px,transparent 4px),
+    linear-gradient(108deg,transparent 0 18%,rgba(255,214,70,.28) 18.5%,transparent 27%),
+    linear-gradient(252deg,transparent 0 18%,rgba(255,214,70,.28) 18.5%,transparent 27%),
+    repeating-linear-gradient(90deg,transparent 0 36px,rgba(255,238,118,.08) 36px 38px);
+  opacity:.95;
+}
+.jagTopSevenPanel::after{
+  content:"";
+  position:absolute;
+  left:3.5%;
+  right:3.5%;
+  bottom:9px;
+  z-index:1;
+  height:28px;
+  border-radius:50%;
+  background:
+    radial-gradient(ellipse at 50% 48%,rgba(255,244,160,.70),rgba(255,198,43,.32) 42%,transparent 73%),
+    linear-gradient(90deg,transparent,rgba(255,216,64,.64),transparent);
+  border-top:2px solid rgba(255,243,168,.54);
+  filter:drop-shadow(0 3px 5px rgba(0,0,0,.34));
+}
+.jagGoldGarland{
+  position:absolute;
+  left:12%;
+  right:12%;
+  top:39px;
+  z-index:2;
+  height:26px;
+  pointer-events:none;
+}
+.jagGoldGarland::before{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:13px;
+  height:24px;
+  border-top:4px solid rgba(255,219,60,.86);
+  border-radius:0 0 50% 50%;
+  filter:drop-shadow(0 3px 3px rgba(0,0,0,.45)) drop-shadow(0 0 8px rgba(255,209,50,.35));
+}
+.jagGoldGarland span{
+  position:absolute;
+  top:5px;
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  background:radial-gradient(circle at 34% 28%,#fffbe5,#ffdf4d 48%,#8d3f00 100%);
+  border:1px solid rgba(69,22,0,.65);
+  box-shadow:0 0 10px rgba(255,219,60,.76);
+}
+.jagGoldGarland span:nth-child(1){left:2%;}
+.jagGoldGarland span:nth-child(2){left:18%;}
+.jagGoldGarland span:nth-child(3){left:34%;}
+.jagGoldGarland span:nth-child(4){left:50%;}
+.jagGoldGarland span:nth-child(5){left:66%;}
+.jagGoldGarland span:nth-child(6){left:82%;}
+.jagGoldGarland span:nth-child(7){left:98%;}
+.jagTopRibbon{
+  position:absolute;
+  top:50px;
+  z-index:1;
+  width:164px;
+  height:66px;
+  border-radius:999px 999px 14px 14px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.26),transparent 28%),
+    repeating-linear-gradient(90deg,rgba(255,231,92,.22) 0 8px,transparent 8px 18px),
+    linear-gradient(90deg,#8f0008,#ffbf2a 18%,#fff29c 45%,#b90910 78%,#5a0007);
+  border:2px solid rgba(255,220,77,.78);
+  box-shadow:inset 0 0 0 2px rgba(80,0,0,.45),0 5px 10px rgba(0,0,0,.36);
+  opacity:.64;
+}
+.jagTopRibbonLeft{left:82px;transform:rotate(-12deg) skewX(-10deg);}
+.jagTopRibbonRight{right:82px;transform:rotate(12deg) skewX(10deg);}
+.jagSparkSpray{
+  position:absolute;
+  inset:0;
+  z-index:4;
+  pointer-events:none;
+}
+.jagSevenMarquee{
+  z-index:5 !important;
+}
+.jagBigChanceText{
+  z-index:6 !important;
+}
+.jagSparkSpray span,
+.jagMainIllustrationLayer span,
+.jagLowerStarfield span{
+  position:absolute;
+  width:22px;
+  height:22px;
+  background:linear-gradient(135deg,#fffbe2,#ffcd23 45%,#8f3900);
+  clip-path:polygon(50% 0,61% 36%,100% 50%,61% 64%,50% 100%,39% 64%,0 50%,39% 36%);
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.42)) drop-shadow(0 0 7px rgba(255,220,77,.70));
+}
+.jagSparkSpray span:nth-child(1){left:9%;top:20%;width:18px;height:18px;}
+.jagSparkSpray span:nth-child(2){left:22%;top:67%;width:11px;height:11px;transform:rotate(15deg);}
+.jagSparkSpray span:nth-child(3){left:39%;top:17%;width:13px;height:13px;transform:rotate(35deg);}
+.jagSparkSpray span:nth-child(4){left:51%;top:69%;width:16px;height:16px;transform:rotate(15deg);}
+.jagSparkSpray span:nth-child(5){left:64%;top:17%;width:13px;height:13px;transform:rotate(35deg);}
+.jagSparkSpray span:nth-child(6){left:78%;top:67%;width:11px;height:11px;transform:rotate(15deg);}
+.jagSparkSpray span:nth-child(7){right:9%;top:20%;width:18px;height:18px;transform:rotate(20deg);}
+.jagMiniMascot{
+  background:
+    radial-gradient(circle at 37% 34%,#111 0 4px,transparent 5px),
+    radial-gradient(circle at 63% 34%,#111 0 4px,transparent 5px),
+    radial-gradient(circle at 50% 55%,#f21c22 0 6px,transparent 7px),
+    radial-gradient(ellipse at 50% 66%,rgba(255,80,88,.88) 0 4px,transparent 5px),
+    radial-gradient(circle at 50% 43%,#fff 0 25px,transparent 26px),
+    radial-gradient(circle at 50% 7%,#e91b23 0 14px,transparent 15px),
+    linear-gradient(180deg,#171717 0 31%,#f4d150 31% 66%,#b8060d 66%) !important;
+  box-shadow:
+    inset 0 -7px 8px rgba(0,0,0,.22),
+    inset 0 6px 7px rgba(255,255,255,.20),
+    0 4px 8px rgba(0,0,0,.45),
+    0 0 11px rgba(255,218,64,.30) !important;
+}
+.jagMainFace::before{
+  content:"";
+  position:absolute;
+  inset:-16px -22px;
+  z-index:0;
+  background:
+    url("assets/backgrounds/bg_rising_jag.png") center 39% / 112% auto no-repeat;
+  opacity:.30;
+  mix-blend-mode:screen;
+  filter:saturate(1.18) contrast(1.03);
+}
+.jagMainFace::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  background:
+    radial-gradient(circle at 17% 18%,rgba(255,244,150,.82) 0 3px,transparent 5px),
+    radial-gradient(circle at 83% 19%,rgba(255,244,150,.82) 0 3px,transparent 5px),
+    radial-gradient(circle at 15% 82%,rgba(255,244,150,.72) 0 4px,transparent 6px),
+    radial-gradient(circle at 84% 82%,rgba(255,244,150,.72) 0 4px,transparent 6px),
+    linear-gradient(110deg,transparent 0 22%,rgba(255,214,80,.20) 22.5%,transparent 34%),
+    linear-gradient(250deg,transparent 0 22%,rgba(255,214,80,.20) 22.5%,transparent 34%);
+  pointer-events:none;
+}
+.jagMainFace > *{
+  z-index:2;
+}
+.jagMainIllustrationLayer{
+  position:absolute;
+  inset:0;
+  z-index:1 !important;
+  pointer-events:none;
+}
+.jagMainIllustrationLayer span:nth-child(1){left:6%;top:12%;width:32px;height:32px;}
+.jagMainIllustrationLayer span:nth-child(2){left:19%;top:76%;width:17px;height:17px;transform:rotate(22deg);}
+.jagMainIllustrationLayer span:nth-child(3){left:34%;top:9%;width:15px;height:15px;transform:rotate(34deg);}
+.jagMainIllustrationLayer span:nth-child(4){right:34%;top:9%;width:15px;height:15px;transform:rotate(34deg);}
+.jagMainIllustrationLayer span:nth-child(5){right:19%;top:76%;width:17px;height:17px;transform:rotate(22deg);}
+.jagMainIllustrationLayer span:nth-child(6){right:6%;top:12%;width:32px;height:32px;}
+.jagCornerBadge{
+  position:absolute;
+  bottom:31px;
+  width:86px;
+  height:96px;
+  border-radius:48% 48% 44% 44%;
+  background:
+    radial-gradient(circle at 36% 31%,#111 0 5px,transparent 6px),
+    radial-gradient(circle at 64% 31%,#111 0 5px,transparent 6px),
+    radial-gradient(circle at 50% 52%,#ef1d25 0 8px,transparent 9px),
+    radial-gradient(ellipse at 50% 39%,#fff 0 34px,transparent 35px),
+    linear-gradient(180deg,#111 0 24%,#f3cf43 24% 62%,#c00412 62%);
+  border:3px solid #250000;
+  box-shadow:0 6px 12px rgba(0,0,0,.42),0 0 12px rgba(255,213,70,.26);
+  opacity:.84;
+}
+.jagCornerBadge::before,
+.jagCornerBadge::after{
+  content:"";
+  position:absolute;
+  top:-10px;
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  background:#111;
+  border:4px solid #e6be32;
+}
+.jagCornerBadge::before{left:-9px;}
+.jagCornerBadge::after{right:-9px;}
+.jagCornerBadgeLeft{left:72px;transform:rotate(-8deg);}
+.jagCornerBadgeRight{right:72px;transform:rotate(8deg);}
+.risingReelBackplate{
+  background:
+    radial-gradient(ellipse at 50% 4%,rgba(255,245,173,.46),rgba(255,245,173,0) 26%),
+    url("assets/backgrounds/bg_rising_jag.png") center 33% / 118% auto no-repeat,
+    radial-gradient(ellipse at 50% 50%,rgba(255,0,0,.23),rgba(60,0,0,.40) 44%,rgba(0,0,0,.30) 82%),
+    linear-gradient(180deg,rgba(255,214,82,.18),rgba(255,214,82,0) 12%,rgba(0,0,0,0) 70%,rgba(255,196,38,.20)),
+    linear-gradient(180deg,rgba(117,7,8,.76),rgba(16,0,4,.82) 55%,rgba(82,4,6,.78)) !important;
+  background-blend-mode:screen,screen,normal,normal,normal;
+}
+.risingLowerPanel{
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.32),transparent 12%,transparent 88%,rgba(0,0,0,.32)),
+    url("assets/backgrounds/bg_rising_jag.png") center 61% / 122% auto no-repeat,
+    radial-gradient(ellipse at 50% 44%,rgba(255,54,31,.28),transparent 60%),
+    linear-gradient(180deg,#bd0712,#7e0009 72%,#3a0005) !important;
+  background-blend-mode:normal,screen,normal,normal;
+}
+.jagLowerStarfield{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+}
+.jagLowerStarfield span:nth-child(1){left:7%;top:21%;width:30px;height:30px;}
+.jagLowerStarfield span:nth-child(2){left:21%;top:64%;width:18px;height:18px;transform:rotate(30deg);}
+.jagLowerStarfield span:nth-child(3){left:39%;top:16%;width:15px;height:15px;transform:rotate(18deg);}
+.jagLowerStarfield span:nth-child(4){right:39%;top:16%;width:15px;height:15px;transform:rotate(18deg);}
+.jagLowerStarfield span:nth-child(5){right:21%;top:64%;width:18px;height:18px;transform:rotate(30deg);}
+.jagLowerStarfield span:nth-child(6){right:7%;top:21%;width:30px;height:30px;}
+.jagLowerSideArt{
+  position:absolute;
+  top:34px;
+  z-index:1;
+  width:152px;
+  height:184px;
+  border-radius:48% 48% 18% 18%;
+  background:
+    radial-gradient(circle at 38% 29%,#111 0 6px,transparent 7px),
+    radial-gradient(circle at 62% 29%,#111 0 6px,transparent 7px),
+    radial-gradient(circle at 50% 45%,#ef1b23 0 10px,transparent 11px),
+    radial-gradient(ellipse at 50% 36%,#fff 0 48px,transparent 49px),
+    radial-gradient(ellipse at 50% 6%,#e61b23 0 38px,transparent 39px),
+    linear-gradient(180deg,#111 0 25%,#f5cc3d 25% 57%,#c60713 57% 100%);
+  border:4px solid rgba(40,0,0,.85);
+  box-shadow:0 10px 18px rgba(0,0,0,.40),0 0 18px rgba(255,214,70,.26);
+  opacity:.86;
+}
+.jagLowerSideArt::before,
+.jagLowerSideArt::after{
+  content:"";
+  position:absolute;
+  top:-11px;
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:#111;
+  border:5px solid #dfb626;
+  box-shadow:0 0 8px rgba(255,220,80,.35);
+}
+.jagLowerSideArt::before{left:-14px;}
+.jagLowerSideArt::after{right:-14px;}
+.jagLowerSideArtLeft{left:41px;transform:rotate(-8deg);}
+.jagLowerSideArtRight{right:41px;transform:scaleX(-1) rotate(-8deg);}
+.risingLowerLogo{
+  z-index:4 !important;
+}
+.risingPanelRibbon{
+  z-index:2 !important;
+}
 @media(max-width:760px){
   :root{
     --jag-cabinet-width:930px;
@@ -5090,6 +5362,10 @@ body{
         </div>
         <div class="jagTopSevenPanel">
           <div class="jagBigChanceText">BIG CHANCE</div>
+          <div class="jagGoldGarland"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="jagTopRibbon jagTopRibbonLeft"></div>
+          <div class="jagTopRibbon jagTopRibbonRight"></div>
+          <div class="jagSparkSpray jagSparkSprayTop"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
           <div class="jagSevenMarquee">
             <span>7</span><span>7</span><span>7</span>
           </div>
@@ -5102,6 +5378,11 @@ body{
           <div class="jagBridgeSpeaker jagBridgeSpeakerRight"></div>
         </div>
         <div class="jagMainFace">
+          <div class="jagMainIllustrationLayer">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div class="jagCornerBadge jagCornerBadgeLeft"></div>
+          <div class="jagCornerBadge jagCornerBadgeRight"></div>
           <div class="jagMainHeader">BONUS GAME</div>
           <div class="jagStageNumbers"><span>3</span><span>2</span><span>1</span></div>
           <div class="jagStatusLamps"><span>START</span><span>REPLAY</span><span>WAIT</span><span>INSERT</span></div>
@@ -5341,6 +5622,9 @@ body{
       </div>
       <div class="risingLowerCabinet" aria-hidden="true">
         <div class="risingLowerPanel">
+          <div class="jagLowerStarfield"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="jagLowerSideArt jagLowerSideArtLeft"></div>
+          <div class="jagLowerSideArt jagLowerSideArtRight"></div>
           <div class="risingLowerLogo">JAG</div>
           <div class="risingPanelRibbon risingPanelRibbonLeft"></div>
           <div class="risingPanelRibbon risingPanelRibbonRight"></div>
