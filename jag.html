@@ -4249,6 +4249,306 @@ body{
   }
 }
 
+/* Lower cabinet: keep the upper background, replace the bottom with a panel and medal tray. */
+.risingLowerCabinet{
+  position:relative;
+  width:min(930px, 100%);
+  height:390px;
+  margin:10px auto 88px;
+  z-index:6;
+  pointer-events:none;
+  filter:drop-shadow(0 18px 22px rgba(0,0,0,.56));
+}
+.risingLowerCabinet::before,
+.risingLowerCabinet::after{
+  content:"";
+  position:absolute;
+  left:-1.9%;
+  right:-1.9%;
+  height:54px;
+  z-index:3;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(20,22,30,.92),rgba(255,255,255,.82) 7%,rgba(130,139,152,.94) 17%,rgba(247,249,255,.96) 50%,rgba(130,139,152,.94) 83%,rgba(255,255,255,.82) 93%,rgba(20,22,30,.92)),
+    linear-gradient(180deg,#f6f8ff,#8791a1 56%,#323741);
+  border:1px solid rgba(255,255,255,.56);
+  box-shadow:inset 0 11px 15px rgba(255,255,255,.64), inset 0 -9px 16px rgba(0,0,0,.40);
+}
+.risingLowerCabinet::before{
+  top:-18px;
+  border-radius:16px 16px 5px 5px;
+}
+.risingLowerCabinet::after{
+  top:196px;
+  height:38px;
+  border-radius:5px;
+  background:
+    linear-gradient(90deg,rgba(30,31,38,.92),rgba(224,231,242,.90) 10%,rgba(122,132,146,.95) 50%,rgba(224,231,242,.90) 90%,rgba(30,31,38,.92)),
+    linear-gradient(180deg,#fff,#8c96a6 52%,#2b303a);
+}
+.risingLowerPanel{
+  position:absolute;
+  left:3.2%;
+  right:3.2%;
+  top:10px;
+  height:205px;
+  overflow:hidden;
+  border-radius:8px;
+  border:3px solid rgba(226,232,242,.92);
+  background:
+    radial-gradient(circle at 9% 24%,rgba(255,246,153,.95) 0 7px,transparent 8px),
+    radial-gradient(circle at 88% 72%,rgba(255,246,153,.82) 0 5px,transparent 6px),
+    radial-gradient(circle at 19% 79%,rgba(255,246,153,.72) 0 4px,transparent 5px),
+    radial-gradient(circle at 80% 23%,rgba(255,246,153,.72) 0 4px,transparent 5px),
+    repeating-linear-gradient(135deg,rgba(255,224,75,.18) 0 2px,transparent 2px 26px),
+    linear-gradient(180deg,#f61b28 0%,#bd0718 42%,#8b0011 100%);
+  box-shadow:
+    inset 0 0 0 3px rgba(255,255,255,.22),
+    inset 0 18px 34px rgba(255,255,255,.18),
+    inset 0 -22px 42px rgba(0,0,0,.34),
+    0 0 0 1px rgba(0,0,0,.50);
+}
+.risingLowerPanel::before{
+  content:"";
+  position:absolute;
+  left:6.2%;
+  right:6.2%;
+  top:21%;
+  height:62%;
+  border-radius:50% / 44%;
+  background:
+    radial-gradient(ellipse at 50% 50%,rgba(255,245,151,.18),transparent 58%),
+    linear-gradient(90deg,transparent,rgba(255,217,64,.72) 13%,rgba(255,245,144,.88) 50%,rgba(255,217,64,.72) 87%,transparent);
+  clip-path:polygon(0 38%, 12% 19%, 28% 32%, 50% 0, 72% 32%, 88% 19%, 100% 38%, 100% 71%, 88% 88%, 70% 74%, 50% 100%, 30% 74%, 12% 88%, 0 71%);
+  opacity:.86;
+  filter:drop-shadow(0 7px 8px rgba(0,0,0,.35));
+}
+.risingLowerPanel::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.34),transparent 13%,transparent 87%,rgba(0,0,0,.34)),
+    radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.38),transparent 38%),
+    linear-gradient(180deg,rgba(255,255,255,.22),transparent 32%,rgba(0,0,0,.18) 100%);
+  pointer-events:none;
+}
+.risingLowerLogo{
+  position:absolute;
+  left:50%;
+  top:49%;
+  z-index:2;
+  transform:translate(-50%, -50%) rotate(-1deg);
+  min-width:270px;
+  padding:14px 34px 12px;
+  border-radius:999px;
+  text-align:center;
+  color:#e81822;
+  font-family:Georgia, "Times New Roman", serif;
+  font-size:60px;
+  font-weight:1000;
+  line-height:.9;
+  letter-spacing:.02em;
+  background:
+    linear-gradient(180deg,#fff8d0,#ffce48 52%,#a05b00 100%);
+  border:5px solid #171717;
+  box-shadow:
+    inset 0 0 0 4px rgba(255,255,255,.46),
+    0 0 0 3px rgba(255,216,67,.90),
+    0 10px 18px rgba(0,0,0,.42);
+  text-shadow:
+    -2px -2px 0 #fff2a4,
+    2px -2px 0 #fff2a4,
+    -2px 2px 0 #5c0000,
+    2px 2px 0 #5c0000,
+    0 0 14px rgba(255,231,85,.82);
+}
+.risingPanelRibbon{
+  position:absolute;
+  top:54%;
+  width:26%;
+  height:36%;
+  z-index:1;
+  border-radius:12px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.28),transparent 28%),
+    linear-gradient(90deg,#fff2a6,#f0bb2e 18%,#b57300 42%,#fff3a7 62%,#f0bb2e);
+  box-shadow:0 8px 12px rgba(0,0,0,.32);
+}
+.risingPanelRibbonLeft{
+  left:6%;
+  transform:skewY(-9deg) rotate(-6deg);
+}
+.risingPanelRibbonRight{
+  right:6%;
+  transform:skewY(9deg) rotate(6deg);
+}
+.risingMedalTray{
+  position:absolute;
+  left:0;
+  right:0;
+  top:222px;
+  height:110px;
+  z-index:4;
+  border-radius:13px 13px 36px 36px / 12px 12px 28px 28px;
+  background:
+    radial-gradient(ellipse at 50% 28%,rgba(255,255,255,.42),transparent 32%),
+    linear-gradient(90deg,#11151d 0%,#c9d0dc 7%,#edf1f7 17%,#8994a5 47%,#eff3fa 82%,#c7ceda 93%,#10141c 100%),
+    linear-gradient(180deg,#f8faff,#8792a3 47%,#343943 100%);
+  border:2px solid rgba(255,255,255,.56);
+  box-shadow:
+    inset 0 15px 19px rgba(255,255,255,.58),
+    inset 0 -22px 25px rgba(0,0,0,.42),
+    0 8px 16px rgba(0,0,0,.48);
+}
+.risingMedalTray::before{
+  content:"";
+  position:absolute;
+  left:5.2%;
+  right:5.2%;
+  top:-10px;
+  height:16px;
+  border-radius:999px;
+  background:linear-gradient(180deg,rgba(9,11,16,.94),rgba(0,0,0,.96));
+  box-shadow:inset 0 3px 6px rgba(255,255,255,.18), 0 5px 8px rgba(0,0,0,.40);
+}
+.risingTrayBowl{
+  position:absolute;
+  left:50%;
+  top:26px;
+  width:240px;
+  height:58px;
+  transform:translateX(-50%);
+  border-radius:16px 16px 46px 46px / 14px 14px 35px 35px;
+  background:
+    radial-gradient(ellipse at 50% 12%,rgba(255,255,255,.22),transparent 30%),
+    linear-gradient(180deg,#262832,#050507 58%,#0c0d12);
+  border:2px solid rgba(0,0,0,.86);
+  box-shadow:inset 0 12px 18px rgba(255,255,255,.10), inset 0 -10px 20px rgba(0,0,0,.92), 0 2px 5px rgba(255,255,255,.25);
+}
+.risingTraySpeaker{
+  position:absolute;
+  top:26px;
+  width:184px;
+  height:64px;
+  border-radius:50% 50% 22px 22px / 72% 72% 24px 24px;
+  background:
+    radial-gradient(circle at 8px 8px,rgba(0,0,0,.86) 0 2px,transparent 2.5px) 0 0 / 12px 12px,
+    radial-gradient(ellipse at 50% 50%,rgba(12,13,18,.92),rgba(0,0,0,.56) 72%);
+  opacity:.86;
+  box-shadow:inset 0 5px 8px rgba(255,255,255,.16), inset 0 -10px 14px rgba(0,0,0,.55);
+}
+.risingTraySpeakerLeft{left:13.2%;}
+.risingTraySpeakerRight{right:13.2%;}
+.risingCabinetBase{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:82px;
+  z-index:2;
+  border-radius:0 0 15px 15px;
+  background:
+    linear-gradient(90deg,#131820 0 13%,#7a8290 13% 15%,#d8dde7 15% 28%,#1a1b22 28% 72%,#d8dde7 72% 85%,#7a8290 85% 87%,#131820 87% 100%),
+    linear-gradient(180deg,#414750,#08090c 62%,#030407);
+  border:2px solid rgba(42,45,52,.92);
+  box-shadow:inset 0 13px 14px rgba(255,255,255,.18), inset 0 -12px 16px rgba(0,0,0,.72);
+}
+.risingBasePocket{
+  position:absolute;
+  left:7.4%;
+  bottom:10px;
+  width:124px;
+  height:50px;
+  border-radius:8px;
+  background:linear-gradient(180deg,#2b313b,#07080c);
+  border:2px solid rgba(0,0,0,.76);
+  box-shadow:inset 0 8px 10px rgba(255,255,255,.10);
+}
+.risingBaseLabel{
+  position:absolute;
+  left:24%;
+  bottom:12px;
+  width:300px;
+  height:44px;
+  display:grid;
+  place-items:center;
+  border-radius:6px;
+  color:#d9533d;
+  font-size:16px;
+  font-weight:1000;
+  letter-spacing:.12em;
+  background:linear-gradient(180deg,#fff4f4,#d9dce4);
+  border:2px solid rgba(98,103,116,.86);
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.64);
+}
+.risingBaseBadge{
+  position:absolute;
+  right:14%;
+  bottom:14px;
+  width:158px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  border-radius:4px;
+  color:#8a929e;
+  font-size:26px;
+  font-weight:1000;
+  letter-spacing:.02em;
+  background:linear-gradient(180deg,#f4f5f8,#b8bec9);
+  border:2px solid rgba(100,107,120,.75);
+  text-shadow:0 1px 0 rgba(255,255,255,.78);
+}
+.machine .resultBoxWide{
+  display:grid !important;
+  position:relative !important;
+  z-index:12 !important;
+  width:290px !important;
+  min-height:34px !important;
+  height:34px !important;
+  margin:-154px auto 112px !important;
+  place-items:center !important;
+  text-align:center !important;
+  border-radius:7px !important;
+  color:#ffeb92 !important;
+  font-size:13px !important;
+  font-weight:1000 !important;
+  letter-spacing:.06em !important;
+  background:linear-gradient(180deg,#1a0004,#080006 64%,#2a0205) !important;
+  border:2px solid rgba(93,97,108,.92) !important;
+  box-shadow:inset 0 0 12px rgba(255,60,35,.22),0 1px 6px rgba(0,0,0,.48) !important;
+  text-shadow:0 0 9px rgba(255,205,70,.76) !important;
+}
+@media(max-width:760px){
+  .risingLowerCabinet{
+    height:360px;
+    margin-top:4px;
+  }
+  .risingLowerPanel{
+    height:190px;
+  }
+  .risingLowerLogo{
+    min-width:230px;
+    font-size:48px;
+  }
+  .risingMedalTray{
+    top:205px;
+  }
+  .risingCabinetBase{
+    height:76px;
+  }
+  .risingTraySpeaker{
+    width:140px;
+  }
+  .risingBaseLabel{
+    width:230px;
+    font-size:13px;
+  }
+  .machine .resultBoxWide{
+    margin-top:-151px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4505,6 +4805,23 @@ body{
             </div>
           </div>
           <button class="effectSkipBtn" id="effectSkipBtn" type="button">SKIP</button>
+        </div>
+      </div>
+      <div class="risingLowerCabinet" aria-hidden="true">
+        <div class="risingLowerPanel">
+          <div class="risingLowerLogo">Rising</div>
+          <div class="risingPanelRibbon risingPanelRibbonLeft"></div>
+          <div class="risingPanelRibbon risingPanelRibbonRight"></div>
+        </div>
+        <div class="risingMedalTray">
+          <div class="risingTraySpeaker risingTraySpeakerLeft"></div>
+          <div class="risingTrayBowl"></div>
+          <div class="risingTraySpeaker risingTraySpeakerRight"></div>
+        </div>
+        <div class="risingCabinetBase">
+          <div class="risingBasePocket risingBasePocketLeft"></div>
+          <div class="risingBaseLabel">JAG SLOT</div>
+          <div class="risingBaseBadge">Rising</div>
         </div>
       </div>
       <div class="resultBox resultBoxWide" id="resultText">-</div>
