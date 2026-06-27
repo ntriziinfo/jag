@@ -5433,27 +5433,29 @@ body{
   filter:none;
   transition:opacity .22s ease, transform .22s ease;
 }
-.jagGogoChance::after{
-  content:"";
+.jagGogoChance::after{display:none;}
+.jagGogoChanceBack{
   position:absolute;
   left:50%;
   top:50%;
-  width:100%;
+  width:114%;
   height:100%;
-  transform:translate(-50%,-50%);
-  z-index:-1;
+  transform:translate(-50%,-50%) scale(1.012);
+  z-index:0;
+  pointer-events:none;
   background:
-    radial-gradient(circle at 42% 38%,rgba(110,48,168,.95),rgba(44,5,86,.96) 48%,rgba(7,0,18,.98) 100%);
+    radial-gradient(circle at 42% 38%,rgba(70,19,116,.98),rgba(28,2,57,.98) 54%,rgba(5,0,15,1) 100%);
   -webkit-mask:url("assets/ui/rising_gogo_chance.png") center / contain no-repeat;
   mask:url("assets/ui/rising_gogo_chance.png") center / contain no-repeat;
-  opacity:1;
-  filter:drop-shadow(0 8px 8px rgba(0,0,0,.90)) drop-shadow(0 0 14px rgba(61,0,126,.78));
+  opacity:.58;
+  filter:drop-shadow(0 8px 8px rgba(0,0,0,.92)) drop-shadow(0 0 6px rgba(38,0,92,.52));
 }
 .jagGogoChance::before{
   content:"";
   position:absolute;
   inset:21% 10% 12%;
   z-index:0;
+  display:none;
   border-radius:50%;
   background:radial-gradient(circle,rgba(255,220,36,.18),rgba(255,43,14,.10) 46%,transparent 72%);
   filter:blur(5px);
@@ -5468,7 +5470,7 @@ body{
   filter:grayscale(.92) brightness(.42) contrast(1.18) drop-shadow(0 5px 5px rgba(0,0,0,.70));
   transition:filter .22s ease, opacity .22s ease;
 }
-.jagGogoChance span{
+.jagGogoChanceLabel{
   position:absolute;
   left:48%;
   bottom:2%;
@@ -5489,7 +5491,12 @@ body{
 .reelArea.jagChanceLit .jagGogoChance::after{
   opacity:.26;
 }
+.reelArea.jagChanceLit .jagGogoChanceBack{
+  opacity:.20;
+  filter:drop-shadow(0 0 14px rgba(255,224,56,.45));
+}
 .reelArea.jagChanceLit .jagGogoChance::before{
+  display:block;
   background:radial-gradient(circle,rgba(255,251,150,.82),rgba(255,88,24,.46) 46%,transparent 74%);
 }
 .reelArea.jagChanceLit .jagGogoChance img{
@@ -6815,8 +6822,9 @@ body{
           <img class="cabinetPart cabinetPartReelFront" src="assets/cabinet/parts/rising_part_reel_front.png" alt="">
         </div>
         <div class="jagGogoChance" id="jagGogoChance" aria-label="GOGO CHANCE">
+          <span class="jagGogoChanceBack" aria-hidden="true"></span>
           <img src="assets/ui/rising_gogo_chance.png" alt="RISING CHANCE" loading="eager" decoding="async" draggable="false">
-          <span>CHANCE</span>
+          <span class="jagGogoChanceLabel">CHANCE</span>
         </div>
         <div class="jagFrameLamps" aria-hidden="true">
           <span>START</span>
