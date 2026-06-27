@@ -11,6 +11,7 @@
 <link rel="preload" as="image" href="assets/symbols/sym_coin.webp">
 <link rel="preload" as="image" href="assets/symbols/sym_grape.webp">
 <link rel="preload" as="image" href="assets/symbols/sym_seven.png">
+<link rel="preload" as="image" href="assets/symbols/sym_bar.png">
 <link rel="preload" as="image" href="assets/backgrounds/bg_rising_jag.png">
 <link rel="preload" as="image" href="assets/cabinet/rising_cabinet_v1.png">
 <link rel="preload" as="image" href="assets/logo/rising_logo.svg">
@@ -6698,7 +6699,7 @@ body{
         <div class="payline"></div>
         <div class="reels">
           <div class="reel" data-reel="0"><div class="window">
-            <div class="cell"><div class="sym barText">BAR</div></div>
+            <div class="cell"><img class="symImg barSymImg" src="assets/symbols/sym_bar.png" alt="BAR symbol" loading="eager" decoding="sync" draggable="false"></div>
             <div class="cell center"><img class="symImg sevenSymImg" src="assets/symbols/sym_seven.png" alt="7 symbol" loading="eager" decoding="sync" draggable="false"></div>
             <div class="cell"><img class="symImg grapeSymImg" src="assets/symbols/sym_grape.webp" alt="grape symbol" loading="eager" decoding="sync" draggable="false"></div>
           </div></div>
@@ -6709,7 +6710,7 @@ body{
           </div></div>
           <div class="reel" data-reel="2"><div class="window">
             <div class="cell"><img class="symImg cherrySymImg" src="assets/symbols/sym_cherry.png" alt="cherry symbol" loading="eager" decoding="sync" draggable="false"></div>
-            <div class="cell center"><div class="sym barText">BAR</div></div>
+            <div class="cell center"><img class="symImg barSymImg" src="assets/symbols/sym_bar.png" alt="BAR symbol" loading="eager" decoding="sync" draggable="false"></div>
             <div class="cell"><div class="sym">🐘</div></div>
           </div></div>
         </div>
@@ -7126,7 +7127,7 @@ body{
   const SEVEN_IMAGE_SRC = "assets/symbols/sym_seven.png";
   const MISS_IMAGE_SRC = "assets/symbols/sym_coin.webp";
   const GRAPE_IMAGE_SRC = "assets/symbols/sym_grape.webp";
-  const BAR_IMAGE_SRC = "assets/logo/rising_logo.svg";
+  const BAR_IMAGE_SRC = "assets/symbols/sym_bar.png";
   const USER_FACE_SRC = "assets/symbols/sym_hourglass.png";
   const REPLAY_IMAGE_SRC = "assets/replay.png";
   const SYMBOL_IMAGE_SRCS = Object.freeze([
@@ -12019,7 +12020,7 @@ body{
                   : (symbol === GRAPE_SYMBOL)
                     ? `<img class="symImg grapeSymImg" src="${GRAPE_IMAGE_SRC}" alt="grape symbol" loading="eager" decoding="sync" draggable="false">`
                     : (symbol === "BAR")
-                      ? `<div class="sym barText">BAR</div>`
+                      ? `<img class="symImg barSymImg" src="${BAR_IMAGE_SRC}" alt="BAR symbol" loading="eager" decoding="sync" draggable="false">`
                       : (symbol === "7")
                         ? `<img class="symImg sevenSymImg" src="${SEVEN_IMAGE_SRC}" alt="7 symbol" loading="eager" decoding="sync" draggable="false">`
                         : `<div class="sym ${cls || ""}">${escapeHtml(symbol)}</div>`;
