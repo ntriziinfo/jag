@@ -20,9 +20,9 @@
 <link rel="preload" as="image" href="assets/buttons/btn_speed_half_blue.png">
 <link rel="preload" as="image" href="assets/effects/reverse_push_blue.png">
 <link rel="preload" as="image" href="assets/effects/reverse_push_red.png">
-<link rel="preload" as="image" href="assets/controls/start_lever.png">
-<link rel="preload" as="image" href="assets/controls/stop_button_red.png">
-<link rel="preload" as="image" href="assets/controls/stop_button_blue.png">
+<link rel="preload" as="image" href="assets/controls/start_lever_cut.png">
+<link rel="preload" as="image" href="assets/controls/stop_button_red_cut.png">
+<link rel="preload" as="image" href="assets/controls/stop_button_blue_cut.png">
 <style>
 :root{
   --bg:#05060c;
@@ -5899,25 +5899,59 @@ body{
   filter:saturate(.74) brightness(.74) !important;
 }
 
-/* Generated cabinet artwork mode. The cabinet itself is now one coherent image; HTML only supplies moving reels and controls. */
+/* Layered cabinet artwork mode. The cabinet is decomposed into image parts so reels and controls can sit in the real hardware slots. */
 :root{
   --jag-cabinet-width:960px;
-  --jag-reel-width:760px;
-  --jag-reel-top:438px;
+  --jag-cabinet-height:1610px;
+  --jag-reel-top:466px;
+  --jag-reel-height:478px;
 }
 .machine{
-  min-height:1505px !important;
+  min-height:1670px !important;
 }
 .jagCabinetShell{
-  height:1440px !important;
+  height:var(--jag-cabinet-height) !important;
   border-radius:18px !important;
-  background:url("assets/cabinet/rising_cabinet_v1.png") center top / 100% auto no-repeat !important;
+  background:none !important;
   filter:drop-shadow(0 30px 38px rgba(0,0,0,.72)) !important;
+  overflow:visible !important;
 }
 .jagCabinetShell::before,
 .jagCabinetShell::after,
 .jagCabinetShell > *{
   display:none !important;
+}
+.jagCabinetShell > .cabinetPartsScene{
+  display:block !important;
+}
+.cabinetPartsScene{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:var(--jag-cabinet-height);
+  pointer-events:none;
+}
+.cabinetPart{
+  position:absolute;
+  left:0;
+  width:100%;
+  height:auto;
+  display:block;
+  pointer-events:none;
+  user-select:none;
+}
+.cabinetPartTop{top:0;}
+.cabinetPartReelBack{top:466px;}
+.cabinetPartControls{top:944px;}
+.cabinetPartLower{top:1129px;}
+.cabinetFrontParts{
+  position:absolute;
+  inset:0;
+  z-index:24;
+  pointer-events:none;
+}
+.cabinetFrontParts .cabinetPartReelFront{
+  top:0;
 }
 .risingLowerCabinet{
   display:none !important;
@@ -5929,8 +5963,8 @@ body{
   display:none !important;
 }
 .reelArea{
-  width:var(--jag-reel-width) !important;
-  height:424px !important;
+  width:var(--jag-cabinet-width) !important;
+  height:var(--jag-reel-height) !important;
   aspect-ratio:auto !important;
   margin:var(--jag-reel-top) auto 0 !important;
   background:transparent !important;
@@ -5940,11 +5974,12 @@ body{
   z-index:25 !important;
 }
 .reels{
-  left:11.8% !important;
-  right:11.8% !important;
-  top:21.6% !important;
-  bottom:10.5% !important;
-  gap:1.25% !important;
+  left:20.7% !important;
+  right:21.7% !important;
+  top:24.9% !important;
+  bottom:25.1% !important;
+  gap:5.9% !important;
+  z-index:3 !important;
   filter:drop-shadow(0 4px 5px rgba(0,0,0,.34)) !important;
 }
 .reel{
@@ -5965,20 +6000,21 @@ body{
     radial-gradient(ellipse at 50% 94%,rgba(0,0,0,.16),transparent 45%) !important;
 }
 .payline{
-  left:12.5% !important;
-  right:12.5% !important;
-  top:48.5% !important;
-  height:13% !important;
+  left:20.7% !important;
+  right:21.7% !important;
+  top:44.6% !important;
+  height:16.0% !important;
   opacity:.34 !important;
-  z-index:30 !important;
+  z-index:18 !important;
 }
 .jagPayoutMeters{
-  top:95.5% !important;
-  width:50.5% !important;
-  height:13.4% !important;
+  top:80.4% !important;
+  width:41.2% !important;
+  height:8.2% !important;
   grid-template-columns:1fr 1fr 1fr !important;
-  gap:8.8% !important;
+  gap:7.0% !important;
   opacity:.98 !important;
+  z-index:44 !important;
 }
 .jagPayoutMeter{
   display:grid !important;
@@ -5995,7 +6031,7 @@ body{
   inset:auto !important;
   height:auto !important;
   display:block !important;
-  font-size:34px !important;
+  font-size:29px !important;
   line-height:1 !important;
   letter-spacing:.02em !important;
   color:#ff1d28 !important;
@@ -6005,16 +6041,17 @@ body{
     1px 1px 0 #220000 !important;
 }
 .jagGogoChance{
-  left:-7.9% !important;
-  top:62.8% !important;
-  width:16.2% !important;
-  height:19.4% !important;
+  left:6.1% !important;
+  top:64.8% !important;
+  width:16.3% !important;
+  height:21.8% !important;
   opacity:.80 !important;
+  z-index:42 !important;
 }
 .playControls{
   top:0 !important;
   width:var(--jag-cabinet-width) !important;
-  height:1440px !important;
+  height:var(--jag-cabinet-height) !important;
   aspect-ratio:auto !important;
   z-index:90 !important;
 }
@@ -6029,8 +6066,8 @@ body{
   opacity:.01 !important;
 }
 .playControls .betArea{
-  left:23.0% !important;
-  top:71.6% !important;
+  left:23.7% !important;
+  top:65.1% !important;
   width:11.5% !important;
   height:8.0% !important;
   overflow:visible !important;
@@ -6073,7 +6110,7 @@ body{
   pointer-events:none;
   z-index:85;
   transform:translate(-50%, -50%);
-  background:url("assets/controls/start_lever.png") center / contain no-repeat;
+  background:url("assets/controls/start_lever_cut.png") center / contain no-repeat;
   filter:drop-shadow(0 5px 5px rgba(0,0,0,.42));
   transition:transform .09s ease, top .09s ease, filter .09s ease;
 }
@@ -6088,20 +6125,20 @@ body{
   opacity:.78;
 }
 .playControls .centerStopBtns button:nth-child(1){
-  left:38.1% !important;
-  top:71.6% !important;
+  left:38.9% !important;
+  top:65.1% !important;
   width:10.5% !important;
   height:8.0% !important;
 }
 .playControls .centerStopBtns button:nth-child(2){
-  left:49.1% !important;
-  top:71.6% !important;
+  left:50.4% !important;
+  top:65.1% !important;
   width:10.5% !important;
   height:8.0% !important;
 }
 .playControls .centerStopBtns button:nth-child(3){
-  left:60.2% !important;
-  top:71.6% !important;
+  left:61.9% !important;
+  top:65.1% !important;
   width:10.5% !important;
   height:8.0% !important;
 }
@@ -6122,12 +6159,12 @@ body{
   height:116%;
   pointer-events:none;
   transform:translate(-50%, -50%);
-  background:url("assets/controls/stop_button_red.png") center / contain no-repeat;
+  background:url("assets/controls/stop_button_red_cut.png") center / contain no-repeat;
   filter:drop-shadow(0 4px 5px rgba(0,0,0,.44));
   transition:transform .08s ease, filter .08s ease, background-image .12s ease;
 }
 .playControls .centerStopBtns button.is-reel-live::before{
-  background-image:url("assets/controls/stop_button_blue.png");
+  background-image:url("assets/controls/stop_button_blue_cut.png");
   filter:drop-shadow(0 0 12px rgba(62,213,255,.68)) drop-shadow(0 4px 5px rgba(0,0,0,.44));
 }
 .playControls .centerStopBtns button:active::before{
@@ -6147,43 +6184,46 @@ body{
   background-size:contain;
 }
 .cabinetStartLever{
-  left:23.0%;
-  top:71.6%;
-  width:16.8%;
-  height:16.8%;
+  left:23.7%;
+  top:65.1%;
+  width:15.4%;
+  height:15.4%;
   transform:translate(-50%, -50%);
-  background-image:url("assets/controls/start_lever.png");
+  background-image:url("assets/controls/start_lever_cut.png");
   filter:drop-shadow(0 4px 5px rgba(0,0,0,.40));
   transition:top .09s ease, transform .09s ease, filter .09s ease;
 }
 .playControls.leverDown .cabinetStartLever{
-  top:73.0%;
+  top:66.3%;
   transform:translate(-50%, -50%) rotate(4deg) scale(.985);
   filter:brightness(.92) drop-shadow(0 2px 3px rgba(0,0,0,.46));
 }
 .cabinetStopButton{
-  top:71.6%;
-  width:11.8%;
-  height:11.8%;
+  top:64.1%;
+  width:10.8%;
+  height:10.8%;
   transform:translate(-50%, -50%);
-  background-image:url("assets/controls/stop_button_red.png");
+  background-image:url("assets/controls/stop_button_red_cut.png");
   filter:drop-shadow(0 4px 5px rgba(0,0,0,.42));
+  opacity:0;
   transition:transform .08s ease, filter .08s ease, background-image .12s ease;
 }
-.cabinetStopButton0{left:38.1%;}
-.cabinetStopButton1{left:49.1%;}
-.cabinetStopButton2{left:60.2%;}
+.cabinetStopButton0{left:38.9%;}
+.cabinetStopButton1{left:50.4%;}
+.cabinetStopButton2{left:61.9%;}
 .cabinetStopButton.is-reel-live{
-  background-image:url("assets/controls/stop_button_blue.png");
+  background-image:url("assets/controls/stop_button_blue_cut.png");
+  opacity:1;
   filter:drop-shadow(0 0 12px rgba(62,213,255,.68)) drop-shadow(0 4px 5px rgba(0,0,0,.42));
 }
 .cabinetStopButton.is-pressed{
   transform:translate(-50%, -43%) scale(.94);
+  opacity:1;
   filter:brightness(.82) drop-shadow(0 2px 3px rgba(0,0,0,.52));
 }
 .playControls .autoArea{
   left:86.0% !important;
-  top:71.6% !important;
+  top:65.1% !important;
   width:10.5% !important;
   height:8.2% !important;
 }
@@ -6193,11 +6233,11 @@ body{
 @media(max-width:760px){
   :root{
     --jag-cabinet-width:930px;
-    --jag-reel-width:736px;
-    --jag-reel-top:424px;
+    --jag-cabinet-height:1558px;
+    --jag-reel-top:451px;
+    --jag-reel-height:463px;
   }
-  .machine{min-height:1458px !important;}
-  .jagCabinetShell,.playControls{height:1395px !important;}
+  .machine{min-height:1615px !important;}
 }
 
 </style>
@@ -6229,6 +6269,12 @@ body{
   <div class="main">
     <section class="machine normal" id="machine">
       <div class="jagCabinetShell" aria-hidden="true">
+        <div class="cabinetPartsScene" aria-hidden="true">
+          <img class="cabinetPart cabinetPartTop" src="assets/cabinet/parts/rising_part_top.png" alt="">
+          <img class="cabinetPart cabinetPartReelBack" src="assets/cabinet/parts/rising_part_reel_back.png" alt="">
+          <img class="cabinetPart cabinetPartControls" src="assets/cabinet/parts/rising_part_controls.png" alt="">
+          <img class="cabinetPart cabinetPartLower" src="assets/cabinet/parts/rising_part_lower.png" alt="">
+        </div>
         <div class="jagSideRail jagSideRailLeft"></div>
         <div class="jagSideRail jagSideRailRight"></div>
         <div class="jagTopBeacon">
@@ -6451,6 +6497,9 @@ body{
             <div class="cell center"><div class="sym barText">BAR</div></div>
             <div class="cell"><div class="sym">🐘</div></div>
           </div></div>
+        </div>
+        <div class="cabinetFrontParts" aria-hidden="true">
+          <img class="cabinetPart cabinetPartReelFront" src="assets/cabinet/parts/rising_part_reel_front.png" alt="">
         </div>
         <div class="jagGogoChance" id="jagGogoChance" aria-label="GOGO CHANCE">
           <img src="assets/ui/rising_gogo_chance.png" alt="RISING CHANCE" loading="eager" decoding="async" draggable="false">
