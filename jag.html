@@ -7325,6 +7325,8 @@ body{
   const MIN_SPIN_WAIT_MS = 500;
   const RESULT_WAIT_MS = 1000;
   const SPIN_COST = 3;
+  const BONUS_ANNOUNCE_THIRD_STOP_RATE = 0.70;
+  const BONUS_ANNOUNCE_EARLY_TIMINGS = Object.freeze(["lever", "stop1", "stop2"]);
   const PAYOUT_BASE = 100;
   const ROLE_PAYOUTS = Object.freeze({
     SMALL:15,
@@ -9358,6 +9360,50 @@ body{
     pauseNormalBgm();
     playBonusConfirmSound();
     return true;
+  }
+
+  function decideBonusAnnouncementTiming(){
+    if(Math.random() < BONUS_ANNOUNCE_THIRD_STOP_RATE) return "stop3";
+    return BONUS_ANNOUNCE_EARLY_TIMINGS[Math.floor(Math.random() * BONUS_ANNOUNCE_EARLY_TIMINGS.length)];
+  }
+
+  function shouldScheduleBonusAnnouncement(normalActiveAtSpinStart, resolved){
+    if(!normalActiveAtSpinStart || !resolved || resolved.bonusPendingAtStart) return false;
+    return !!(
+      resolved.aTypeBonusReady ||
+      resolved.bonusHit ||
+      resolved.bonusReady ||
+      resolved.regReady ||
+      resolved.bar3PremiumReady
+    );
+  }
+
+  function bonusAnnouncementTimingLabel(timing){
+    return timing === "lever" ? "レバーオン"
+      : timing === "stop1" ? "第1停止"
+      : timing === "stop2" ? "第2停止"
+      : timing === "stop3" ? "第3停止"
+      : timing || "";
+  }
+
+  function lightBonusAnnouncement(spin=currentSpin, timing=""){
+    if(!spin || spin.bonusAnnouncementLit) return false;
+    spin.bonusAnnouncementLit = true;
+    jagChanceHold = true;
+    const lamp = $("stLamp");
+    if(lamp) lamp.classList.add("on");
+    updateDisplay();
+    if(timing){
+      log(`BONUS告知：${bonusAnnouncementTimingLabel(timing)}`);
+    }
+    return true;
+  }
+
+  function maybeLightBonusAnnouncementForStop(stopOrder, spin=currentSpin){
+    if(!spin || !spin.bonusAnnouncementTiming) return false;
+    const timing = `stop${stopOrder}`;
+    if(spin.bonusAnnouncementTiming !== timing) return false;
+    return lightBonusAnnouncement(spin, timing);
   }
 
   function showBonusConfirmScreen(mode="solid"){
@@ -12468,6 +12514,9 @@ body{
     const speedModeBonusRogiEffect = speedModeSpinAtStart && !bigPremiumEffect && shouldPlaySpeedModeBonusRogi(result, resolved);
     const gekiatsuChance = bigPremiumEffect;
     const zakoEffect = decideZakoEffect(result, resolved, normalActiveAtSpinStart);
+    const bonusAnnouncementTiming = shouldScheduleBonusAnnouncement(normalActiveAtSpinStart, resolved)
+      ? decideBonusAnnouncementTiming()
+      : "";
 
 
     currentSpin = {
@@ -12487,6 +12536,8 @@ body{
       battleActiveAtStart:battleActiveAtSpinStart,
       normalActiveAtStart:normalActiveAtSpinStart,
       speedModeAtStart:speedModeSpinAtStart,
+      bonusAnnouncementTiming,
+      bonusAnnouncementLit:false,
       devilRushEntryEffect,
       battleRound:battleRoundAtSpinStart,
       stopped:[false,false,false],
@@ -12533,6 +12584,9 @@ body{
     }
     if(reversePushGuide){
       showReversePushGuide(reversePushGuide);
+    }
+    if(currentSpin.bonusAnnouncementTiming === "lever"){
+      lightBonusAnnouncement(currentSpin, "lever");
     }
 
     const waitText = speedModeSpinAtStart
@@ -12587,6 +12641,7 @@ body{
     stopReel(i, col, label, spec.cls, result === "MISS" ? null : lineRow);
     currentSpin.stopped[i] = true;
     syncCabinetControlState();
+    maybeLightBonusAnnouncementForStop(stopOrder, currentSpin);
     if(stopOrder === 1 && currentSpin.reversePushGuide){
       setReversePushGuideTranslucent();
     }
