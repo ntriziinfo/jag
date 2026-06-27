@@ -4978,12 +4978,12 @@ body{
 }
 .playControls .betArea,
 .playControls .autoArea{
-  top:89.3% !important;
+  top:96.0% !important;
 }
 .centerStopBtns button:nth-child(1),
 .centerStopBtns button:nth-child(2),
 .centerStopBtns button:nth-child(3){
-  top:90.1% !important;
+  top:96.0% !important;
 }
 .risingLowerCabinet{
   width:calc(var(--jag-cabinet-width) - 76px) !important;
@@ -5329,9 +5329,9 @@ body{
 .jagPayoutMeters{
   position:absolute;
   left:50%;
-  top:70.6%;
+  top:79.2%;
   width:41.2%;
-  height:10.6%;
+  height:6.9%;
   z-index:44;
   transform:translateX(-50%);
   display:grid;
@@ -5350,7 +5350,7 @@ body{
 .jagPayoutMeter::before{
   content:"";
   width:100%;
-  height:29px;
+  height:21px;
   display:block;
   grid-row:1;
   border-radius:5px;
@@ -5369,12 +5369,12 @@ body{
   top:4px;
   left:0;
   right:0;
-  height:29px;
+  height:21px;
   display:grid;
   place-items:center;
   color:#ff2434;
   font-family:"Courier New", monospace;
-  font-size:23px;
+  font-size:18px;
   font-weight:1000;
   line-height:1;
   letter-spacing:.03em;
@@ -5388,7 +5388,7 @@ body{
   grid-row:2;
   margin-top:2px;
   color:#ffd64d;
-  font-size:11px;
+  font-size:9px;
   font-weight:1000;
   line-height:1;
   letter-spacing:.04em;
@@ -5462,6 +5462,177 @@ body{
 }
 .risingPanelRibbon{
   z-index:2 !important;
+}
+
+/* Realistic illustration pass: chrome glare, plastic lens depth, and cabinet texture. */
+.jagCabinetShell::after{
+  content:"";
+  position:absolute;
+  inset:2px;
+  border-radius:22px 22px 18px 18px;
+  pointer-events:none;
+  z-index:5;
+  background:
+    linear-gradient(102deg,rgba(255,255,255,.52) 0 1.8%,transparent 5.8% 93.8%,rgba(255,255,255,.34) 97.2%,transparent 100%),
+    linear-gradient(78deg,transparent 0 42%,rgba(255,255,255,.10) 47%,transparent 53% 100%),
+    radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.24),transparent 18%),
+    radial-gradient(ellipse at 50% 100%,rgba(255,255,255,.18),transparent 19%);
+  mix-blend-mode:screen;
+  opacity:.72;
+}
+.jagSideRail{
+  overflow:hidden;
+}
+.jagSideRail::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    repeating-linear-gradient(180deg,rgba(255,255,255,.14) 0 1px,transparent 1px 12px),
+    linear-gradient(90deg,rgba(255,255,255,.72),transparent 34%,rgba(0,0,0,.24) 72%,rgba(255,255,255,.22));
+  opacity:.72;
+}
+.jagSideRail::after{
+  content:"";
+  position:absolute;
+  top:18px;
+  bottom:18px;
+  left:50%;
+  width:6px;
+  transform:translateX(-50%);
+  border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.10) 42%,rgba(0,0,0,.24) 66%,rgba(255,255,255,.56));
+  filter:blur(.2px);
+}
+.jagTopBeacon::before{
+  content:"";
+  position:absolute;
+  inset:5px 9px;
+  z-index:12;
+  pointer-events:none;
+  border-radius:10px;
+  background:
+    linear-gradient(115deg,rgba(255,255,255,.46),transparent 18% 72%,rgba(255,255,255,.20)),
+    radial-gradient(ellipse at 50% 10%,rgba(255,255,255,.32),transparent 30%),
+    radial-gradient(ellipse at 50% 88%,rgba(0,0,0,.24),transparent 38%);
+  mix-blend-mode:screen;
+  opacity:.78;
+}
+.jagTopBeacon::after{
+  content:"";
+  position:absolute;
+  left:9px;
+  right:9px;
+  top:50%;
+  height:2px;
+  z-index:13;
+  pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.78),transparent);
+  box-shadow:0 -79px 0 rgba(255,255,255,.12),0 79px 0 rgba(0,0,0,.18);
+}
+.jagTopRed{
+  overflow:hidden;
+}
+.jagTopRed::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.48),transparent 32%,rgba(0,0,0,.24) 100%),
+    radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.42),transparent 42%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.13) 0 1px,transparent 1px 9px);
+  mix-blend-mode:screen;
+  opacity:.72;
+}
+.jagTopGreen::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background:
+    radial-gradient(ellipse at 48% 18%,rgba(255,255,255,.76),transparent 27%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.15) 0 1px,transparent 1px 8px),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.10) 0 1px,transparent 1px 7px);
+  opacity:.82;
+  mix-blend-mode:screen;
+}
+.jagNameBridge::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  border-radius:5px;
+  background:
+    linear-gradient(105deg,transparent 0 20%,rgba(255,255,255,.58) 24%,transparent 31% 66%,rgba(255,255,255,.34) 70%,transparent 78%),
+    repeating-linear-gradient(180deg,rgba(255,255,255,.10) 0 1px,transparent 1px 10px),
+    radial-gradient(ellipse at 50% 15%,rgba(255,255,255,.40),transparent 38%),
+    radial-gradient(ellipse at 50% 96%,rgba(0,0,0,.28),transparent 48%);
+  mix-blend-mode:screen;
+  opacity:.78;
+}
+.jagNameBridge::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:7px;
+  width:42%;
+  height:5px;
+  transform:translateX(-50%);
+  border-radius:999px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.74),transparent);
+  box-shadow:0 -72px 0 rgba(255,255,255,.16);
+  pointer-events:none;
+}
+.jagBridgeSpeaker{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.18),transparent 24%,rgba(0,0,0,.45)),
+    repeating-linear-gradient(0deg,#0c1017 0 3px,#1d232f 3px 5px,#030405 5px 10px) !important;
+}
+.jagMainFace{
+  background:
+    radial-gradient(circle at 12% 12%,rgba(255,235,92,.96) 0 5px,transparent 6px),
+    radial-gradient(circle at 90% 14%,rgba(255,235,92,.90) 0 4px,transparent 5px),
+    repeating-linear-gradient(135deg,rgba(255,255,255,.06) 0 1px,transparent 1px 9px),
+    repeating-linear-gradient(90deg,rgba(255,215,72,.07) 0 1px,transparent 1px 18px),
+    radial-gradient(ellipse at 50% 48%,rgba(255,70,32,.36),transparent 58%),
+    linear-gradient(180deg,#c80a14,#7a0009 72%,#280003) !important;
+}
+.jagControlDeck::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  background:
+    linear-gradient(110deg,transparent 0 19%,rgba(255,255,255,.56) 22%,transparent 29% 71%,rgba(255,255,255,.35) 74%,transparent 81%),
+    radial-gradient(ellipse at 50% 12%,rgba(255,255,255,.32),transparent 38%),
+    radial-gradient(ellipse at 50% 96%,rgba(0,0,0,.34),transparent 52%);
+  mix-blend-mode:screen;
+  opacity:.84;
+}
+.reelArea{
+  filter:drop-shadow(0 0 19px rgba(255,199,54,.22)) drop-shadow(0 18px 22px rgba(0,0,0,.52)) contrast(1.02) !important;
+}
+.risingReelBackplate{
+  box-shadow:
+    inset 0 0 0 2px rgba(54,0,0,.68),
+    inset 0 28px 60px rgba(255,230,125,.16),
+    inset 0 -38px 72px rgba(0,0,0,.68),
+    0 0 30px rgba(255,196,38,.24),
+    0 24px 40px rgba(0,0,0,.54) !important;
+}
+.risingMedalTray::after{
+  content:"";
+  position:absolute;
+  inset:10px 18px;
+  border-radius:16px;
+  pointer-events:none;
+  background:
+    linear-gradient(100deg,transparent 0 18%,rgba(255,255,255,.46) 23%,transparent 31% 72%,rgba(255,255,255,.28) 77%,transparent 86%),
+    radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.34),transparent 45%),
+    radial-gradient(ellipse at 50% 100%,rgba(0,0,0,.44),transparent 55%);
+  mix-blend-mode:screen;
+  opacity:.78;
 }
 @media(max-width:760px){
   :root{
@@ -6067,17 +6238,19 @@ body{
   const AT_BGM_SRC = "assets/media/at_bgm.wav";
   const BAR_BGM_SRC = "assets/media/bar_bgm.mp3";
 
-  const BIG_SOUND_SRC = "assets/media/big_sound.wav";
+  const BIG_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
 
   const KOATARI_SOUND_SRC = "assets/media/koatari_sound.wav";
-  const PAYOUT_SOUND_SRC = "assets/payout.wav";
-  const PAYOUT_3PT_BELL_SOUND_SRC = "assets/pay1.wav";
-  const REPLAY_SOUND_SRC = "assets/rep.wav";
-  const SPIN_SOUND_SRC = "assets/media/spin_start.wav";
-  const STOP_SOUND_SRC = "assets/media/reel_stop.wav";
-  const SEVEN_CONFIRM_SOUND_SRC = "assets/media/seven_confirm.wav";
-  const REG_CONFIRM_SOUND_SRC = "assets/media/77bar_confirm.wav";
-  const BONUS_CONFIRM_SOUND_SRC = "assets/media/bonus_confirm.wav";
+  const PAYOUT_SOUND_SRC = "assets/media/jag/bell.wav";
+  const PAYOUT_3PT_BELL_SOUND_SRC = "assets/media/jag/bell.wav";
+  const REPLAY_SOUND_SRC = "assets/media/jag/replay.wav";
+  const CHERRY_SOUND_SRC = "assets/media/jag/cherry.wav";
+  const SPECIAL_SYMBOL_SOUND_SRC = "assets/media/jag/special_symbol.wav";
+  const SPIN_SOUND_SRC = "assets/media/jag/start.wav";
+  const STOP_SOUND_SRC = "assets/media/jag/stop.wav";
+  const SEVEN_CONFIRM_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
+  const REG_CONFIRM_SOUND_SRC = "assets/media/jag/special_symbol.wav";
+  const BONUS_CONFIRM_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
   const BATTLE_BGM_SRC = "assets/media/battle_part_bgm.wav";
   const SPEED_BGM_SRC = "assets/media/speed_bgm.wav";
 
@@ -12035,7 +12208,9 @@ body{
 
   function payoutSoundSrcFor(result, reward=0){
     if(result === "REPLAY") return REPLAY_SOUND_SRC;
-    if(result === "BELL3" && Number(reward) === 3) return PAYOUT_3PT_BELL_SOUND_SRC;
+    if(result === "CHERRY_ANY" || result === "CHERRY_DOUBLE" || result === "CHERRY_TRIPLE" || result === "MID_CHERRY") return CHERRY_SOUND_SRC;
+    if(result === "MID" || result === "BAR3" || result === "SMALL" || result === "DEVIL_ZONE" || result === "SUPER_DEVIL_ZONE") return SPECIAL_SYMBOL_SOUND_SRC;
+    if(result === "GRAPE" || result === "BELL" || result === "BELL3") return PAYOUT_3PT_BELL_SOUND_SRC;
     return PAYOUT_SOUND_SRC;
   }
 
