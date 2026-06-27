@@ -4757,7 +4757,7 @@ body{
 (function(){
   "use strict";
 
-  const STORAGE_KEY = "white_devil_gorai_rebuild_v2";
+  const STORAGE_KEY = "jag_slot_state_v1";
 
   const DEFAULT_NORMAL_BGM_SRC = "assets/media/normal_bgm.mp3";
   const HIGH_MODE_BGM_SRC = "assets/media/high_mode_bgm.wav";
@@ -5354,13 +5354,13 @@ body{
   }
 
   const ADMIN_SERVER_DEFAULT = location.protocol.startsWith("http") ? location.origin : "http://localhost:8787";
-  const ADMIN_SERVER = (adminParams.get("server") || safeStorageGet("white_devil_admin_server") || ADMIN_SERVER_DEFAULT).replace(/\/$/, "");
-  let machineId = adminParams.get("machine") || safeStorageGet("white_devil_machine_id");
+  const ADMIN_SERVER = (adminParams.get("server") || safeStorageGet("jag_admin_server") || ADMIN_SERVER_DEFAULT).replace(/\/$/, "");
+  let machineId = adminParams.get("machine") || safeStorageGet("jag_machine_id");
   let adminPushTimer = null;
   let adminCommandStream = null;
   let adminCommandReconnectTimer = null;
-  const PAGE_ZOOM_STORAGE_KEY = "white_devil_page_zoom";
-  const PAGE_PAN_STORAGE_KEY = "white_devil_page_pan_x";
+  const PAGE_ZOOM_STORAGE_KEY = "jag_page_zoom";
+  const PAGE_PAN_STORAGE_KEY = "jag_page_pan_x";
   const PAGE_STAGE_WIDTH = 1360;
   const PAGE_ZOOM_MIN = 0.75;
   const PAGE_ZOOM_MAX = 1.30;

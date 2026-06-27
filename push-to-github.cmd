@@ -40,7 +40,7 @@ if exist ".git\index.lock" (
 "%GIT_EXE%" config --global --add safe.directory "%CD%" >nul 2>nul
 
 echo Staging GitHub source files only...
-"%GIT_EXE%" add -A -- .gitignore AGENTS.md README.txt admin.html gorai.html index.html jag.html server.js whitedevil.html Documents assets push-to-github.cmd pull-from-github.cmd sync-dropbox-from-git.cmd sync-dropbox-from-git.ps1
+"%GIT_EXE%" add -A -- .gitignore AGENTS.md README.txt admin.html gorai.html index.html jag.html server.js Documents assets push-to-github.cmd pull-from-github.cmd sync-dropbox-from-git.cmd sync-dropbox-from-git.ps1
 if errorlevel 1 (
   echo Failed to stage files.
   pause

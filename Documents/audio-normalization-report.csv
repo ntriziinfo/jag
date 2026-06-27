@@ -1,4 +1,4 @@
-﻿"path","type","status","target_active_rms_dbfs","peak_ceiling_dbfs","before_active_rms_dbfs","before_peak_dbfs","gain_db","after_active_rms_dbfs","after_peak_dbfs"
+"path","type","status","target_active_rms_dbfs","peak_ceiling_dbfs","before_active_rms_dbfs","before_peak_dbfs","gain_db","after_active_rms_dbfs","after_peak_dbfs"
 "assets\battle_bgm.wav","wav","normalized","-18.00","-1.00","-12.01","-1.31","-5.99","-18.00","-7.31"
 "assets\media\big_sound.wav","wav","normalized","-18.00","-1.00","-27.51","-13.36","9.51","-18.31","-3.85"
 "assets\media\koatari_sound.wav","wav","normalized","-18.00","-1.00","-37.55","-19.41","18.41","-20.40","-1.00"

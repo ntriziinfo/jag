@@ -3,7 +3,6 @@ RISING JAG SLOT
 Main files:
 - jag.html : slot app
 - index.html : entry page that opens jag.html
-- whitedevil.html : legacy redirect to jag.html
 - admin.html : admin screen
 - server.js : local sync server
 
