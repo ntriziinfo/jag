@@ -6026,7 +6026,7 @@ body{
 }
 .playControls .betArea,
 .centerStopBtns button{
-  opacity:1 !important;
+  opacity:.01 !important;
 }
 .playControls .betArea{
   left:23.0% !important;
@@ -6041,6 +6041,11 @@ body{
   background:transparent !important;
   border:0 !important;
   box-shadow:none !important;
+}
+.playControls .betArea::before,
+.playControls .betArea::after,
+.playControls .centerStopBtns button::before{
+  display:none !important;
 }
 .playControls .betArea::after{
   content:"";
@@ -6127,6 +6132,53 @@ body{
 }
 .playControls .centerStopBtns button:active::before{
   transform:translate(-50%, -42%) scale(.94);
+  filter:brightness(.82) drop-shadow(0 2px 3px rgba(0,0,0,.52));
+}
+.cabinetControlParts{
+  position:absolute;
+  inset:0;
+  z-index:84;
+  pointer-events:none;
+}
+.cabinetControlPart{
+  position:absolute;
+  background-position:center;
+  background-repeat:no-repeat;
+  background-size:contain;
+}
+.cabinetStartLever{
+  left:23.0%;
+  top:71.6%;
+  width:16.8%;
+  height:16.8%;
+  transform:translate(-50%, -50%);
+  background-image:url("assets/controls/start_lever.png");
+  filter:drop-shadow(0 4px 5px rgba(0,0,0,.40));
+  transition:top .09s ease, transform .09s ease, filter .09s ease;
+}
+.playControls.leverDown .cabinetStartLever{
+  top:73.0%;
+  transform:translate(-50%, -50%) rotate(4deg) scale(.985);
+  filter:brightness(.92) drop-shadow(0 2px 3px rgba(0,0,0,.46));
+}
+.cabinetStopButton{
+  top:71.6%;
+  width:11.8%;
+  height:11.8%;
+  transform:translate(-50%, -50%);
+  background-image:url("assets/controls/stop_button_red.png");
+  filter:drop-shadow(0 4px 5px rgba(0,0,0,.42));
+  transition:transform .08s ease, filter .08s ease, background-image .12s ease;
+}
+.cabinetStopButton0{left:38.1%;}
+.cabinetStopButton1{left:49.1%;}
+.cabinetStopButton2{left:60.2%;}
+.cabinetStopButton.is-reel-live{
+  background-image:url("assets/controls/stop_button_blue.png");
+  filter:drop-shadow(0 0 12px rgba(62,213,255,.68)) drop-shadow(0 4px 5px rgba(0,0,0,.42));
+}
+.cabinetStopButton.is-pressed{
+  transform:translate(-50%, -43%) scale(.94);
   filter:brightness(.82) drop-shadow(0 2px 3px rgba(0,0,0,.52));
 }
 .playControls .autoArea{
@@ -6433,6 +6485,12 @@ body{
       </div>
 
       <div class="buttonRow playControls">
+        <div class="cabinetControlParts" aria-hidden="true">
+          <div class="cabinetControlPart cabinetStartLever" id="cabinetStartLever"></div>
+          <div class="cabinetControlPart cabinetStopButton cabinetStopButton0" data-stop-part="0"></div>
+          <div class="cabinetControlPart cabinetStopButton cabinetStopButton1" data-stop-part="1"></div>
+          <div class="cabinetControlPart cabinetStopButton cabinetStopButton2" data-stop-part="2"></div>
+        </div>
         <div class="betArea">
           <button class="spinBtn betBtn" id="spinBtn">BET</button>
         </div>
@@ -11040,6 +11098,11 @@ body{
       const reelLive = !!(isSpinning && !reelStopped);
       btn.classList.toggle("is-reel-live", reelLive);
       btn.classList.toggle("is-reel-stopped", !reelLive);
+      const part = document.querySelector(`[data-stop-part="${i}"]`);
+      if(part){
+        part.classList.toggle("is-reel-live", reelLive);
+        part.classList.toggle("is-reel-stopped", !reelLive);
+      }
     });
   }
 
@@ -13222,7 +13285,11 @@ body{
     onClick("spinBtn", spin);
     const betHitArea = document.querySelector(".betArea");
     if(betHitArea){
-      const setLeverDown = down=>betHitArea.classList.toggle("leverDown", !!down);
+      const playControls = document.querySelector(".playControls");
+      const setLeverDown = down=>{
+        betHitArea.classList.toggle("leverDown", !!down);
+        if(playControls) playControls.classList.toggle("leverDown", !!down);
+      };
       betHitArea.addEventListener("pointerdown", ()=>setLeverDown(true));
       window.addEventListener("pointerup", ()=>setLeverDown(false));
       window.addEventListener("pointercancel", ()=>setLeverDown(false));
@@ -13295,6 +13362,12 @@ body{
 
     stopBtns.forEach((btn,i)=>{
       if(!btn) return;
+      const stopPart = document.querySelector(`[data-stop-part="${i}"]`);
+      const setStopPressed = down=>{ if(stopPart) stopPart.classList.toggle("is-pressed", !!down); };
+      btn.addEventListener("pointerdown", ()=>setStopPressed(true));
+      window.addEventListener("pointerup", ()=>setStopPressed(false));
+      window.addEventListener("pointercancel", ()=>setStopPressed(false));
+      btn.addEventListener("mouseleave", ()=>setStopPressed(false));
       btn.addEventListener("click", ()=>{
         stopSingleReel(i);
       });
