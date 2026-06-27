@@ -12501,6 +12501,7 @@ body{
     hideDevilRushEntryEffect();
     const devilRushEntryEffect = atSpinAtStart ? consumeDevilRushEntryEffect() : "";
     if(devilRushEntryEffect) showDevilRushEntryEffect(devilRushEntryEffect);
+    // 大当たりを含む成立役はBET/レバーON時点で確定させる。停止時はこの結果を表示するだけ。
     const result = normalActiveAtSpinStart ? drawNormalResult() : drawResult();
     const spec = RESULT[result];
     const lineRow = resultLineRow(result);
