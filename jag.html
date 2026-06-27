@@ -5252,6 +5252,154 @@ body{
     linear-gradient(180deg,rgba(117,7,8,.76),rgba(16,0,4,.82) 55%,rgba(82,4,6,.78)) !important;
   background-blend-mode:screen,screen,normal,normal,normal;
 }
+.risingReelBackplate::before{
+  background:
+    linear-gradient(90deg,rgba(255,232,120,.18),transparent 16%,transparent 84%,rgba(255,232,120,.18)),
+    radial-gradient(ellipse at 50% 50%,rgba(255,236,150,.36),rgba(255,236,150,0) 62%) !important;
+  border-top:3px solid rgba(255,250,205,.66) !important;
+  border-bottom:2px solid rgba(255,202,45,.38) !important;
+}
+.risingReelBackplate::after{
+  left:12.5% !important;
+  right:12.5% !important;
+  bottom:5.4% !important;
+  height:18.5% !important;
+  border-radius:18px 18px 46% 46% / 18px 18px 42% 42% !important;
+  background:
+    radial-gradient(circle at 12% 42%,rgba(255,231,91,.85) 0 3px,transparent 4px),
+    radial-gradient(circle at 88% 42%,rgba(255,231,91,.85) 0 3px,transparent 4px),
+    repeating-linear-gradient(90deg,rgba(255,224,91,.30) 0 7px,transparent 7px 24px),
+    linear-gradient(180deg,rgba(255,235,148,.25),rgba(35,0,0,.58)) !important;
+  border:1px solid rgba(255,221,89,.48) !important;
+}
+.jagGogoChance{
+  position:absolute;
+  left:-8.4%;
+  top:57.8%;
+  width:18.2%;
+  height:21.5%;
+  z-index:42;
+  display:grid;
+  place-items:center;
+  pointer-events:none;
+  transform:rotate(-8deg);
+  opacity:.78;
+  filter:grayscale(.92) brightness(.42) contrast(1.18) drop-shadow(0 5px 5px rgba(0,0,0,.70));
+  transition:filter .22s ease, opacity .22s ease, transform .22s ease;
+}
+.jagGogoChance::before{
+  content:"";
+  position:absolute;
+  inset:21% 10% 12%;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,220,36,.18),rgba(255,43,14,.10) 46%,transparent 72%);
+  filter:blur(5px);
+}
+.jagGogoChance img{
+  width:114%;
+  max-width:none;
+  height:auto;
+  position:relative;
+  z-index:1;
+}
+.jagGogoChance span{
+  position:absolute;
+  left:48%;
+  bottom:2%;
+  z-index:2;
+  transform:translateX(-50%) rotate(7deg);
+  color:#f2f7ff;
+  font-family:Impact, "Arial Black", sans-serif;
+  font-size:15px;
+  line-height:.86;
+  letter-spacing:.04em;
+  text-shadow:2px 2px 0 #001130,0 0 8px rgba(45,148,255,.42);
+}
+.reelArea.jagChanceLit .jagGogoChance{
+  opacity:1;
+  filter:saturate(1.24) brightness(1.15) contrast(1.08) drop-shadow(0 0 14px rgba(255,224,56,.88)) drop-shadow(0 0 28px rgba(255,60,24,.62));
+  transform:rotate(-8deg) scale(1.04);
+}
+.reelArea.jagChanceLit .jagGogoChance::before{
+  background:radial-gradient(circle,rgba(255,251,150,.82),rgba(255,88,24,.46) 46%,transparent 74%);
+}
+.jagPayoutMeters{
+  position:absolute;
+  left:50%;
+  top:70.6%;
+  width:41.2%;
+  height:10.6%;
+  z-index:44;
+  transform:translateX(-50%);
+  display:grid;
+  grid-template-columns:1fr 1.38fr 1fr;
+  gap:4.6%;
+  pointer-events:none;
+}
+.jagPayoutMeter{
+  position:relative;
+  display:grid;
+  grid-template-rows:minmax(0, 1fr) auto;
+  align-items:end;
+  justify-items:center;
+  padding:3px 5px 0;
+}
+.jagPayoutMeter::before{
+  content:"";
+  width:100%;
+  height:29px;
+  display:block;
+  grid-row:1;
+  border-radius:5px;
+  background:
+    linear-gradient(180deg,rgba(255,42,42,.18),transparent 42%),
+    radial-gradient(circle at 50% 50%,rgba(255,0,0,.22),transparent 58%),
+    linear-gradient(180deg,#170004,#040005 62%,#190006);
+  border:2px solid rgba(255,197,54,.76);
+  box-shadow:
+    inset 0 0 0 2px rgba(0,0,0,.78),
+    inset 0 0 15px rgba(255,0,0,.22),
+    0 0 9px rgba(255,210,68,.24);
+}
+.jagPayoutMeter b{
+  position:absolute;
+  top:4px;
+  left:0;
+  right:0;
+  height:29px;
+  display:grid;
+  place-items:center;
+  color:#ff2434;
+  font-family:"Courier New", monospace;
+  font-size:23px;
+  font-weight:1000;
+  line-height:1;
+  letter-spacing:.03em;
+  text-shadow:
+    0 0 5px rgba(255,0,22,.98),
+    0 0 14px rgba(255,0,22,.62),
+    1px 1px 0 #2d0000;
+  font-variant-numeric:tabular-nums;
+}
+.jagPayoutMeter span{
+  grid-row:2;
+  margin-top:2px;
+  color:#ffd64d;
+  font-size:11px;
+  font-weight:1000;
+  line-height:1;
+  letter-spacing:.04em;
+  text-shadow:1px 1px 0 #2c0000,0 0 8px rgba(255,208,52,.48);
+}
+.jagPayoutMeter::after{
+  content:"";
+  position:absolute;
+  left:12%;
+  right:12%;
+  bottom:13px;
+  height:2px;
+  background:linear-gradient(90deg,transparent,rgba(255,229,95,.72),transparent);
+}
 .risingLowerPanel{
   background:
     linear-gradient(90deg,rgba(0,0,0,.32),transparent 12%,transparent 88%,rgba(0,0,0,.32)),
@@ -5571,6 +5719,24 @@ body{
             <div class="cell center"><div class="sym barText">BAR</div></div>
             <div class="cell"><div class="sym">🐘</div></div>
           </div></div>
+        </div>
+        <div class="jagGogoChance" id="jagGogoChance" aria-label="GOGO CHANCE">
+          <img src="assets/ui/rising_gogo_chance.png" alt="RISING CHANCE" loading="eager" decoding="async" draggable="false">
+          <span>CHANCE</span>
+        </div>
+        <div class="jagPayoutMeters" aria-label="払い出し表示">
+          <div class="jagPayoutMeter">
+            <b id="jagCreditMeter">50</b>
+            <span>CREDIT</span>
+          </div>
+          <div class="jagPayoutMeter">
+            <b id="jagCountMeter">0</b>
+            <span>COUNT</span>
+          </div>
+          <div class="jagPayoutMeter">
+            <b id="jagGamePayoutMeter">0</b>
+            <span>PAYOUT</span>
+          </div>
         </div>
         <div class="gekiatsuLayer" id="gekiatsuLayer" aria-hidden="true">
           <video id="gekiatsuVideo" playsinline preload="auto"></video>
@@ -6158,6 +6324,9 @@ body{
   };
 
   let isSpinning = false;
+  let jagLastGamePayout = 0;
+  let jagLastBonusPayout = 0;
+  let jagChanceHold = false;
   let currentSpin = null;
   let spinCanStop = false;
   let spinWaitTimer = null;
@@ -9249,6 +9418,9 @@ body{
         resultPayout:null,
         endSignal:null
       };
+      jagLastBonusPayout = initialPaid;
+      jagLastGamePayout = 0;
+      jagChanceHold = true;
       stats.totalSessions++;
       queueDevilRushEntryEffect("start");
       recordSlumpPoint();
@@ -9324,6 +9496,7 @@ body{
     session.battleRemain = 0;
     session.battleWin = false;
     session.battleSource = "";
+    jagChanceHold = false;
     resetBonusEndSpecialEffects(true);
     setSpeedFrameOffHold(false);
     $("spinBtn").textContent = "BET";
@@ -9749,6 +9922,7 @@ body{
     const lineText = result !== "MISS" ? `${lineName(lineRow)}ライン` : "";
     const normalReward = Number(resolved.reward) || 0;
     const normalRewardText = normalReward > 0 ? ` / +${normalReward}pt` : "";
+    jagLastGamePayout = normalReward;
 
     if(resolved.highAtStart){
       stats.highSpins = (Number(stats.highSpins) || 0) + 1;
@@ -9776,6 +9950,7 @@ body{
     }
 
     if(resolved.bonusWaitSpin){
+      jagChanceHold = true;
       normalState.bonusWaitGames = Math.max(1, (Number(normalState.bonusWaitGames) || 0) + 1);
       $("stLamp").classList.add("on");
       showBonusConfirmScreen();
@@ -9787,6 +9962,8 @@ body{
     }
 
     if(resolved.aTypeBonusReady){
+      jagChanceHold = true;
+      jagLastBonusPayout = normalReward;
       resetNormalModeAfterBonus();
       $("stLamp").classList.add("on");
       const isRegBonus = result === "MID" || result === "MID_CHERRY";
@@ -9808,6 +9985,7 @@ body{
     }
 
     if(resolved.bar3PremiumReady){
+      jagChanceHold = true;
       resetNormalModeAfterBonus();
       $("stLamp").classList.add("on");
       showMessage("BAR揃い", `${resolved.bonusSource} / 出玉なし / AT突入 / SET+5 / 継続${formatRate(BAR3_CONTINUATION_RATE)}${lineText ? " / " + lineText : ""}`);
@@ -9822,6 +10000,7 @@ body{
     }
 
     if(resolved.bonusReady){
+      jagChanceHold = true;
       normalState.bonusPending = false;
       normalState.bonusKind = "";
       normalState.bonusSource = "";
@@ -9839,6 +10018,8 @@ body{
     }
 
     if(resolved.regReady){
+      jagChanceHold = true;
+      jagLastBonusPayout = normalReward;
       resetNormalModeAfterBonus();
       $("stLamp").classList.add("on");
       showMessage("REG", `${resolved.bonusSource} / +${normalReward}pt / 天井リセット / 天井まで${ceilingRemain()}G${lineText ? " / " + lineText : ""}`);
@@ -9852,6 +10033,7 @@ body{
     }
 
     if(resolved.bonusHit){
+      jagChanceHold = true;
       normalState.bonusPending = true;
       normalState.bonusKind = resolved.bonusKind || "BIG";
       normalState.bonusSource = resolved.bonusSource;
@@ -9900,6 +10082,7 @@ body{
   function applyResult(result, resolved, lineRow=1){
     const info = RESULT[result];
     const reward = resolved.reward;
+    jagLastGamePayout = Number(reward) || 0;
     const baseSets = resolved.sets || 0;
     const zoneSets = resolved.zoneSets || 0;
     const stGameAdd = (resolved.add || 0) + (resolved.zoneStGames || 0);
@@ -9908,6 +10091,7 @@ body{
 
     if(reward > 0){
       session.paid += reward;
+      jagLastBonusPayout = Math.max(0, Number(session.paid) || 0);
       stats.totalPaid += reward;
       playPayoutSound(result, reward);
       updateCompleteTrialState("AT払い出し");
@@ -10125,6 +10309,27 @@ body{
       const el = $(id);
       if(el) el.textContent = value;
     };
+    const formatMeterNumber = (value, max=999)=>{
+      const n = Math.max(0, Math.min(max, Math.round(Number(value) || 0)));
+      return String(n);
+    };
+    const stLampOn = !!($("stLamp") && $("stLamp").classList.contains("on"));
+    const jagChanceLit = !!(active || normalState.bonusPending || jagChanceHold || stLampOn || bonusConfirmBgmHold);
+    if(reelArea) reelArea.classList.toggle("jagChanceLit", jagChanceLit);
+    const gogoChance = $("jagGogoChance");
+    if(gogoChance){
+      gogoChance.classList.toggle("is-lit", jagChanceLit);
+      gogoChance.setAttribute("aria-pressed", jagChanceLit ? "true" : "false");
+    }
+    const displayCredit = 50;
+    const displayCount = active
+      ? Math.max(0, Number(session.paid) || 0)
+      : session.resultPayout !== null && session.resultPayout !== undefined
+        ? Math.max(0, Number(session.resultPayout) || 0)
+        : Math.max(0, Number(jagLastBonusPayout) || 0);
+    setText("jagCreditMeter", formatMeterNumber(displayCredit));
+    setText("jagCountMeter", formatMeterNumber(displayCount));
+    setText("jagGamePayoutMeter", formatMeterNumber(jagLastGamePayout));
     const atCountText = stats.totalSessions || 0;
     const stEmblem = $("wdStEmblem");
     if(stEmblem){
@@ -10380,6 +10585,9 @@ body{
     bonusConfirmBgmHold = false;
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",bonusWaitGames:0,morningCeilingActive:false};
     session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
+    jagLastGamePayout = 0;
+    jagLastBonusPayout = 0;
+    jagChanceHold = false;
     completeTrialState = {locked:false,lockedSetting:0,rescueActive:false,completeProfit:0};
     setSpeedFrameOffHold(false);
     forceResult = "";
@@ -10429,6 +10637,9 @@ body{
     bonusConfirmBgmHold = false;
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",bonusWaitGames:0,morningCeilingActive:!A_TYPE_MODE};
     session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
+    jagLastGamePayout = 0;
+    jagLastBonusPayout = 0;
+    jagChanceHold = false;
     completeTrialState = {locked:false,lockedSetting:0,rescueActive:false,completeProfit:0};
     setSpeedFrameOffHold(false);
     forceResult = "";
@@ -10916,6 +11127,8 @@ body{
     const spinWaitMs = speedModeSpinAtStart ? speedModeWaitMs() : MIN_SPIN_WAIT_MS;
 
     isSpinning = true;
+    jagLastGamePayout = 0;
+    if(!normalState.bonusPending && !session.active) jagChanceHold = false;
     clearReelLight(true);
     spinCanStop = false;
     $("spinBtn").disabled = false;
@@ -11710,6 +11923,8 @@ body{
 
     stats.totalSpins++;
     chargeSpinCost();
+    jagLastGamePayout = 0;
+    if(!normalState.bonusPending && !session.active) jagChanceHold = false;
 
     const result = normalActiveAtSpinStart ? drawNormalResult() : drawResult();
     const lineRow = resultLineRow(result);
