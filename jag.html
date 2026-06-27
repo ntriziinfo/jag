@@ -5429,6 +5429,7 @@ body{
   transform:rotate(-8deg);
   opacity:1;
   isolation:isolate;
+  overflow:visible;
   filter:none;
   transition:opacity .22s ease, transform .22s ease;
 }
@@ -5440,7 +5441,7 @@ body{
   width:100%;
   height:100%;
   transform:translate(-50%,-50%);
-  z-index:0;
+  z-index:-1;
   background:
     radial-gradient(circle at 42% 38%,rgba(110,48,168,.95),rgba(44,5,86,.96) 48%,rgba(7,0,18,.98) 100%);
   -webkit-mask:url("assets/ui/rising_gogo_chance.png") center / contain no-repeat;
@@ -5452,7 +5453,7 @@ body{
   content:"";
   position:absolute;
   inset:21% 10% 12%;
-  z-index:1;
+  z-index:0;
   border-radius:50%;
   background:radial-gradient(circle,rgba(255,220,36,.18),rgba(255,43,14,.10) 46%,transparent 72%);
   filter:blur(5px);
@@ -5463,7 +5464,7 @@ body{
   height:auto;
   position:relative;
   z-index:2;
-  opacity:.58;
+  opacity:1;
   filter:grayscale(.92) brightness(.42) contrast(1.18) drop-shadow(0 5px 5px rgba(0,0,0,.70));
   transition:filter .22s ease, opacity .22s ease;
 }
