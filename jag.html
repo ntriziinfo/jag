@@ -7120,7 +7120,8 @@ body{
   const PIERROT_SYMBOL = "🤡";
   const CHERRY_SYMBOL = "🍒";
   const GRAPE_SYMBOL = "🍇";
-  const BELL_SYMBOL = "粕";
+  const BELL_SYMBOL = "🔔";
+  const BLANK_SYMBOL = "__BLANK__";
   const SUICA_IMAGE_SRC = "assets/symbols/sym_suika.png";
   const CHERRY_IMAGE_SRC = "assets/symbols/sym_cherry.png";
   const BELL_IMAGE_SRC = "assets/symbols/sym_bell.png";
@@ -7195,7 +7196,7 @@ body{
     6:{weights:[{result:"SMALL",w:4},{result:"MID",w:3},{result:"BIG",w:0.397},{result:"BELL",w:300},{result:"BELL3",w:70},{result:"REPLAY",w:366},{result:"SUICA",w:3},{result:"CHERRY_DOUBLE",w:2},{result:"CHERRY_TRIPLE",w:1}]}
   });
 
-  const symbols = ["7","BAR",ELEPHANT_SYMBOL,GRAPE_SYMBOL,CHERRY_SYMBOL,PIERROT_SYMBOL];
+  const symbols = ["7","BAR",ELEPHANT_SYMBOL,GRAPE_SYMBOL,CHERRY_SYMBOL,PIERROT_SYMBOL,BELL_SYMBOL,BLANK_SYMBOL];
   const AUDIO_BALANCE_VERSION = 4;
   const DEFAULT_MASTER_VOLUME = 0.70;
   const DEFAULT_BGM_VOLUME = 0.50;
@@ -12009,21 +12010,23 @@ body{
         ? `<img class="symImg" src="${USER_FACE_SRC}" alt="small hit symbol" loading="eager" decoding="sync" draggable="false">`
         : (symbol === CHERRY_SYMBOL)
           ? `<img class="symImg cherrySymImg" src="${CHERRY_IMAGE_SRC}" alt="cherry symbol" loading="eager" decoding="sync" draggable="false">`
-          : (symbol === "🔔")
+          : (symbol === BELL_SYMBOL)
             ? `<img class="symImg bellSymImg" src="${BELL_IMAGE_SRC}" alt="bell symbol" loading="eager" decoding="sync" draggable="false">`
-            : (symbol === "REPLAY")
-              ? `<img class="symImg replaySymImg" src="${REPLAY_IMAGE_SRC}" alt="replay symbol" loading="eager" decoding="sync" draggable="false">`
-              : (symbol === "🍋")
-                ? `<img class="symImg suikaSymImg" src="${SUICA_IMAGE_SRC}" alt="suika symbol" loading="eager" decoding="sync" draggable="false">`
-                : (symbol === "⭐")
-                  ? `<img class="symImg missSymImg" src="${MISS_IMAGE_SRC}" alt="miss symbol" loading="eager" decoding="sync" draggable="false">`
-                  : (symbol === GRAPE_SYMBOL)
-                    ? `<img class="symImg grapeSymImg" src="${GRAPE_IMAGE_SRC}" alt="grape symbol" loading="eager" decoding="sync" draggable="false">`
-                    : (symbol === "BAR")
-                      ? `<img class="symImg barSymImg" src="${BAR_IMAGE_SRC}" alt="BAR symbol" loading="eager" decoding="sync" draggable="false">`
-                      : (symbol === "7")
-                        ? `<img class="symImg sevenSymImg" src="${SEVEN_IMAGE_SRC}" alt="7 symbol" loading="eager" decoding="sync" draggable="false">`
-                        : `<div class="sym ${cls || ""}">${escapeHtml(symbol)}</div>`;
+            : (symbol === BLANK_SYMBOL)
+              ? `<div class="sym blankSym" aria-label="blank"></div>`
+              : (symbol === "REPLAY")
+                ? `<img class="symImg replaySymImg" src="${REPLAY_IMAGE_SRC}" alt="replay symbol" loading="eager" decoding="sync" draggable="false">`
+                : (symbol === "🍋")
+                  ? `<img class="symImg suikaSymImg" src="${SUICA_IMAGE_SRC}" alt="suika symbol" loading="eager" decoding="sync" draggable="false">`
+                  : (symbol === "⭐")
+                    ? `<img class="symImg missSymImg" src="${MISS_IMAGE_SRC}" alt="miss symbol" loading="eager" decoding="sync" draggable="false">`
+                    : (symbol === GRAPE_SYMBOL)
+                      ? `<img class="symImg grapeSymImg" src="${GRAPE_IMAGE_SRC}" alt="grape symbol" loading="eager" decoding="sync" draggable="false">`
+                      : (symbol === "BAR")
+                        ? `<img class="symImg barSymImg" src="${BAR_IMAGE_SRC}" alt="BAR symbol" loading="eager" decoding="sync" draggable="false">`
+                        : (symbol === "7")
+                          ? `<img class="symImg sevenSymImg" src="${SEVEN_IMAGE_SRC}" alt="7 symbol" loading="eager" decoding="sync" draggable="false">`
+                          : `<div class="sym ${cls || ""}">${escapeHtml(symbol)}</div>`;
     return `${inner}`;
   }
 
@@ -12052,12 +12055,10 @@ body{
   }
 
   const REEL_STRIPS = [
-    // 左リール：7 / BAR / ゾウ / ブドウ / チェリー / ピエロ
-    ["7",CHERRY_SYMBOL,ELEPHANT_SYMBOL,"BAR",GRAPE_SYMBOL,PIERROT_SYMBOL,"7",GRAPE_SYMBOL,CHERRY_SYMBOL,"BAR",ELEPHANT_SYMBOL,PIERROT_SYMBOL],
-    // 中リール：7 / BAR / ゾウ / ブドウ / チェリー / ピエロ
-    ["7",ELEPHANT_SYMBOL,GRAPE_SYMBOL,"BAR",PIERROT_SYMBOL,CHERRY_SYMBOL,"7",CHERRY_SYMBOL,ELEPHANT_SYMBOL,GRAPE_SYMBOL,"BAR",PIERROT_SYMBOL],
-    // 右リール：7 / BAR / ゾウ / ブドウ / チェリー / ピエロ
-    ["BAR",PIERROT_SYMBOL,GRAPE_SYMBOL,"7",ELEPHANT_SYMBOL,CHERRY_SYMBOL,GRAPE_SYMBOL,"BAR",CHERRY_SYMBOL,"7",PIERROT_SYMBOL,ELEPHANT_SYMBOL]
+    // Reference rows 21 -> 1, top to bottom.
+    [BELL_SYMBOL,"7",ELEPHANT_SYMBOL,GRAPE_SYMBOL,ELEPHANT_SYMBOL,GRAPE_SYMBOL,"BAR",CHERRY_SYMBOL,GRAPE_SYMBOL,ELEPHANT_SYMBOL,GRAPE_SYMBOL,"7",PIERROT_SYMBOL,GRAPE_SYMBOL,ELEPHANT_SYMBOL,GRAPE_SYMBOL,CHERRY_SYMBOL,"BAR",GRAPE_SYMBOL,ELEPHANT_SYMBOL,GRAPE_SYMBOL],
+    [ELEPHANT_SYMBOL,"7",GRAPE_SYMBOL,CHERRY_SYMBOL,ELEPHANT_SYMBOL,BELL_SYMBOL,GRAPE_SYMBOL,CHERRY_SYMBOL,ELEPHANT_SYMBOL,"BAR",GRAPE_SYMBOL,CHERRY_SYMBOL,ELEPHANT_SYMBOL,BELL_SYMBOL,GRAPE_SYMBOL,CHERRY_SYMBOL,ELEPHANT_SYMBOL,"BAR",GRAPE_SYMBOL,CHERRY_SYMBOL,PIERROT_SYMBOL],
+    [GRAPE_SYMBOL,"7","BAR",BELL_SYMBOL,ELEPHANT_SYMBOL,GRAPE_SYMBOL,PIERROT_SYMBOL,BELL_SYMBOL,ELEPHANT_SYMBOL,BLANK_SYMBOL,PIERROT_SYMBOL,BELL_SYMBOL,ELEPHANT_SYMBOL,GRAPE_SYMBOL,PIERROT_SYMBOL,BELL_SYMBOL,ELEPHANT_SYMBOL,GRAPE_SYMBOL,PIERROT_SYMBOL,BELL_SYMBOL,ELEPHANT_SYMBOL]
   ];
 
   function mod(n, m){
