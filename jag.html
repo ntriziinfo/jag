@@ -6516,6 +6516,7 @@ body{
           <div class="layoutEditorHead">
             <div class="layoutEditorTitle">配置調整</div>
             <div class="layoutEditorActions">
+              <button class="layoutEditorAction" id="layoutEditSaveDefaultBtn" type="button">今を標準</button>
               <button class="layoutEditorAction" id="layoutEditResetBtn" type="button">RESET</button>
               <button class="layoutEditorAction" id="layoutEditCloseBtn" type="button">CLOSE</button>
             </div>
@@ -7594,6 +7595,7 @@ body{
   const pagePanView = $("pagePanView");
   const layoutEditToggleBtn = $("layoutEditToggleBtn");
   const layoutEditorPanel = $("layoutEditorPanel");
+  const layoutEditSaveDefaultBtn = $("layoutEditSaveDefaultBtn");
   const layoutEditResetBtn = $("layoutEditResetBtn");
   const layoutEditCloseBtn = $("layoutEditCloseBtn");
   const layoutEditInputs = [...document.querySelectorAll(".layoutEditInput")];
@@ -7652,6 +7654,7 @@ body{
   const PAGE_ZOOM_STORAGE_KEY = "jag_unified_page_zoom";
   const PAGE_PAN_STORAGE_KEY = "jag_unified_page_pan_x";
   const LAYOUT_EDIT_STORAGE_KEY = "jag_layout_editor_v1";
+  const LAYOUT_DEFAULT_STORAGE_KEY = "jag_layout_default_v1";
   const PAGE_STAGE_WIDTH = 1360;
   const PAGE_ZOOM_MIN = 0.75;
   const PAGE_ZOOM_MAX = 1.30;
@@ -7676,7 +7679,8 @@ body{
   let pageZoom = 1;
   let pagePanX = 0;
   let layoutEditOpen = false;
-  let layoutEditState = JSON.parse(JSON.stringify(LAYOUT_DEFAULTS));
+  let layoutDefaultState = JSON.parse(JSON.stringify(LAYOUT_DEFAULTS));
+  let layoutEditState = JSON.parse(JSON.stringify(layoutDefaultState));
   let backgroundSyncRaf = 0;
   let pageScrollBoundsRaf = 0;
 
@@ -7880,6 +7884,10 @@ body{
   }
 
   function cloneLayoutDefaults(){
+    return JSON.parse(JSON.stringify(layoutDefaultState || LAYOUT_DEFAULTS));
+  }
+
+  function cloneFactoryLayoutDefaults(){
     return JSON.parse(JSON.stringify(LAYOUT_DEFAULTS));
   }
 
@@ -7947,6 +7955,29 @@ body{
       layoutEditState = cloneLayoutDefaults();
     }
     applyLayoutEdit(false);
+  }
+
+  function loadLayoutDefaultState(){
+    try{
+      const saved = safeStorageGet(LAYOUT_DEFAULT_STORAGE_KEY);
+      layoutDefaultState = saved ? normalizeLayoutState(JSON.parse(saved)) : cloneFactoryLayoutDefaults();
+    }catch(e){
+      layoutDefaultState = cloneFactoryLayoutDefaults();
+    }
+  }
+
+  function saveLayoutAsDefault(){
+    layoutEditState = normalizeLayoutState(layoutEditState);
+    layoutDefaultState = JSON.parse(JSON.stringify(layoutEditState));
+    safeStorageSet(LAYOUT_DEFAULT_STORAGE_KEY, JSON.stringify(layoutDefaultState));
+    applyLayoutEdit(true);
+    if(layoutEditSaveDefaultBtn){
+      layoutEditSaveDefaultBtn.textContent = "保存済";
+      clearTimeout(layoutEditSaveDefaultBtn._layoutFeedbackTimer);
+      layoutEditSaveDefaultBtn._layoutFeedbackTimer = setTimeout(()=>{
+        layoutEditSaveDefaultBtn.textContent = "今を標準";
+      }, 1000);
+    }
   }
 
   function resetLayoutEdit(){
@@ -13623,6 +13654,12 @@ body{
         setLayoutEditorOpen(false);
       });
     }
+    if(layoutEditSaveDefaultBtn){
+      layoutEditSaveDefaultBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        saveLayoutAsDefault();
+      });
+    }
     if(layoutEditResetBtn){
       layoutEditResetBtn.addEventListener("click", e=>{
         e.stopPropagation();
@@ -13875,6 +13912,7 @@ body{
   load();
   loadPageZoom();
   loadPagePan();
+  loadLayoutDefaultState();
   loadLayoutEdit();
   applySettings();
   setup();
