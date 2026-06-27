@@ -1,16 +1,17 @@
-WHITE DEVIL SLOT
+RISING JAG SLOT
 
-主要ファイル:
-- whitedevil.html : スロット本体
-- index.html : whitedevil.html へ転送する入口
-- admin.html : 管理画面
-- server.js : ローカル同期サーバー
+Main files:
+- jag.html : slot app
+- index.html : entry page that opens jag.html
+- whitedevil.html : legacy redirect to jag.html
+- admin.html : admin screen
+- server.js : local sync server
 
-起動:
+Start:
 1. node server.js
-2. http://localhost:8787/whitedevil.html を開く
-3. 管理画面は http://localhost:8787/admin.html
+2. Open http://localhost:8787/jag.html
+3. Admin screen: http://localhost:8787/admin.html
 
-注意:
-- 抽選・払い出し・機械割に関わる変更は、実装前に確認する。
-- ユーザー提供素材は著作物として扱い、外部学習や無断転用をしない。
+Notes:
+- Keep jag.html as the main screen for this repository.
+- Treat user-provided assets as original/reference material.

@@ -69,7 +69,7 @@ function sendCommand(machineId, command){
 
 function serveFile(res, pathname){
   if(pathname === "/gorai.html" || pathname === "/gourai.html" || pathname === "/gorai_complete_test.html"){
-    res.writeHead(302, {"Location":"/whitedevil.html"});
+    res.writeHead(302, {"Location":"/jag.html"});
     res.end();
     return;
   }
@@ -188,7 +188,7 @@ setInterval(()=>{
 }, 3000);
 
 server.listen(PORT, ()=>{
-  console.log(`White Devil admin server`);
-  console.log(`Slot:  http://localhost:${PORT}/?machine=台1`);
+  console.log(`Rising JAG admin server`);
+  console.log(`Slot:  http://localhost:${PORT}/jag.html?machine=台1`);
   console.log(`Admin: http://localhost:${PORT}/admin.html`);
 });
