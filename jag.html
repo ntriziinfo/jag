@@ -5428,13 +5428,30 @@ body{
   pointer-events:none;
   transform:rotate(-8deg);
   opacity:.78;
+  isolation:isolate;
   filter:grayscale(.92) brightness(.42) contrast(1.18) drop-shadow(0 5px 5px rgba(0,0,0,.70));
   transition:filter .22s ease, opacity .22s ease, transform .22s ease;
+}
+.jagGogoChance::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:126%;
+  height:126%;
+  transform:translate(-50%,-50%);
+  z-index:0;
+  background:linear-gradient(180deg,#2b0758 0%,#140022 68%,#07000f 100%);
+  -webkit-mask:url("assets/ui/rising_gogo_chance.png") center / contain no-repeat;
+  mask:url("assets/ui/rising_gogo_chance.png") center / contain no-repeat;
+  opacity:.92;
+  filter:drop-shadow(0 7px 7px rgba(0,0,0,.86)) drop-shadow(0 0 10px rgba(41,0,91,.55));
 }
 .jagGogoChance::before{
   content:"";
   position:absolute;
   inset:21% 10% 12%;
+  z-index:1;
   border-radius:50%;
   background:radial-gradient(circle,rgba(255,220,36,.18),rgba(255,43,14,.10) 46%,transparent 72%);
   filter:blur(5px);
@@ -5444,7 +5461,7 @@ body{
   max-width:none;
   height:auto;
   position:relative;
-  z-index:1;
+  z-index:2;
 }
 .jagGogoChance span{
   position:absolute;
