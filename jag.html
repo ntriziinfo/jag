@@ -2951,11 +2951,11 @@ body::after{display:none !important;content:none !important;}
 }
 .reels{
   position:absolute !important;
-  left:12.7% !important;
-  right:12.7% !important;
-  top:27.8% !important;
-  bottom:21.4% !important;
-  gap:1.65% !important;
+  left:12.64% !important;
+  right:12.66% !important;
+  top:27.55% !important;
+  bottom:21.1% !important;
+  gap:1.25% !important;
   z-index:3 !important;
 }
 .reel{
@@ -2988,14 +2988,14 @@ body::after{display:none !important;content:none !important;}
 .playControls .betArea,
 .playControls .autoArea{
   position:absolute !important;
-  top:88.85% !important;
-  width:12.2% !important;
-  height:14.48% !important;
+  top:90.15% !important;
+  width:11.25% !important;
+  height:12.0% !important;
   transform:translate(-50%, -50%) !important;
   pointer-events:auto !important;
   z-index:82 !important;
 }
-.playControls .betArea{left:15.45% !important;}
+.playControls .betArea{left:10.75% !important;}
 .playControls .centerStopBtns{
   position:absolute !important;
   top:0 !important;
@@ -3007,7 +3007,7 @@ body::after{display:none !important;content:none !important;}
   pointer-events:none !important;
   z-index:82 !important;
 }
-.playControls .autoArea{left:84.55% !important;}
+.playControls .autoArea{left:89.25% !important;}
 .betBtn,
 .centerStopBtns button,
 .autoArea .autoInlineBtn,
@@ -3028,26 +3028,26 @@ body::after{display:none !important;content:none !important;}
 .centerStopBtns button{
   position:absolute !important;
   transform:translate(-50%, -50%) !important;
-  width:12.2% !important;
-  height:14.48% !important;
+  width:11.25% !important;
+  height:12.0% !important;
 }
 .centerStopBtns button:nth-child(1){
-  left:32.8% !important;
-  top:89.75% !important;
-  width:12.2% !important;
-  height:14.48% !important;
+  left:29.42% !important;
+  top:90.2% !important;
+  width:11.25% !important;
+  height:12.0% !important;
 }
 .centerStopBtns button:nth-child(2){
   left:50.0% !important;
-  top:89.65% !important;
-  width:12.2% !important;
-  height:14.48% !important;
+  top:90.2% !important;
+  width:11.25% !important;
+  height:12.0% !important;
 }
 .centerStopBtns button:nth-child(3){
-  left:67.1% !important;
-  top:89.75% !important;
-  width:12.2% !important;
-  height:14.48% !important;
+  left:70.58% !important;
+  top:90.2% !important;
+  width:11.25% !important;
+  height:12.0% !important;
 }
 .autoArea .autoInlineBtn{
   width:100% !important;
@@ -4978,12 +4978,12 @@ body{
 }
 .playControls .betArea,
 .playControls .autoArea{
-  top:96.0% !important;
+  top:90.15% !important;
 }
 .centerStopBtns button:nth-child(1),
 .centerStopBtns button:nth-child(2),
 .centerStopBtns button:nth-child(3){
-  top:96.0% !important;
+  top:90.2% !important;
 }
 .risingLowerCabinet{
   width:calc(var(--jag-cabinet-width) - 76px) !important;
@@ -5252,7 +5252,8 @@ body{
     linear-gradient(180deg,rgba(117,7,8,.76),rgba(16,0,4,.82) 55%,rgba(82,4,6,.78)) !important;
   background-blend-mode:screen,screen,normal,normal,normal;
 }
-.reelArea .wd-reel-data-panel{
+.reelArea .wd-reel-data-panel,
+.reelArea .wd-reel-counter-panel{
   display:none !important;
 }
 .risingReelBackplate::before{
@@ -5326,17 +5327,57 @@ body{
 .reelArea.jagChanceLit .jagGogoChance::before{
   background:radial-gradient(circle,rgba(255,251,150,.82),rgba(255,88,24,.46) 46%,transparent 74%);
 }
+.jagFrameLamps{
+  position:absolute;
+  right:3.5%;
+  top:31.5%;
+  width:8.5%;
+  z-index:46;
+  display:grid;
+  gap:8px;
+  pointer-events:none;
+}
+.jagFrameLamps span{
+  height:32px;
+  display:grid;
+  place-items:center;
+  border-radius:6px;
+  color:#ffe7b3;
+  font-size:12px;
+  font-weight:1000;
+  line-height:1;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.16),transparent 30%),
+    linear-gradient(180deg,#250005,#72000b 54%,#100003);
+  border:2px solid rgba(255,210,78,.86);
+  box-shadow:
+    inset 0 0 9px rgba(255,211,65,.24),
+    0 0 7px rgba(255,207,61,.20),
+    0 3px 4px rgba(0,0,0,.42);
+  text-shadow:0 0 7px rgba(255,240,190,.42),1px 1px 0 #210000;
+}
+.jagFrameLamps span:nth-child(2){
+  color:#64d8ff;
+  border-color:rgba(90,190,255,.92);
+}
+.jagFrameLamps span:nth-child(3){
+  color:#88ff80;
+  border-color:rgba(104,245,103,.88);
+}
+.jagFrameLamps span:nth-child(4){
+  color:#fff;
+}
 .jagPayoutMeters{
   position:absolute;
   left:50%;
-  top:79.2%;
-  width:41.2%;
-  height:6.9%;
+  top:76.9%;
+  width:56.6%;
+  height:7.2%;
   z-index:44;
   transform:translateX(-50%);
   display:grid;
   grid-template-columns:1fr 1.38fr 1fr;
-  gap:4.6%;
+  gap:3.8%;
   pointer-events:none;
 }
 .jagPayoutMeter{
@@ -5350,7 +5391,7 @@ body{
 .jagPayoutMeter::before{
   content:"";
   width:100%;
-  height:21px;
+  height:19px;
   display:block;
   grid-row:1;
   border-radius:5px;
@@ -5369,12 +5410,12 @@ body{
   top:4px;
   left:0;
   right:0;
-  height:21px;
+  height:19px;
   display:grid;
   place-items:center;
   color:#ff2434;
   font-family:"Courier New", monospace;
-  font-size:18px;
+  font-size:17px;
   font-weight:1000;
   line-height:1;
   letter-spacing:.03em;
@@ -5388,7 +5429,7 @@ body{
   grid-row:2;
   margin-top:2px;
   color:#ffd64d;
-  font-size:9px;
+  font-size:8.5px;
   font-weight:1000;
   line-height:1;
   letter-spacing:.04em;
@@ -5897,6 +5938,12 @@ body{
         <div class="jagGogoChance" id="jagGogoChance" aria-label="GOGO CHANCE">
           <img src="assets/ui/rising_gogo_chance.png" alt="RISING CHANCE" loading="eager" decoding="async" draggable="false">
           <span>CHANCE</span>
+        </div>
+        <div class="jagFrameLamps" aria-hidden="true">
+          <span>START</span>
+          <span>REPLAY</span>
+          <span>WAIT</span>
+          <span>INSERT</span>
         </div>
         <div class="jagPayoutMeters" aria-label="払い出し表示">
           <div class="jagPayoutMeter">
