@@ -9,7 +9,7 @@
 <link rel="preload" as="image" href="assets/symbols/sym_bell.png">
 <link rel="preload" as="image" href="assets/symbols/sym_suika.png">
 <link rel="preload" as="image" href="assets/symbols/sym_coin.webp">
-<link rel="preload" as="image" href="assets/symbols/sym_grape.webp">
+<link rel="preload" as="image" href="assets/symbols/sym_grape.png">
 <link rel="preload" as="image" href="assets/symbols/sym_seven.png">
 <link rel="preload" as="image" href="assets/symbols/sym_bar.png">
 <link rel="preload" as="image" href="assets/backgrounds/bg_rising_jag.png">
@@ -5441,11 +5441,12 @@ body{
   height:100%;
   transform:translate(-50%,-50%);
   z-index:0;
-  background:linear-gradient(180deg,#4a1189 0%,#220044 52%,#090010 100%);
+  background:
+    radial-gradient(circle at 42% 38%,rgba(110,48,168,.95),rgba(44,5,86,.96) 48%,rgba(7,0,18,.98) 100%);
   -webkit-mask:url("assets/ui/rising_gogo_chance.png") center / contain no-repeat;
   mask:url("assets/ui/rising_gogo_chance.png") center / contain no-repeat;
   opacity:1;
-  filter:drop-shadow(0 8px 8px rgba(0,0,0,.90)) drop-shadow(0 0 12px rgba(61,0,126,.72));
+  filter:drop-shadow(0 8px 8px rgba(0,0,0,.90)) drop-shadow(0 0 14px rgba(61,0,126,.78));
 }
 .jagGogoChance::before{
   content:"";
@@ -5462,8 +5463,9 @@ body{
   height:auto;
   position:relative;
   z-index:2;
+  opacity:.58;
   filter:grayscale(.92) brightness(.42) contrast(1.18) drop-shadow(0 5px 5px rgba(0,0,0,.70));
-  transition:filter .22s ease;
+  transition:filter .22s ease, opacity .22s ease;
 }
 .jagGogoChance span{
   position:absolute;
@@ -5490,6 +5492,7 @@ body{
   background:radial-gradient(circle,rgba(255,251,150,.82),rgba(255,88,24,.46) 46%,transparent 74%);
 }
 .reelArea.jagChanceLit .jagGogoChance img{
+  opacity:1;
   filter:saturate(1.24) brightness(1.15) contrast(1.08) drop-shadow(0 0 14px rgba(255,224,56,.88)) drop-shadow(0 0 28px rgba(255,60,24,.62));
 }
 .jagFrameLamps{
@@ -6794,11 +6797,11 @@ body{
           <div class="reel" data-reel="0"><div class="window">
             <div class="cell"><img class="symImg barSymImg" src="assets/symbols/sym_bar.png" alt="BAR symbol" loading="eager" decoding="sync" draggable="false"></div>
             <div class="cell center"><img class="symImg sevenSymImg" src="assets/symbols/sym_seven.png" alt="7 symbol" loading="eager" decoding="sync" draggable="false"></div>
-            <div class="cell"><img class="symImg grapeSymImg" src="assets/symbols/sym_grape.webp" alt="grape symbol" loading="eager" decoding="sync" draggable="false"></div>
+            <div class="cell"><img class="symImg grapeSymImg" src="assets/symbols/sym_grape.png" alt="grape symbol" loading="eager" decoding="sync" draggable="false"></div>
           </div></div>
           <div class="reel" data-reel="1"><div class="window">
             <div class="cell"><div class="sym">🐘</div></div>
-            <div class="cell center"><img class="symImg grapeSymImg" src="assets/symbols/sym_grape.webp" alt="grape symbol" loading="eager" decoding="sync" draggable="false"></div>
+            <div class="cell center"><img class="symImg grapeSymImg" src="assets/symbols/sym_grape.png" alt="grape symbol" loading="eager" decoding="sync" draggable="false"></div>
             <div class="cell"><div class="sym">🤡</div></div>
           </div></div>
           <div class="reel" data-reel="2"><div class="window">
@@ -7016,7 +7019,7 @@ body{
           <input id="bigAddInput" type="number" min="0" max="1000" step="1" value="252" readonly />
         </div>
         <div class="help">
-          BBは252pt、RBは96pt、ブドウは8pt、ゾウリプレイは3pt、ピエロ特殊役は15pt。
+          BBは252pt、RBは96pt、ブドウは8pt、ベルは15pt、ゾウリプレイは3pt、ピエロ特殊役は10pt。
         </div>
       </div>
 
@@ -7029,7 +7032,7 @@ body{
             <option value="MISS">ハズレ</option>
             <option value="REPLAY">リプレイ（3pt）</option>
             <option value="GRAPE">ブドウ（8pt）</option>
-            <option value="SMALL">特殊役（ピエロ/15pt）</option>
+            <option value="SMALL">特殊役（ピエロ/10pt）</option>
             <option value="MID">RB（77BAR/96pt）</option>
             <option value="MID_CHERRY">RBチェリー同時（77BAR/96pt）</option>
             <option value="BIG">BB（777/252pt）</option>
@@ -7200,13 +7203,14 @@ body{
   const A_TYPE_PAYOUTS = Object.freeze({
     BIG:252,
     MID:96,
-    SMALL:15,
+    SMALL:10,
     GRAPE:8,
+    BELL:15,
     REPLAY:3
   });
-  const A_TYPE_BONUS_PAY_PER_GAME = 15;
+  const A_TYPE_BONUS_PAY_PER_GAME = 10;
   const A_TYPE_BONUS_MAIN_RESULT = "SMALL";
-  const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID", "MID_CHERRY", "SMALL", "GRAPE", "REPLAY"]);
+  const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID", "MID_CHERRY", "SMALL", "GRAPE", "BELL", "REPLAY"]);
 
   const USER_FACE = "__USER_FACE__";
   const ELEPHANT_SYMBOL = "🐘";
@@ -7220,7 +7224,7 @@ body{
   const BELL_IMAGE_SRC = "assets/symbols/sym_bell.png";
   const SEVEN_IMAGE_SRC = "assets/symbols/sym_seven.png";
   const MISS_IMAGE_SRC = "assets/symbols/sym_coin.webp";
-  const GRAPE_IMAGE_SRC = "assets/symbols/sym_grape.webp";
+  const GRAPE_IMAGE_SRC = "assets/symbols/sym_grape.png";
   const BAR_IMAGE_SRC = "assets/symbols/sym_bar.png";
   const USER_FACE_SRC = "assets/symbols/sym_hourglass.png";
   const REPLAY_IMAGE_SRC = "assets/replay.png";
@@ -11698,7 +11702,7 @@ body{
     if($("stInfoViewLegacy")) $("stInfoViewLegacy").textContent = stInfoText;
     if($("adminStInfoView")) $("adminStInfoView").textContent = stInfoText;
     const payoutScaleText = A_TYPE_MODE
-      ? `Aタイプ:BB純増${A_TYPE_PAYOUTS.BIG}pt/RB純増${A_TYPE_PAYOUTS.MID}pt/ブドウ${A_TYPE_PAYOUTS.GRAPE}pt/ゾウリプレイ${A_TYPE_PAYOUTS.REPLAY}pt/ピエロ特殊役${A_TYPE_PAYOUTS.SMALL}pt`
+      ? `Aタイプ:BB純増${A_TYPE_PAYOUTS.BIG}pt/RB純増${A_TYPE_PAYOUTS.MID}pt/ブドウ${A_TYPE_PAYOUTS.GRAPE}pt/ベル${A_TYPE_PAYOUTS.BELL}pt/ゾウリプレイ${A_TYPE_PAYOUTS.REPLAY}pt/ピエロ特殊役${A_TYPE_PAYOUTS.SMALL}pt`
       : `通常:ベル${NORMAL_ROLE_PAYOUTS.BELL}pt/スイカ${NORMAL_ROLE_PAYOUTS.SUICA}pt/チェリー${NORMAL_ROLE_PAYOUTS.CHERRY_ANY}pt/リプレイ${NORMAL_ROLE_PAYOUTS.REPLAY}pt/REG${NORMAL_ROLE_PAYOUTS.MID}pt / 通常小役${Math.round(NORMAL_ROLE_RATE * 100)}% / 高確小役${Math.round(HIGH_ROLE_RATE * 100)}% / ATベル${ROLE_PAYOUTS.BELL}pt/斜めベル${ROLE_PAYOUTS.BELL3}pt / 平均継続${formatRate(averageContinuationRate(settings.setting))}`;
     if($("payoutScaleView")) $("payoutScaleView").textContent = payoutScaleText;
     if($("payoutScaleViewLegacy")) $("payoutScaleViewLegacy").textContent = payoutScaleText;
