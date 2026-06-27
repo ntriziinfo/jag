@@ -219,6 +219,16 @@
         "width": 968,
         "height": 482
       }
+    },
+    {
+      "file": "09_start_lever_ball_cutout.png",
+      "key": "start_lever_ball_cutout",
+      "label": "?????????????????",
+      "source_file": "assets/controls/start_lever_ball.png",
+      "size": {
+        "width": 220,
+        "height": 220
+      }
     }
   ]
 }
