@@ -434,14 +434,14 @@ h1{
 }
 body.layoutEditOpen .reels,
 body.layoutEditOpen .jagGogoChance,
-body.layoutEditOpen .jagPayoutMeters{
+body.layoutEditOpen .jagPayoutMeter{
   outline:2px dashed rgba(77,231,255,.88);
   outline-offset:3px;
 }
 body.layoutEditOpen .jagGogoChance{
   outline-color:rgba(255,211,106,.92);
 }
-body.layoutEditOpen .jagPayoutMeters{
+body.layoutEditOpen .jagPayoutMeter{
   outline-color:rgba(255,54,93,.92);
 }
 @media(max-width:640px){
@@ -6074,10 +6074,18 @@ body{
   --layout-chance-y:64.8%;
   --layout-chance-w:16.3%;
   --layout-chance-h:21.8%;
-  --layout-sevenseg-x:29.4%;
-  --layout-sevenseg-y:80.4%;
-  --layout-sevenseg-w:41.2%;
-  --layout-sevenseg-h:8.2%;
+  --layout-credit-x:29.4%;
+  --layout-credit-y:80.4%;
+  --layout-credit-w:11.8%;
+  --layout-credit-h:8.2%;
+  --layout-count-x:44.1%;
+  --layout-count-y:80.4%;
+  --layout-count-w:11.8%;
+  --layout-count-h:8.2%;
+  --layout-payout-x:58.8%;
+  --layout-payout-y:80.4%;
+  --layout-payout-w:11.8%;
+  --layout-payout-h:8.2%;
 }
 .machine{
   min-height:1670px !important;
@@ -6183,20 +6191,40 @@ body{
   z-index:18 !important;
 }
 .jagPayoutMeters{
-  left:var(--layout-sevenseg-x) !important;
-  top:var(--layout-sevenseg-y) !important;
-  width:var(--layout-sevenseg-w) !important;
-  height:var(--layout-sevenseg-h) !important;
+  left:0 !important;
+  top:0 !important;
+  width:100% !important;
+  height:100% !important;
   transform:none !important;
-  grid-template-columns:1fr 1fr 1fr !important;
-  gap:7.0% !important;
+  display:block !important;
+  gap:0 !important;
   opacity:.98 !important;
   z-index:44 !important;
 }
 .jagPayoutMeter{
+  position:absolute !important;
   display:grid !important;
   place-items:center !important;
   padding:0 !important;
+  container-type:size !important;
+}
+.jagPayoutMeterCredit{
+  left:var(--layout-credit-x) !important;
+  top:var(--layout-credit-y) !important;
+  width:var(--layout-credit-w) !important;
+  height:var(--layout-credit-h) !important;
+}
+.jagPayoutMeterCount{
+  left:var(--layout-count-x) !important;
+  top:var(--layout-count-y) !important;
+  width:var(--layout-count-w) !important;
+  height:var(--layout-count-h) !important;
+}
+.jagPayoutMeterPayout{
+  left:var(--layout-payout-x) !important;
+  top:var(--layout-payout-y) !important;
+  width:var(--layout-payout-w) !important;
+  height:var(--layout-payout-h) !important;
 }
 .jagPayoutMeter::before,
 .jagPayoutMeter::after,
@@ -6209,7 +6237,7 @@ body{
   height:auto !important;
   display:block !important;
   font-family:"DSEG7Classic","Courier New",monospace !important;
-  font-size:29px !important;
+  font-size:min(74cqh, 26cqw) !important;
   font-weight:400 !important;
   line-height:1 !important;
   letter-spacing:.00em !important;
@@ -6567,12 +6595,30 @@ body{
               </div>
             </div>
             <div class="layoutEditGroup">
-              <div class="layoutEditGroupTitle">7SEG</div>
+              <div class="layoutEditGroupTitle">7SEG CREDIT</div>
               <div class="layoutEditRows">
-                <label class="layoutEditRow"><span>X</span><input class="layoutEditInput" type="range" min="0" max="90" step="0.1" data-layout-target="sevenseg" data-layout-prop="x"><b class="layoutEditValue" data-layout-view="sevenseg-x"></b></label>
-                <label class="layoutEditRow"><span>Y</span><input class="layoutEditInput" type="range" min="0" max="95" step="0.1" data-layout-target="sevenseg" data-layout-prop="y"><b class="layoutEditValue" data-layout-view="sevenseg-y"></b></label>
-                <label class="layoutEditRow"><span>W</span><input class="layoutEditInput" type="range" min="12" max="75" step="0.1" data-layout-target="sevenseg" data-layout-prop="w"><b class="layoutEditValue" data-layout-view="sevenseg-w"></b></label>
-                <label class="layoutEditRow"><span>H</span><input class="layoutEditInput" type="range" min="3" max="24" step="0.1" data-layout-target="sevenseg" data-layout-prop="h"><b class="layoutEditValue" data-layout-view="sevenseg-h"></b></label>
+                <label class="layoutEditRow"><span>X</span><input class="layoutEditInput" type="range" min="0" max="95" step="0.1" data-layout-target="credit" data-layout-prop="x"><b class="layoutEditValue" data-layout-view="credit-x"></b></label>
+                <label class="layoutEditRow"><span>Y</span><input class="layoutEditInput" type="range" min="0" max="95" step="0.1" data-layout-target="credit" data-layout-prop="y"><b class="layoutEditValue" data-layout-view="credit-y"></b></label>
+                <label class="layoutEditRow"><span>W</span><input class="layoutEditInput" type="range" min="4" max="35" step="0.1" data-layout-target="credit" data-layout-prop="w"><b class="layoutEditValue" data-layout-view="credit-w"></b></label>
+                <label class="layoutEditRow"><span>H</span><input class="layoutEditInput" type="range" min="2" max="24" step="0.1" data-layout-target="credit" data-layout-prop="h"><b class="layoutEditValue" data-layout-view="credit-h"></b></label>
+              </div>
+            </div>
+            <div class="layoutEditGroup">
+              <div class="layoutEditGroupTitle">7SEG COUNT</div>
+              <div class="layoutEditRows">
+                <label class="layoutEditRow"><span>X</span><input class="layoutEditInput" type="range" min="0" max="95" step="0.1" data-layout-target="count" data-layout-prop="x"><b class="layoutEditValue" data-layout-view="count-x"></b></label>
+                <label class="layoutEditRow"><span>Y</span><input class="layoutEditInput" type="range" min="0" max="95" step="0.1" data-layout-target="count" data-layout-prop="y"><b class="layoutEditValue" data-layout-view="count-y"></b></label>
+                <label class="layoutEditRow"><span>W</span><input class="layoutEditInput" type="range" min="4" max="35" step="0.1" data-layout-target="count" data-layout-prop="w"><b class="layoutEditValue" data-layout-view="count-w"></b></label>
+                <label class="layoutEditRow"><span>H</span><input class="layoutEditInput" type="range" min="2" max="24" step="0.1" data-layout-target="count" data-layout-prop="h"><b class="layoutEditValue" data-layout-view="count-h"></b></label>
+              </div>
+            </div>
+            <div class="layoutEditGroup">
+              <div class="layoutEditGroupTitle">7SEG PAYOUT</div>
+              <div class="layoutEditRows">
+                <label class="layoutEditRow"><span>X</span><input class="layoutEditInput" type="range" min="0" max="95" step="0.1" data-layout-target="payout" data-layout-prop="x"><b class="layoutEditValue" data-layout-view="payout-x"></b></label>
+                <label class="layoutEditRow"><span>Y</span><input class="layoutEditInput" type="range" min="0" max="95" step="0.1" data-layout-target="payout" data-layout-prop="y"><b class="layoutEditValue" data-layout-view="payout-y"></b></label>
+                <label class="layoutEditRow"><span>W</span><input class="layoutEditInput" type="range" min="4" max="35" step="0.1" data-layout-target="payout" data-layout-prop="w"><b class="layoutEditValue" data-layout-view="payout-w"></b></label>
+                <label class="layoutEditRow"><span>H</span><input class="layoutEditInput" type="range" min="2" max="24" step="0.1" data-layout-target="payout" data-layout-prop="h"><b class="layoutEditValue" data-layout-view="payout-h"></b></label>
               </div>
             </div>
           </div>
@@ -6753,15 +6799,15 @@ body{
           <span>INSERT</span>
         </div>
         <div class="jagPayoutMeters" aria-label="払い出し表示">
-          <div class="jagPayoutMeter">
+          <div class="jagPayoutMeter jagPayoutMeterCredit">
             <b id="jagCreditMeter">50</b>
             <span>CREDIT</span>
           </div>
-          <div class="jagPayoutMeter">
+          <div class="jagPayoutMeter jagPayoutMeterCount">
             <b id="jagCountMeter">0</b>
             <span>COUNT</span>
           </div>
-          <div class="jagPayoutMeter">
+          <div class="jagPayoutMeter jagPayoutMeterPayout">
             <b id="jagGamePayoutMeter">0</b>
             <span>PAYOUT</span>
           </div>
@@ -7703,7 +7749,9 @@ body{
   const LAYOUT_DEFAULTS = Object.freeze({
     reels:{x:20.7, y:24.9, w:57.6, h:50.0},
     chance:{x:6.1, y:64.8, w:16.3, h:21.8},
-    sevenseg:{x:29.4, y:80.4, w:41.2, h:8.2}
+    credit:{x:29.4, y:80.4, w:11.8, h:8.2},
+    count:{x:44.1, y:80.4, w:11.8, h:8.2},
+    payout:{x:58.8, y:80.4, w:11.8, h:8.2}
   });
   let pageZoom = 1;
   let pagePanX = 0;
@@ -7937,8 +7985,32 @@ body{
     );
   }
 
+  function migrateLegacySevenSegState(raw){
+    if(!raw || typeof raw !== "object" || !raw.sevenseg || typeof raw.sevenseg !== "object") return raw;
+    const next = {...raw};
+    const legacy = raw.sevenseg;
+    const legacyX = Number(legacy.x);
+    const legacyY = Number(legacy.y);
+    const legacyW = Number(legacy.w);
+    const legacyH = Number(legacy.h);
+    if(!Number.isFinite(legacyX) || !Number.isFinite(legacyY) || !Number.isFinite(legacyW) || !Number.isFinite(legacyH)) return next;
+    const gap = legacyW * 0.07;
+    const meterW = Math.max(4, (legacyW - gap * 2) / 3);
+    const makeMeter = index => ({
+      x:legacyX + (meterW + gap) * index,
+      y:legacyY,
+      w:meterW,
+      h:legacyH
+    });
+    if(!next.credit) next.credit = makeMeter(0);
+    if(!next.count) next.count = makeMeter(1);
+    if(!next.payout) next.payout = makeMeter(2);
+    return next;
+  }
+
   function normalizeLayoutState(raw){
     const next = cloneLayoutDefaults();
+    raw = migrateLegacySevenSegState(raw);
     if(!raw || typeof raw !== "object") return next;
     Object.keys(next).forEach(target=>{
       if(!raw[target] || typeof raw[target] !== "object") return;
