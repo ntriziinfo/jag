@@ -6226,16 +6226,44 @@ body{
   width:var(--layout-payout-w) !important;
   height:var(--layout-payout-h) !important;
 }
-.jagPayoutMeter::before,
-.jagPayoutMeter::after,
 .jagPayoutMeter span{
   display:none !important;
+}
+.jagPayoutMeter::before{
+  content:"";
+  position:absolute !important;
+  inset:10% 3% 12% !important;
+  z-index:0 !important;
+  display:block !important;
+  border-radius:8px !important;
+  background:
+    radial-gradient(circle at 50% 42%,rgba(88,0,0,.20),transparent 58%),
+    linear-gradient(180deg,#080000 0%,#020001 58%,#110004 100%) !important;
+  border:1px solid rgba(255,205,70,.42) !important;
+  box-shadow:
+    inset 0 0 0 2px rgba(0,0,0,.76),
+    inset 0 0 18px rgba(255,0,0,.08),
+    0 0 6px rgba(0,0,0,.62) !important;
+}
+.jagPayoutMeter::after{
+  content:"";
+  position:absolute !important;
+  left:9% !important;
+  right:9% !important;
+  top:18% !important;
+  z-index:1 !important;
+  display:block !important;
+  height:1px !important;
+  background:linear-gradient(90deg,transparent,rgba(255,230,94,.20),transparent) !important;
 }
 .jagPayoutMeter b{
   position:relative !important;
   inset:auto !important;
-  height:auto !important;
-  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  z-index:2 !important;
+  display:grid !important;
+  place-items:center !important;
   font-family:"DSEG7Classic","Courier New",monospace !important;
   font-size:min(74cqh, 26cqw) !important;
   font-weight:400 !important;
@@ -6246,6 +6274,18 @@ body{
     0 0 5px rgba(255,0,16,.90),
     0 0 13px rgba(255,0,16,.48),
     1px 1px 0 #220000 !important;
+}
+.jagPayoutMeter b::before{
+  content:"888";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  display:grid;
+  place-items:center;
+  color:rgba(255,28,35,.16);
+  text-shadow:
+    0 0 3px rgba(255,0,20,.24),
+    0 0 10px rgba(255,0,20,.16);
 }
 .jagGogoChance{
   left:var(--layout-chance-x) !important;
