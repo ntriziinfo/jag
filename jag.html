@@ -436,7 +436,8 @@ h1{
 }
 body.layoutEditOpen .reels,
 body.layoutEditOpen .jagGogoChance,
-body.layoutEditOpen .jagPayoutMeter{
+body.layoutEditOpen .jagPayoutMeter,
+body.layoutEditOpen .jagBonusDataMeters{
   outline:2px dashed rgba(77,231,255,.88);
   outline-offset:3px;
 }
@@ -445,6 +446,9 @@ body.layoutEditOpen .jagGogoChance{
 }
 body.layoutEditOpen .jagPayoutMeter{
   outline-color:rgba(255,54,93,.92);
+}
+body.layoutEditOpen .jagBonusDataMeters{
+  outline-color:rgba(170,111,255,.94);
 }
 @media(max-width:640px){
   .pageZoomControls{
@@ -6109,6 +6113,10 @@ body{
   --layout-payout-y:80.4%;
   --layout-payout-w:11.8%;
   --layout-payout-h:8.2%;
+  --layout-bonusdata-x:21.4%;
+  --layout-bonusdata-y:9.2%;
+  --layout-bonusdata-w:57.2%;
+  --layout-bonusdata-h:9.6%;
 }
 .machine{
   min-height:1670px !important;
@@ -6189,10 +6197,10 @@ body{
 }
 .jagBonusDataMeters{
   position:absolute;
-  left:21.4%;
-  top:9.2%;
-  width:57.2%;
-  height:9.6%;
+  left:var(--layout-bonusdata-x);
+  top:var(--layout-bonusdata-y);
+  width:var(--layout-bonusdata-w);
+  height:var(--layout-bonusdata-h);
   z-index:47;
   display:grid;
   grid-template-columns:1.2fr 1.2fr .82fr .82fr;
@@ -6765,6 +6773,15 @@ body{
                 <label class="layoutEditRow"><span>Y</span><input class="layoutEditInput" type="range" min="0" max="95" step="0.1" data-layout-target="payout" data-layout-prop="y"><b class="layoutEditValue" data-layout-view="payout-y"></b></label>
                 <label class="layoutEditRow"><span>W</span><input class="layoutEditInput" type="range" min="4" max="35" step="0.1" data-layout-target="payout" data-layout-prop="w"><b class="layoutEditValue" data-layout-view="payout-w"></b></label>
                 <label class="layoutEditRow"><span>H</span><input class="layoutEditInput" type="range" min="2" max="24" step="0.1" data-layout-target="payout" data-layout-prop="h"><b class="layoutEditValue" data-layout-view="payout-h"></b></label>
+              </div>
+            </div>
+            <div class="layoutEditGroup">
+              <div class="layoutEditGroupTitle">BONUS DATA</div>
+              <div class="layoutEditRows">
+                <label class="layoutEditRow"><span>X</span><input class="layoutEditInput" type="range" min="0" max="95" step="0.1" data-layout-target="bonusdata" data-layout-prop="x"><b class="layoutEditValue" data-layout-view="bonusdata-x"></b></label>
+                <label class="layoutEditRow"><span>Y</span><input class="layoutEditInput" type="range" min="0" max="40" step="0.1" data-layout-target="bonusdata" data-layout-prop="y"><b class="layoutEditValue" data-layout-view="bonusdata-y"></b></label>
+                <label class="layoutEditRow"><span>W</span><input class="layoutEditInput" type="range" min="20" max="95" step="0.1" data-layout-target="bonusdata" data-layout-prop="w"><b class="layoutEditValue" data-layout-view="bonusdata-w"></b></label>
+                <label class="layoutEditRow"><span>H</span><input class="layoutEditInput" type="range" min="4" max="24" step="0.1" data-layout-target="bonusdata" data-layout-prop="h"><b class="layoutEditValue" data-layout-view="bonusdata-h"></b></label>
               </div>
             </div>
           </div>
@@ -7951,7 +7968,8 @@ body{
     chance:{x:6.1, y:64.8, w:16.3, h:21.8},
     credit:{x:29.4, y:80.4, w:11.8, h:8.2},
     count:{x:44.1, y:80.4, w:11.8, h:8.2},
-    payout:{x:58.8, y:80.4, w:11.8, h:8.2}
+    payout:{x:58.8, y:80.4, w:11.8, h:8.2},
+    bonusdata:{x:21.4, y:9.2, w:57.2, h:9.6}
   });
   let pageZoom = 1;
   let pagePanX = 0;
