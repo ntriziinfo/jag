@@ -12208,6 +12208,8 @@ body{
             ? `<img class="symImg bellSymImg" src="${BELL_IMAGE_SRC}" alt="bell symbol" loading="eager" decoding="sync" draggable="false">`
             : (symbol === PIERROT_SYMBOL)
               ? `<img class="symImg pieroSymImg" src="${PIERROT_IMAGE_SRC}" alt="piero symbol" loading="eager" decoding="sync" draggable="false">`
+              : (symbol === ELEPHANT_SYMBOL)
+                ? `<img class="symImg replaySymImg" src="${REPLAY_IMAGE_SRC}" alt="replay elephant symbol" loading="eager" decoding="sync" draggable="false">`
             : (symbol === BLANK_SYMBOL)
               ? `<div class="sym blankSym" aria-label="blank"></div>`
               : (symbol === "REPLAY")
