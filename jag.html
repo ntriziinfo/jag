@@ -12524,21 +12524,39 @@ body{
     if(rowMatches(RESULT.REPLAY.reel)) return "REPLAY";
     if(rowMatches(RESULT.GRAPE.reel)) return "GRAPE";
     if(rowMatches(RESULT.SUICA.reel)) return "SUICA";
-    if(rowMatches(RESULT.CHERRY_TRIPLE.reel)) return "CHERRY_TRIPLE";
-    if(rows.some(row => row[0] === CHERRY_SYMBOL && row[1] === CHERRY_SYMBOL && row[2] !== CHERRY_SYMBOL)) return "CHERRY_DOUBLE";
+    const cherryResult = cherryResultFromRows(rows);
+    if(cherryResult) return cherryResult;
     return "MISS";
+  }
+
+  function cherryResultFromRow(row){
+    if(!Array.isArray(row) || row[0] !== CHERRY_SYMBOL) return "";
+    if(row[1] === CHERRY_SYMBOL && row[2] === CHERRY_SYMBOL) return "CHERRY_TRIPLE";
+    if(row[1] === CHERRY_SYMBOL) return "CHERRY_DOUBLE";
+    return "CHERRY_ANY";
+  }
+
+  function cherryResultFromRows(rows){
+    let best = "";
+    for(const row of rows){
+      const result = cherryResultFromRow(row);
+      if(result === "CHERRY_TRIPLE") return result;
+      if(result === "CHERRY_DOUBLE") best = "CHERRY_DOUBLE";
+      else if(result === "CHERRY_ANY" && !best) best = "CHERRY_ANY";
+    }
+    return best;
   }
 
   function displayedResultFromRow(row){
     if(!Array.isArray(row) || row.length < 3) return "MISS";
-    const cherry = RESULT.CHERRY_TRIPLE.reel[0];
     const exactResults = ["BIG","MID","BAR3","SMALL","BELL","REPLAY","GRAPE","SUICA","CHERRY_TRIPLE"];
 
     for(const result of exactResults){
       const reel = RESULT[result].reel;
       if(row[0] === reel[0] && row[1] === reel[1] && row[2] === reel[2]) return result;
     }
-    if(row[0] === cherry && row[1] === cherry && row[2] !== cherry) return "CHERRY_DOUBLE";
+    const cherryResult = cherryResultFromRow(row);
+    if(cherryResult) return cherryResult;
     return "MISS";
   }
 
