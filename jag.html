@@ -6148,6 +6148,104 @@ body{
 .cabinetPartReelBack{top:466px;}
 .cabinetPartControls{top:944px;}
 .cabinetPartLower{top:1129px;}
+.cabinetTopSevenOverlay{
+  position:absolute;
+  left:18.8%;
+  top:229px;
+  width:62.4%;
+  height:126px;
+  z-index:6;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:1.3%;
+  padding:8px 12px 6px;
+  box-sizing:border-box;
+  pointer-events:none;
+}
+.cabinetTopSevenOverlay::before{
+  content:"";
+  position:absolute;
+  inset:5px 3px 2px;
+  z-index:-1;
+  border-radius:14px;
+  background:
+    radial-gradient(ellipse at 50% 35%,rgba(255,70,26,.30),transparent 62%),
+    linear-gradient(180deg,rgba(124,0,11,.98),rgba(39,0,4,.98));
+  border:2px solid rgba(255,206,54,.55);
+  box-shadow:
+    inset 0 0 0 2px rgba(22,0,0,.62),
+    inset 0 0 24px rgba(255,207,52,.18),
+    0 4px 12px rgba(0,0,0,.38);
+}
+.cabinetTopSevenOverlay img{
+  width:32%;
+  height:100%;
+  object-fit:contain;
+  transform:scale(1.18);
+  filter:
+    drop-shadow(0 4px 3px rgba(0,0,0,.76))
+    drop-shadow(0 0 8px rgba(255,222,70,.70));
+}
+.jagBonusDataMeters{
+  position:absolute;
+  left:21.4%;
+  top:9.2%;
+  width:57.2%;
+  height:9.6%;
+  z-index:47;
+  display:grid;
+  grid-template-columns:1.2fr 1.2fr .82fr .82fr;
+  gap:7px;
+  padding:5px 8px;
+  box-sizing:border-box;
+  border-radius:999px;
+  pointer-events:none;
+  background:
+    linear-gradient(180deg,rgba(22,0,6,.98),rgba(67,0,10,.98) 48%,rgba(16,0,4,.99)),
+    radial-gradient(ellipse at 50% 18%,rgba(255,58,42,.22),transparent 68%);
+  border:2px solid rgba(255,204,58,.88);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.12),
+    inset 0 0 14px rgba(255,198,48,.20),
+    0 3px 8px rgba(0,0,0,.42);
+}
+.jagBonusDataMeter{
+  min-width:0;
+  display:grid;
+  grid-template-rows:12px 1fr;
+  align-items:center;
+}
+.jagBonusDataMeter span{
+  overflow:hidden;
+  color:#ffe279;
+  font-size:10px;
+  font-weight:1000;
+  line-height:1;
+  text-align:center;
+  white-space:nowrap;
+  text-shadow:1px 1px 0 #360000,0 0 5px rgba(255,218,84,.56);
+}
+.jagBonusDataMeter b{
+  min-width:0;
+  display:block;
+  overflow:hidden;
+  color:#ff1d28;
+  font-family:"DSEG7Classic","Courier New",monospace;
+  font-size:22px;
+  font-weight:400;
+  line-height:1;
+  letter-spacing:0;
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+  text-shadow:
+    0 0 5px rgba(255,0,16,.92),
+    0 0 12px rgba(255,0,16,.46),
+    1px 1px 0 #220000;
+}
+.jagBonusDataMeter:nth-child(n+3) b{
+  font-size:23px;
+}
 .cabinetFrontParts{
   position:absolute;
   inset:0;
@@ -6543,6 +6641,11 @@ body{
       <div class="jagCabinetShell" aria-hidden="true">
         <div class="cabinetPartsScene" aria-hidden="true">
           <img class="cabinetPart cabinetPartTop" src="assets/cabinet/parts/rising_part_top.png" alt="">
+          <div class="cabinetTopSevenOverlay" aria-hidden="true">
+            <img src="assets/symbols/sym_seven.png" alt="">
+            <img src="assets/symbols/sym_seven.png" alt="">
+            <img src="assets/symbols/sym_seven.png" alt="">
+          </div>
           <img class="cabinetPart cabinetPartReelBack" src="assets/cabinet/parts/rising_part_reel_back_roles.png" alt="">
           <img class="cabinetPart cabinetPartControls" src="assets/cabinet/parts/rising_part_controls.png" alt="">
           <img class="cabinetPart cabinetPartLower" src="assets/cabinet/parts/rising_part_lower.png" alt="">
@@ -6830,6 +6933,24 @@ body{
         </div>
         <div class="cabinetFrontParts" aria-hidden="true">
           <img class="cabinetPart cabinetPartReelFront" src="assets/cabinet/parts/rising_part_reel_front_roles.png" alt="">
+        </div>
+        <div class="jagBonusDataMeters" aria-label="BONUS GAME DATA">
+          <div class="jagBonusDataMeter">
+            <span>総回転</span>
+            <b id="jagTotalGameDataMeter">00000</b>
+          </div>
+          <div class="jagBonusDataMeter">
+            <span>ボーナス後</span>
+            <b id="jagAfterBonusDataMeter">0000</b>
+          </div>
+          <div class="jagBonusDataMeter">
+            <span>BIG</span>
+            <b id="jagBigDataMeter">000</b>
+          </div>
+          <div class="jagBonusDataMeter">
+            <span>REG</span>
+            <b id="jagRegDataMeter">000</b>
+          </div>
         </div>
         <div class="jagGogoChance" id="jagGogoChance" aria-label="GOGO CHANCE">
           <span class="jagGogoChanceBack" aria-hidden="true"></span>
@@ -11925,6 +12046,10 @@ body{
       const raw = Math.round(Number(value) || 0);
       return `${raw < 0 ? "-" : ""}${formatMeterDigits(raw, 4, 9999)}`;
     };
+    setText("jagTotalGameDataMeter", formatMeterDigits(stats.totalSpins, 5, 99999));
+    setText("jagAfterBonusDataMeter", formatMeterDigits(normalState.sinceBonus, 4, 9999));
+    setText("jagBigDataMeter", formatMeterDigits(stats.bigCount, 3, 999));
+    setText("jagRegDataMeter", formatMeterDigits(stats.midCount, 3, 999));
     const stLampOn = !!($("stLamp") && $("stLamp").classList.contains("on"));
     const jagChanceLit = !!(active || normalState.bonusPending || jagChanceHold || stLampOn || bonusConfirmBgmHold);
     if(reelArea) reelArea.classList.toggle("jagChanceLit", jagChanceLit);
