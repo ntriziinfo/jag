@@ -7038,7 +7038,7 @@ body{
           <input id="bigAddInput" type="number" min="0" max="1000" step="1" value="252" readonly />
         </div>
         <div class="help">
-          BBは252pt、RBは96pt、ブドウは8pt、ベルは15pt、ゾウリプレイは3pt、ピエロ特殊役は10pt。
+          BBは252pt、RBは96pt、ブドウは8pt、ベルは10pt、ゾウリプレイは3pt、ピエロ特殊役は14pt、チェリーは中段1pt・上下段2pt。
         </div>
       </div>
 
@@ -7051,7 +7051,8 @@ body{
             <option value="MISS">ハズレ</option>
             <option value="REPLAY">リプレイ（3pt）</option>
             <option value="GRAPE">ブドウ（8pt）</option>
-            <option value="SMALL">特殊役（ピエロ/10pt）</option>
+            <option value="SMALL">特殊役（ピエロ/14pt）</option>
+            <option value="CHERRY_ANY">チェリー（中段1pt・上下段2pt）</option>
             <option value="MID">RB（77BAR/96pt）</option>
             <option value="MID_CHERRY">RBチェリー同時（77BAR/96pt）</option>
             <option value="BIG">BB（777/252pt）</option>
@@ -7061,7 +7062,7 @@ body{
           <button class="subBtn" id="applyForceBtn">次回だけ適用</button>
           <button class="ghostBtn" id="clearForceBtn">解除</button>
         </div>
-        <div class="field" style="margin-top:12px">
+        <div class="field" style="margin-top:12px;display:none">
           <label>プレミア演出強制フラグ</label>
           <div class="row">
             <button class="subBtn" id="forcePremiumBtn">次回プレミア演出</button>
@@ -7160,6 +7161,12 @@ body{
 
   const AT_BGM_SRC = "";
   const BAR_BGM_SRC = "";
+  const BIG_BONUS_BGM_SRCS = Object.freeze([
+    "assets/media/jag/big_1.wav",
+    "assets/media/jag/big_2.wav"
+  ]);
+  const BIG_50G_BONUS_BGM_SRC = "assets/media/jag/big_50g.wav";
+  const REG_BONUS_BGM_SRC = "assets/media/jag/reg_bonus.wav";
 
   const BIG_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
 
@@ -7228,14 +7235,14 @@ body{
   const A_TYPE_PAYOUTS = Object.freeze({
     BIG:252,
     MID:96,
-    SMALL:10,
+    SMALL:14,
     GRAPE:8,
-    BELL:15,
+    BELL:10,
     REPLAY:3
   });
-  const A_TYPE_BONUS_PAY_PER_GAME = 10;
+  const A_TYPE_BONUS_PAY_PER_GAME = A_TYPE_PAYOUTS.SMALL;
   const A_TYPE_BONUS_MAIN_RESULT = "SMALL";
-  const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID", "MID_CHERRY", "SMALL", "GRAPE", "BELL", "REPLAY"]);
+  const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID", "MID_CHERRY", "SMALL", "GRAPE", "BELL", "REPLAY", "CHERRY_ANY", "CHERRY_DOUBLE", "CHERRY_TRIPLE", "BAR3"]);
 
   const USER_FACE = "__USER_FACE__";
   const ELEPHANT_SYMBOL = "🐘";
@@ -7432,6 +7439,7 @@ body{
     phase:"idle",
     bonusKind:"",
     bonusTarget:0,
+    bonusBgmSrc:"",
     battleRemain:0,
     battleWin:false,
     battleSource:"",
@@ -7453,13 +7461,13 @@ body{
   const BONUS_ANNOUNCE_EARLY_TIMINGS = Object.freeze(["lever", "stop1", "stop2"]);
   const PAYOUT_BASE = 100;
   const ROLE_PAYOUTS = Object.freeze({
-    SMALL:15,
+    SMALL:14,
     MID:15,
     BAR3:0,
     BIG:15,
     DEVIL_ZONE:15,
     SUPER_DEVIL_ZONE:15,
-    BELL:15,
+    BELL:10,
     BELL3:3,
     REPLAY:3,
     SUICA:3,
@@ -7471,7 +7479,7 @@ body{
     BIG:0,
     MID:50,
     BAR3:0,
-    BELL:8,
+    BELL:10,
     REPLAY:3,
     SUICA:3,
     CHERRY_ANY:3,
@@ -8992,6 +9000,7 @@ body{
   }
 
   function decideZakoEffect(result, resolved, normalActiveAtStart){
+    if(A_TYPE_MODE) return {active:false, bell:false, add:false};
     if(normalActiveAtStart || result === "BELL3") return {active:false, bell:false, add:false};
     const bell = result === "BELL";
     const addChance = resolved && resolved.zoneGame ? ZAKO_ZONE_ADD_EFFECT_CHANCE : ZAKO_ADD_EFFECT_CHANCE;
@@ -9020,6 +9029,7 @@ body{
   }
 
   function shouldPlaySpeedModeBonusRogi(result, resolved){
+    if(A_TYPE_MODE) return false;
     if(!resolved) return result === "BIG" || result === "MID";
     if(result === "BIG" || result === "MID") return true;
     if(resolved.bonusReady || resolved.regReady) return true;
@@ -9040,6 +9050,7 @@ body{
   }
 
   function decideBigPremiumEffect(result, resolved, premiumForced=false){
+    if(A_TYPE_MODE) return false;
     if(!isBigPremiumEffectEligible(result, resolved)) return false;
     return !!premiumForced || Math.random() < GEKIATSU_CHANCE_ON_BIG;
   }
@@ -9056,6 +9067,7 @@ body{
   }
 
   function decideRogiStopEffectMax(spin=currentSpin){
+    if(A_TYPE_MODE) return 0;
     if(!isRogiHighZoneSpin(spin)) return 0;
     const table = isRogiHitSpin(spin) ? ROGI_STOP_EFFECT_CHANCES.hit : ROGI_STOP_EFFECT_CHANCES.miss;
     const reach3 = clampChance(table[3]);
@@ -9219,8 +9231,17 @@ body{
     return ROLE_PAYOUTS[result] || 0;
   }
 
-  function normalRewardFor(result){
-    if(A_TYPE_MODE && (result === "BIG" || result === "MID" || result === "MID_CHERRY")) return 0;
+  function isCherryResult(result){
+    return result === "CHERRY_ANY" || result === "CHERRY_DOUBLE" || result === "CHERRY_TRIPLE" || result === "MID_CHERRY";
+  }
+
+  function aTypeCherryPayoutForLine(lineRow=1){
+    return lineRow === 1 ? 1 : 2;
+  }
+
+  function normalRewardFor(result, lineRow=1){
+    if(A_TYPE_MODE && (result === "BIG" || result === "MID")) return 0;
+    if(A_TYPE_MODE && isCherryResult(result)) return aTypeCherryPayoutForLine(lineRow);
     if(A_TYPE_MODE && A_TYPE_PAYOUTS[result]) return A_TYPE_PAYOUTS[result];
     return NORMAL_ROLE_PAYOUTS[result] || 0;
   }
@@ -10287,11 +10308,12 @@ body{
     return "MISS";
   }
 
-  function resolveNormalOutcome(result){
+  function resolveNormalOutcome(result, lineRow=1){
     if(A_TYPE_MODE){
       const isBig = result === "BIG";
       const isReg = result === "MID" || result === "MID_CHERRY";
       const isBonus = isBig || isReg;
+      const gamesSinceLastBonusAtStart = Math.max(0, Number(normalState.sinceBonus) || 0);
       const bonusSource = result === "MID_CHERRY"
         ? "チェリー同時当選"
         : isBonus
@@ -10299,7 +10321,7 @@ body{
           : "";
       return {
         normalGame:true,
-        reward:normalRewardFor(result),
+        reward:normalRewardFor(result, lineRow),
         add:0,
         sets:0,
         bigZone:0,
@@ -10312,7 +10334,8 @@ body{
         bonusWaitSpin:false,
         bonusWaitGamesAtStart:0,
         highAdd:0,
-        ceilingAfter:isBonus ? 0 : clamp((Number(normalState.sinceBonus) || 0) + 1, 0, NORMAL_CEILING_GAMES),
+        ceilingAfter:isBonus ? 0 : clamp(gamesSinceLastBonusAtStart + 1, 0, NORMAL_CEILING_GAMES),
+        gamesSinceLastBonusAtStart,
         bonusHit:false,
         bonusReady:isBig,
         regReady:isReg,
@@ -10618,11 +10641,11 @@ body{
     settings.fee = PAYOUT_BASE;
     settings.stSpins = clamp(Number($("stSpinsInput").value) || 10, 1, 100);
     settings.oddsMultiplier = clamp(Number($("oddsMultiplierInput").value) || 1, 0.1, 100);
-    settings.smallMul = ROLE_PAYOUTS.SMALL / PAYOUT_BASE;
+    settings.smallMul = (A_TYPE_MODE ? A_TYPE_PAYOUTS.SMALL : ROLE_PAYOUTS.SMALL) / PAYOUT_BASE;
     settings.midMul = (A_TYPE_MODE ? A_TYPE_PAYOUTS.MID : ROLE_PAYOUTS.MID) / PAYOUT_BASE;
     settings.crownMul = 0.0;
-    settings.cherryMul = ROLE_PAYOUTS.CHERRY_ANY / PAYOUT_BASE;
-    settings.bellMul = ROLE_PAYOUTS.BELL / PAYOUT_BASE;
+    settings.cherryMul = (A_TYPE_MODE ? 2 : ROLE_PAYOUTS.CHERRY_ANY) / PAYOUT_BASE;
+    settings.bellMul = (A_TYPE_MODE ? A_TYPE_PAYOUTS.BELL : ROLE_PAYOUTS.BELL) / PAYOUT_BASE;
     settings.suikaMul = ROLE_PAYOUTS.SUICA / PAYOUT_BASE;
     settings.bigMul = (A_TYPE_MODE ? A_TYPE_PAYOUTS.BIG : ROLE_PAYOUTS.BIG) / PAYOUT_BASE;
     settings.bigAdd = A_TYPE_MODE ? A_TYPE_PAYOUTS.BIG : 5;
@@ -10708,11 +10731,11 @@ body{
     $("stSpinsInput").value = A_TYPE_MODE ? 1 : settings.stSpins;
     $("stSpinsInput").readOnly = !!A_TYPE_MODE;
     $("oddsMultiplierInput").value = settings.oddsMultiplier;
-    if($("smallMulInput")) $("smallMulInput").value = ROLE_PAYOUTS.SMALL / PAYOUT_BASE;
+    if($("smallMulInput")) $("smallMulInput").value = (A_TYPE_MODE ? A_TYPE_PAYOUTS.SMALL : ROLE_PAYOUTS.SMALL) / PAYOUT_BASE;
     if($("midMulInput")) $("midMulInput").value = A_TYPE_MODE ? A_TYPE_PAYOUTS.MID : ROLE_PAYOUTS.MID / PAYOUT_BASE;
     if($("crownMulInput")) $("crownMulInput").value = 0;
-    if($("cherryMulInput")) $("cherryMulInput").value = ROLE_PAYOUTS.CHERRY_ANY / PAYOUT_BASE;
-    if($("bellMulInput")) $("bellMulInput").value = ROLE_PAYOUTS.BELL / PAYOUT_BASE;
+    if($("cherryMulInput")) $("cherryMulInput").value = (A_TYPE_MODE ? 2 : ROLE_PAYOUTS.CHERRY_ANY) / PAYOUT_BASE;
+    if($("bellMulInput")) $("bellMulInput").value = (A_TYPE_MODE ? A_TYPE_PAYOUTS.BELL : ROLE_PAYOUTS.BELL) / PAYOUT_BASE;
     if($("suikaMulInput")) $("suikaMulInput").value = ROLE_PAYOUTS.SUICA / PAYOUT_BASE;
     if($("bigMulInput")) $("bigMulInput").value = A_TYPE_MODE ? A_TYPE_PAYOUTS.BIG : ROLE_PAYOUTS.BIG / PAYOUT_BASE;
     if($("bigAddInput")) $("bigAddInput").value = A_TYPE_MODE ? A_TYPE_PAYOUTS.BIG : 5;
@@ -10753,6 +10776,12 @@ body{
         const bonusKind = normalizeATypeBonusKind(options.bonusKind || normalState.bonusKind || "BIG");
         const bonusTarget = aTypeBonusTarget(bonusKind);
         const bonusLabel = aTypeBonusLabel(bonusKind);
+        const hadPreviousBonus = (Number(stats.totalSessions) || 0) > 0;
+        const gamesSinceLastBonus = Math.max(0, Number.isFinite(Number(options.gamesSinceLastBonus))
+          ? Number(options.gamesSinceLastBonus)
+          : Number(normalState.sinceBonus) || 0);
+        const within50 = hadPreviousBonus && gamesSinceLastBonus <= 50;
+        const bonusBgm = pickATypeBonusBgm(bonusKind, within50);
         resetNormalModeAfterBonus();
         pauseNormalBgm();
         session = {
@@ -10775,6 +10804,7 @@ body{
           phase:"a_type_bonus",
           bonusKind,
           bonusTarget,
+          bonusBgmSrc:bonusBgm.src || "",
           battleRemain:0,
           battleWin:false,
           battleSource:"",
@@ -10788,9 +10818,9 @@ body{
         recordSlumpPoint();
         $("spinBtn").textContent = "BET";
         showMessage(`${bonusLabel} BONUS`, `純増${bonusTarget}ptまで小役入賞`);
-        log(`${bonusLabel} BONUS開始：純増${bonusTarget}ptまで小役入賞 / 設定${settings.setting}`);
+        log(`${bonusLabel} BONUS開始：純増${bonusTarget}ptまで小役入賞 / 設定${settings.setting}${within50 ? " / 50G以内" : ""}`);
         updateDisplay();
-        playWinSound(false);
+        playATypeBonusBgm(bonusBgm);
         return true;
       }
       const premiumStockSets = Math.max(0, Number(options.stockSets) || 0);
@@ -10822,6 +10852,7 @@ body{
         phase:"st",
         bonusKind:"",
         bonusTarget:0,
+        bonusBgmSrc:"",
         battleRemain:0,
         battleWin:false,
         battleSource:"",
@@ -10915,6 +10946,7 @@ body{
     session.bigZoneType = "";
     session.bonusKind = "";
     session.bonusTarget = 0;
+    session.bonusBgmSrc = "";
     session.phase = (aTypeEnd || A_TYPE_MODE) ? "idle" : "ended";
     session.battleRemain = 0;
     session.battleWin = false;
@@ -11234,13 +11266,35 @@ body{
     playBarAudioSource(BAR_BGM_SRC, "bar", "BAR揃いBGM再生");
   }
 
+  function pickATypeBonusBgm(kind="BIG", within50=false){
+    const normalized = normalizeATypeBonusKind(kind);
+    if(normalized === "MID"){
+      return {src:REG_BONUS_BGM_SRC, label:"REG BGM"};
+    }
+    if(within50){
+      return {src:BIG_50G_BONUS_BGM_SRC, label:"BIG 50G以内BGM"};
+    }
+    const src = BIG_BONUS_BGM_SRCS[Math.floor(Math.random() * BIG_BONUS_BGM_SRCS.length)] || BIG_BONUS_BGM_SRCS[0];
+    return {src, label:"BIG BGM"};
+  }
+
+  function playATypeBonusBgm(bgmInfo){
+    if(!bgmInfo || !bgmInfo.src) return;
+    playBarAudioSource(bgmInfo.src, "a_type_bonus", `${bgmInfo.label}再生`);
+  }
+
   function resumeSessionBgm(){
     if(!session.active) return;
+    if(session.phase === "a_type_bonus"){
+      playATypeBonusBgm({src:session.bonusBgmSrc, label:"BONUS BGM"});
+      return;
+    }
     if(session.currentSetBarBgm) playBarBgm();
     else playAtBgm();
   }
 
   function activeBarBgmSrc(){
+    if(barBgmMode === "a_type_bonus") return session.bonusBgmSrc || "";
     return barBgmMode === "bar" ? BAR_BGM_SRC : AT_BGM_SRC;
   }
 
@@ -11738,7 +11792,7 @@ body{
     if($("stInfoViewLegacy")) $("stInfoViewLegacy").textContent = stInfoText;
     if($("adminStInfoView")) $("adminStInfoView").textContent = stInfoText;
     const payoutScaleText = A_TYPE_MODE
-      ? `Aタイプ:BB純増${A_TYPE_PAYOUTS.BIG}pt/RB純増${A_TYPE_PAYOUTS.MID}pt/ブドウ${A_TYPE_PAYOUTS.GRAPE}pt/ベル${A_TYPE_PAYOUTS.BELL}pt/ゾウリプレイ${A_TYPE_PAYOUTS.REPLAY}pt/ピエロ特殊役${A_TYPE_PAYOUTS.SMALL}pt`
+      ? `Aタイプ:BB純増${A_TYPE_PAYOUTS.BIG}pt/RB純増${A_TYPE_PAYOUTS.MID}pt/ブドウ${A_TYPE_PAYOUTS.GRAPE}pt/ベル${A_TYPE_PAYOUTS.BELL}pt/ゾウリプレイ${A_TYPE_PAYOUTS.REPLAY}pt/ピエロ特殊役${A_TYPE_PAYOUTS.SMALL}pt/チェリー中段1pt・上下段2pt`
       : `通常:ベル${NORMAL_ROLE_PAYOUTS.BELL}pt/スイカ${NORMAL_ROLE_PAYOUTS.SUICA}pt/チェリー${NORMAL_ROLE_PAYOUTS.CHERRY_ANY}pt/リプレイ${NORMAL_ROLE_PAYOUTS.REPLAY}pt/REG${NORMAL_ROLE_PAYOUTS.MID}pt / 通常小役${Math.round(NORMAL_ROLE_RATE * 100)}% / 高確小役${Math.round(HIGH_ROLE_RATE * 100)}% / ATベル${ROLE_PAYOUTS.BELL}pt/斜めベル${ROLE_PAYOUTS.BELL3}pt / 平均継続${formatRate(averageContinuationRate(settings.setting))}`;
     if($("payoutScaleView")) $("payoutScaleView").textContent = payoutScaleText;
     if($("payoutScaleViewLegacy")) $("payoutScaleViewLegacy").textContent = payoutScaleText;
@@ -12057,7 +12111,7 @@ body{
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",bonusWaitGames:0,morningCeilingActive:false};
-    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
+    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,bonusBgmSrc:"",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     jagLastGamePayout = 0;
     jagLastBonusPayout = 0;
     jagChanceHold = false;
@@ -12109,7 +12163,7 @@ body{
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",bonusWaitGames:0,morningCeilingActive:!A_TYPE_MODE};
-    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
+    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,bonusBgmSrc:"",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     jagLastGamePayout = 0;
     jagLastBonusPayout = 0;
     jagChanceHold = false;
@@ -12642,7 +12696,7 @@ body{
     forcePremiumEffect = false;
     $("forceResult").value = "";
     if($("premiumForceStatus")) $("premiumForceStatus").value = "OFF";
-    if(premiumForced && !pendingForceResult) pendingForceResult = "BIG";
+    if(!A_TYPE_MODE && premiumForced && !pendingForceResult) pendingForceResult = "BIG";
 
     const atSpinAtStart = session.active && !aTypeBonusActiveAtSpinStart && !zoneActiveAtSpinStart && !battleActiveAtSpinStart;
     if(normalActiveAtSpinStart){
@@ -12672,12 +12726,12 @@ body{
     const result = normalActiveAtSpinStart ? drawNormalResult() : drawResult();
     const spec = RESULT[result];
     const lineRow = resultLineRow(result);
-    const resolved = normalActiveAtSpinStart ? resolveNormalOutcome(result) : resolveOutcome(result);
+    const resolved = normalActiveAtSpinStart ? resolveNormalOutcome(result, lineRow) : resolveOutcome(result);
     const reversePushGuide = zoneActiveAtSpinStart ? decideReversePushGuide(result, zoneActiveAtSpinStart ? currentGoraiZoneType() : "") : "";
     const grid = zoneActiveAtSpinStart && reversePushGuide && result === "MISS"
       ? buildReversePushMissGrid()
       : buildGrid(result, lineRow);
-    const bar3LeverEffect = !speedModeSpinAtStart && result === "BAR3";
+    const bar3LeverEffect = !A_TYPE_MODE && !speedModeSpinAtStart && result === "BAR3";
     const bigPremiumEffect = !bar3LeverEffect && decideBigPremiumEffect(result, resolved, premiumForced);
     const speedModeBonusRogiEffect = speedModeSpinAtStart && !bigPremiumEffect && shouldPlaySpeedModeBonusRogi(result, resolved);
     const gekiatsuChance = bigPremiumEffect;
@@ -12950,7 +13004,8 @@ body{
       if(A_TYPE_MODE && resolved.aTypeBonusReady){
         startBonusSessionNow({
           bonusKind:resolved.bonusKind || (resolved.regReady ? "MID" : "BIG"),
-          bonusSource:resolved.bonusSource || ""
+          bonusSource:resolved.bonusSource || "",
+          gamesSinceLastBonus:resolved.gamesSinceLastBonusAtStart
         });
       }else if(!A_TYPE_MODE && resolved.bar3PremiumReady){
         stopSpeedToBonus("ボーナス確定のためSPEED停止");
@@ -13023,9 +13078,9 @@ body{
     const normalDirect = !session.active;
     const spec = RESULT[result];
     const lineRow = resultLineRow(result);
-    const resolved = normalDirect ? resolveNormalOutcome(result) : resolveOutcome(result);
+    const resolved = normalDirect ? resolveNormalOutcome(result, lineRow) : resolveOutcome(result);
     const grid = buildGrid(result, lineRow);
-    if(forcePremiumEffect){
+    if(!A_TYPE_MODE && forcePremiumEffect){
       forcePremiumEffect = false;
       if($("premiumForceStatus")) $("premiumForceStatus").value = "OFF";
       startGekiatsuEffect(true);
@@ -13043,7 +13098,8 @@ body{
       if(A_TYPE_MODE && resolved.aTypeBonusReady){
         setTimeout(()=>startBonusSessionNow({
           bonusKind:resolved.bonusKind || (resolved.regReady ? "MID" : "BIG"),
-          bonusSource:resolved.bonusSource || ""
+          bonusSource:resolved.bonusSource || "",
+          gamesSinceLastBonus:resolved.gamesSinceLastBonusAtStart
         }), 700);
       }else if(!A_TYPE_MODE && resolved.bonusReady){
         setTimeout(()=>startSession(), 700);
@@ -13437,7 +13493,7 @@ body{
     forcePremiumEffect = false;
     if($("forceResult")) $("forceResult").value = "";
     if($("premiumForceStatus")) $("premiumForceStatus").value = "OFF";
-    if(premiumForced && !pendingForceResult) pendingForceResult = "BIG";
+    if(!A_TYPE_MODE && premiumForced && !pendingForceResult) pendingForceResult = "BIG";
 
     if(battleActiveAtSpinStart){
       session.battleRemain = Math.max(0, (session.battleRemain || 0) - 1);
@@ -13455,7 +13511,7 @@ body{
 
     const result = normalActiveAtSpinStart ? drawNormalResult() : drawResult();
     const lineRow = resultLineRow(result);
-    const resolved = normalActiveAtSpinStart ? resolveNormalOutcome(result) : resolveOutcome(result);
+    const resolved = normalActiveAtSpinStart ? resolveNormalOutcome(result, lineRow) : resolveOutcome(result);
 
     if(normalActiveAtSpinStart){
       applyNormalResult(result, resolved, lineRow);
@@ -13463,7 +13519,8 @@ body{
       if(A_TYPE_MODE && resolved.aTypeBonusReady){
         startBonusSessionNow({
           bonusKind:resolved.bonusKind || (resolved.regReady ? "MID" : "BIG"),
-          bonusSource:resolved.bonusSource || ""
+          bonusSource:resolved.bonusSource || "",
+          gamesSinceLastBonus:resolved.gamesSinceLastBonusAtStart
         });
       }else if(!A_TYPE_MODE && resolved.bar3PremiumReady){
         startBonusSessionNow({
@@ -13669,7 +13726,7 @@ body{
 
   function playSpinSound(){ playOneShotSound(SPIN_SOUND_SRC); }
   function isBonusStopSoundSpin(spin=currentSpin){
-    return !!(spin && (spin.result === "BIG" || spin.result === "MID"));
+    return !!(spin && spin.result === "BAR3");
   }
   function playStopSound(i, stopOrder=null){
     const order = Math.max(1, Math.min(3, Math.round(Number(stopOrder) || 0)));
@@ -14062,9 +14119,9 @@ body{
 
     if($("forcePremiumBtn")){
       $("forcePremiumBtn").addEventListener("click", ()=>{
-        forcePremiumEffect = true;
-        if($("premiumForceStatus")) $("premiumForceStatus").value = "ON：次回転で発生";
-        log("次回転プレミア演出を強制");
+        forcePremiumEffect = false;
+        if($("premiumForceStatus")) $("premiumForceStatus").value = "使用しない";
+        log("プレミア演出は使用しません");
       });
     }
 
