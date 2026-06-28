@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RISING!</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23030005'/%3E%3Cpath d='M9 39 32 7l23 32H40l-8 18-8-18H9z' fill='%23ff2334' stroke='%23ffd761' stroke-width='4'/%3E%3C/svg%3E">
 <link rel="preload" as="image" href="assets/symbols/sym_hourglass.png">
 <link rel="preload" as="image" href="assets/symbols/sym_cherry.png">
 <link rel="preload" as="image" href="assets/symbols/sym_bell.png">
@@ -14,18 +15,12 @@
 <link rel="preload" as="image" href="assets/symbols/sym_bar.png">
 <link rel="preload" as="image" href="assets/symbols/sym_replay.png">
 <link rel="preload" as="image" href="assets/cabinet/edit_parts/piero.png">
-<link rel="preload" as="image" href="assets/backgrounds/bg_rising_jag.png">
-<link rel="preload" as="image" href="assets/cabinet/rising_cabinet_v1.png">
 <link rel="preload" as="image" href="assets/logo/rising_logo.svg">
-<link rel="preload" as="image" href="assets/frames/rising_reel_frame_off.svg">
 <link rel="preload" as="image" href="assets/frames/rising_reel_frame_on.svg">
 <link rel="preload" as="image" href="assets/buttons/btn_auto_half_blue.png">
 <link rel="preload" as="image" href="assets/buttons/btn_speed_half_blue.png">
-<link rel="preload" as="image" href="assets/effects/reverse_push_blue.png">
-<link rel="preload" as="image" href="assets/effects/reverse_push_red.png">
 <link rel="preload" as="image" href="assets/controls/start_lever_ball.png">
 <link rel="preload" as="image" href="assets/controls/stop_button_red_cut.png">
-<link rel="preload" as="image" href="assets/controls/stop_button_blue_cut.png">
 <link rel="preload" as="font" href="assets/fonts/DSEG7Classic-Regular.woff2" type="font/woff2" crossorigin>
 <style>
 @font-face{
@@ -10728,7 +10723,7 @@ body{
   }
 
   function pushAdminState(){
-    if(!ADMIN_SERVER || !window.fetch) return;
+    if(!ADMIN_SERVER || !window.fetch || !machineId || machineId === "null" || machineId === "undefined") return;
     fetch(`${ADMIN_SERVER}/api/machines/${encodeURIComponent(machineId)}/state`, {
       method:"POST",
       headers:{"Content-Type":"application/json"},
