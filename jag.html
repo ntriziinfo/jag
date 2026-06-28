@@ -6218,6 +6218,85 @@ body{
   opacity:.34 !important;
   z-index:18 !important;
 }
+.jagKoyakuGuide{
+  position:absolute;
+  left:21.0%;
+  top:11.0%;
+  width:58.4%;
+  height:9.2%;
+  z-index:48;
+  pointer-events:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:3px 12px;
+  box-sizing:border-box;
+  border:2px solid rgba(255,210,62,.92);
+  border-radius:999px;
+  background:
+    linear-gradient(180deg,rgba(255,239,140,.28),transparent 36%),
+    radial-gradient(ellipse at 50% 45%,rgba(255,28,20,.36),transparent 62%),
+    linear-gradient(90deg,rgba(35,0,0,.92),rgba(140,0,0,.94) 18%,rgba(168,0,0,.96) 50%,rgba(140,0,0,.94) 82%,rgba(35,0,0,.92));
+  box-shadow:
+    inset 0 0 0 2px rgba(0,0,0,.58),
+    inset 0 7px 12px rgba(255,255,255,.16),
+    inset 0 -7px 13px rgba(0,0,0,.48),
+    0 0 9px rgba(255,209,62,.45);
+}
+.jagKoyakuItem{
+  min-width:74px;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+}
+.jagKoyakuItem b{
+  min-width:20px;
+  color:#ffe86a;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:16px;
+  font-weight:1000;
+  line-height:1;
+  text-align:right;
+  text-shadow:
+    1px 1px 0 #230000,
+    -1px 1px 0 #230000,
+    0 0 7px rgba(255,230,76,.72);
+}
+.jagKoyakuItem span{
+  color:#fff2a2;
+  font-family:Arial,sans-serif;
+  font-size:9px;
+  font-weight:900;
+  line-height:1;
+  text-shadow:0 1px 0 #220000,0 0 5px rgba(255,210,50,.5);
+}
+.jagKoyakuItem img{
+  width:36px;
+  height:32px;
+  object-fit:contain;
+  filter:
+    drop-shadow(0 2px 0 rgba(255,255,255,.58))
+    drop-shadow(0 3px 4px rgba(0,0,0,.62));
+}
+.jagKoyakuReplay img{
+  width:42px;
+  height:34px;
+}
+.jagKoyakuGrape img,
+.jagKoyakuPiero img{
+  width:38px;
+  height:34px;
+}
+.jagKoyakuCherry{
+  min-width:86px;
+}
+.jagKoyakuCherry img{
+  width:34px;
+  height:32px;
+}
 .jagPayoutMeters{
   left:0 !important;
   top:0 !important;
@@ -6808,6 +6887,23 @@ body{
             <div><span>BB</span><b id="wdCounterBig">0</b></div>
             <div><span>RB</span><b id="wdCounterReg">0</b></div>
             <div><span>ブドウ</span><b id="wdCounterGrape">0</b></div>
+          </div>
+        </div>
+        <div class="jagKoyakuGuide" aria-hidden="true">
+          <div class="jagKoyakuItem jagKoyakuBell">
+            <b>15</b><img src="assets/symbols/sym_bell.png" alt="" loading="eager" decoding="sync" draggable="false">
+          </div>
+          <div class="jagKoyakuItem jagKoyakuPiero">
+            <b>10</b><img src="assets/cabinet/edit_parts/piero.png" alt="" loading="eager" decoding="sync" draggable="false">
+          </div>
+          <div class="jagKoyakuItem jagKoyakuGrape">
+            <b>8</b><img src="assets/symbols/sym_grape.png" alt="" loading="eager" decoding="sync" draggable="false">
+          </div>
+          <div class="jagKoyakuItem jagKoyakuReplay">
+            <span>REPLAY</span><img src="assets/symbols/sym_replay.png" alt="" loading="eager" decoding="sync" draggable="false">
+          </div>
+          <div class="jagKoyakuItem jagKoyakuCherry">
+            <span>CHANCE</span><img src="assets/symbols/sym_cherry.png" alt="" loading="eager" decoding="sync" draggable="false">
           </div>
         </div>
         <div class="payline"></div>
