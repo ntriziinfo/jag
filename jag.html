@@ -7201,36 +7201,52 @@ body{
 
   const A_TYPE_MODE = true;
   const A_TYPE_BONUS_TABLE = Object.freeze({
-    1:{big:286.515218, reg:461.443153, total:176.761824, payout:93.0},
-    2:{big:279.253789, reg:413.766841, total:166.728021, payout:95.0},
-    3:{big:277.099442, reg:340.071918, total:152.686506, payout:97.0},
-    4:{big:258.412135, reg:314.363193, total:141.827449, payout:101.0},
-    5:{big:255.464541, reg:251.523794, total:126.739426, payout:104.0},
-    6:{big:243.545684, reg:243.550188, total:121.773968, payout:109.0}
+    1:{big:299.057854, reg:481.643524, total:184.499839, payout:93.0},
+    2:{big:293.635039, reg:435.075359, total:175.314323, payout:95.0},
+    3:{big:289.206517, reg:354.930397, total:159.357711, payout:97.0},
+    4:{big:271.956047, reg:330.839616, total:149.260918, payout:101.0},
+    5:{big:266.311923, reg:262.203846, total:132.120959, payout:104.0},
+    6:{big:256.447304, reg:256.452046, total:128.224838, payout:109.0}
   });
   const A_TYPE_GRAPE_TABLE = Object.freeze({
-    1:6.315714,
-    2:6.233251,
-    3:6.185164,
-    4:6.006336,
-    5:5.937824,
-    6:5.539470
+    1:6.592194,
+    2:6.554256,
+    3:6.455407,
+    4:6.321140,
+    5:6.189952,
+    6:5.832919
   });
   const A_TYPE_REPLAY_TABLE = Object.freeze({
-    1:7.151560,
-    2:7.116457,
-    3:7.140150,
-    4:7.019065,
-    5:7.034305,
-    6:6.805954
+    1:7.464630,
+    2:7.482946,
+    3:7.452119,
+    4:7.386949,
+    5:7.332991,
+    6:7.166493
+  });
+  const A_TYPE_BELL_TABLE = Object.freeze({
+    1:128.0,
+    2:192.0,
+    3:124.0,
+    4:184.0,
+    5:120.0,
+    6:176.0
+  });
+  const A_TYPE_PIERROT_TABLE = Object.freeze({
+    1:360.0,
+    2:160.0,
+    3:340.0,
+    4:145.0,
+    5:320.0,
+    6:130.0
   });
   const A_TYPE_REG_DETAIL_TABLE = Object.freeze({
-    1:{solo:661.104228, cherry:1527.899315},
-    2:{solo:595.244412, cherry:1357.150633},
-    3:{solo:487.929274, cherry:1122.237330},
-    4:{solo:447.861155, cherry:1054.630806},
-    5:{solo:359.120018, cherry:839.501853},
-    6:{solo:347.735482, cherry:812.888636}
+    1:{solo:690.045063, cherry:1594.785413},
+    2:{solo:625.898817, cherry:1427.042335},
+    3:{solo:509.247962, cherry:1171.270312},
+    4:{solo:471.334481, cherry:1109.906179},
+    5:{solo:374.368757, cherry:875.148277},
+    6:{solo:366.156466, cherry:855.950702}
   });
   const A_TYPE_PAYOUTS = Object.freeze({
     BIG:252,
@@ -10286,6 +10302,8 @@ body{
       const table = A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1];
       const grape = A_TYPE_GRAPE_TABLE[settings.setting] || A_TYPE_GRAPE_TABLE[1];
       const replay = A_TYPE_REPLAY_TABLE[settings.setting] || A_TYPE_REPLAY_TABLE[1];
+      const bell = A_TYPE_BELL_TABLE[settings.setting] || A_TYPE_BELL_TABLE[1];
+      const pierrot = A_TYPE_PIERROT_TABLE[settings.setting] || A_TYPE_PIERROT_TABLE[1];
       const regDetail = A_TYPE_REG_DETAIL_TABLE[settings.setting] || A_TYPE_REG_DETAIL_TABLE[1];
       let roll = Math.random();
       const multiplier = clamp(Number(settings.oddsMultiplier) || 1, 0.1, 100);
@@ -10294,6 +10312,8 @@ body{
       const regCherryP = clamp((1 / regDetail.cherry) * multiplier, 0, 0.98 - bigP - regSoloP);
       const grapeP = clamp((1 / grape) * multiplier, 0, 0.98 - bigP - regSoloP - regCherryP);
       const replayP = clamp((1 / replay) * multiplier, 0, 0.98 - bigP - regSoloP - regCherryP - grapeP);
+      const bellP = clamp((1 / bell) * multiplier, 0, 0.98 - bigP - regSoloP - regCherryP - grapeP - replayP);
+      const pierrotP = clamp((1 / pierrot) * multiplier, 0, 0.98 - bigP - regSoloP - regCherryP - grapeP - replayP - bellP);
       const gamesSinceLastBonusAtStart = Math.max(0, Number(normalState.sinceBonus) || 0);
       if(roll < bigP){
         pendingATypeInternalBonus = {kind:"BIG", source:"単独当選", internalResult:"BIG", gamesSinceLastBonusAtStart};
@@ -10313,6 +10333,10 @@ body{
       if(roll < grapeP) return "GRAPE";
       roll -= grapeP;
       if(roll < replayP) return "REPLAY";
+      roll -= replayP;
+      if(roll < bellP) return "BELL";
+      roll -= bellP;
+      if(roll < pierrotP) return "SMALL";
       return "MISS";
     }
 
