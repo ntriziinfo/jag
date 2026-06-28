@@ -10892,6 +10892,9 @@ body{
     if(aTypeEnd){
       showMessage(`${bonusLabel}終了`, `純増${resultPayout}pt / 払出${session.paid}pt / BET${session.cost}pt`);
       log(`${bonusLabel}終了：純増${resultPayout}pt / 払出${session.paid}pt / BET${session.cost}pt`);
+    }else if(A_TYPE_MODE){
+      showMessage("ボーナス終了", `獲得pt ${session.paid}pt`);
+      log(`ボーナス終了：獲得${session.paid}pt / 損益${formatSigned(profit)}pt`);
     }else{
       showMessage("ATバトルが終了しました。", `継続SET数 ${endedSets}回 / 獲得pt ${session.paid}pt`);
       log(`Rising BB終了：獲得${session.paid}pt / 損益${formatSigned(profit)}pt / ${endedSets}SET / STOCK獲得${session.added || 0}SET / G上乗せ${session.addedGames || 0}G`);
@@ -10912,7 +10915,7 @@ body{
     session.bigZoneType = "";
     session.bonusKind = "";
     session.bonusTarget = 0;
-    session.phase = aTypeEnd ? "idle" : "ended";
+    session.phase = (aTypeEnd || A_TYPE_MODE) ? "idle" : "ended";
     session.battleRemain = 0;
     session.battleWin = false;
     session.battleSource = "";
@@ -10924,6 +10927,11 @@ body{
     if(aTypeEnd){
       hideSessionResultScreen();
       if($("resultText")) $("resultText").textContent = `${bonusLabel}終了 / 純増${resultPayout}pt`;
+      showOverlay("ボーナス終了");
+    }else if(A_TYPE_MODE){
+      hideSessionResultScreen();
+      if($("resultText")) $("resultText").textContent = `ボーナス終了 / 獲得${resultPayout}pt`;
+      showOverlay("ボーナス終了");
     }else{
       showSessionResultScreen(endedSets, resultPayout, null);
       showOverlay("ATバトル終了");
