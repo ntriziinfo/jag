@@ -7171,6 +7171,12 @@ body{
   const SPECIAL_SYMBOL_SOUND_SRC = "assets/media/jag/special_symbol.wav";
   const SPIN_SOUND_SRC = "assets/media/jag/start.wav";
   const STOP_SOUND_SRC = "assets/media/jag/stop.wav";
+  const BONUS_STOP_SOUND_SRCS = Object.freeze([
+    "assets/media/jag/bonus_stop_1.wav",
+    "assets/media/jag/bonus_stop_2.wav",
+    "assets/media/jag/bonus_stop_3.wav"
+  ]);
+  const PEKA_SOUND_SRC = "assets/media/jag/peka_1.wav";
   const SEVEN_CONFIRM_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
   const REG_CONFIRM_SOUND_SRC = "assets/media/jag/special_symbol.wav";
   const BONUS_CONFIRM_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
@@ -9536,6 +9542,7 @@ body{
     jagChanceHold = true;
     const lamp = $("stLamp");
     if(lamp) lamp.classList.add("on");
+    playPekaSound();
     updateDisplay();
     if(timing){
       log(`BONUS告知：${bonusAnnouncementTimingLabel(timing)}`);
@@ -12791,7 +12798,7 @@ body{
     const col = [grid[0][i], grid[1][i], grid[2][i]];
     const label = i === 1 ? spec.label : "";
 
-    stopReel(i, col, label, spec.cls, result === "MISS" ? null : lineRow);
+    stopReel(i, col, label, spec.cls, result === "MISS" ? null : lineRow, stopOrder);
     currentSpin.stopped[i] = true;
     syncCabinetControlState();
     maybeLightBonusAnnouncementForStop(stopOrder, currentSpin);
@@ -12865,12 +12872,12 @@ body{
     });
   }
 
-  function stopReel(i, columnSymbols, label, cls, lineRow=null){
+  function stopReel(i, columnSymbols, label, cls, lineRow=null, stopOrder=null){
     clearInterval(spinIntervals[i]);
     reels[i].classList.remove("spinning");
     setReelColumn(i, columnSymbols, label, cls, lineRow);
     stopBtns[i].disabled = true;
-    playStopSound(i);
+    playStopSound(i, stopOrder);
   }
 
   function finishSpin(result, resolved, lineRow=1){
@@ -13527,6 +13534,7 @@ body{
   function playSevenConfirmSound(){ playOneShotSound(SEVEN_CONFIRM_SOUND_SRC, sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE)); }
   function playRegConfirmSound(){ playOneShotSound(REG_CONFIRM_SOUND_SRC, sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE)); }
   function playBonusConfirmSound(){ playOneShotSound(BONUS_CONFIRM_SOUND_SRC, sfxOutputVolume(BONUS_CONFIRM_SOUND_OUTPUT_SCALE)); }
+  function playPekaSound(){ playOneShotSound(PEKA_SOUND_SRC, sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE)); }
 
   function playKoatariSound(){
     if(!koatariSound) return;
@@ -13652,7 +13660,16 @@ body{
   }
 
   function playSpinSound(){ playOneShotSound(SPIN_SOUND_SRC); }
-  function playStopSound(i){ playOneShotSound(STOP_SOUND_SRC); }
+  function isBonusStopSoundSpin(spin=currentSpin){
+    return !!(spin && (spin.result === "BIG" || spin.result === "MID"));
+  }
+  function playStopSound(i, stopOrder=null){
+    const order = Math.max(1, Math.min(3, Math.round(Number(stopOrder) || 0)));
+    const src = isBonusStopSoundSpin(currentSpin) && BONUS_STOP_SOUND_SRCS[order - 1]
+      ? BONUS_STOP_SOUND_SRCS[order - 1]
+      : STOP_SOUND_SRC;
+    playOneShotSound(src);
+  }
   function playWinSound(big){
     if(debugFastSpinActive || speedToBonusActive) return;
     const notes = big ? [523,659,784,1046,1318] : [440,554,659,880];
