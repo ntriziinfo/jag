@@ -6294,6 +6294,29 @@ body{
   z-index:3 !important;
   filter:drop-shadow(0 4px 5px rgba(0,0,0,.34)) !important;
 }
+.premiumReelOverlay{
+  position:absolute;
+  left:var(--layout-reels-x);
+  top:var(--layout-reels-y);
+  width:var(--layout-reels-w);
+  height:var(--layout-reels-h);
+  z-index:4;
+  pointer-events:none;
+  opacity:0;
+  overflow:hidden;
+  mix-blend-mode:screen;
+  transition:opacity .35s ease;
+}
+.reelArea.premiumBigOverlayOn .premiumReelOverlay{
+  opacity:.46;
+}
+.premiumReelOverlay img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center 36%;
+  filter:saturate(1.08) contrast(1.04) brightness(1.12);
+}
 .reel{
   height:100% !important;
   min-height:0 !important;
@@ -6928,6 +6951,9 @@ body{
           </div>
         </div>
         <div class="payline"></div>
+        <div class="premiumReelOverlay" id="premiumReelOverlay" aria-hidden="true">
+          <img src="assets/effects/premium_reel_overlay.png" alt="" loading="eager" decoding="async" draggable="false">
+        </div>
         <div class="reels">
           <div class="reel" data-reel="0"><div class="window">
             <div class="cell"><img class="symImg barSymImg" src="assets/symbols/sym_bar.png" alt="BAR symbol" loading="eager" decoding="sync" draggable="false"></div>
@@ -7191,10 +7217,12 @@ body{
             <option value="MID">RB（77BAR/96pt）</option>
             <option value="MID_CHERRY">RBチェリー同時（77BAR/96pt）</option>
             <option value="BIG">BB（777/252pt）</option>
+            <option value="BAR3">BAR（プレミアムBIG/1G連確認）</option>
           </select>
         </div>
         <div class="row">
           <button class="subBtn" id="applyForceBtn">次回だけ適用</button>
+          <button class="subBtn" id="forceBarBtn">次回BAR</button>
           <button class="ghostBtn" id="clearForceBtn">解除</button>
         </div>
         <div class="field" style="margin-top:12px;display:none">
@@ -7302,6 +7330,8 @@ body{
   ]);
   const BIG_50G_BONUS_BGM_SRC = "assets/media/jag/big_50g.wav";
   const REG_BONUS_BGM_SRC = "assets/media/jag/reg_bonus.wav";
+  const PREMIUM_BIG_FIRST_BGM_SRC = "assets/media/jag/premium_big_first.mp3";
+  const PREMIUM_BIG_SECOND_BGM_SRC = "assets/media/jag/premium_big_second.wav";
 
   const BIG_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
 
@@ -7342,6 +7372,11 @@ body{
     4:{big:268.819247, reg:327.023640, total:147.539310, payout:102.0},
     5:{big:263.330023, reg:259.267945, total:130.641599, payout:105.0},
     6:{big:259.280478, reg:259.285272, total:129.641437, payout:108.0}
+  });
+  const A_TYPE_POST_PREMIUM_TARGET_RTP = Object.freeze({
+    4:1.010,
+    5:1.040,
+    6:1.080
   });
   const A_TYPE_GRAPE_TABLE = Object.freeze({
     1:6.592194,
@@ -7391,6 +7426,7 @@ body{
     BELL:10,
     REPLAY:3
   });
+  const PREMIUM_BIG_CHAIN_PAYOUT = A_TYPE_PAYOUTS.BIG;
   const A_TYPE_BONUS_PAY_PER_GAME = A_TYPE_PAYOUTS.SMALL;
   const A_TYPE_BONUS_MAIN_RESULT = "SMALL";
   const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID", "MID_CHERRY", "SMALL", "GRAPE", "BELL", "REPLAY", "CHERRY_ANY", "CHERRY_DOUBLE", "CHERRY_TRIPLE", "BAR3"]);
@@ -7566,6 +7602,8 @@ body{
     bonusPending:false,
     bonusKind:"",
     bonusSource:"",
+    premiumBonus:false,
+    oneGameRenBonus:false,
     bonusWaitGames:0,
     bonusHitGamesSince:0,
     morningCeilingActive:false
@@ -7591,6 +7629,8 @@ body{
     phase:"idle",
     bonusKind:"",
     bonusTarget:0,
+    premiumBonus:false,
+    oneGameRenBonus:false,
     bonusBgmSrc:"",
     battleRemain:0,
     battleWin:false,
@@ -9204,8 +9244,8 @@ body{
   }
 
   function decideBigPremiumEffect(result, resolved, premiumForced=false){
-    if(A_TYPE_MODE) return false;
     if(!isBigPremiumEffectEligible(result, resolved)) return false;
+    if(A_TYPE_MODE && resolved && resolved.bonusPendingAtStart) return !!resolved.premiumBonus;
     return !!premiumForced || Math.random() < GEKIATSU_CHANCE_ON_BIG;
   }
 
@@ -9408,11 +9448,12 @@ body{
     return kind === "MID" || kind === "REG" || kind === "RB" ? "MID" : "BIG";
   }
 
-  function aTypeBonusLabel(kind=session.bonusKind){
+  function aTypeBonusLabel(kind=session.bonusKind, premium=session.premiumBonus){
+    if(normalizeATypeBonusKind(kind) !== "MID" && premium) return "PREMIUM BB";
     return normalizeATypeBonusKind(kind) === "MID" ? "RB" : "BB";
   }
 
-  function aTypeBonusTarget(kind=session.bonusKind){
+  function aTypeBonusTarget(kind=session.bonusKind, premium=session.premiumBonus){
     return normalizeATypeBonusKind(kind) === "MID" ? A_TYPE_PAYOUTS.MID : A_TYPE_PAYOUTS.BIG;
   }
 
@@ -9636,8 +9677,18 @@ body{
     return weights.reduce((sum,t)=>sum + expectedStAddFor(t.result, settingNo) * (t.w / total), 0);
   }
 
+  function aTypePremiumRtpBonus(settingNo){
+    const bonus = A_TYPE_BONUS_TABLE[settingNo] || A_TYPE_BONUS_TABLE[1];
+    const extraPayout = PREMIUM_BIG_CHAIN_PAYOUT;
+    return extraPayout * GEKIATSU_CHANCE_ON_BIG / ((Number(bonus.big) || 1) * SPIN_COST);
+  }
+
   function targetRtpFor(settingNo){
-    return (SETTING[settingNo] || SETTING[1]).target;
+    const base = (SETTING[settingNo] || SETTING[1]).target;
+    if(A_TYPE_MODE && A_TYPE_POST_PREMIUM_TARGET_RTP[settingNo]){
+      return A_TYPE_POST_PREMIUM_TARGET_RTP[settingNo];
+    }
+    return A_TYPE_MODE ? base + aTypePremiumRtpBonus(settingNo) : base;
   }
 
   function hitProbability(settingNo = settings.setting){
@@ -9662,6 +9713,7 @@ body{
   function pendingBonusLabel(){
     if(normalState.bonusKind === "MID") return "REG";
     if(normalState.bonusKind === "BAR3") return "BAR";
+    if(normalState.premiumBonus || normalState.oneGameRenBonus) return "BAR";
     return "777";
   }
 
@@ -9680,7 +9732,9 @@ body{
       normalState.bonusPending &&
       pendingBonusWaitDone() &&
       normalState.bonusKind !== "MID" &&
-      normalState.bonusKind !== "BAR3"
+      normalState.bonusKind !== "BAR3" &&
+      !normalState.premiumBonus &&
+      !normalState.oneGameRenBonus
     );
   }
 
@@ -9907,6 +9961,8 @@ body{
     normalState.bonusPending = false;
     normalState.bonusKind = "";
     normalState.bonusSource = "";
+    normalState.premiumBonus = false;
+    normalState.oneGameRenBonus = false;
     normalState.bonusWaitGames = 0;
     normalState.bonusHitGamesSince = 0;
     normalState.morningCeilingActive = false;
@@ -10428,6 +10484,7 @@ body{
       pendingATypeInternalBonus = null;
       if(normalState.bonusPending){
         if(!isChanceLampLit()) return "MISS";
+        if(normalState.premiumBonus || normalState.oneGameRenBonus) return "BAR3";
         return normalState.bonusKind === "MID" ? "MID" : "BIG";
       }
 
@@ -10498,15 +10555,18 @@ body{
       const internalBonus = pendingATypeInternalBonus;
       pendingATypeInternalBonus = null;
       const bonusPendingAtStart = !!normalState.bonusPending;
-      const pendingReady = bonusPendingAtStart && (result === "BIG" || result === "MID");
-      const directReady = !bonusPendingAtStart && !internalBonus && (result === "BIG" || result === "MID" || result === "MID_CHERRY");
+      const pendingReady = bonusPendingAtStart && (
+        result === "MID" ||
+        ((normalState.premiumBonus || normalState.oneGameRenBonus) ? result === "BAR3" : result === "BIG")
+      );
+      const directReady = !bonusPendingAtStart && !internalBonus && (result === "BIG" || result === "MID" || result === "MID_CHERRY" || result === "BAR3");
       const isNewBonusHit = !!internalBonus;
       const isReadyBonus = pendingReady || directReady;
       const bonusKind = internalBonus
         ? internalBonus.kind
         : bonusPendingAtStart
           ? (normalState.bonusKind || "BIG")
-          : (result === "MID" || result === "MID_CHERRY") ? "MID" : result === "BIG" ? "BIG" : "";
+          : (result === "MID" || result === "MID_CHERRY") ? "MID" : (result === "BIG" || result === "BAR3") ? "BIG" : "";
       const isBig = bonusKind === "BIG" && (isNewBonusHit || isReadyBonus);
       const isReg = bonusKind === "MID" && (isNewBonusHit || isReadyBonus);
       const gamesSinceLastBonusAtStart = internalBonus
@@ -10546,6 +10606,8 @@ body{
         bar3PremiumReady:false,
         bonusKind:isReg ? "MID" : isBig ? "BIG" : "",
         bonusSource,
+        premiumBonus:isBig && (bonusPendingAtStart ? !!normalState.premiumBonus : result === "BAR3"),
+        oneGameRenBonus:isBig && bonusPendingAtStart ? !!normalState.oneGameRenBonus : false,
         aTypeBonusReady:isReadyBonus
       };
     }
@@ -10597,7 +10659,8 @@ body{
       regReady:(!bonusWaitSpin && bonusPending && bonusKind === "MID" && result === "MID") || directRegReady,
       bar3PremiumReady:directBar3Ready,
       bonusKind,
-      bonusSource
+      bonusSource,
+      premiumBonus:false
     };
   }
 
@@ -10638,6 +10701,8 @@ body{
           bonusPending:!!data.normalState.bonusPending,
           bonusKind:String(data.normalState.bonusKind || ""),
           bonusSource:String(data.normalState.bonusSource || ""),
+          premiumBonus:!!data.normalState.premiumBonus,
+          oneGameRenBonus:!!data.normalState.oneGameRenBonus,
           bonusWaitGames:Math.max(0, Number(data.normalState.bonusWaitGames) || 0),
           bonusHitGamesSince:Math.max(0, Number(data.normalState.bonusHitGamesSince) || 0),
           morningCeilingActive:!!data.normalState.morningCeilingActive
@@ -10645,6 +10710,8 @@ body{
         if(!normalState.bonusPending){
           normalState.bonusWaitGames = 0;
           normalState.bonusHitGamesSince = 0;
+          normalState.premiumBonus = false;
+          normalState.oneGameRenBonus = false;
         }
         normalState.sinceBonus = clamp(normalState.sinceBonus, 0, currentNormalCeilingGames());
       }
@@ -10982,14 +11049,16 @@ body{
       readSettings();
       if(A_TYPE_MODE){
         const bonusKind = normalizeATypeBonusKind(options.bonusKind || normalState.bonusKind || "BIG");
-        const bonusTarget = aTypeBonusTarget(bonusKind);
-        const bonusLabel = aTypeBonusLabel(bonusKind);
+        const premiumBonus = bonusKind === "BIG" && !!(options.premiumBonus || normalState.premiumBonus);
+        const oneGameRenBonus = bonusKind === "BIG" && !!(options.oneGameRenBonus || normalState.oneGameRenBonus);
+        const bonusTarget = aTypeBonusTarget(bonusKind, premiumBonus);
+        const bonusLabel = aTypeBonusLabel(bonusKind, premiumBonus);
         const hadPreviousBonus = (Number(stats.totalSessions) || 0) > 0;
         const gamesSinceLastBonus = Math.max(0, Number.isFinite(Number(options.gamesSinceLastBonus))
           ? Number(options.gamesSinceLastBonus)
           : Number(normalState.sinceBonus) || 0);
         const within50 = hadPreviousBonus && gamesSinceLastBonus <= 50;
-        const bonusBgm = pickATypeBonusBgm(bonusKind, within50);
+        const bonusBgm = pickATypeBonusBgm(bonusKind, within50, {premiumBonus, oneGameRenBonus});
         resetNormalModeAfterBonus();
         pauseNormalBgm();
         session = {
@@ -11012,6 +11081,8 @@ body{
           phase:"a_type_bonus",
           bonusKind,
           bonusTarget,
+          premiumBonus,
+          oneGameRenBonus,
           bonusBgmSrc:bonusBgm.src || "",
           battleRemain:0,
           battleWin:false,
@@ -11127,6 +11198,7 @@ body{
     const profit = session.paid - (Number(session.cost) || 0);
     const endedSets = session.setNo || 0;
     const bonusLabel = aTypeEnd ? aTypeBonusLabel(session.bonusKind) : "";
+    const premiumOneGameRen = !!(aTypeEnd && session.premiumBonus && normalizeATypeBonusKind(session.bonusKind) === "BIG");
     if(autoPlay) stopAutoPlay(aTypeEnd ? "ボーナス終了のためオート停止" : "ATバトル終了のためオート停止");
     if(aTypeEnd){
       showMessage(`${bonusLabel}終了`, `純増${resultPayout}pt / 払出${session.paid}pt / BET${session.cost}pt`);
@@ -11154,6 +11226,8 @@ body{
     session.bigZoneType = "";
     session.bonusKind = "";
     session.bonusTarget = 0;
+    session.premiumBonus = false;
+    session.oneGameRenBonus = false;
     session.bonusBgmSrc = "";
     session.phase = (aTypeEnd || A_TYPE_MODE) ? "idle" : "ended";
     session.battleRemain = 0;
@@ -11162,6 +11236,17 @@ body{
     jagChanceHold = false;
     resetBonusEndSpecialEffects(true);
     setSpeedFrameOffHold(false);
+    if(premiumOneGameRen){
+      normalState.bonusPending = true;
+      normalState.bonusKind = "BIG";
+      normalState.bonusSource = "BAR揃い1G連";
+      normalState.premiumBonus = false;
+      normalState.oneGameRenBonus = true;
+      normalState.bonusWaitGames = 1;
+      normalState.bonusHitGamesSince = 0;
+      jagChanceHold = true;
+      $("stLamp").classList.add("on");
+    }
     $("spinBtn").textContent = "BET";
     jagLastBonusPayout = resultPayout;
     if(aTypeEnd){
@@ -11474,10 +11559,16 @@ body{
     playBarAudioSource(BAR_BGM_SRC, "bar", "BAR揃いBGM再生");
   }
 
-  function pickATypeBonusBgm(kind="BIG", within50=false){
+  function pickATypeBonusBgm(kind="BIG", within50=false, options={}){
     const normalized = normalizeATypeBonusKind(kind);
     if(normalized === "MID"){
       return {src:REG_BONUS_BGM_SRC, label:"REG BGM"};
+    }
+    if(options.oneGameRenBonus){
+      return {src:PREMIUM_BIG_SECOND_BGM_SRC, label:"PREMIUM BIG 1G REN BGM"};
+    }
+    if(options.premiumBonus){
+      return {src:PREMIUM_BIG_FIRST_BGM_SRC, label:"PREMIUM BIG BGM"};
     }
     if(within50){
       return {src:BIG_50G_BONUS_BGM_SRC, label:"BIG 50G以内BGM"};
@@ -11669,8 +11760,9 @@ body{
       resetNormalModeAfterBonus();
       $("stLamp").classList.add("on");
       const isRegBonus = resolved.bonusKind === "MID" || result === "MID" || result === "MID_CHERRY";
-      const bonusLabel = isRegBonus ? "RB" : "BB";
-      const bonusTarget = aTypeBonusTarget(isRegBonus ? "MID" : "BIG");
+      const premiumBonus = !isRegBonus && !!resolved.premiumBonus;
+      const bonusLabel = isRegBonus ? "RB" : aTypeBonusLabel("BIG", premiumBonus);
+      const bonusTarget = aTypeBonusTarget(isRegBonus ? "MID" : "BIG", premiumBonus);
       const sourceText = resolved.bonusSource || "単独当選";
       showMessage(`${bonusLabel}確定`, `${sourceText} / 純増${bonusTarget}ptまで小役入賞${lineText ? " / " + lineText : ""}`);
       log(`${bonusLabel}確定：${sourceText} / 純増${bonusTarget}ptまで小役入賞`);
@@ -11707,6 +11799,7 @@ body{
       normalState.bonusPending = false;
       normalState.bonusKind = "";
       normalState.bonusSource = "";
+      normalState.premiumBonus = false;
       normalState.bonusWaitGames = 0;
       hideBonusConfirmScreen();
       normalState.sinceBonus = 0;
@@ -11742,6 +11835,8 @@ body{
         normalState.bonusPending = true;
         normalState.bonusKind = resolved.bonusKind || "BIG";
         normalState.bonusSource = resolved.bonusSource;
+        normalState.premiumBonus = (normalState.bonusKind === "BIG") && !!resolved.premiumBonus;
+        normalState.oneGameRenBonus = false;
         normalState.bonusWaitGames = 1;
         normalState.bonusHitGamesSince = Math.max(0, Number(resolved.gamesSinceLastBonusAtStart) || 0);
         hideBonusConfirmScreen();
@@ -11759,6 +11854,8 @@ body{
       normalState.bonusPending = true;
       normalState.bonusKind = resolved.bonusKind || "BIG";
       normalState.bonusSource = resolved.bonusSource;
+      normalState.premiumBonus = (normalState.bonusKind === "BIG") && !!resolved.premiumBonus;
+      normalState.oneGameRenBonus = false;
       normalState.bonusWaitGames = 0;
       hideBonusConfirmScreen();
       $("stLamp").classList.add("on");
@@ -11995,6 +12092,9 @@ body{
     updateReelFrameMode();
     syncDevilZoneConfirmScreen();
     machine.className = "machine " + (active ? "active" : "normal") + (session.paid > 0 ? " win" : "");
+    if(reelArea){
+      reelArea.classList.toggle("premiumBigOverlayOn", !!(isATypeBonusActive() && (session.premiumBonus || session.oneGameRenBonus)));
+    }
     $("modeTag").className = "modeTag " + (active ? "active" : "");
     $("modeTag").textContent = A_TYPE_MODE ? (active ? `${aTypeBonusLabel(session.bonusKind)} BONUS` : "A-TYPE") : active ? (isContinuationBattleActive() ? "継続BATTLE" : "BATTLE") : normalModeLabel();
 
@@ -12263,7 +12363,7 @@ body{
           <td>1/${bonus.total.toFixed(1)}</td>
           <td>1/${grape.toFixed(2)}</td>
           <td>1/${replay.toFixed(2)}</td>
-          <td>${bonus.payout.toFixed(1)}%</td>
+          <td>${(targetRtpFor(i) * 100).toFixed(1)}%</td>
         </tr>`;
       }
       table.innerHTML = html;
@@ -12341,8 +12441,8 @@ body{
     stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,grapeCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
-    normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",bonusWaitGames:0,bonusHitGamesSince:0,morningCeilingActive:false};
-    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,bonusBgmSrc:"",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
+    normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",premiumBonus:false,oneGameRenBonus:false,bonusWaitGames:0,bonusHitGamesSince:0,morningCeilingActive:false};
+    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,premiumBonus:false,oneGameRenBonus:false,bonusBgmSrc:"",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     jagLastGamePayout = 0;
     jagLastBonusPayout = 0;
     jagChanceHold = false;
@@ -12394,8 +12494,8 @@ body{
     stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,grapeCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
-    normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",bonusWaitGames:0,bonusHitGamesSince:0,morningCeilingActive:!A_TYPE_MODE};
-    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,bonusBgmSrc:"",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
+    normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",premiumBonus:false,oneGameRenBonus:false,bonusWaitGames:0,bonusHitGamesSince:0,morningCeilingActive:!A_TYPE_MODE};
+    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,premiumBonus:false,oneGameRenBonus:false,bonusBgmSrc:"",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     jagLastGamePayout = 0;
     jagLastBonusPayout = 0;
     jagChanceHold = false;
@@ -12984,11 +13084,15 @@ body{
       : buildGrid(result, lineRow);
     const bar3LeverEffect = !A_TYPE_MODE && !speedModeSpinAtStart && result === "BAR3";
     const bigPremiumEffect = !bar3LeverEffect && decideBigPremiumEffect(result, resolved, premiumForced);
-    const speedModeBonusRogiEffect = speedModeSpinAtStart && !bigPremiumEffect && shouldPlaySpeedModeBonusRogi(result, resolved);
-    const gekiatsuChance = bigPremiumEffect;
+    if(A_TYPE_MODE && normalActiveAtSpinStart && resolved && (resolved.bonusHit || resolved.bonusReady) && resolved.bonusKind === "BIG"){
+      resolved.premiumBonus = !!(resolved.premiumBonus || bigPremiumEffect);
+    }
+    const premiumMovieEffect = bigPremiumEffect && (!A_TYPE_MODE || !resolved.bonusHit);
+    const speedModeBonusRogiEffect = speedModeSpinAtStart && !premiumMovieEffect && shouldPlaySpeedModeBonusRogi(result, resolved);
+    const gekiatsuChance = premiumMovieEffect;
     const zakoEffect = decideZakoEffect(result, resolved, normalActiveAtSpinStart);
     const bonusAnnouncementTiming = shouldScheduleBonusAnnouncement(normalActiveAtSpinStart, resolved)
-      ? decideBonusAnnouncementTiming()
+      ? (A_TYPE_MODE && resolved.premiumBonus ? "lever" : decideBonusAnnouncementTiming())
       : "";
 
 
@@ -13256,6 +13360,8 @@ body{
         startBonusSessionNow({
           bonusKind:resolved.bonusKind || (resolved.regReady ? "MID" : "BIG"),
           bonusSource:resolved.bonusSource || "",
+          premiumBonus:!!resolved.premiumBonus,
+          oneGameRenBonus:!!resolved.oneGameRenBonus,
           gamesSinceLastBonus:resolved.gamesSinceLastBonusAtStart
         });
       }else if(!A_TYPE_MODE && resolved.bar3PremiumReady){
@@ -13331,10 +13437,15 @@ body{
     const lineRow = resultLineRow(result);
     const resolved = normalDirect ? resolveNormalOutcome(result, lineRow) : resolveOutcome(result);
     const grid = buildGrid(result, lineRow);
-    if(!A_TYPE_MODE && forcePremiumEffect){
+    const premiumForced = forcePremiumEffect;
+    const bigPremiumEffect = normalDirect && decideBigPremiumEffect(result, resolved, premiumForced);
+    if(A_TYPE_MODE && normalDirect && resolved && (resolved.bonusHit || resolved.bonusReady) && resolved.bonusKind === "BIG"){
+      resolved.premiumBonus = !!(resolved.premiumBonus || bigPremiumEffect);
+    }
+    if(premiumForced){
       forcePremiumEffect = false;
       if($("premiumForceStatus")) $("premiumForceStatus").value = "OFF";
-      startGekiatsuEffect(true);
+      if(bigPremiumEffect) startGekiatsuEffect(true);
     }
 
     for(let i=0;i<3;i++){
@@ -13350,6 +13461,8 @@ body{
         setTimeout(()=>startBonusSessionNow({
           bonusKind:resolved.bonusKind || (resolved.regReady ? "MID" : "BIG"),
           bonusSource:resolved.bonusSource || "",
+          premiumBonus:!!resolved.premiumBonus,
+          oneGameRenBonus:!!resolved.oneGameRenBonus,
           gamesSinceLastBonus:resolved.gamesSinceLastBonusAtStart
         }), 700);
       }else if(!A_TYPE_MODE && resolved.bonusReady){
@@ -13763,6 +13876,10 @@ body{
     const result = normalActiveAtSpinStart ? drawNormalResult() : drawResult();
     const lineRow = resultLineRow(result);
     const resolved = normalActiveAtSpinStart ? resolveNormalOutcome(result, lineRow) : resolveOutcome(result);
+    const bigPremiumEffect = normalActiveAtSpinStart && decideBigPremiumEffect(result, resolved, premiumForced);
+    if(A_TYPE_MODE && normalActiveAtSpinStart && resolved && (resolved.bonusHit || resolved.bonusReady) && resolved.bonusKind === "BIG"){
+      resolved.premiumBonus = !!(resolved.premiumBonus || bigPremiumEffect);
+    }
 
     if(normalActiveAtSpinStart){
       applyNormalResult(result, resolved, lineRow);
@@ -13771,6 +13888,8 @@ body{
         startBonusSessionNow({
           bonusKind:resolved.bonusKind || (resolved.regReady ? "MID" : "BIG"),
           bonusSource:resolved.bonusSource || "",
+          premiumBonus:!!resolved.premiumBonus,
+          oneGameRenBonus:!!resolved.oneGameRenBonus,
           gamesSinceLastBonus:resolved.gamesSinceLastBonusAtStart
         });
       }else if(!A_TYPE_MODE && resolved.bar3PremiumReady){
@@ -14361,6 +14480,11 @@ body{
       const requested = $("forceResult").value;
       forceResult = A_TYPE_MODE && requested ? normalizeATypeResult(requested) : requested;
       log(forceResult ? `次回転指定：${RESULT[forceResult].name}` : "次回転指定なし");
+    });
+    onClick("forceBarBtn", ()=>{
+      forceResult = "BAR3";
+      if($("forceResult")) $("forceResult").value = "BAR3";
+      log("次回転指定：BAR揃い");
     });
     onClick("clearForceBtn", ()=>{
       forceResult = "";
