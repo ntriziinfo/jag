@@ -7498,7 +7498,7 @@ body{
   const REVERSE_PUSH_BLUE_EXPECTATION = 0.30;
   const REVERSE_PUSH_HIT_RED_RATE = 0.70;
   const GEKIATSU_VIDEO_SRC = "";
-  const BAR3_LEVER_VIDEO_SRC = "";
+  const BAR3_LEVER_VIDEO_SRC = PREMIUM_BIG_CONFIRM_MOVIE_SRC;
   const ROGI_STOP_VIDEO_SRCS = Object.freeze({
     1:"",
     2:"",
@@ -13416,7 +13416,17 @@ body{
     if(A_TYPE_MODE && normalActiveAtSpinStart && resolved && (resolved.bonusHit || resolved.bonusReady) && resolved.bonusKind === "BIG"){
       resolved.premiumBonus = !!(resolved.premiumBonus || bigPremiumEffect);
     }
-    const premiumConfirmMovieEffect = !!(A_TYPE_MODE && normalActiveAtSpinStart && resolved && resolved.bonusHit && resolved.bonusKind === "BIG" && resolved.premiumBonus);
+    const premiumConfirmMovieEffect = !!(
+      A_TYPE_MODE &&
+      normalActiveAtSpinStart &&
+      resolved &&
+      resolved.bonusKind === "BIG" &&
+      resolved.premiumBonus &&
+      (
+        resolved.bonusHit ||
+        (!resolved.bonusPendingAtStart && result === "BAR3")
+      )
+    );
     const premiumMovieEffect = bigPremiumEffect && (!A_TYPE_MODE || !resolved.bonusHit);
     const speedModeBonusRogiEffect = speedModeSpinAtStart && !premiumMovieEffect && shouldPlaySpeedModeBonusRogi(result, resolved);
     const gekiatsuChance = premiumMovieEffect;
