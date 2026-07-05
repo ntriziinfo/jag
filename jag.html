@@ -9006,11 +9006,14 @@ body{
     if(!normalActiveAtSpinStart || !premiumBigConfirmMovieHold || !normalState.bonusPending) return false;
     if(!(normalState.premiumBonus || normalState.oneGameRenBonus) || normalState.bonusKind === "MID") return false;
     premiumBigConfirmMovieHold = false;
-    premiumBigConfirmMovieTranslucent = true;
+    premiumBigConfirmMovieTranslucent = false;
     premiumBigConfirmSilence = false;
     const layer = $("premiumBigReelMovie");
     const video = layer ? layer.querySelector("video") : null;
-    if(video) video.muted = true;
+    if(video){
+      video.muted = true;
+      try{ video.pause(); }catch(e){}
+    }
     updatePremiumBigReelMovie();
     playOneShotSound(BAR_AIM_VOICE_SRC, sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE), {allowDuringPremiumConfirm:true});
     return true;
