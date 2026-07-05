@@ -7102,6 +7102,14 @@ body{
     "assets/media/jag/bonus_stop_3.wav"
   ]);
   const PEKA_SOUND_SRC = "assets/media/jag/peka_1.wav";
+  const PEKA_SOUND_SRCS = Object.freeze([
+    PEKA_SOUND_SRC,
+    "assets/media/jag/peka_kyuin.wav",
+    "assets/media/jag/peka_atari.wav",
+    "assets/media/jag/peka_kyuin_triple.wav"
+  ]);
+  const PEKA_BIG_ATSU_SOUND_SRC = "assets/media/jag/peka_atsu.wav";
+  const PEKA_BIG_ATSU_RATE = 0.1;
   const SEVEN_CONFIRM_SOUND_SRC = "assets/media/jag/big_kakutei.wav";
   const REG_CONFIRM_SOUND_SRC = "assets/media/jag/reg_kakutei.wav";
   const BONUS_CONFIRM_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
@@ -9689,7 +9697,7 @@ body{
     jagChanceHold = true;
     const lamp = $("stLamp");
     if(lamp) lamp.classList.add("on");
-    playPekaSound();
+    playPekaSound(isBigLampAnnouncement(spin));
     updateDisplay();
     if(timing){
       log(`BONUS告知：${bonusAnnouncementTimingLabel(timing)}`);
@@ -9702,6 +9710,18 @@ body{
     const timing = `stop${stopOrder}`;
     if(spin.bonusAnnouncementTiming !== timing) return false;
     return lightBonusAnnouncement(spin, timing);
+  }
+
+  function isBigLampAnnouncement(spin=currentSpin){
+    const resolved = spin && spin.resolved ? spin.resolved : null;
+    if(resolved){
+      if(resolved.bonusKind === "MID" || resolved.regReady) return false;
+      if(resolved.bonusKind === "BIG" || resolved.bonusReady || resolved.bar3PremiumReady) return true;
+      if(resolved.bonusHit && (resolved.bonusKind || "BIG") !== "MID") return true;
+      if(resolved.aTypeBonusReady && (resolved.bonusKind || "BIG") !== "MID") return true;
+    }
+    if(normalState.bonusPending) return normalState.bonusKind !== "MID";
+    return false;
   }
 
   function shouldSuppressLineupConfirmSound(){
@@ -13040,7 +13060,7 @@ body{
     jagChanceHold = true;
     const lamp = $("stLamp");
     if(lamp) lamp.classList.add("on");
-    playPekaSound();
+    playPekaSound(bonusKind !== "MID");
     showMessage("BONUS確定", `${source} / CHANCE点灯 / 777を狙ってください`);
     log(`リーチ目告知：${source} / 次ゲームCHANCE点灯`);
     return true;
@@ -14290,7 +14310,12 @@ body{
   function playSevenConfirmSound(){ playLockedBonusConfirmSound(SEVEN_CONFIRM_SOUND_SRC, sfxOutputVolume(LINEUP_CONFIRM_SOUND_OUTPUT_SCALE)); }
   function playRegConfirmSound(){ playLockedBonusConfirmSound(REG_CONFIRM_SOUND_SRC, sfxOutputVolume(LINEUP_CONFIRM_SOUND_OUTPUT_SCALE)); }
   function playBonusConfirmSound(){ playLockedBonusConfirmSound(BONUS_CONFIRM_SOUND_SRC, sfxOutputVolume(BONUS_CONFIRM_SOUND_OUTPUT_SCALE)); }
-  function playPekaSound(){ playOneShotSound(PEKA_SOUND_SRC, sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE)); }
+  function playPekaSound(isBig=false){
+    const src = isBig && Math.random() < PEKA_BIG_ATSU_RATE
+      ? PEKA_BIG_ATSU_SOUND_SRC
+      : PEKA_SOUND_SRCS[randomInt(0, PEKA_SOUND_SRCS.length - 1)];
+    playOneShotSound(src, sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE));
+  }
 
   function playKoatariSound(){
     if(!koatariSound) return;
