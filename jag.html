@@ -12620,7 +12620,7 @@ body{
 
   function currentReelTopIndex(reelIndex){
     const strip = REEL_STRIPS[reelIndex] || REEL_STRIPS[0];
-    return mod((Number(reelSpinOffsets[reelIndex]) || 0) - 1, strip.length);
+    return mod((Number(reelSpinOffsets[reelIndex]) || 0) + 1, strip.length);
   }
 
   function reelWindowFromTopIndex(reelIndex, topIndex){
@@ -12648,7 +12648,7 @@ body{
       strip.forEach((symbol, idx)=>{
         if(symbol !== targetSymbol) return;
         const candidateTop = mod(idx - targetRow, strip.length);
-        const distance = mod(candidateTop - baseTop, strip.length);
+        const distance = mod(baseTop - candidateTop, strip.length);
         if(distance <= slipFrames && distance < bestDistance){
           bestDistance = distance;
           bestTop = candidateTop;
@@ -12708,7 +12708,7 @@ body{
 
     const findSafeColumn = limit=>{
       for(let distance=0; distance<=limit; distance++){
-        const column = reelWindowFromTopIndex(reelIndex, baseTop + distance);
+        const column = reelWindowFromTopIndex(reelIndex, baseTop - distance);
         const testGrid = cloneGrid(spin.grid);
         setGridColumn(testGrid, reelIndex, column);
         const result = displayedResultFromGrid(testGrid);
@@ -13006,7 +13006,7 @@ body{
       reelSpinOffsets[index] = Math.floor(Math.random() * strip.length);
     }
     const start = mod(reelSpinOffsets[index], strip.length);
-    reelSpinOffsets[index] = mod(reelSpinOffsets[index] + 1, strip.length);
+    reelSpinOffsets[index] = mod(reelSpinOffsets[index] - 1, strip.length);
     const symbols = [
       strip[start],
       strip[mod(start + 1, strip.length)],
