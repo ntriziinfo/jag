@@ -9788,10 +9788,6 @@ body{
     return false;
   }
 
-  function shouldSuppressLineupConfirmSound(){
-    return !!(currentSpin && currentSpin.bonusAnnouncementLit);
-  }
-
   function showBonusConfirmScreen(mode="solid"){
     if(!bonusConfirmLayer) return;
     bonusConfirmLayer.classList.toggle("translucent", mode === "translucent");
@@ -11804,11 +11800,10 @@ body{
       flashReelLight("rainbow", result === "BIG" ? 2200 : 1800);
       showOverlay(`${bonusLabel} BONUS`);
       if(isRegBonus){
-        if(!shouldSuppressLineupConfirmSound()) playRegConfirmSound();
+        playRegConfirmSound();
         confetti(45);
       }else{
-        const forcePremiumLineupSound = premiumBonus || !!resolved.oneGameRenBonus || result === "BAR3";
-        if(forcePremiumLineupSound || !shouldSuppressLineupConfirmSound()) playSevenConfirmSound();
+        playSevenConfirmSound();
         confetti(90);
       }
       return;
@@ -11844,7 +11839,7 @@ body{
       flashReelLight("rainbow", 2200);
       showOverlay("BB BONUS");
       confetti(90);
-      if(!shouldSuppressLineupConfirmSound()) playSevenConfirmSound();
+      playSevenConfirmSound();
       return;
     }
 
@@ -11858,7 +11853,7 @@ body{
       flashReelLight("rainbow", 1800);
       showOverlay(`REG +${normalReward}pt`);
       confetti(35);
-      if(!shouldSuppressLineupConfirmSound()) playRegConfirmSound();
+      playRegConfirmSound();
       return;
     }
 
