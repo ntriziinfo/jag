@@ -1,23 +1,20 @@
 {
+  "cleanUrls": true,
+  "trailingSlash": false,
   "redirects": [
     {
-      "source": "/jag",
-      "destination": "/jag.html",
-      "permanent": false
-    },
-    {
       "source": "/jag/",
-      "destination": "/jag.html",
+      "destination": "/jag",
       "permanent": false
     },
     {
       "source": "/gorai",
-      "destination": "/jag.html",
+      "destination": "/jag",
       "permanent": false
     },
     {
       "source": "/gourai",
-      "destination": "/jag.html",
+      "destination": "/jag",
       "permanent": false
     }
   ]
