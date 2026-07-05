@@ -7127,16 +7127,19 @@ body{
 
   const A_TYPE_MODE = true;
   const A_TYPE_BONUS_TABLE = Object.freeze({
-    1:{big:299.057854, reg:481.643524, total:184.499839, payout:93.0},
-    2:{big:293.635039, reg:435.075359, total:175.314323, payout:95.0},
-    3:{big:289.206517, reg:354.930397, total:159.357711, payout:97.0},
-    4:{big:268.819247, reg:327.023640, total:147.539310, payout:102.0},
-    5:{big:263.330023, reg:259.267945, total:130.641599, payout:105.0},
-    6:{big:259.280478, reg:259.285272, total:129.641437, payout:108.0}
+    1:{big:317.901940, reg:511.992608, total:196.125452, payout:93.0},
+    2:{big:311.671469, reg:461.799711, total:186.082944, payout:95.0},
+    3:{big:305.863510, reg:375.372790, total:168.535997, payout:97.0},
+    4:{big:284.221395, reg:345.760641, total:155.992657, payout:102.0},
+    5:{big:277.144402, reg:272.869226, total:137.495099, payout:105.0},
+    6:{big:272.956551, reg:272.961598, total:136.479537, payout:108.0}
   });
   const A_TYPE_POST_PREMIUM_TARGET_RTP = Object.freeze({
-    4:1.010,
-    5:1.040,
+    1:0.930,
+    2:0.950,
+    3:0.970,
+    4:1.020,
+    5:1.050,
     6:1.080
   });
   const A_TYPE_GRAPE_TABLE = Object.freeze({
@@ -7172,13 +7175,14 @@ body{
     6:130.0
   });
   const A_TYPE_REG_DETAIL_TABLE = Object.freeze({
-    1:{solo:690.045063, cherry:1594.785413},
-    2:{solo:625.898817, cherry:1427.042335},
-    3:{solo:509.247962, cherry:1171.270312},
-    4:{solo:465.898006, cherry:1097.104279},
-    5:{solo:370.176943, cherry:865.349226},
-    6:{solo:370.201682, cherry:865.407058}
+    1:{solo:733.525843, cherry:1695.275247},
+    2:{solo:664.344433, cherry:1514.697911},
+    3:{solo:538.578351, cherry:1238.730206},
+    4:{solo:492.591892, cherry:1159.963480},
+    5:{solo:389.596546, cherry:910.745729},
+    6:{solo:389.728433, cherry:911.054036}
   });
+  const A_TYPE_PREMIUM_BIG_PAYOUT = 500;
   const A_TYPE_PAYOUTS = Object.freeze({
     BIG:252,
     MID:96,
@@ -7187,7 +7191,7 @@ body{
     BELL:10,
     REPLAY:3
   });
-  const PREMIUM_BIG_CHAIN_PAYOUT = A_TYPE_PAYOUTS.BIG;
+  const PREMIUM_BIG_CHAIN_PAYOUT = A_TYPE_PREMIUM_BIG_PAYOUT;
   const A_TYPE_BONUS_PAY_PER_GAME = A_TYPE_PAYOUTS.SMALL;
   const A_TYPE_BONUS_MAIN_RESULT = "SMALL";
   const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID", "MID_CHERRY", "SMALL", "GRAPE", "BELL", "REPLAY", "CHERRY_ANY", "CHERRY_DOUBLE", "CHERRY_TRIPLE", "BAR3"]);
@@ -9338,12 +9342,13 @@ body{
     return kind === "MID" || kind === "REG" || kind === "RB" ? "MID" : "BIG";
   }
 
-  function aTypeBonusLabel(kind=session.bonusKind, premium=session.premiumBonus){
+  function aTypeBonusLabel(kind=session.bonusKind, premium=(session.premiumBonus || session.oneGameRenBonus)){
     if(normalizeATypeBonusKind(kind) !== "MID" && premium) return "PREMIUM BB";
     return normalizeATypeBonusKind(kind) === "MID" ? "RB" : "BB";
   }
 
-  function aTypeBonusTarget(kind=session.bonusKind, premium=session.premiumBonus){
+  function aTypeBonusTarget(kind=session.bonusKind, premium=(session.premiumBonus || session.oneGameRenBonus)){
+    if(normalizeATypeBonusKind(kind) !== "MID" && premium) return A_TYPE_PREMIUM_BIG_PAYOUT;
     return normalizeATypeBonusKind(kind) === "MID" ? A_TYPE_PAYOUTS.MID : A_TYPE_PAYOUTS.BIG;
   }
 
@@ -10937,8 +10942,9 @@ body{
         const bonusKind = normalizeATypeBonusKind(options.bonusKind || normalState.bonusKind || "BIG");
         const premiumBonus = bonusKind === "BIG" && !!(options.premiumBonus || normalState.premiumBonus);
         const oneGameRenBonus = bonusKind === "BIG" && !!(options.oneGameRenBonus || normalState.oneGameRenBonus);
-        const bonusTarget = aTypeBonusTarget(bonusKind, premiumBonus);
-        const bonusLabel = aTypeBonusLabel(bonusKind, premiumBonus);
+        const premiumTargetBonus = premiumBonus || oneGameRenBonus;
+        const bonusTarget = aTypeBonusTarget(bonusKind, premiumTargetBonus);
+        const bonusLabel = aTypeBonusLabel(bonusKind, premiumTargetBonus);
         const hadPreviousBonus = (Number(stats.totalSessions) || 0) > 0;
         const gamesSinceLastBonus = Math.max(0, Number.isFinite(Number(options.gamesSinceLastBonus))
           ? Number(options.gamesSinceLastBonus)
@@ -11639,6 +11645,20 @@ body{
       normalState.mode = isHighMode() ? "high" : "normal";
     }
 
+    if(resolved.manualLineupMiss){
+      jagChanceHold = true;
+      normalState.bonusPending = true;
+      normalState.bonusKind = resolved.bonusKind || normalState.bonusKind || "BIG";
+      normalState.bonusSource = resolved.bonusSource || normalState.bonusSource || "BONUS確定";
+      normalState.premiumBonus = !!(resolved.premiumBonus || normalState.premiumBonus);
+      normalState.oneGameRenBonus = !!(resolved.oneGameRenBonus || normalState.oneGameRenBonus);
+      normalState.bonusWaitGames = Math.max(1, Number(normalState.bonusWaitGames) || 1);
+      $("stLamp").classList.add("on");
+      showMessage("目押し失敗", `${pendingBonusLabel()}を狙ってください / BONUS確定は持ち越し`);
+      log(`目押し失敗：${pendingBonusLabel()}揃い持ち越し`);
+      return;
+    }
+
     if(resolved.bonusWaitSpin){
       jagChanceHold = true;
       normalState.bonusWaitGames = Math.max(1, (Number(normalState.bonusWaitGames) || 0) + 1);
@@ -11657,7 +11677,7 @@ body{
       resetNormalModeAfterBonus();
       $("stLamp").classList.add("on");
       const isRegBonus = resolved.bonusKind === "MID" || result === "MID" || result === "MID_CHERRY";
-      const premiumBonus = !isRegBonus && !!resolved.premiumBonus;
+      const premiumBonus = !isRegBonus && !!(resolved.premiumBonus || resolved.oneGameRenBonus);
       const bonusLabel = isRegBonus ? "RB" : aTypeBonusLabel("BIG", premiumBonus);
       const bonusTarget = aTypeBonusTarget(isRegBonus ? "MID" : "BIG", premiumBonus);
       const sourceText = resolved.bonusSource || "単独当選";
@@ -12597,6 +12617,107 @@ body{
     ];
   }
 
+  function currentReelTopIndex(reelIndex){
+    const strip = REEL_STRIPS[reelIndex] || REEL_STRIPS[0];
+    return mod((Number(reelSpinOffsets[reelIndex]) || 0) - 1, strip.length);
+  }
+
+  function reelWindowFromTopIndex(reelIndex, topIndex){
+    const strip = REEL_STRIPS[reelIndex] || REEL_STRIPS[0];
+    const start = mod(topIndex, strip.length);
+    return [
+      strip[start],
+      strip[mod(start + 1, strip.length)],
+      strip[mod(start + 2, strip.length)]
+    ];
+  }
+
+  function manualStopColumnForReel(reelIndex, spin=currentSpin){
+    const strip = REEL_STRIPS[reelIndex] || REEL_STRIPS[0];
+    const baseTop = currentReelTopIndex(reelIndex);
+    const targetResult = displayResultFor(spin?.result || "MISS");
+    const targetSpec = RESULT[targetResult] || RESULT.MISS;
+    const targetSymbol = targetSpec.reel ? targetSpec.reel[reelIndex] : "";
+    const targetRow = Array.isArray(spin?.lineRow) ? spin.lineRow[reelIndex] : Number(spin?.lineRow ?? 1);
+    const slipFrames = 4;
+
+    if(targetResult !== "MISS" && targetSymbol && Number.isFinite(targetRow)){
+      let bestTop = null;
+      let bestDistance = Infinity;
+      strip.forEach((symbol, idx)=>{
+        if(symbol !== targetSymbol) return;
+        const candidateTop = mod(idx - targetRow, strip.length);
+        const distance = mod(candidateTop - baseTop, strip.length);
+        if(distance <= slipFrames && distance < bestDistance){
+          bestDistance = distance;
+          bestTop = candidateTop;
+        }
+      });
+      if(bestTop !== null){
+        return reelWindowFromTopIndex(reelIndex, bestTop);
+      }
+    }
+
+    return reelWindowFromTopIndex(reelIndex, baseTop);
+  }
+
+  function setGridColumn(grid, reelIndex, columnSymbols){
+    if(!Array.isArray(grid) || !Array.isArray(columnSymbols)) return;
+    for(let row=0; row<3; row++){
+      if(!Array.isArray(grid[row])) grid[row] = [];
+      grid[row][reelIndex] = columnSymbols[row];
+    }
+  }
+
+  function refreshStoppedGrid(grid, result="MISS", lineRow=null){
+    const spec = RESULT[result] || RESULT.MISS;
+    for(let i=0;i<3;i++){
+      const col = [grid?.[0]?.[i], grid?.[1]?.[i], grid?.[2]?.[i]];
+      setReelColumn(i, col, i === 1 ? spec.label : "", spec.cls, result === "MISS" ? null : lineRow);
+    }
+  }
+
+  function shouldUseManualBonusStop(spin=currentSpin){
+    return !!(
+      A_TYPE_MODE &&
+      spin &&
+      spin.normalActiveAtStart &&
+      spin.resolved &&
+      spin.resolved.aTypeBonusReady &&
+      !spin.autoStopAtStart &&
+      !spin.speedModeAtStart &&
+      !debugFastSpinActive
+    );
+  }
+
+  function prepareManualBonusOutcome(spin=currentSpin){
+    if(!spin || !spin.manualBonusStop || spin.manualOutcomeApplied) return;
+    const targetResult = displayResultFor(spin.result);
+    const stoppedResult = displayedResultFromGrid(spin.grid);
+    spin.manualOutcomeApplied = true;
+
+    if(stoppedResult === targetResult){
+      refreshStoppedGrid(spin.grid, spin.result, spin.lineRow);
+      return;
+    }
+
+    const nextCeiling = clamp((Number(normalState.sinceBonus) || 0) + 1, 0, NORMAL_CEILING_GAMES);
+    spin.result = "MISS";
+    spin.spec = RESULT.MISS;
+    spin.lineRow = 1;
+    spin.resolved = {
+      ...spin.resolved,
+      reward:0,
+      bonusReady:false,
+      regReady:false,
+      aTypeBonusReady:false,
+      bonusWaitSpin:false,
+      manualLineupMiss:true,
+      ceilingAfter:nextCeiling
+    };
+    refreshStoppedGrid(spin.grid, "MISS", null);
+  }
+
   function lineName(row){
     if(Array.isArray(row)) return row[0] === 0 ? "右下がり斜め" : "右上がり斜め";
     return row === 0 ? "上段" : row === 2 ? "下段" : "中段";
@@ -13032,6 +13153,7 @@ body{
       battleActiveAtStart:battleActiveAtSpinStart,
       normalActiveAtStart:normalActiveAtSpinStart,
       speedModeAtStart:speedModeSpinAtStart,
+      autoStopAtStart:autoPlay,
       bonusAnnouncementTiming,
       bonusAnnouncementLit:false,
       devilRushEntryEffect,
@@ -13052,6 +13174,7 @@ body{
       reversePushGuide,
       pendingBattleOutcome:null
     };
+    currentSpin.manualBonusStop = shouldUseManualBonusStop(currentSpin);
     if(currentSpin.bonusConfirmWaitSpin){
       showBonusConfirmScreen("solid");
     }else if(currentSpin.bonusConfirmPrizeSpin){
@@ -13131,10 +13254,15 @@ body{
     const {grid, spec, result, lineRow} = currentSpin;
     const stopOrder = currentSpin.stopped.filter(Boolean).length + 1;
     const reversePushWrongFirst = isReversePushGuidedMiss(currentSpin) && stopOrder === 1 && i !== 2;
-    const col = [grid[0][i], grid[1][i], grid[2][i]];
+    const col = currentSpin.manualBonusStop
+      ? manualStopColumnForReel(i, currentSpin)
+      : [grid[0][i], grid[1][i], grid[2][i]];
+    if(currentSpin.manualBonusStop){
+      setGridColumn(grid, i, col);
+    }
     const label = i === 1 ? spec.label : "";
 
-    stopReel(i, col, label, spec.cls, result === "MISS" ? null : lineRow, stopOrder);
+    stopReel(i, col, label, spec.cls, currentSpin.manualBonusStop || result === "MISS" ? null : lineRow, stopOrder);
     currentSpin.stopped[i] = true;
     syncCabinetControlState();
     maybeLightBonusAnnouncementForStop(stopOrder, currentSpin);
@@ -13173,6 +13301,7 @@ body{
 
     if(currentSpin.stopped.every(Boolean) && !currentSpin.finishScheduled){
       currentSpin.finishScheduled = true;
+      prepareManualBonusOutcome(currentSpin);
       updatePremiumBigReelMovie();
       if(willEnterBattleAfterCurrentSpin(currentSpin)){
         ensurePendingBattleOutcome(currentSpin);
@@ -13182,6 +13311,7 @@ body{
       const resultWaitMs = currentSpin.speedModeAtStart ? 0 : RESULT_WAIT_MS;
       setTimeout(()=>{
         if(currentSpin){
+          prepareManualBonusOutcome(currentSpin);
           finishSpin(currentSpin.result, currentSpin.resolved, currentSpin.lineRow);
         }
       }, resultWaitMs);
