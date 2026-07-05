@@ -12674,6 +12674,25 @@ body{
     }
   }
 
+  function gridPaylineRows(grid){
+    const rows = Array.isArray(grid) ? grid : [];
+    return [
+      [rows[0]?.[0], rows[0]?.[1], rows[0]?.[2]],
+      [rows[1]?.[0], rows[1]?.[1], rows[1]?.[2]],
+      [rows[2]?.[0], rows[2]?.[1], rows[2]?.[2]],
+      [rows[0]?.[0], rows[1]?.[1], rows[2]?.[2]],
+      [rows[2]?.[0], rows[1]?.[1], rows[0]?.[2]]
+    ];
+  }
+
+  function gridHasOnlyAllowedPaylines(grid, allowedResult="MISS"){
+    const allowed = displayResultFor(allowedResult);
+    return gridPaylineRows(grid).every(row=>{
+      const result = displayedResultFromRow(row);
+      return result === "MISS" || result === allowed;
+    });
+  }
+
   function manualBonusFinalColumnForReel(reelIndex, spin=currentSpin, initialColumn=null){
     if(!spin || !spin.grid) return initialColumn || manualStopColumnForReel(reelIndex, spin);
     const targetResult = displayResultFor(spin.result);
@@ -12683,14 +12702,19 @@ body{
     const firstGrid = cloneGrid(spin.grid);
     setGridColumn(firstGrid, reelIndex, firstColumn);
     const firstResult = displayedResultFromGrid(firstGrid);
-    if(firstResult === targetResult || firstResult === "MISS") return firstColumn;
+    if((firstResult === targetResult || firstResult === "MISS") && gridHasOnlyAllowedPaylines(firstGrid, targetResult)){
+      return firstColumn;
+    }
 
     const findSafeColumn = limit=>{
       for(let distance=0; distance<=limit; distance++){
         const column = reelWindowFromTopIndex(reelIndex, baseTop + distance);
         const testGrid = cloneGrid(spin.grid);
         setGridColumn(testGrid, reelIndex, column);
-        if(displayedResultFromGrid(testGrid) === "MISS") return column;
+        const result = displayedResultFromGrid(testGrid);
+        if((result === "MISS" || result === targetResult) && gridHasOnlyAllowedPaylines(testGrid, targetResult)){
+          return column;
+        }
       }
       return null;
     };
