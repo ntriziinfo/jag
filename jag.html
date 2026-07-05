@@ -7374,6 +7374,10 @@ body{
     oneGameRenBonus:false,
     bonusWaitGames:0,
     bonusHitGamesSince:0,
+    reachMePending:false,
+    reachMeBonusKind:"",
+    reachMeBonusSource:"",
+    reachMeHitGamesSince:0,
     pendingSettingVoiceSrc:"",
     pendingPremiumVoiceSrc:"",
     morningCeilingActive:false
@@ -9866,6 +9870,10 @@ body{
     normalState.oneGameRenBonus = false;
     normalState.bonusWaitGames = 0;
     normalState.bonusHitGamesSince = 0;
+    normalState.reachMePending = false;
+    normalState.reachMeBonusKind = "";
+    normalState.reachMeBonusSource = "";
+    normalState.reachMeHitGamesSince = 0;
     normalState.morningCeilingActive = false;
     hideBonusConfirmScreen();
   }
@@ -10606,6 +10614,10 @@ body{
           oneGameRenBonus:!!data.normalState.oneGameRenBonus,
           bonusWaitGames:Math.max(0, Number(data.normalState.bonusWaitGames) || 0),
           bonusHitGamesSince:Math.max(0, Number(data.normalState.bonusHitGamesSince) || 0),
+          reachMePending:!!data.normalState.reachMePending,
+          reachMeBonusKind:String(data.normalState.reachMeBonusKind || ""),
+          reachMeBonusSource:String(data.normalState.reachMeBonusSource || ""),
+          reachMeHitGamesSince:Math.max(0, Number(data.normalState.reachMeHitGamesSince) || 0),
           pendingSettingVoiceSrc:String(data.normalState.pendingSettingVoiceSrc || ""),
           pendingPremiumVoiceSrc:String(data.normalState.pendingPremiumVoiceSrc || ""),
           morningCeilingActive:!!data.normalState.morningCeilingActive
@@ -12375,7 +12387,7 @@ body{
     stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,grapeCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
-    normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",premiumBonus:false,oneGameRenBonus:false,bonusWaitGames:0,bonusHitGamesSince:0,pendingSettingVoiceSrc:"",pendingPremiumVoiceSrc:"",morningCeilingActive:false};
+    normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",premiumBonus:false,oneGameRenBonus:false,bonusWaitGames:0,bonusHitGamesSince:0,reachMePending:false,reachMeBonusKind:"",reachMeBonusSource:"",reachMeHitGamesSince:0,pendingSettingVoiceSrc:"",pendingPremiumVoiceSrc:"",morningCeilingActive:false};
     session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,premiumBonus:false,oneGameRenBonus:false,bonusBgmSrc:"",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     jagLastGamePayout = 0;
     jagLastBonusPayout = 0;
@@ -12429,7 +12441,7 @@ body{
     stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,grapeCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
-    normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",premiumBonus:false,oneGameRenBonus:false,bonusWaitGames:0,bonusHitGamesSince:0,pendingSettingVoiceSrc:"",pendingPremiumVoiceSrc:"",morningCeilingActive:!A_TYPE_MODE};
+    normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",premiumBonus:false,oneGameRenBonus:false,bonusWaitGames:0,bonusHitGamesSince:0,reachMePending:false,reachMeBonusKind:"",reachMeBonusSource:"",reachMeHitGamesSince:0,pendingSettingVoiceSrc:"",pendingPremiumVoiceSrc:"",morningCeilingActive:!A_TYPE_MODE};
     session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,premiumBonus:false,oneGameRenBonus:false,bonusBgmSrc:"",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     jagLastGamePayout = 0;
     jagLastBonusPayout = 0;
@@ -12926,27 +12938,55 @@ body{
 
   function applyReachMeBonusIfNeeded(result, resolved){
     if(!A_TYPE_MODE || !currentSpin || !currentSpin.normalActiveAtStart) return false;
-    if(session.active || normalState.bonusPending) return false;
+    if(session.active || normalState.bonusPending || normalState.reachMePending) return false;
     if(result !== "MISS") return false;
     if(resolved && (resolved.bonusHit || resolved.aTypeBonusReady || resolved.bonusReady || resolved.regReady)) return false;
 
     const reachLine = bonusReachLineFromGrid(currentSpin.grid);
     if(!reachLine) return false;
 
-    jagChanceHold = true;
+    jagChanceHold = false;
+    normalState.reachMePending = true;
+    normalState.reachMeBonusKind = "BIG";
+    normalState.reachMeBonusSource = `リーチ目 ${reachLine.join("")}`;
+    normalState.reachMeHitGamesSince = Math.max(0, Number(normalState.sinceBonus) || 0);
+    normalState.bonusPending = false;
+    normalState.bonusKind = "";
+    normalState.bonusSource = "";
+    normalState.premiumBonus = false;
+    normalState.oneGameRenBonus = false;
+    normalState.bonusWaitGames = 0;
+    normalState.bonusHitGamesSince = 0;
+    const lamp = $("stLamp");
+    if(lamp) lamp.classList.remove("on");
+    showMessage("リーチ目", `${reachLine.join("")} / 次ゲーム告知`);
+    log(`リーチ目：${reachLine.join("")} / 次ゲーム告知`);
+    flashReelLight("rainbow", 1600);
+    showOverlay("リーチ目");
+    return true;
+  }
+
+  function activateReachMeBonusAnnouncementIfNeeded(normalActiveAtSpinStart){
+    if(!A_TYPE_MODE || !normalActiveAtSpinStart || session.active) return false;
+    if(!normalState.reachMePending || normalState.bonusPending) return false;
+    const source = normalState.reachMeBonusSource || "リーチ目";
+    normalState.reachMePending = false;
+    normalState.reachMeBonusKind = "";
+    normalState.reachMeBonusSource = "";
     normalState.bonusPending = true;
     normalState.bonusKind = "BIG";
-    normalState.bonusSource = `リーチ目 ${reachLine.join("")}`;
+    normalState.bonusSource = source;
     normalState.premiumBonus = false;
     normalState.oneGameRenBonus = false;
     normalState.bonusWaitGames = 1;
-    normalState.bonusHitGamesSince = Math.max(0, Number(normalState.sinceBonus) || 0);
+    normalState.bonusHitGamesSince = Math.max(0, Number(normalState.reachMeHitGamesSince) || Number(normalState.sinceBonus) || 0);
+    normalState.reachMeHitGamesSince = 0;
+    jagChanceHold = true;
     const lamp = $("stLamp");
     if(lamp) lamp.classList.add("on");
-    showMessage("リーチ目", `${reachLine.join("")} / 次ゲームBONUS確定`);
-    log(`リーチ目：${reachLine.join("")} / 次ゲームBONUS確定`);
-    flashReelLight("rainbow", 1600);
-    showOverlay("リーチ目");
+    playPekaSound();
+    showMessage("BONUS確定", `${source} / CHANCE点灯 / 777を狙ってください`);
+    log(`リーチ目告知：${source} / 次ゲームCHANCE点灯`);
     return true;
   }
 
@@ -13201,6 +13241,8 @@ body{
     stats.totalSpins++;
     chargeSpinCost();
     $("stLamp").classList.remove("on");
+    const reachMeAnnouncementLit = activateReachMeBonusAnnouncementIfNeeded(normalActiveAtSpinStart);
+    if(reachMeAnnouncementLit) triggerBonusConfirmBetSoundIfNeeded();
     updateDisplay();
     $("spinBtn").textContent = "ストップ";
 
@@ -14037,6 +14079,8 @@ body{
     chargeSpinCost();
     jagLastGamePayout = 0;
     if(!normalState.bonusPending && !session.active) jagChanceHold = false;
+    const reachMeAnnouncementLit = activateReachMeBonusAnnouncementIfNeeded(normalActiveAtSpinStart);
+    if(reachMeAnnouncementLit) triggerBonusConfirmBetSoundIfNeeded();
 
     const result = normalActiveAtSpinStart ? drawNormalResult() : drawResult();
     const lineRow = resultLineRow(result);
