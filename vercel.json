@@ -1,20 +1,24 @@
 {
-  "rewrites": [
+  "redirects": [
     {
       "source": "/jag",
-      "destination": "/jag.html"
+      "destination": "/jag.html",
+      "permanent": false
     },
     {
       "source": "/jag/",
-      "destination": "/jag.html"
+      "destination": "/jag.html",
+      "permanent": false
     },
     {
       "source": "/gorai",
-      "destination": "/jag.html"
+      "destination": "/jag.html",
+      "permanent": false
     },
     {
       "source": "/gourai",
-      "destination": "/jag.html"
+      "destination": "/jag.html",
+      "permanent": false
     }
   ]
 }
