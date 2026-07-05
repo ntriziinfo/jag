@@ -7294,6 +7294,7 @@ body{
   const SFX_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
   const SETTING_VOICE_OUTPUT_SCALE = 2.8;
   const CONFIRM_SOUND_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
+  const LINEUP_CONFIRM_SOUND_OUTPUT_SCALE = 3.2;
   const BONUS_CONFIRM_SOUND_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
   const PAYOUT_SOUND_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
   const BELL_PAYOUT_SOUND_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
@@ -9638,7 +9639,6 @@ body{
     if(!isPendingSevenBonusBet()) return false;
     bonusConfirmBgmHold = true;
     pauseNormalBgm();
-    playBonusConfirmSound();
     return true;
   }
 
@@ -14080,8 +14080,8 @@ body{
     }
   }
 
-  function playSevenConfirmSound(){ playLockedBonusConfirmSound(SEVEN_CONFIRM_SOUND_SRC, sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE)); }
-  function playRegConfirmSound(){ playLockedBonusConfirmSound(REG_CONFIRM_SOUND_SRC, sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE)); }
+  function playSevenConfirmSound(){ playLockedBonusConfirmSound(SEVEN_CONFIRM_SOUND_SRC, sfxOutputVolume(LINEUP_CONFIRM_SOUND_OUTPUT_SCALE)); }
+  function playRegConfirmSound(){ playLockedBonusConfirmSound(REG_CONFIRM_SOUND_SRC, sfxOutputVolume(LINEUP_CONFIRM_SOUND_OUTPUT_SCALE)); }
   function playBonusConfirmSound(){ playLockedBonusConfirmSound(BONUS_CONFIRM_SOUND_SRC, sfxOutputVolume(BONUS_CONFIRM_SOUND_OUTPUT_SCALE)); }
   function playPekaSound(){ playOneShotSound(PEKA_SOUND_SRC, sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE)); }
 
