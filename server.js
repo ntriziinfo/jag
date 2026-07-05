@@ -188,7 +188,6 @@ setInterval(()=>{
 }, 3000);
 
 server.listen(PORT, ()=>{
-  console.log(`Rising JAG admin server`);
-  console.log(`Slot:  http://localhost:${PORT}/jag.html?machine=台1`);
-  console.log(`Admin: http://localhost:${PORT}/admin.html`);
+  console.log("RISING server");
+  console.log(`Open: http://localhost:${PORT}/jag.html`);
 });
