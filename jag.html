@@ -7182,6 +7182,7 @@ body{
     5:{solo:389.596546, cherry:910.745729},
     6:{solo:389.728433, cherry:911.054036}
   });
+  const A_TYPE_REACH_ME_ANNOUNCE_RATE = 0.25;
   const A_TYPE_PREMIUM_BIG_PAYOUT = 500;
   const A_TYPE_PAYOUTS = Object.freeze({
     BIG:252,
@@ -11758,6 +11759,10 @@ body{
       return;
     }
 
+    if(applyReachMeBonusIfNeeded(result, resolved)){
+      return;
+    }
+
     if(resolved.bonusHit){
       if(A_TYPE_MODE){
         const announced = !!(currentSpin && currentSpin.bonusAnnouncementLit);
@@ -11795,10 +11800,6 @@ body{
       showOverlay("BONUS確定");
       confetti(70);
       playWinSound(true);
-      return;
-    }
-
-    if(applyReachMeBonusIfNeeded(result, resolved)){
       return;
     }
 
@@ -12838,6 +12839,23 @@ body{
     [[GRAPE_SYMBOL,"BAR",PIERROT_SYMBOL],["7",GRAPE_SYMBOL,CHERRY_SYMBOL],[ELEPHANT_SYMBOL,"7","BAR"]]
   ];
 
+  const REACH_ME_GRID_PATTERNS = [
+    [[GRAPE_SYMBOL,ELEPHANT_SYMBOL,PIERROT_SYMBOL],["BAR","BAR","7"],[ELEPHANT_SYMBOL,GRAPE_SYMBOL,PIERROT_SYMBOL]],
+    [[GRAPE_SYMBOL,ELEPHANT_SYMBOL,PIERROT_SYMBOL],["7","BAR","7"],[ELEPHANT_SYMBOL,GRAPE_SYMBOL,PIERROT_SYMBOL]],
+    [[GRAPE_SYMBOL,ELEPHANT_SYMBOL,PIERROT_SYMBOL],["7","BAR","BAR"],[ELEPHANT_SYMBOL,GRAPE_SYMBOL,PIERROT_SYMBOL]],
+    [[GRAPE_SYMBOL,ELEPHANT_SYMBOL,PIERROT_SYMBOL],["BAR","7","7"],[ELEPHANT_SYMBOL,GRAPE_SYMBOL,PIERROT_SYMBOL]],
+    [[GRAPE_SYMBOL,ELEPHANT_SYMBOL,PIERROT_SYMBOL],["BAR","7","BAR"],[ELEPHANT_SYMBOL,GRAPE_SYMBOL,PIERROT_SYMBOL]],
+    [[GRAPE_SYMBOL,ELEPHANT_SYMBOL,CHERRY_SYMBOL],[PIERROT_SYMBOL,"7",PIERROT_SYMBOL],[ELEPHANT_SYMBOL,GRAPE_SYMBOL,"BAR"]],
+    [[GRAPE_SYMBOL,ELEPHANT_SYMBOL,CHERRY_SYMBOL],[PIERROT_SYMBOL,"BAR",PIERROT_SYMBOL],[ELEPHANT_SYMBOL,GRAPE_SYMBOL,"7"]],
+    [[GRAPE_SYMBOL,ELEPHANT_SYMBOL,PIERROT_SYMBOL],[CHERRY_SYMBOL,GRAPE_SYMBOL,"7"],[ELEPHANT_SYMBOL,PIERROT_SYMBOL,GRAPE_SYMBOL]],
+    [[CHERRY_SYMBOL,GRAPE_SYMBOL,"7"],[ELEPHANT_SYMBOL,PIERROT_SYMBOL,GRAPE_SYMBOL],[GRAPE_SYMBOL,ELEPHANT_SYMBOL,PIERROT_SYMBOL]],
+    [[GRAPE_SYMBOL,ELEPHANT_SYMBOL,PIERROT_SYMBOL],[ELEPHANT_SYMBOL,PIERROT_SYMBOL,GRAPE_SYMBOL],[CHERRY_SYMBOL,GRAPE_SYMBOL,"BAR"]]
+  ];
+
+  function buildReachMeGrid(){
+    return REACH_ME_GRID_PATTERNS[randomInt(0, REACH_ME_GRID_PATTERNS.length - 1)].map(row => row.slice());
+  }
+
 
   function shuffleArray(arr){
     const copy = arr.slice();
@@ -12924,32 +12942,52 @@ body{
     return "MISS";
   }
 
-  function isBonusSymbol(symbol){
-    return symbol === "7" || symbol === "BAR";
+  const REACH_ME_LINE_PATTERNS = [
+    ["BAR","BAR","7"],
+    ["7","BAR","7"],
+    ["7","BAR","BAR"],
+    ["BAR","7","7"],
+    ["BAR","7","BAR"],
+    [PIERROT_SYMBOL,"7",PIERROT_SYMBOL],
+    [PIERROT_SYMBOL,"BAR",PIERROT_SYMBOL]
+  ];
+
+  function reachMeLabelForRow(row){
+    if(!Array.isArray(row) || row.length < 3) return "";
+    const pattern = REACH_ME_LINE_PATTERNS.find(line => line[0] === row[0] && line[1] === row[1] && line[2] === row[2]);
+    return pattern ? pattern.join("") : "";
   }
 
-  function bonusReachLineFromGrid(grid){
-    return gridPaylineRows(grid).find(row=>{
-      return row.length === 3 &&
-        row.every(isBonusSymbol) &&
-        displayedResultFromRow(row) === "MISS";
-    }) || null;
+  function reachMeLabelFromGrid(grid){
+    const rows = Array.isArray(grid) ? grid : [];
+    for(const row of gridPaylineRows(rows)){
+      const label = reachMeLabelForRow(row);
+      if(label) return label;
+    }
+    if(rows[1]?.[0] === CHERRY_SYMBOL) return "中段チェリー";
+    if(rows[0]?.[0] === CHERRY_SYMBOL && rows[0]?.[1] !== CHERRY_SYMBOL) return "上段チェリー・中チェリーなし";
+    if(rows[2]?.[0] === CHERRY_SYMBOL && rows[2]?.[1] !== CHERRY_SYMBOL) return "下段チェリー・中チェリーなし";
+    return "";
+  }
+
+  function hasReachMeShape(grid){
+    return !!reachMeLabelFromGrid(grid);
   }
 
   function applyReachMeBonusIfNeeded(result, resolved){
     if(!A_TYPE_MODE || !currentSpin || !currentSpin.normalActiveAtStart) return false;
     if(session.active || normalState.bonusPending || normalState.reachMePending) return false;
     if(result !== "MISS") return false;
-    if(resolved && (resolved.bonusHit || resolved.aTypeBonusReady || resolved.bonusReady || resolved.regReady)) return false;
+    if(!resolved || !resolved.bonusHit || resolved.aTypeBonusReady || resolved.bonusReady || resolved.regReady) return false;
 
-    const reachLine = bonusReachLineFromGrid(currentSpin.grid);
+    const reachLine = currentSpin.reachMeLine || reachMeLabelFromGrid(currentSpin.grid);
     if(!reachLine) return false;
 
     jagChanceHold = false;
     normalState.reachMePending = true;
-    normalState.reachMeBonusKind = "BIG";
-    normalState.reachMeBonusSource = `リーチ目 ${reachLine.join("")}`;
-    normalState.reachMeHitGamesSince = Math.max(0, Number(normalState.sinceBonus) || 0);
+    normalState.reachMeBonusKind = resolved.bonusKind || "BIG";
+    normalState.reachMeBonusSource = `${resolved.bonusSource || "単独当選"} / リーチ目 ${reachLine}`;
+    normalState.reachMeHitGamesSince = Math.max(0, Number(resolved.gamesSinceLastBonusAtStart) || Number(normalState.sinceBonus) || 0);
     normalState.bonusPending = false;
     normalState.bonusKind = "";
     normalState.bonusSource = "";
@@ -12959,8 +12997,8 @@ body{
     normalState.bonusHitGamesSince = 0;
     const lamp = $("stLamp");
     if(lamp) lamp.classList.remove("on");
-    showMessage("リーチ目", `${reachLine.join("")} / 次ゲーム告知`);
-    log(`リーチ目：${reachLine.join("")} / 次ゲーム告知`);
+    showMessage("リーチ目", `${reachLine} / ランプ非点灯 / 次ゲーム告知`);
+    log(`リーチ目：${reachLine} / ランプ非点灯 / 次ゲーム告知`);
     flashReelLight("rainbow", 1600);
     showOverlay("リーチ目");
     return true;
@@ -12970,11 +13008,12 @@ body{
     if(!A_TYPE_MODE || !normalActiveAtSpinStart || session.active) return false;
     if(!normalState.reachMePending || normalState.bonusPending) return false;
     const source = normalState.reachMeBonusSource || "リーチ目";
+    const bonusKind = normalState.reachMeBonusKind || "BIG";
     normalState.reachMePending = false;
     normalState.reachMeBonusKind = "";
     normalState.reachMeBonusSource = "";
     normalState.bonusPending = true;
-    normalState.bonusKind = "BIG";
+    normalState.bonusKind = bonusKind;
     normalState.bonusSource = source;
     normalState.premiumBonus = false;
     normalState.oneGameRenBonus = false;
@@ -13039,14 +13078,14 @@ body{
     if(result === "MISS"){
       let picked = MISS_GRID_PATTERNS[randomInt(0, MISS_GRID_PATTERNS.length - 1)].map(row => row.slice());
 
-      // ハズレでは、77BAR・BARナナメ揃い・王冠表示を絶対に出さない
+      // ハズレでは、ボーナス揃い・BARナナメ揃い・王冠表示・リーチ目を絶対に出さない
       let guard = 0;
-      while((displayedResultFromGrid(picked) !== "MISS" || hasBarDiagonal(picked) || hasCrownVisible(picked)) && guard < 50){
+      while((displayedResultFromGrid(picked) !== "MISS" || hasBarDiagonal(picked) || hasCrownVisible(picked) || hasReachMeShape(picked)) && guard < 50){
         picked = MISS_GRID_PATTERNS[randomInt(0, MISS_GRID_PATTERNS.length - 1)].map(row => row.slice());
         guard++;
       }
-      if(displayedResultFromGrid(picked) !== "MISS" || hasBarDiagonal(picked) || hasCrownVisible(picked)){
-        picked = [["7","7",GRAPE_SYMBOL],[ELEPHANT_SYMBOL,"BAR",PIERROT_SYMBOL],[GRAPE_SYMBOL,GRAPE_SYMBOL,CHERRY_SYMBOL]];
+      if(displayedResultFromGrid(picked) !== "MISS" || hasBarDiagonal(picked) || hasCrownVisible(picked) || hasReachMeShape(picked)){
+        picked = [[GRAPE_SYMBOL,ELEPHANT_SYMBOL,PIERROT_SYMBOL],[PIERROT_SYMBOL,GRAPE_SYMBOL,ELEPHANT_SYMBOL],[ELEPHANT_SYMBOL,PIERROT_SYMBOL,GRAPE_SYMBOL]];
       }
       return picked;
     }
@@ -13257,9 +13296,14 @@ body{
     const lineRow = resultLineRow(result);
     const resolved = normalActiveAtSpinStart ? resolveNormalOutcome(result, lineRow) : resolveOutcome(result);
     const reversePushGuide = zoneActiveAtSpinStart ? decideReversePushGuide(result, zoneActiveAtSpinStart ? currentGoraiZoneType() : "") : "";
-    const grid = zoneActiveAtSpinStart && reversePushGuide && result === "MISS"
+    let grid = zoneActiveAtSpinStart && reversePushGuide && result === "MISS"
       ? buildReversePushMissGrid()
       : buildGrid(result, lineRow);
+    let reachMeLine = "";
+    if(A_TYPE_MODE && normalActiveAtSpinStart && result === "MISS" && resolved && resolved.bonusHit && Math.random() < A_TYPE_REACH_ME_ANNOUNCE_RATE){
+      grid = buildReachMeGrid();
+      reachMeLine = reachMeLabelFromGrid(grid);
+    }
     const bar3LeverEffect = !A_TYPE_MODE && !speedModeSpinAtStart && result === "BAR3";
     const bigPremiumEffect = !bar3LeverEffect && decideBigPremiumEffect(result, resolved, premiumForced);
     if(A_TYPE_MODE && normalActiveAtSpinStart && resolved && (resolved.bonusHit || resolved.bonusReady) && resolved.bonusKind === "BIG"){
@@ -13269,7 +13313,7 @@ body{
     const speedModeBonusRogiEffect = speedModeSpinAtStart && !premiumMovieEffect && shouldPlaySpeedModeBonusRogi(result, resolved);
     const gekiatsuChance = premiumMovieEffect;
     const zakoEffect = decideZakoEffect(result, resolved, normalActiveAtSpinStart);
-    const bonusAnnouncementTiming = shouldScheduleBonusAnnouncement(normalActiveAtSpinStart, resolved)
+    const bonusAnnouncementTiming = !reachMeLine && shouldScheduleBonusAnnouncement(normalActiveAtSpinStart, resolved)
       ? (A_TYPE_MODE && resolved.premiumBonus ? "lever" : decideBonusAnnouncementTiming())
       : "";
 
@@ -13294,6 +13338,7 @@ body{
       autoStopAtStart:autoPlay,
       bonusAnnouncementTiming,
       bonusAnnouncementLit:false,
+      reachMeLine,
       devilRushEntryEffect,
       battleRound:battleRoundAtSpinStart,
       stopped:[false,false,false],
