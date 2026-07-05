@@ -7426,6 +7426,7 @@ body{
   let bonusConfirmSoundTimer = null;
   const MIN_SPIN_WAIT_MS = 500;
   const RESULT_WAIT_MS = 1000;
+  const REEL_FULL_ROTATION_MS = 750;
   const SPIN_COST = 3;
   const BONUS_ANNOUNCE_THIRD_STOP_RATE = 0.70;
   const BONUS_ANNOUNCE_EARLY_TIMINGS = Object.freeze(["lever", "stop1", "stop2"]);
@@ -11785,6 +11786,10 @@ body{
       return;
     }
 
+    if(applyReachMeBonusIfNeeded(result, resolved)){
+      return;
+    }
+
     $("stLamp").classList.remove("on");
     if(resolved.highAdd > 0){
       showMessage("高確移行", `${modeAtStart} / ${info.name}${lineText ? " / " + lineText : ""}${normalRewardText} / 高確${normalState.highRemain}G / 天井まで${ceilingRemain()}G`);
@@ -12907,6 +12912,44 @@ body{
     return "MISS";
   }
 
+  function isBonusSymbol(symbol){
+    return symbol === "7" || symbol === "BAR";
+  }
+
+  function bonusReachLineFromGrid(grid){
+    return gridPaylineRows(grid).find(row=>{
+      return row.length === 3 &&
+        row.every(isBonusSymbol) &&
+        displayedResultFromRow(row) === "MISS";
+    }) || null;
+  }
+
+  function applyReachMeBonusIfNeeded(result, resolved){
+    if(!A_TYPE_MODE || !currentSpin || !currentSpin.normalActiveAtStart) return false;
+    if(session.active || normalState.bonusPending) return false;
+    if(result !== "MISS") return false;
+    if(resolved && (resolved.bonusHit || resolved.aTypeBonusReady || resolved.bonusReady || resolved.regReady)) return false;
+
+    const reachLine = bonusReachLineFromGrid(currentSpin.grid);
+    if(!reachLine) return false;
+
+    jagChanceHold = true;
+    normalState.bonusPending = true;
+    normalState.bonusKind = "BIG";
+    normalState.bonusSource = `リーチ目 ${reachLine.join("")}`;
+    normalState.premiumBonus = false;
+    normalState.oneGameRenBonus = false;
+    normalState.bonusWaitGames = 1;
+    normalState.bonusHitGamesSince = Math.max(0, Number(normalState.sinceBonus) || 0);
+    const lamp = $("stLamp");
+    if(lamp) lamp.classList.add("on");
+    showMessage("リーチ目", `${reachLine.join("")} / 次ゲームBONUS確定`);
+    log(`リーチ目：${reachLine.join("")} / 次ゲームBONUS確定`);
+    flashReelLight("rainbow", 1600);
+    showOverlay("リーチ目");
+    return true;
+  }
+
   function isMiddleLineOnlyResult(result){
     const display = displayResultFor(result);
     return display === "BIG" || display === "MID" || display === "BAR3";
@@ -13281,7 +13324,9 @@ body{
     reels.forEach((reel,i)=>{
       reel.classList.add("spinning");
       setRandomReel(i);
-      spinIntervals[i] = setInterval(()=>setRandomReel(i), 78 + i*14);
+      const strip = REEL_STRIPS[i] || REEL_STRIPS[0];
+      const reelStepMs = Math.max(16, REEL_FULL_ROTATION_MS / strip.length);
+      spinIntervals[i] = setInterval(()=>setRandomReel(i), reelStepMs);
     });
 
     // オート/SPEED中だけ自動停止。手動時はストップ/左中右を押すまで止まらない。
