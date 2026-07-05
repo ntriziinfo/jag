@@ -12640,7 +12640,7 @@ body{
     const targetSpec = RESULT[targetResult] || RESULT.MISS;
     const targetSymbol = targetSpec.reel ? targetSpec.reel[reelIndex] : "";
     const targetRow = Array.isArray(spin?.lineRow) ? spin.lineRow[reelIndex] : Number(spin?.lineRow ?? 1);
-    const slipFrames = 4;
+    const slipFrames = 5;
 
     if(targetResult !== "MISS" && targetSymbol && Number.isFinite(targetRow)){
       let bestTop = null;
@@ -12662,6 +12662,10 @@ body{
     return reelWindowFromTopIndex(reelIndex, baseTop);
   }
 
+  function cloneGrid(grid){
+    return Array.isArray(grid) ? grid.map(row => Array.isArray(row) ? row.slice() : []) : [];
+  }
+
   function setGridColumn(grid, reelIndex, columnSymbols){
     if(!Array.isArray(grid) || !Array.isArray(columnSymbols)) return;
     for(let row=0; row<3; row++){
@@ -12669,6 +12673,31 @@ body{
       grid[row][reelIndex] = columnSymbols[row];
     }
   }
+
+  function manualBonusFinalColumnForReel(reelIndex, spin=currentSpin, initialColumn=null){
+    if(!spin || !spin.grid) return initialColumn || manualStopColumnForReel(reelIndex, spin);
+    const targetResult = displayResultFor(spin.result);
+    const baseTop = currentReelTopIndex(reelIndex);
+    const strip = REEL_STRIPS[reelIndex] || REEL_STRIPS[0];
+    const firstColumn = initialColumn || reelWindowFromTopIndex(reelIndex, baseTop);
+    const firstGrid = cloneGrid(spin.grid);
+    setGridColumn(firstGrid, reelIndex, firstColumn);
+    const firstResult = displayedResultFromGrid(firstGrid);
+    if(firstResult === targetResult || firstResult === "MISS") return firstColumn;
+
+    const findSafeColumn = limit=>{
+      for(let distance=0; distance<=limit; distance++){
+        const column = reelWindowFromTopIndex(reelIndex, baseTop + distance);
+        const testGrid = cloneGrid(spin.grid);
+        setGridColumn(testGrid, reelIndex, column);
+        if(displayedResultFromGrid(testGrid) === "MISS") return column;
+      }
+      return null;
+    };
+
+    return findSafeColumn(5) || findSafeColumn(strip.length - 1) || firstColumn;
+  }
+
 
   function refreshStoppedGrid(grid, result="MISS", lineRow=null){
     const spec = RESULT[result] || RESULT.MISS;
@@ -12716,8 +12745,6 @@ body{
       manualLineupMiss:true,
       ceilingAfter:nextCeiling
     };
-    spin.grid = buildGrid("MISS", 1);
-    refreshStoppedGrid(spin.grid, "MISS", null);
   }
 
   function lineName(row){
@@ -13256,9 +13283,12 @@ body{
     const {grid, spec, result, lineRow} = currentSpin;
     const stopOrder = currentSpin.stopped.filter(Boolean).length + 1;
     const reversePushWrongFirst = isReversePushGuidedMiss(currentSpin) && stopOrder === 1 && i !== 2;
-    const col = currentSpin.manualBonusStop
+    let col = currentSpin.manualBonusStop
       ? manualStopColumnForReel(i, currentSpin)
       : [grid[0][i], grid[1][i], grid[2][i]];
+    if(currentSpin.manualBonusStop && stopOrder === 3){
+      col = manualBonusFinalColumnForReel(i, currentSpin, col);
+    }
     if(currentSpin.manualBonusStop){
       setGridColumn(grid, i, col);
     }
