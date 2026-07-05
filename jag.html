@@ -16,8 +16,11 @@
 <link rel="preload" as="image" href="assets/symbols/sym_replay.png">
 <link rel="preload" as="image" href="assets/cabinet/edit_parts/piero.png">
 <link rel="preload" as="image" href="assets/logo/rising_logo.svg">
+<link rel="preload" as="image" href="assets/ui/rising_chance_lamp_bg.png">
+<link rel="preload" as="image" href="assets/ui/rising_chance_lamp_text.png">
+<link rel="preload" as="image" href="assets/ui/rising_chance_bar_confirm.png">
 <link rel="preload" as="image" href="assets/frames/rising_reel_frame_on.svg">
-<link rel="preload" as="image" href="assets/buttons/btn_auto_half_blue.png">
+<link rel="preload" as="image" href="assets/buttons/btn_auto_gold_transparent.png">
 <link rel="preload" as="image" href="assets/buttons/btn_speed_half_blue.png">
 <link rel="preload" as="image" href="assets/controls/start_lever_ball.png">
 <link rel="preload" as="image" href="assets/controls/stop_button_red_cut.png">
@@ -183,6 +186,41 @@ h1{
   object-fit:contain;
   pointer-events:none;
   filter:drop-shadow(0 0 10px rgba(77,231,255,.34)) drop-shadow(0 5px 5px rgba(0,0,0,.55));
+}
+.utilityTextBtn{
+  width:68px;
+  height:54px;
+  border-radius:18px;
+  display:grid;
+  place-items:center;
+  padding:0 10px;
+  color:#eaf8ff;
+  font-size:14px;
+  font-weight:1000;
+  letter-spacing:0;
+  border:1px solid rgba(77,231,255,.42);
+  background:
+    linear-gradient(180deg,rgba(36,111,170,.96),rgba(5,18,46,.98)),
+    radial-gradient(circle at 50% 20%,rgba(255,255,255,.32),transparent 48%);
+  box-shadow:
+    inset 0 0 10px rgba(255,255,255,.12),
+    0 0 12px rgba(77,231,255,.28),
+    0 5px 5px rgba(0,0,0,.48);
+  text-shadow:0 0 8px rgba(77,231,255,.54), 1px 1px 0 #001228;
+}
+.utilityTextBtn.on{
+  color:#101006;
+  border-color:rgba(255,224,92,.88);
+  background:linear-gradient(180deg,#fff49a,#ffbf27 58%,#d96200);
+  box-shadow:
+    inset 0 0 12px rgba(255,255,255,.30),
+    0 0 18px rgba(255,224,92,.58),
+    0 5px 5px rgba(0,0,0,.48);
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
+}
+.utilityTextBtn:disabled{
+  opacity:.48;
+  filter:grayscale(.45);
 }
 .audioDock.open .audioToggleBtn,
 .audioToggleBtn:focus-visible,
@@ -491,6 +529,9 @@ body.layoutEditOpen .jagBonusDataMeters{
   transform:translateX(-50%);
   max-height:var(--wd-info-panel-max-height, min(620px, calc(100vh - var(--wd-info-panel-top, 84px) - 18px)));
 }
+.audioDock.slumpOpen #slumpPanel{
+  min-width:min(760px, calc(100vw - 32px));
+}
 #slumpPanel{
   width:min(1000px, calc(100vw - 32px));
   max-height:min(620px, calc(100vh - 94px));
@@ -542,6 +583,7 @@ body.layoutEditOpen .jagBonusDataMeters{
 }
 #slumpPanel .slumpCanvasWrap{
   width:100%;
+  min-height:190px;
   height:190px;
   overflow:hidden;
   border:1px solid rgba(77,231,255,.24);
@@ -550,6 +592,8 @@ body.layoutEditOpen .jagBonusDataMeters{
 }
 #slumpPanel #slumpGraph{
   display:block;
+  min-width:280px;
+  min-height:190px;
   width:100%;
   height:100%;
 }
@@ -1138,86 +1182,6 @@ body.layoutEditOpen .jagBonusDataMeters{
 .bellZakoPanel.stopVideo video{
   filter:saturate(1.28) contrast(1.14) brightness(1.05);
 }
-.gekiatsuLayer{
-  position:absolute;
-  inset:10px;
-  border-radius:26px;
-  overflow:hidden;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-  z-index:12;
-  background:rgba(0,0,0,0);
-  transition:opacity .18s ease, visibility .18s ease, transform .18s ease;
-  transform:scale(.98);
-}
-.gekiatsuLayer.show{
-  opacity:.72;
-  visibility:visible;
-  transform:scale(1);
-  mix-blend-mode:screen;
-}
-.gekiatsuLayer.solidMovie.show{
-  opacity:1;
-  background:#000;
-  mix-blend-mode:normal;
-}
-.gekiatsuLayer video{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  filter:saturate(1.15) brightness(1.04) contrast(.95);
-}
-.gekiatsuLayer.solidMovie video{
-  filter:none;
-}
-.bonusConfirmLayer{
-  position:absolute;
-  left:12.7%;
-  right:12.7%;
-  top:27.8%;
-  bottom:21.4%;
-  border-radius:8px;
-  overflow:hidden;
-  display:grid;
-  place-items:center;
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-  z-index:14;
-  background:#000;
-  transition:opacity .16s ease, visibility .16s ease, transform .16s ease;
-  transform:scale(.985);
-  box-shadow:
-    inset 0 0 42px rgba(255,190,28,.28),
-    0 0 28px rgba(255,138,0,.28);
-}
-.bonusConfirmLayer.show{
-  opacity:1;
-  visibility:visible;
-  transform:scale(1);
-  mix-blend-mode:normal;
-}
-.bonusConfirmLayer.show.translucent{
-  opacity:.72;
-  background:rgba(0,0,0,.08);
-  mix-blend-mode:screen;
-}
-.bonusConfirmLayer img{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-.bonusConfirmLayer.show.translucent img{
-  filter:saturate(1.15) brightness(1.04) contrast(.95);
-}
 .devilZoneConfirmLayer{
   position:absolute;
   left:12.7%;
@@ -1368,61 +1332,6 @@ body.layoutEditOpen .jagBonusDataMeters{
   58%{opacity:.82}
   100%{opacity:0}
 }
-.battleIntroLayer{
-  position:absolute;
-  inset:10px;
-  border-radius:26px;
-  overflow:hidden;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-  z-index:11;
-  transform:scale(.985);
-  transition:opacity .16s ease, visibility .16s ease, transform .16s ease;
-  background:
-    radial-gradient(circle at 52% 46%, rgba(255,255,255,.60), rgba(81,228,255,.46) 20%, rgba(20,105,223,.88) 53%, rgba(4,16,73,.98) 100%),
-    linear-gradient(120deg, rgba(185,246,255,.28), rgba(0,64,210,.10));
-  box-shadow:
-    inset 0 0 46px rgba(93,224,255,.42),
-    inset 0 0 88px rgba(1,35,130,.62),
-    0 0 28px rgba(46,160,255,.30);
-}
-.battleIntroLayer::before{
-  content:"";
-  position:absolute;
-  inset:-32% -18%;
-  background:
-    linear-gradient(112deg, rgba(255,255,255,0) 18%, rgba(255,255,255,.42) 45%, rgba(70,226,255,.24) 54%, rgba(255,255,255,0) 76%),
-    repeating-linear-gradient(166deg, rgba(255,255,255,.18) 0 2px, rgba(255,255,255,0) 2px 22px);
-  transform:translateX(-36%);
-  animation:battleIntroSweep 1.35s ease-out both;
-  mix-blend-mode:screen;
-}
-.battleIntroLayer.show{
-  opacity:.94;
-  visibility:visible;
-  transform:scale(1);
-}
-.battleIntroLayer.continueConfirmed{
-  background:
-    radial-gradient(circle at 52% 46%, rgba(255,255,255,.58), rgba(255,92,64,.50) 20%, rgba(210,16,32,.90) 53%, rgba(64,0,20,.98) 100%),
-    linear-gradient(120deg, rgba(255,221,96,.30), rgba(255,48,48,.12));
-  box-shadow:
-    inset 0 0 50px rgba(255,184,80,.42),
-    inset 0 0 90px rgba(145,0,20,.72),
-    0 0 34px rgba(255,48,68,.42);
-}
-.battleIntroLayer.continueConfirmed::before{
-  background:
-    linear-gradient(112deg, rgba(255,255,255,0) 18%, rgba(255,244,183,.50) 45%, rgba(255,72,48,.28) 54%, rgba(255,255,255,0) 76%),
-    repeating-linear-gradient(166deg, rgba(255,224,116,.20) 0 2px, rgba(255,255,255,0) 2px 22px);
-}
-.battleIntroLayer.continueConfirmed .battleIntroCharacter{
-  filter:drop-shadow(0 16px 24px rgba(0,0,0,.78)) drop-shadow(0 0 20px rgba(255,160,70,.55));
-}
 .sessionResultLayer{
   position:absolute;
   inset:0;
@@ -1478,47 +1387,6 @@ body.layoutEditOpen .jagBonusDataMeters{
     0 2px 0 rgba(75,48,0,.72),
     0 0 18px rgba(255,212,74,.58),
     0 9px 26px rgba(0,42,86,.38);
-}
-.battleIntroLogo{
-  position:absolute;
-  left:50%;
-  top:6%;
-  width:min(58%, 470px);
-  max-height:38%;
-  object-fit:contain;
-  transform:translateX(-50%);
-  z-index:4;
-  filter:drop-shadow(0 10px 16px rgba(0,0,0,.72)) drop-shadow(0 0 18px rgba(255,220,75,.60));
-}
-.battleIntroRound{
-  position:absolute;
-  right:8%;
-  bottom:6%;
-  width:min(20%, 132px);
-  max-height:37%;
-  object-fit:contain;
-  z-index:5;
-  filter:drop-shadow(0 10px 16px rgba(0,0,0,.75)) drop-shadow(0 0 16px rgba(255,220,55,.62));
-}
-.battleIntroCharacter{
-  position:absolute;
-  left:4%;
-  bottom:-9%;
-  max-width:49%;
-  max-height:106%;
-  object-fit:contain;
-  z-index:3;
-  filter:drop-shadow(0 16px 24px rgba(0,0,0,.78)) drop-shadow(0 0 18px rgba(130,230,255,.42));
-}
-.battleIntroCharacter.right{
-  left:auto;
-  right:2%;
-  transform:scaleX(-1);
-}
-@keyframes battleIntroSweep{
-  0%{transform:translateX(-45%); opacity:.15}
-  58%{opacity:.88}
-  100%{transform:translateX(28%); opacity:.34}
 }
 .lineGuide{
   position:absolute;
@@ -2330,57 +2198,6 @@ body.debugOpen .debugDrawer .secret{
 }
 
 
-.gekiatsuLayer{
-  position:absolute;
-  left:12.7%;
-  right:12.7%;
-  top:27.8%;
-  bottom:21.4%;
-  border-radius:7px;
-  overflow:hidden;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-  z-index:95;
-  background:rgba(0,0,0,0);
-  transition:opacity .18s ease, visibility .18s ease, transform .18s ease;
-  transform:scale(.98);
-}
-.gekiatsuLayer.solidMovie{
-  background:#000;
-}
-.gekiatsuLayer.show{
-  opacity:1;
-  visibility:visible;
-  transform:scale(1);
-}
-.gekiatsuLayer::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:radial-gradient(circle at center, rgba(255,255,255,.02), rgba(0,0,0,.10));
-  z-index:1;
-}
-.gekiatsuLayer video{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  filter:saturate(1.18) brightness(1.08);
-}
-.gekiatsuLayer img{
-  position:relative;
-  z-index:2;
-  width:min(94%, 1100px);
-  max-height:76%;
-  object-fit:contain;
-  filter:drop-shadow(0 0 12px rgba(255,255,255,.9)) drop-shadow(0 0 36px rgba(255,0,0,.65));
-  animation:gekiatsuPulse .45s ease-in-out 1 alternate;
-}
 .reelArea.goraiZoneGlow{
   filter:saturate(1.16);
 }
@@ -2422,139 +2239,6 @@ body.debugOpen .debugDrawer .secret{
   height:100%;
   object-fit:cover;
   filter:saturate(1.12) contrast(1.05) brightness(.96);
-}
-.battleIntroLayer{
-  position:absolute;
-  left:12.7%;
-  right:12.7%;
-  top:27.8%;
-  bottom:21.4%;
-  border-radius:7px;
-  overflow:hidden;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-  z-index:96;
-  transform:scale(.985);
-  transition:opacity .16s ease, visibility .16s ease, transform .16s ease;
-  background:
-    radial-gradient(circle at 52% 46%, rgba(255,255,255,.60), rgba(81,228,255,.46) 20%, rgba(20,105,223,.88) 53%, rgba(4,16,73,.98) 100%),
-    linear-gradient(120deg, rgba(185,246,255,.28), rgba(0,64,210,.10));
-  box-shadow:
-    inset 0 0 46px rgba(93,224,255,.42),
-    inset 0 0 88px rgba(1,35,130,.62),
-    0 0 28px rgba(46,160,255,.30);
-}
-.battleIntroLayer::before{
-  content:"";
-  position:absolute;
-  inset:-32% -18%;
-  background:
-    linear-gradient(112deg, rgba(255,255,255,0) 18%, rgba(255,255,255,.42) 45%, rgba(70,226,255,.24) 54%, rgba(255,255,255,0) 76%),
-    repeating-linear-gradient(166deg, rgba(255,255,255,.18) 0 2px, rgba(255,255,255,0) 2px 22px);
-  transform:translateX(-36%);
-  animation:battleIntroSweep 1.35s ease-out both;
-  mix-blend-mode:screen;
-}
-.battleIntroLayer.show{
-  opacity:.94;
-  visibility:visible;
-  transform:scale(1);
-}
-.battleIntroLayer.continueConfirmed{
-  background:
-    radial-gradient(circle at 52% 46%, rgba(255,255,255,.58), rgba(255,92,64,.50) 20%, rgba(210,16,32,.90) 53%, rgba(64,0,20,.98) 100%),
-    linear-gradient(120deg, rgba(255,221,96,.30), rgba(255,48,48,.12));
-}
-.battleIntroLogo{
-  position:absolute;
-  left:50%;
-  top:6%;
-  width:min(58%, 470px);
-  max-height:38%;
-  object-fit:contain;
-  transform:translateX(-50%);
-  z-index:4;
-  filter:drop-shadow(0 10px 16px rgba(0,0,0,.72)) drop-shadow(0 0 18px rgba(255,220,75,.60));
-}
-.battleIntroRound{
-  position:absolute;
-  right:8%;
-  bottom:6%;
-  width:min(20%, 132px);
-  max-height:37%;
-  object-fit:contain;
-  z-index:5;
-  filter:drop-shadow(0 10px 16px rgba(0,0,0,.75)) drop-shadow(0 0 16px rgba(255,220,55,.62));
-}
-.battleIntroCharacter{
-  position:absolute;
-  left:4%;
-  bottom:-9%;
-  max-width:49%;
-  max-height:106%;
-  object-fit:contain;
-  z-index:3;
-  filter:drop-shadow(0 16px 24px rgba(0,0,0,.78)) drop-shadow(0 0 18px rgba(130,230,255,.42));
-}
-.battleIntroCharacter.right{
-  left:auto;
-  right:2%;
-  transform:scaleX(-1);
-}
-
-/* Battle intro composition: fill the reel display frame without overflowing it. */
-.battleIntroLayer{
-  left:12.7% !important;
-  right:12.7% !important;
-  top:27.8% !important;
-  bottom:21.4% !important;
-  border-radius:7px !important;
-  overflow:hidden !important;
-}
-.battleIntroLogo{
-  left:1.6% !important;
-  top:18.2% !important;
-  width:64.4% !important;
-  height:63.5% !important;
-  max-width:none !important;
-  max-height:none !important;
-  transform:none !important;
-  object-fit:contain !important;
-  object-position:center center !important;
-  z-index:7 !important;
-}
-.battleIntroRound{
-  left:66.8% !important;
-  right:12.5% !important;
-  bottom:5.0% !important;
-  width:20.7% !important;
-  height:34.0% !important;
-  max-width:none !important;
-  max-height:none !important;
-  object-fit:contain !important;
-  object-position:center bottom !important;
-  z-index:8 !important;
-}
-.battleIntroCharacter,
-.battleIntroCharacter.right{
-  left:66.4% !important;
-  right:0 !important;
-  top:0 !important;
-  bottom:0 !important;
-  width:33.6% !important;
-  height:100% !important;
-  max-width:none !important;
-  max-height:none !important;
-  object-fit:contain !important;
-  object-position:center bottom !important;
-  z-index:6 !important;
-}
-.battleIntroCharacter.right{
-  transform:scaleX(-1);
 }
 .sessionResultLayer{
   position:absolute;
@@ -2849,7 +2533,7 @@ body::after{
 .betBtn.waiting,.betBtn.stopReady{background-image:url("assets/buttons/btn_bet_on.png") !important;}
 .centerStopBtns button{background-image:url("assets/buttons/btn_stop.png") !important;width:118px !important;height:78px !important;}
 .centerStopBtns button:not(:disabled){background-image:url("assets/buttons/btn_stop_on.png") !important;}
-.autoArea .autoInlineBtn{background-image:url("assets/buttons/btn_auto_half_blue.png") !important;min-width:118px !important;min-height:38px !important;}
+.autoArea .autoInlineBtn{background-image:url("assets/buttons/btn_auto_gold_transparent.png") !important;min-width:118px !important;min-height:38px !important;}
 .autoArea .speedInlineBtn{background-image:url("assets/buttons/btn_speed_half_blue.png") !important;min-width:118px !important;min-height:38px !important;}
 .resultBoxWide{font-size:15px;color:#9edcff !important;text-shadow:0 0 10px rgba(20,165,255,.6) !important;}
 .side{display:contents !important;}
@@ -2878,7 +2562,6 @@ body::after{
 .wd-devil-mark{font-size:38px;font-weight:1000;color:#ff2525;text-shadow:0 0 12px rgba(255,0,0,.9);}
 .wd-bonus-card p{margin:8px 0 0;font-weight:800;line-height:1.6;}
 .logList{max-height:360px !important;}
-.gekiatsuLayer img{content:url("assets/effects/gekiachu.png");}
 @media(max-width:1120px){
     .wd-hero{grid-template-columns:1fr;min-height:360px;padding:26px 12px;}
   .wd-vertical-copy,.wd-hero-side{display:none;}
@@ -3229,7 +2912,7 @@ body::after{display:none !important;content:none !important;}
   line-height:1 !important;
 }
 .autoArea .autoInlineBtn{
-  background-image:url("assets/buttons/btn_auto_half_blue.png") !important;
+  background-image:url("assets/buttons/btn_auto_gold_transparent.png") !important;
 }
 .autoArea .speedInlineBtn{
   background-image:url("assets/buttons/btn_speed_half_blue.png") !important;
@@ -3942,7 +3625,7 @@ body{
   --wd-left-rail-width:256px;
   --wd-right-rail-width:244px;
   --wd-cabinet-anchor-offset:0px;
-  --wd-cabinet-x-offset:-15px;
+  --wd-cabinet-x-offset:-190px;
   --wd-bg-sync-x:center top;
   --wd-bg-sync-size:100% auto;
 }
@@ -4647,6 +4330,38 @@ body{
   background:linear-gradient(180deg,#f4f5f8,#b8bec9);
   border:2px solid rgba(100,107,120,.75);
   text-shadow:0 1px 0 rgba(255,255,255,.78);
+}
+.playControls .autoArea{
+  left:72.7% !important;
+  top:65.1% !important;
+  width:8.2% !important;
+  height:auto !important;
+  aspect-ratio:1 / 1 !important;
+  opacity:1 !important;
+  filter:none !important;
+}
+.playControls .autoArea .autoStack{
+  inset:0 !important;
+  grid-template-rows:1fr !important;
+}
+.playControls .autoArea .autoInlineBtn{
+  opacity:1 !important;
+  background-size:contain !important;
+  filter:
+    drop-shadow(0 0 5px rgba(42,149,255,.95))
+    drop-shadow(0 0 13px rgba(42,149,255,.62))
+    drop-shadow(0 0 22px rgba(42,149,255,.34)) !important;
+}
+.playControls .autoArea .autoInlineBtn.on{
+  filter:
+    drop-shadow(0 0 5px rgba(255,44,64,.98))
+    drop-shadow(0 0 14px rgba(255,44,64,.72))
+    drop-shadow(0 0 25px rgba(255,44,64,.42))
+    brightness(.98)
+    saturate(1.12) !important;
+}
+.playControls .autoArea .speedInlineBtn{
+  display:none !important;
 }
 .machine .resultBoxWide{
   display:grid !important;
@@ -5442,7 +5157,19 @@ body{
   filter:none;
   transition:opacity .22s ease, transform .22s ease;
 }
-.jagGogoChance::after{display:none;}
+.jagGogoChance::after{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  z-index:0;
+  pointer-events:none;
+  background:url("assets/ui/rising_gogo_chance.png") center / contain no-repeat;
+  opacity:.74;
+  filter:brightness(.17) saturate(1.5) hue-rotate(232deg) drop-shadow(0 8px 8px rgba(0,0,0,.92)) drop-shadow(0 0 7px rgba(55,0,115,.72));
+}
 .jagGogoChanceBack{
   position:absolute;
   left:0;
@@ -5450,9 +5177,9 @@ body{
   width:100%;
   height:100%;
   transform:none;
-  z-index:0;
+  z-index:1;
   pointer-events:none;
-  background:url("assets/ui/rising_gogo_chance.png") center / contain no-repeat;
+  background:url("assets/ui/rising_chance_lamp_bg.png") center / contain no-repeat;
   opacity:.58;
   filter:brightness(.28) saturate(1.35) hue-rotate(235deg) drop-shadow(0 8px 8px rgba(0,0,0,.92)) drop-shadow(0 0 6px rgba(38,0,92,.52));
 }
@@ -5460,7 +5187,7 @@ body{
   content:"";
   position:absolute;
   inset:21% 10% 12%;
-  z-index:0;
+  z-index:1;
   display:none;
   border-radius:50%;
   background:radial-gradient(circle,rgba(255,220,36,.18),rgba(255,43,14,.10) 46%,transparent 72%);
@@ -5478,6 +5205,22 @@ body{
   opacity:1;
   filter:grayscale(.92) brightness(.42) contrast(1.18) drop-shadow(0 5px 5px rgba(0,0,0,.70));
   transition:filter .22s ease, opacity .22s ease;
+}
+.jagGogoChanceBar{
+  visibility:hidden;
+  opacity:0;
+}
+.jagGogoChance.is-bar-confirm .jagGogoChanceText{
+  visibility:hidden;
+  opacity:0;
+}
+.jagGogoChance.is-bar-confirm .jagGogoChanceBar{
+  visibility:visible;
+  opacity:1;
+  filter:saturate(1.18) brightness(1.08) contrast(1.08) drop-shadow(0 0 14px rgba(60,225,255,.84)) drop-shadow(0 0 26px rgba(0,112,255,.56));
+}
+.jagGogoChance.is-bar-confirm .jagGogoChanceLabel{
+  display:none;
 }
 .jagGogoChanceLabel{
   position:absolute;
@@ -5498,11 +5241,12 @@ body{
   transform:rotate(-8deg) scale(1.04);
 }
 .reelArea.jagChanceLit .jagGogoChance::after{
-  opacity:.26;
+  opacity:.34;
+  filter:brightness(.28) saturate(1.8) hue-rotate(232deg) drop-shadow(0 0 12px rgba(92,0,180,.72)) drop-shadow(0 0 20px rgba(0,0,0,.86));
 }
 .reelArea.jagChanceLit .jagGogoChanceBack{
-  opacity:.20;
-  filter:drop-shadow(0 0 14px rgba(255,224,56,.45));
+  opacity:.95;
+  filter:saturate(1.18) brightness(1.1) contrast(1.05) drop-shadow(0 0 14px rgba(255,224,56,.72)) drop-shadow(0 0 26px rgba(255,60,24,.48));
 }
 .reelArea.jagChanceLit .jagGogoChance::before{
   display:block;
@@ -6086,30 +5830,30 @@ body{
   --jag-cabinet-height:1610px;
   --jag-reel-top:466px;
   --jag-reel-height:478px;
-  --layout-reels-x:20.7%;
-  --layout-reels-y:24.9%;
-  --layout-reels-w:57.6%;
-  --layout-reels-h:50%;
-  --layout-chance-x:6.1%;
-  --layout-chance-y:64.8%;
-  --layout-chance-w:16.3%;
-  --layout-chance-h:21.8%;
-  --layout-credit-x:29.4%;
+  --layout-reels-x:20.6%;
+  --layout-reels-y:20.4%;
+  --layout-reels-w:57.4%;
+  --layout-reels-h:56.4%;
+  --layout-chance-x:14.6%;
+  --layout-chance-y:76%;
+  --layout-chance-w:11.9%;
+  --layout-chance-h:22.4%;
+  --layout-credit-x:28%;
   --layout-credit-y:80.4%;
-  --layout-credit-w:11.8%;
-  --layout-credit-h:8.2%;
-  --layout-count-x:44.1%;
-  --layout-count-y:80.4%;
-  --layout-count-w:11.8%;
-  --layout-count-h:8.2%;
-  --layout-payout-x:58.8%;
-  --layout-payout-y:80.4%;
-  --layout-payout-w:11.8%;
-  --layout-payout-h:8.2%;
-  --layout-bonusdata-x:21.4%;
-  --layout-bonusdata-y:9.2%;
-  --layout-bonusdata-w:57.2%;
-  --layout-bonusdata-h:9.6%;
+  --layout-credit-w:12.2%;
+  --layout-credit-h:22.1%;
+  --layout-count-x:41.6%;
+  --layout-count-y:83.2%;
+  --layout-count-w:12.2%;
+  --layout-count-h:11.2%;
+  --layout-payout-x:57%;
+  --layout-payout-y:83.2%;
+  --layout-payout-w:12.2%;
+  --layout-payout-h:11.2%;
+  --layout-bonusdata-x:19%;
+  --layout-bonusdata-y:6.5%;
+  --layout-bonusdata-w:62.9%;
+  --layout-bonusdata-h:13.3%;
 }
 .machine{
   min-height:1670px !important;
@@ -6290,28 +6034,41 @@ body{
   z-index:3 !important;
   filter:drop-shadow(0 4px 5px rgba(0,0,0,.34)) !important;
 }
-.premiumReelOverlay{
+.premiumBigReelMovie{
   position:absolute;
-  left:var(--layout-reels-x);
+  left:calc(var(--layout-reels-x) - 1.8%);
   top:var(--layout-reels-y);
-  width:var(--layout-reels-w);
+  width:calc(var(--layout-reels-w) + 3.6%);
   height:var(--layout-reels-h);
-  z-index:4;
-  pointer-events:none;
+  padding-top:10px;
+  padding-bottom:2px;
+  box-sizing:border-box;
+  z-index:17;
   opacity:0;
+  visibility:hidden;
+  pointer-events:none;
   overflow:hidden;
+  border-radius:8px;
   mix-blend-mode:screen;
-  transition:opacity .35s ease;
+  filter:saturate(1.32) contrast(1.18) brightness(1.08);
+  transition:opacity .25s ease, visibility .25s ease;
 }
-.reelArea.premiumBigOverlayOn .premiumReelOverlay{
-  opacity:.46;
+.premiumBigReelMovie.show{
+  opacity:.9;
+  visibility:visible;
 }
-.premiumReelOverlay img{
-  width:100%;
+.premiumBigReelMovie.show.is-reel-stopped{
+  opacity:1;
+  mix-blend-mode:normal;
+  filter:saturate(1.18) contrast(1.08) brightness(1.02);
+}
+.premiumBigReelMovie video{
+  width:118%;
   height:100%;
+  display:block;
   object-fit:cover;
-  object-position:center 36%;
-  filter:saturate(1.08) contrast(1.04) brightness(1.12);
+  transform:translateX(-7.62%);
+  transform-origin:center center;
 }
 .reel{
   height:100% !important;
@@ -6616,10 +6373,36 @@ body{
   transform:scale(.92);
 }
 .playControls .autoArea{
-  left:86.0% !important;
+  left:72.7% !important;
   top:65.1% !important;
-  width:10.5% !important;
-  height:8.2% !important;
+  width:8.2% !important;
+  height:auto !important;
+  aspect-ratio:1 / 1 !important;
+  opacity:1 !important;
+  filter:none !important;
+}
+.playControls .autoArea .autoStack{
+  inset:0 !important;
+  grid-template-rows:1fr !important;
+}
+.playControls .autoArea .autoInlineBtn{
+  opacity:1 !important;
+  background-size:contain !important;
+  filter:
+    drop-shadow(0 0 5px rgba(42,149,255,.95))
+    drop-shadow(0 0 13px rgba(42,149,255,.62))
+    drop-shadow(0 0 22px rgba(42,149,255,.34)) !important;
+}
+.playControls .autoArea .autoInlineBtn.on{
+  filter:
+    drop-shadow(0 0 5px rgba(255,44,64,.98))
+    drop-shadow(0 0 14px rgba(255,44,64,.72))
+    drop-shadow(0 0 25px rgba(255,44,64,.42))
+    brightness(.98)
+    saturate(1.12) !important;
+}
+.playControls .autoArea .speedInlineBtn{
+  display:none !important;
 }
 .machine .resultBoxWide{
   display:none !important;
@@ -6857,20 +6640,6 @@ body{
               <input id="payoutVolumeNumber" class="audioVolumeNumber" type="number" min="0" max="100" step="1" value="50" inputmode="numeric" aria-label="払い出し音量 %" />
             </div>
           </div>
-          <div class="field">
-            <label>動画音量</label>
-            <div class="audioVolumeControl">
-              <input id="movieVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
-              <input id="movieVolumeNumber" class="audioVolumeNumber" type="number" min="0" max="100" step="1" value="50" inputmode="numeric" aria-label="動画音量 %" />
-            </div>
-          </div>
-          <div class="field">
-            <label>CZ動画音量</label>
-            <div class="audioVolumeControl">
-              <input id="rogiMovieVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
-              <input id="rogiMovieVolumeNumber" class="audioVolumeNumber" type="number" min="0" max="100" step="1" value="50" inputmode="numeric" aria-label="CZ動画音量 %" />
-            </div>
-          </div>
         </div>
       </div>
       <div class="lamps">
@@ -6922,6 +6691,9 @@ body{
       <div class="reelArea">
         <div class="risingReelBackplate" aria-hidden="true"></div>
         <img class="reelFrameOnOverlay" src="assets/frames/rising_reel_frame_on.svg" alt="" aria-hidden="true" loading="eager" decoding="sync" draggable="false">
+        <div class="premiumBigReelMovie" id="premiumBigReelMovie" aria-hidden="true">
+          <video muted loop playsinline preload="auto"></video>
+        </div>
         <div class="wd-public-panels wd-st-status-panel wd-reel-data-panel" id="bonus-info">
           <div class="wd-st-emblem" id="wdStEmblem">A-TYPE<br>BONUS</div>
           <div class="wd-st-readout">
@@ -6947,9 +6719,6 @@ body{
           </div>
         </div>
         <div class="payline"></div>
-        <div class="premiumReelOverlay" id="premiumReelOverlay" aria-hidden="true">
-          <img src="assets/effects/premium_reel_overlay.png" alt="" loading="eager" decoding="async" draggable="false">
-        </div>
         <div class="reels">
           <div class="reel" data-reel="0"><div class="window">
             <div class="cell"><img class="symImg barSymImg" src="assets/symbols/sym_bar.png" alt="BAR symbol" loading="eager" decoding="sync" draggable="false"></div>
@@ -6990,7 +6759,8 @@ body{
         </div>
         <div class="jagGogoChance" id="jagGogoChance" aria-label="GOGO CHANCE">
           <span class="jagGogoChanceBack" aria-hidden="true"></span>
-          <img src="assets/ui/rising_gogo_chance.png" alt="RISING CHANCE" loading="eager" decoding="async" draggable="false">
+          <img class="jagGogoChanceText" src="assets/ui/rising_chance_lamp_text.png" alt="RISING CHANCE" loading="eager" decoding="async" draggable="false">
+          <img class="jagGogoChanceBar" src="assets/ui/rising_chance_bar_confirm.png" alt="BAR RISING CHANCE" loading="eager" decoding="async" draggable="false">
           <span class="jagGogoChanceLabel">CHANCE</span>
         </div>
         <div class="jagFrameLamps" aria-hidden="true">
@@ -7012,12 +6782,6 @@ body{
             <b id="jagGamePayoutMeter">000</b>
             <span>PAYOUT</span>
           </div>
-        </div>
-        <div class="gekiatsuLayer" id="gekiatsuLayer" aria-hidden="true">
-          <video id="gekiatsuVideo" playsinline preload="auto"></video>
-        </div>
-        <div class="bonusConfirmLayer" id="bonusConfirmLayer" aria-hidden="true">
-          <img src="assets/effects/bonus_kakutei_gold.gif" alt="BONUS確定" decoding="async" draggable="false">
         </div>
       </div>
 
@@ -7213,21 +6977,13 @@ body{
             <option value="MID">RB（77BAR/96pt）</option>
             <option value="MID_CHERRY">RBチェリー同時（77BAR/96pt）</option>
             <option value="BIG">BB（777/252pt）</option>
-            <option value="BAR3">BAR（プレミアムBIG/1G連確認）</option>
+            <option value="BAR3">BAR</option>
           </select>
         </div>
         <div class="row">
           <button class="subBtn" id="applyForceBtn">次回だけ適用</button>
           <button class="subBtn" id="forceBarBtn">次回BAR</button>
           <button class="ghostBtn" id="clearForceBtn">解除</button>
-        </div>
-        <div class="field" style="margin-top:12px;display:none">
-          <label>プレミア演出強制フラグ</label>
-          <div class="row">
-            <button class="subBtn" id="forcePremiumBtn">次回プレミア演出</button>
-            <button class="ghostBtn" id="clearPremiumBtn">演出解除</button>
-          </div>
-          <input id="premiumForceStatus" type="text" value="OFF" readonly />
         </div>
         <div class="field" style="margin-top:12px">
           <label>直行操作</label>
@@ -7331,7 +7087,7 @@ body{
 
   const BIG_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
 
-  const KOATARI_SOUND_SRC = "assets/media/koatari_sound.wav";
+  const KOATARI_SOUND_SRC = "";
   const PAYOUT_SOUND_SRC = "assets/media/jag/bell.wav";
   const PAYOUT_3PT_BELL_SOUND_SRC = "assets/media/jag/bell.wav";
   const REPLAY_SOUND_SRC = "assets/media/jag/replay.wav";
@@ -7348,6 +7104,15 @@ body{
   const SEVEN_CONFIRM_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
   const REG_CONFIRM_SOUND_SRC = "assets/media/jag/special_symbol.wav";
   const BONUS_CONFIRM_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
+  const BONUS_END_BGM_SRC = "assets/media/jag/bonus_end.wav";
+  const PREMIUM_BONUS_END_VOICE_SRC = "assets/media/jag/premium_bonus_end_voice.wav";
+  const PREMIUM_BIG_REEL_MOVIE_SRC = "assets/media/jag/premium_big_reel.mp4?v=20260705_1113";
+  const SETTING_BONUS_END_VOICE_SRCS = Object.freeze({
+    2:"assets/media/jag/setting_voice_2plus.wav",
+    4:"assets/media/jag/setting_voice_4plus.wav",
+    5:"assets/media/jag/setting_voice_5plus.wav",
+    6:"assets/media/jag/setting_voice_6plus.wav"
+  });
   const BATTLE_BGM_SRC = "";
   const SPEED_BGM_SRC = "";
 
@@ -7511,24 +7276,26 @@ body{
   });
 
   const symbols = ["7","BAR",ELEPHANT_SYMBOL,GRAPE_SYMBOL,CHERRY_SYMBOL,PIERROT_SYMBOL,BELL_SYMBOL];
-  const AUDIO_BALANCE_VERSION = 4;
+  const AUDIO_BALANCE_VERSION = 5;
   const DEFAULT_MASTER_VOLUME = 0.70;
   const DEFAULT_BGM_VOLUME = 0.50;
   const DEFAULT_SFX_VOLUME = 0.50;
   const DEFAULT_PAYOUT_VOLUME = 0.50;
   const DEFAULT_MOVIE_VOLUME = 0.50;
   const DEFAULT_ROGI_MOVIE_VOLUME = 0.50;
-  const MATCHED_BGM_GAIN_DB = -4.5;
+  const MATCHED_BGM_GAIN_DB = 0;
+  const NORMALIZED_AUDIO_OUTPUT_SCALE = 1;
   const BGM_OUTPUT_SCALE = dbToGain(MATCHED_BGM_GAIN_DB);
   const BAR_BGM_OUTPUT_SCALE = dbToGain(MATCHED_BGM_GAIN_DB);
-  const SFX_OUTPUT_SCALE = 0.65;
-  const CONFIRM_SOUND_OUTPUT_SCALE = 1.20;
-  const BONUS_CONFIRM_SOUND_OUTPUT_SCALE = 1.05;
-  const PAYOUT_SOUND_OUTPUT_SCALE = 0.25;
-  const BELL_PAYOUT_SOUND_OUTPUT_SCALE = 0.35;
+  const SFX_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
+  const SETTING_VOICE_OUTPUT_SCALE = 2.8;
+  const CONFIRM_SOUND_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
+  const BONUS_CONFIRM_SOUND_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
+  const PAYOUT_SOUND_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
+  const BELL_PAYOUT_SOUND_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
   const BATTLE_BGM_OUTPUT_SCALE = dbToGain(MATCHED_BGM_GAIN_DB);
-  const MOVIE_OUTPUT_SCALE = 0.50;
-  const ROGI_MOVIE_OUTPUT_SCALE = dbToGain(-3);
+  const MOVIE_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
+  const ROGI_MOVIE_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
 
   function dbToGain(db){
     return Math.pow(10, Number(db) / 20);
@@ -7602,6 +7369,8 @@ body{
     oneGameRenBonus:false,
     bonusWaitGames:0,
     bonusHitGamesSince:0,
+    pendingSettingVoiceSrc:"",
+    pendingPremiumVoiceSrc:"",
     morningCeilingActive:false
   };
 
@@ -7643,6 +7412,13 @@ body{
   let currentSpin = null;
   let spinCanStop = false;
   let spinWaitTimer = null;
+  let bonusEndBgmPlaying = false;
+  let bonusEndBgmAudio = null;
+  let bonusEndVoiceAudio = null;
+  let bonusEndBgmTimer = null;
+  let bonusConfirmSoundPlaying = false;
+  let bonusConfirmSoundAudio = null;
+  let bonusConfirmSoundTimer = null;
   const MIN_SPIN_WAIT_MS = 500;
   const RESULT_WAIT_MS = 1000;
   const SPIN_COST = 3;
@@ -7683,53 +7459,39 @@ body{
   const HIGH_ROLE_RATE = 0.22;
   const BAR3_PREMIUM_DENOM = 8192;
   const BAR3_CONTINUATION_RATE = 0.80;
-  const BELL_REEL_READY_VIDEO_SRC = "assets/zako1.mp4";
-  const BELL_REEL_STOP_VIDEO_SRC = "assets/zako1-2.mp4";
-  const DEVIL_ZONE_FIRE_VIDEO_SRC = "assets/devil_zone_fire.mp4";
-  const DEVIL_ZONE_CONFIRM_IMAGE_SRC = "assets/effects/devilzone_confirm_loop.gif";
-  const SUPER_DEVIL_ZONE_CONFIRM_IMAGE_SRC = "assets/effects/super_devilzone_confirm_loop.gif";
+  const BELL_REEL_READY_VIDEO_SRC = "";
+  const BELL_REEL_STOP_VIDEO_SRC = "";
+  const DEVIL_ZONE_FIRE_VIDEO_SRC = "";
+  const DEVIL_ZONE_CONFIRM_IMAGE_SRC = "";
+  const SUPER_DEVIL_ZONE_CONFIRM_IMAGE_SRC = "";
   const REVERSE_PUSH_GUIDE_IMAGE_SRCS = Object.freeze({
-    blue:"assets/effects/reverse_push_blue.png",
-    red:"assets/effects/reverse_push_red.png"
+    blue:"",
+    red:""
   });
   const DEVIL_RUSH_ENTRY_IMAGE_SRCS = Object.freeze({
-    start:"assets/effects/devil_rush_entry_start.png",
-    continue:"assets/effects/devil_rush_entry_continue.png"
+    start:"",
+    continue:""
   });
   const REVERSE_PUSH_RED_EXPECTATION = 0.80;
   const REVERSE_PUSH_BLUE_EXPECTATION = 0.30;
   const REVERSE_PUSH_HIT_RED_RATE = 0.70;
-  const GEKIATSU_VIDEO_SRC = "assets/puremia.mp4";
-  const BAR3_LEVER_VIDEO_SRC = "assets/bar3_lever_on.mp4";
+  const GEKIATSU_VIDEO_SRC = "";
+  const BAR3_LEVER_VIDEO_SRC = "";
   const ROGI_STOP_VIDEO_SRCS = Object.freeze({
-    1:"assets/rogi1.mp4",
-    2:"assets/rogi2.mp4",
-    3:"assets/rogi3.mp4"
+    1:"",
+    2:"",
+    3:""
   });
   const ROGI_STOP_EFFECT_CHANCES = Object.freeze({
     hit:{1:1.00,2:1.00,3:1.00},
     miss:{1:0.60,2:0.40,3:0.00}
   });
-  const VOICE_SRC = {
-    add:"assets/voice/add.wav",
-    at1:"assets/voice/at_1.wav",
-    at2:"assets/voice/at_2.wav",
-    at3:"assets/voice/at_3.wav",
-    last:"assets/voice/last.wav",
-    reach:"assets/voice/reach.wav",
-    reg:"assets/voice/reg.wav",
-    hyahha:"assets/voice/hyahha.wav",
-    abeshi:"assets/voice/abeshi.wav",
-    achi:"assets/voice/achi.wav",
-    keizoku:"assets/voice/keizoku.wav",
-    uwanose:"assets/voice/uwanose.wav"
-  };
   const ZAKO_ADD_EFFECT_CHANCE = 0.30;
   const ZAKO_ZONE_ADD_EFFECT_CHANCE = 0.05;
   const GEKIATSU_CHANCE_ON_BIG = 0.03;
-  const BATTLE_INTRO_LOGO_SRC = "assets/battle/battle.png";
-  const BATTLE_ROUND_IMAGE_SRCS = Array.from({length:10}, (_,i)=>i ? `assets/battle/round_${i}.png` : "");
-  const BATTLE_CHARACTER_SRCS = Array.from({length:6}, (_,i)=>`assets/battle/character_${i + 1}.png`);
+  const BATTLE_INTRO_LOGO_SRC = "";
+  const BATTLE_ROUND_IMAGE_SRCS = Array.from({length:10}, ()=>"");
+  const BATTLE_CHARACTER_SRCS = [];
   const GORAI_CONTINUATION_RATES_BY_SETTING = Object.freeze({
     1:[{rate:0.10,w:24},{rate:0.30,w:24},{rate:0.50,w:22},{rate:0.60,w:12},{rate:0.80,w:18}],
     2:[{rate:0.10,w:18},{rate:0.30,w:30},{rate:0.50,w:34},{rate:0.60,w:15},{rate:0.80,w:3}],
@@ -7859,9 +7621,7 @@ body{
     {rangeId:"masterVolume", numberId:"masterVolumeNumber"},
     {rangeId:"bgmVolume", numberId:"bgmVolumeNumber"},
     {rangeId:"sfxVolume", numberId:"sfxVolumeNumber"},
-    {rangeId:"payoutVolume", numberId:"payoutVolumeNumber"},
-    {rangeId:"movieVolume", numberId:"movieVolumeNumber"},
-    {rangeId:"rogiMovieVolume", numberId:"rogiMovieVolumeNumber"}
+    {rangeId:"payoutVolume", numberId:"payoutVolumeNumber"}
   ]);
   const machine = $("machine");
   const reels = [...document.querySelectorAll(".reel")];
@@ -7947,7 +7707,6 @@ body{
   let bellReadyVideoKeepAliveTimer = null;
   let bellZakoLayer = null;
   const bellZakoTimers = [null, null, null];
-  let zakoVoiceSound = null;
   const oneShotSoundCache = new Map();
   let gekiatsuActive = false;
   let gekiatsuHideTimer = null;
@@ -7976,10 +7735,11 @@ body{
   let adminPushTimer = null;
   let adminCommandStream = null;
   let adminCommandReconnectTimer = null;
-  const PAGE_ZOOM_STORAGE_KEY = "jag_unified_page_zoom";
-  const PAGE_PAN_STORAGE_KEY = "jag_unified_page_pan_x";
-  const LAYOUT_EDIT_STORAGE_KEY = "jag_layout_editor_v1";
-  const LAYOUT_DEFAULT_STORAGE_KEY = "jag_layout_default_v1";
+  const PAGE_ZOOM_STORAGE_KEY = "jag_unified_page_zoom_v3";
+  const PAGE_PAN_STORAGE_KEY = "jag_unified_page_pan_x_v3";
+  const LAYOUT_EDIT_STORAGE_KEY = "jag_layout_editor_v3";
+  const LAYOUT_DEFAULT_STORAGE_KEY = "jag_layout_default_v3";
+  const LAYOUT_EDITOR_ENABLED = true;
   const PAGE_STAGE_WIDTH = 1360;
   const PAGE_ZOOM_MIN = 0.75;
   const PAGE_ZOOM_MAX = 1.30;
@@ -7990,6 +7750,7 @@ body{
   const CABINET_X_OFFSET_AT_75 = 0;
   const CABINET_X_OFFSET_AT_100 = 0;
   const CABINET_X_OFFSET_AT_130 = 0;
+  const PAGE_PAN_DEFAULT = -190;
   const SLOT_ZOOM_ANCHOR_X = 680;
   const SLOT_ZOOM_ANCHOR_Y = 500;
   const BG_IMAGE_WIDTH = 1881;
@@ -7997,15 +7758,15 @@ body{
   const BG_ORANGE_LOGO_ANCHOR_X = 964;
   const BG_LOGO_LOWER_ANCHOR_Y = 742;
   const LAYOUT_DEFAULTS = Object.freeze({
-    reels:{x:20.7, y:24.9, w:57.6, h:50.0},
-    chance:{x:6.1, y:64.8, w:16.3, h:21.8},
-    credit:{x:29.4, y:80.4, w:11.8, h:8.2},
-    count:{x:44.1, y:80.4, w:11.8, h:8.2},
-    payout:{x:58.8, y:80.4, w:11.8, h:8.2},
-    bonusdata:{x:21.4, y:9.2, w:57.2, h:9.6}
+    reels:{x:20.6, y:20.4, w:57.4, h:56.4},
+    chance:{x:14.6, y:76.0, w:11.9, h:22.4},
+    credit:{x:28.0, y:80.4, w:12.2, h:22.1},
+    count:{x:41.6, y:83.2, w:12.2, h:11.2},
+    payout:{x:57.0, y:83.2, w:12.2, h:11.2},
+    bonusdata:{x:19.0, y:6.5, w:62.9, h:13.3}
   });
   let pageZoom = 1;
-  let pagePanX = 0;
+  let pagePanX = PAGE_PAN_DEFAULT;
   let layoutEditOpen = false;
   let layoutDefaultState = JSON.parse(JSON.stringify(LAYOUT_DEFAULTS));
   let layoutEditState = JSON.parse(JSON.stringify(layoutDefaultState));
@@ -8140,8 +7901,11 @@ body{
     const wrapEl = document.querySelector(".wrap");
     const wrapRect = wrapEl ? wrapEl.getBoundingClientRect() : null;
     const bgWidth = wrapRect && Number.isFinite(wrapRect.width) && wrapRect.width > 0 ? wrapRect.width : viewW;
+    const cabinetWindow = document.querySelector(".jagCabinetShell") || machine || document.querySelector(".reelArea");
+    const cabinetRect = cabinetWindow ? cabinetWindow.getBoundingClientRect() : null;
+    const cabinetCenter = cabinetRect ? cabinetRect.left + cabinetRect.width / 2 : NaN;
     const reelCenter = reelCenterScreenX();
-    const centerX = Number.isFinite(reelCenter) ? reelCenter : viewW / 2;
+    const centerX = Number.isFinite(cabinetCenter) ? cabinetCenter : Number.isFinite(reelCenter) ? reelCenter : viewW / 2;
     const bgLeft = Math.round((centerX - bgWidth / 2) * 100) / 100;
     root.style.setProperty("--wd-bg-sync-size", `${Math.round(bgWidth * 100) / 100}px auto`);
     root.style.setProperty("--wd-bg-sync-x", `${bgLeft}px top`);
@@ -8206,8 +7970,9 @@ body{
   }
 
   function loadPagePan(){
-    const saved = Number(safeStorageGet(PAGE_PAN_STORAGE_KEY));
-    if(Number.isFinite(saved)) pagePanX = saved;
+    const savedRaw = safeStorageGet(PAGE_PAN_STORAGE_KEY);
+    const saved = savedRaw == null ? NaN : Number(savedRaw);
+    pagePanX = Number.isFinite(saved) ? saved : PAGE_PAN_DEFAULT;
     applyPagePan(false);
   }
 
@@ -8338,6 +8103,7 @@ body{
   }
 
   function setLayoutEditorOpen(open){
+    if(!LAYOUT_EDITOR_ENABLED) open = false;
     layoutEditOpen = !!open;
     if(layoutEditorPanel) layoutEditorPanel.classList.toggle("open", layoutEditOpen);
     if(layoutEditToggleBtn){
@@ -8369,6 +8135,105 @@ body{
     return audioOutputVolume(settings.payoutVolume, scale);
   }
 
+  function clearBonusEndBgmLock(){
+    bonusEndBgmPlaying = false;
+    if(bonusEndBgmTimer){
+      clearTimeout(bonusEndBgmTimer);
+      bonusEndBgmTimer = null;
+    }
+    if(bonusEndBgmAudio){
+      bonusEndBgmAudio.onended = null;
+      bonusEndBgmAudio.onerror = null;
+      try{ bonusEndBgmAudio.pause(); }catch(e){}
+      bonusEndBgmAudio = null;
+    }
+    if(bonusEndVoiceAudio){
+      bonusEndVoiceAudio.onended = null;
+      bonusEndVoiceAudio.onerror = null;
+      try{ bonusEndVoiceAudio.pause(); }catch(e){}
+      bonusEndVoiceAudio = null;
+    }
+    updateAutoUi();
+  }
+
+  function pickSettingBonusEndVoiceSrc(settingNo = settings.setting){
+    const setting = clamp(Number(settingNo) || 1, 1, 6);
+    const hits = [];
+    if(setting >= 2 && Math.random() < 0.05) hits.push(2);
+    if(setting >= 4 && Math.random() < 0.02) hits.push(4);
+    if(setting >= 5 && Math.random() < 0.02) hits.push(5);
+    if(setting >= 6 && Math.random() < 0.01) hits.push(6);
+    const highest = hits.length ? Math.max(...hits) : 0;
+    return highest ? SETTING_BONUS_END_VOICE_SRCS[highest] : "";
+  }
+
+  function completeBonusEndBgmSequence(callback){
+    const cb = callback;
+    clearBonusEndBgmLock();
+    if(typeof cb === "function") cb();
+  }
+
+  function playPendingSettingVoiceOnLever(){
+    const premiumSrc = String(normalState.pendingPremiumVoiceSrc || "");
+    const settingSrc = String(normalState.pendingSettingVoiceSrc || "");
+    if(!premiumSrc && !settingSrc) return false;
+    normalState.pendingPremiumVoiceSrc = "";
+    normalState.pendingSettingVoiceSrc = "";
+    if(premiumSrc){
+      playOneShotSound(premiumSrc, sfxOutputVolume(SETTING_VOICE_OUTPUT_SCALE));
+      log("プレミアBIG継続ボイス：次GレバーON");
+      if(settingSrc){
+        setTimeout(()=>playOneShotSound(settingSrc, sfxOutputVolume(SETTING_VOICE_OUTPUT_SCALE)), 1400);
+        log("設定示唆ボイス予約：継続ボイス後に再生");
+      }
+    }else if(settingSrc){
+      playOneShotSound(settingSrc, sfxOutputVolume(SETTING_VOICE_OUTPUT_SCALE));
+      log("設定示唆ボイス：ボーナス後1G目レバーON");
+    }
+    return true;
+  }
+
+  function playBonusEndBgmThen(callback){
+    clearBonusEndBgmLock();
+    bonusEndBgmPlaying = true;
+    updateAutoUi();
+    if($("resultText")) $("resultText").textContent = "ボーナス終了BGM中...";
+    stopBattleBgm(false);
+    stopBarBgm(false);
+    if(bgm){
+      try{
+        bgm.pause();
+        bgm.currentTime = 0;
+      }catch(e){}
+    }
+    const finish = ()=>{
+      if(!bonusEndBgmPlaying) return;
+      if(bonusEndBgmTimer){
+        clearTimeout(bonusEndBgmTimer);
+        bonusEndBgmTimer = null;
+      }
+      if(bonusEndBgmAudio){
+        bonusEndBgmAudio.onended = null;
+        bonusEndBgmAudio.onerror = null;
+        try{ bonusEndBgmAudio.pause(); }catch(e){}
+        bonusEndBgmAudio = null;
+      }
+      completeBonusEndBgmSequence(callback);
+    };
+    const audio = new Audio(BONUS_END_BGM_SRC);
+    bonusEndBgmAudio = audio;
+    audio.volume = bgmOutputVolume(BGM_OUTPUT_SCALE);
+    audio.onended = finish;
+    audio.onerror = finish;
+    bonusEndBgmTimer = setTimeout(finish, 15000);
+    try{
+      const p = audio.play();
+      if(p && typeof p.catch === "function") p.catch(()=>setTimeout(finish, 500));
+    }catch(e){
+      setTimeout(finish, 500);
+    }
+  }
+
   function movieOutputVolume(scale=MOVIE_OUTPUT_SCALE){
     return audioOutputVolume(settings.movieVolume, scale);
   }
@@ -8398,7 +8263,6 @@ body{
     if(bigSound) bigSound.volume = sfxOutputVolume();
     if(payoutSound) payoutSound.volume = payoutOutputVolume();
     if(voiceSound) voiceSound.volume = sfxOutputVolume();
-    if(zakoVoiceSound) zakoVoiceSound.volume = sfxOutputVolume();
     if(gekiatsuVideo) gekiatsuVideo.volume = currentGekiatsuVideoOutputVolume();
     updateAudioMuteButton();
   }
@@ -8582,7 +8446,15 @@ body{
         : maxHeight;
       top = anchorTop - gap - panelHeight;
     }
-    left = clamp(left, 16, Math.max(16, viewW - 16));
+    if(maxHeight < 260){
+      top = 84;
+      maxHeight = Math.max(260, (window.innerHeight || document.documentElement.clientHeight || 720) - top - 18);
+    }
+    const panelWidth = activePanel
+      ? Math.min(activePanel.scrollWidth || activePanel.getBoundingClientRect().width || 760, viewW - 32)
+      : Math.min(760, viewW - 32);
+    const halfPanelWidth = Math.max(16, panelWidth / 2);
+    left = clamp(left, halfPanelWidth + 16, Math.max(halfPanelWidth + 16, viewW - halfPanelWidth - 16));
     top = Math.max(8, top);
     root.style.setProperty("--wd-info-panel-left", `${Math.round(left * 100) / 100}px`);
     root.style.setProperty("--wd-info-panel-top", `${Math.round(top * 100) / 100}px`);
@@ -8668,12 +8540,14 @@ body{
     flashReelLight("rainbowHold");
     ensureBarBgmContinuing();
     updateDevilStatusLamp();
+    updateDisplay();
   }
 
   function stopBarRainbowHold(){
     barRainbowHold = false;
     clearReelLight(false);
     updateDevilStatusLamp();
+    updateDisplay();
   }
 
   function flashGuaranteedSetStart(){
@@ -9010,6 +8884,45 @@ body{
     }
   }
 
+  function shouldShowPremiumBigReelMovie(){
+    return !!(isATypeBonusActive() && (session.premiumBonus || session.oneGameRenBonus) && normalizeATypeBonusKind(session.bonusKind) === "BIG");
+  }
+
+  function premiumBigReelMovieSrc(){
+    return PREMIUM_BIG_REEL_MOVIE_SRC;
+  }
+
+  function updatePremiumBigReelMovie(){
+    const layer = $("premiumBigReelMovie");
+    if(!layer) return;
+    const video = layer.querySelector("video");
+    if(!video) return;
+    const show = shouldShowPremiumBigReelMovie();
+    const reelsStopped = !!(!isSpinning || (currentSpin && Array.isArray(currentSpin.stopped) && currentSpin.stopped.every(Boolean)));
+    layer.classList.toggle("show", show);
+    layer.classList.toggle("is-reel-stopped", show && reelsStopped);
+    layer.setAttribute("aria-hidden", show ? "false" : "true");
+    if(show){
+      const movieSrc = premiumBigReelMovieSrc();
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      if(video.getAttribute("src") !== movieSrc){
+        video.setAttribute("src", movieSrc);
+        try{ video.load(); }catch(e){}
+        try{ video.currentTime = 0; }catch(e){}
+      }
+      if(video.paused || video.ended){
+        try{
+          const p = video.play();
+          if(p && typeof p.catch === "function") p.catch(()=>{});
+        }catch(e){}
+      }
+    }else{
+      try{ video.pause(); }catch(e){}
+    }
+  }
+
   function ensureReelVideo(index){
     const reel = reels[index];
     if(!reel) return null;
@@ -9338,25 +9251,6 @@ body{
       currentSpin.rogiLastStopEffectOrder = stopOrder;
     }
     return true;
-  }
-
-  function playZakoThirdStopVoices(spin=currentSpin){
-    if(!spin || !spin.zakoEffectActive || spin.zakoThirdStopVoicesPlayed || spin.effectsSkipped) return;
-    spin.zakoThirdStopVoicesPlayed = true;
-    let delayMs = 0;
-    if(spin.zakoBellEffect){
-      playZakoVoiceSound(VOICE_SRC.abeshi, delayMs);
-      delayMs += 220;
-    }
-    if(spin.zakoAddEffect){
-      playZakoVoiceSound(VOICE_SRC.uwanose, delayMs);
-      delayMs += 340;
-    }
-    const battleOutcome = ensurePendingBattleOutcome(spin);
-    if(battleOutcome && battleOutcome.win){
-      const src = Math.random() < 0.5 ? VOICE_SRC.keizoku : VOICE_SRC.achi;
-      playZakoVoiceSound(src, delayMs);
-    }
   }
 
   function skipActiveEffects(){
@@ -9785,6 +9679,10 @@ body{
     const timing = `stop${stopOrder}`;
     if(spin.bonusAnnouncementTiming !== timing) return false;
     return lightBonusAnnouncement(spin, timing);
+  }
+
+  function shouldSuppressLineupConfirmSound(){
+    return !!(currentSpin && currentSpin.bonusAnnouncementLit);
   }
 
   function showBonusConfirmScreen(mode="solid"){
@@ -10701,6 +10599,8 @@ body{
           oneGameRenBonus:!!data.normalState.oneGameRenBonus,
           bonusWaitGames:Math.max(0, Number(data.normalState.bonusWaitGames) || 0),
           bonusHitGamesSince:Math.max(0, Number(data.normalState.bonusHitGamesSince) || 0),
+          pendingSettingVoiceSrc:String(data.normalState.pendingSettingVoiceSrc || ""),
+          pendingPremiumVoiceSrc:String(data.normalState.pendingPremiumVoiceSrc || ""),
           morningCeilingActive:!!data.normalState.morningCeilingActive
         };
         if(!normalState.bonusPending){
@@ -10838,16 +10738,6 @@ body{
       forceResult = A_TYPE_MODE && requested ? normalizeATypeResult(requested) : requested;
       if($("forceResult")) $("forceResult").value = forceResult;
       log(forceResult ? `管理画面：次回転指定 ${RESULT[forceResult].name}` : "管理画面：次回転指定を解除");
-      updateDisplay();
-    }else if(command.type === "forcePremium"){
-      forcePremiumEffect = true;
-      if($("premiumForceStatus")) $("premiumForceStatus").value = "ON：次回転で発生";
-      log("管理画面：次回転プレミア演出を強制");
-      updateDisplay();
-    }else if(command.type === "clearPremium"){
-      forcePremiumEffect = false;
-      if($("premiumForceStatus")) $("premiumForceStatus").value = "OFF";
-      log("管理画面：プレミア演出強制を解除");
       updateDisplay();
     }else if(command.type === "direct" && RESULT[command.result]){
       direct(command.result);
@@ -11174,6 +11064,12 @@ body{
     clearPendingAtStart();
     const startOptions = {...options};
     const waitAndStart = ()=>{
+      if(bonusConfirmSoundPlaying){
+        pendingAtStartTimer = setTimeout(waitAndStart, 120);
+        updateDevilStatusLamp();
+        if($("resultText")) $("resultText").textContent = "ボーナス確定音再生中...";
+        return;
+      }
       if(isRogiThirdStopHoldActive()){
         pendingAtStartTimer = setTimeout(waitAndStart, 150);
         updateDevilStatusLamp();
@@ -11195,7 +11091,8 @@ body{
     const endedSets = session.setNo || 0;
     const bonusLabel = aTypeEnd ? aTypeBonusLabel(session.bonusKind) : "";
     const premiumOneGameRen = !!(aTypeEnd && session.premiumBonus && normalizeATypeBonusKind(session.bonusKind) === "BIG");
-    if(autoPlay) stopAutoPlay(aTypeEnd ? "ボーナス終了のためオート停止" : "ATバトル終了のためオート停止");
+    const settingVoiceAfterBonus = aTypeEnd ? pickSettingBonusEndVoiceSrc(settings.setting) : "";
+    if(autoPlay) stopAutoPlay("ボーナス終了のためオート停止");
     if(aTypeEnd){
       showMessage(`${bonusLabel}終了`, `純増${resultPayout}pt / 払出${session.paid}pt / BET${session.cost}pt`);
       log(`${bonusLabel}終了：純増${resultPayout}pt / 払出${session.paid}pt / BET${session.cost}pt`);
@@ -11203,7 +11100,7 @@ body{
       showMessage("ボーナス終了", `獲得pt ${session.paid}pt`);
       log(`ボーナス終了：獲得${session.paid}pt / 損益${formatSigned(profit)}pt`);
     }else{
-      showMessage("ATバトルが終了しました。", `継続SET数 ${endedSets}回 / 獲得pt ${session.paid}pt`);
+      showMessage("ボーナス終了", `獲得pt ${session.paid}pt`);
       log(`Rising BB終了：獲得${session.paid}pt / 損益${formatSigned(profit)}pt / ${endedSets}SET / STOCK獲得${session.added || 0}SET / G上乗せ${session.addedGames || 0}G`);
     }
     stopGekiatsuEffect(true);
@@ -11243,6 +11140,10 @@ body{
       jagChanceHold = true;
       $("stLamp").classList.add("on");
     }
+    normalState.pendingPremiumVoiceSrc = premiumOneGameRen ? PREMIUM_BONUS_END_VOICE_SRC : "";
+    normalState.pendingSettingVoiceSrc = settingVoiceAfterBonus;
+    if(normalState.pendingPremiumVoiceSrc) log("プレミアBIG継続ボイス予約：次GレバーON");
+    if(settingVoiceAfterBonus) log("設定示唆ボイス予約：次GレバーON");
     $("spinBtn").textContent = "BET";
     jagLastBonusPayout = resultPayout;
     if(aTypeEnd){
@@ -11255,7 +11156,7 @@ body{
       showOverlay("ボーナス終了");
     }else{
       showSessionResultScreen(endedSets, resultPayout, null);
-      showOverlay("ATバトル終了");
+      showOverlay("ボーナス終了");
     }
     if(resultPayout > 0 && !aTypeEnd){
       confetti(70);
@@ -11765,11 +11666,11 @@ body{
       flashReelLight("rainbow", result === "BIG" ? 2200 : 1800);
       showOverlay(`${bonusLabel} BONUS`);
       if(isRegBonus){
-        playVoiceSound(VOICE_SRC.reg);
-        playRegConfirmSound();
+        if(!shouldSuppressLineupConfirmSound()) playRegConfirmSound();
         confetti(45);
       }else{
-        playSevenConfirmSound();
+        const forcePremiumLineupSound = premiumBonus || !!resolved.oneGameRenBonus || result === "BAR3";
+        if(forcePremiumLineupSound || !shouldSuppressLineupConfirmSound()) playSevenConfirmSound();
         confetti(90);
       }
       return;
@@ -11779,10 +11680,10 @@ body{
       jagChanceHold = true;
       resetNormalModeAfterBonus();
       $("stLamp").classList.add("on");
-      showMessage("BAR揃い", `${resolved.bonusSource} / 出玉なし / AT突入 / SET+5 / 継続${formatRate(BAR3_CONTINUATION_RATE)}${lineText ? " / " + lineText : ""}`);
-      log(`BAR揃い：${resolved.bonusSource} / 出玉なし / AT突入 / SET+5 / 継続${formatRate(BAR3_CONTINUATION_RATE)}`);
+      showMessage("BAR揃い", `${resolved.bonusSource} / BAR確定${lineText ? " / " + lineText : ""}`);
+      log(`BAR揃い：${resolved.bonusSource} / BAR確定`);
       flashReelLight("rainbow", 2600);
-      showOverlay(`BAR SET+5 継続${formatRate(BAR3_CONTINUATION_RATE)}`);
+      showOverlay("BAR BONUS");
       confetti(110);
       playBarBgm();
       startBarRainbowHold();
@@ -11800,12 +11701,12 @@ body{
       hideBonusConfirmScreen();
       normalState.sinceBonus = 0;
       $("stLamp").classList.add("on");
-      showMessage("7揃い", `${resolved.bonusSource} / AT突入${lineText ? " / " + lineText : ""}`);
-      log(`7揃い：${resolved.bonusSource} / AT突入`);
+      showMessage("7揃い", `${resolved.bonusSource} / BB確定${lineText ? " / " + lineText : ""}`);
+      log(`7揃い：${resolved.bonusSource} / BB確定`);
       flashReelLight("rainbow", 2200);
-      showOverlay("AT突入");
+      showOverlay("BB BONUS");
       confetti(90);
-      playSevenConfirmSound();
+      if(!shouldSuppressLineupConfirmSound()) playSevenConfirmSound();
       return;
     }
 
@@ -11818,9 +11719,8 @@ body{
       log(`REG揃い：${resolved.bonusSource} / +${normalReward}pt / 天井リセット`);
       flashReelLight("rainbow", 1800);
       showOverlay(`REG +${normalReward}pt`);
-      playVoiceSound(VOICE_SRC.reg);
       confetti(35);
-      playRegConfirmSound();
+      if(!shouldSuppressLineupConfirmSound()) playRegConfirmSound();
       return;
     }
 
@@ -11954,14 +11854,6 @@ body{
         session.currentSetBarBgm = true;
       }
     }
-    const hasVoiceAdd = stockAdd > 0 || stGameAdd > 0 || zoneGameAdd > 0;
-    if(result === "MID"){
-      playVoiceSound(VOICE_SRC.reg);
-    }
-    if(hasVoiceAdd){
-      playVoiceSound(VOICE_SRC.add, result === "MID" ? 900 : 220);
-    }
-
     let continuationBoostText = "";
     if(result === "BAR3"){
       const boostedRate = Math.max(Number(session.continuationRate) || 0, BAR3_CONTINUATION_RATE);
@@ -12087,6 +11979,7 @@ body{
     updateDevilStatusLamp();
     updateReelFrameMode();
     syncDevilZoneConfirmScreen();
+    updatePremiumBigReelMovie();
     machine.className = "machine " + (active ? "active" : "normal") + (session.paid > 0 ? " win" : "");
     if(reelArea){
       reelArea.classList.toggle("premiumBigOverlayOn", !!(isATypeBonusActive() && (session.premiumBonus || session.oneGameRenBonus)));
@@ -12166,7 +12059,18 @@ body{
     if(reelArea) reelArea.classList.toggle("jagChanceLit", jagChanceLit);
     const gogoChance = $("jagGogoChance");
     if(gogoChance){
+      const premiumBonusActive = !!(isATypeBonusActive() && (session.premiumBonus || session.oneGameRenBonus));
+      const jagChanceBarConfirm = !!(
+        premiumBonusActive ||
+        (jagChanceLit && pendingBonusLabel() === "BAR") ||
+        barRainbowHold ||
+        (currentSpin && jagChanceLit && (
+          currentSpin.result === "BAR3" ||
+          !!(currentSpin.resolved && (currentSpin.resolved.premiumBonus || currentSpin.resolved.oneGameRenBonus))
+        ))
+      );
       gogoChance.classList.toggle("is-lit", jagChanceLit);
+      gogoChance.classList.toggle("is-bar-confirm", jagChanceBarConfirm);
       gogoChance.setAttribute("aria-pressed", jagChanceLit ? "true" : "false");
     }
     const displayCredit = profit;
@@ -12285,6 +12189,13 @@ body{
     if($("quickAutoBtn")){
       $("quickAutoBtn").textContent = autoPlay ? "STOP" : "AUTO";
       $("quickAutoBtn").classList.toggle("on", autoPlay);
+      $("quickAutoBtn").disabled = (bonusEndBgmPlaying || bonusConfirmSoundPlaying) && !autoPlay;
+    }
+    if($("topAutoBtn")){
+      $("topAutoBtn").textContent = autoPlay ? "STOP" : "AUTO";
+      $("topAutoBtn").classList.toggle("on", autoPlay);
+      $("topAutoBtn").setAttribute("aria-pressed", autoPlay ? "true" : "false");
+      $("topAutoBtn").disabled = (isCompleteTrialLocked() || bonusEndBgmPlaying || bonusConfirmSoundPlaying) && !autoPlay;
     }
     updateSpeedToBonusUi();
     scheduleAdminStatePush();
@@ -12413,6 +12324,7 @@ body{
     pauseNormalBgm();
     stopBattleBgm(false);
     stopBarBgm();
+    clearBonusConfirmSoundLock();
     stopGekiatsuEffect(true);
     hideBonusConfirmScreen();
     devilZoneConfirmIntroPending = false;
@@ -12437,7 +12349,7 @@ body{
     stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,grapeCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
-    normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",premiumBonus:false,oneGameRenBonus:false,bonusWaitGames:0,bonusHitGamesSince:0,morningCeilingActive:false};
+    normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",premiumBonus:false,oneGameRenBonus:false,bonusWaitGames:0,bonusHitGamesSince:0,pendingSettingVoiceSrc:"",pendingPremiumVoiceSrc:"",morningCeilingActive:false};
     session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,premiumBonus:false,oneGameRenBonus:false,bonusBgmSrc:"",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     jagLastGamePayout = 0;
     jagLastBonusPayout = 0;
@@ -12466,6 +12378,7 @@ body{
     pauseNormalBgm();
     stopBattleBgm(false);
     stopBarBgm();
+    clearBonusConfirmSoundLock();
     stopGekiatsuEffect(true);
     hideBonusConfirmScreen();
     devilZoneConfirmIntroPending = false;
@@ -12490,7 +12403,7 @@ body{
     stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,grapeCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
-    normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",premiumBonus:false,oneGameRenBonus:false,bonusWaitGames:0,bonusHitGamesSince:0,morningCeilingActive:!A_TYPE_MODE};
+    normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",premiumBonus:false,oneGameRenBonus:false,bonusWaitGames:0,bonusHitGamesSince:0,pendingSettingVoiceSrc:"",pendingPremiumVoiceSrc:"",morningCeilingActive:!A_TYPE_MODE};
     session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,premiumBonus:false,oneGameRenBonus:false,bonusBgmSrc:"",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     jagLastGamePayout = 0;
     jagLastBonusPayout = 0;
@@ -12948,6 +12861,14 @@ body{
   async function spin(){
     if(debugFastSpinActive) return;
     if(speedToBonusActive && !speedModeSpinRequest) return;
+    if(bonusEndBgmPlaying){
+      if($("resultText")) $("resultText").textContent = "ボーナス終了BGM中...";
+      return;
+    }
+    if(bonusConfirmSoundPlaying){
+      if($("resultText")) $("resultText").textContent = "ボーナス確定音再生中...";
+      return;
+    }
     if(!canPlayCompleteTrial()) return;
     // 回転中にメインボタンを押したら、残りリールを停止する
     if(isSpinning){
@@ -12965,13 +12886,14 @@ body{
       startBonusSessionNow();
       return;
     }
+    const normalActiveAtSpinStart = !session.active;
+    if(normalActiveAtSpinStart) playPendingSettingVoiceOnLever();
     triggerBonusConfirmBetSoundIfNeeded();
     hideBattleIntro();
     hideRogiContinuationBlackout();
     hideBonusConfirmScreen();
     clearReelVideos();
 
-    const normalActiveAtSpinStart = !session.active;
     if(normalActiveAtSpinStart && normalState.bonusPending){
       setSpeedFrameOffHold(false);
     }
@@ -12989,8 +12911,10 @@ body{
     const zoneActiveAtSpinStart = session.active && isGoraiZoneActive();
     const aTypeBonusActiveAtSpinStart = isATypeBonusActive();
     if(aTypeBonusActiveAtSpinStart && isATypeBonusComplete()){
-      finishSession();
-      scheduleNextAuto();
+      playBonusEndBgmThen(()=>{
+        finishSession();
+        scheduleNextAuto();
+      });
       return;
     }
     if(zoneActiveAtSpinStart){
@@ -13057,7 +12981,6 @@ body{
     }else{
       session.remain--;
     }
-    if(atSpinAtStart) playAtRemainVoiceIfNeeded();
     stats.totalSpins++;
     chargeSpinCost();
     $("stLamp").classList.remove("on");
@@ -13152,7 +13075,6 @@ body{
       startGekiatsuEffect(premiumForced);
     }
     if(zakoEffect.active){
-      if(zakoEffect.bell) playZakoVoiceSound(VOICE_SRC.hyahha);
       startBellReelReadyVideos();
     }
     if(reversePushGuide){
@@ -13190,7 +13112,8 @@ body{
     if(autoPlay || speedModeSpinAtStart){
       const stopOrder = zoneActiveAtSpinStart ? [2,1,0] : [0,1,2];
       stopOrder.forEach((i,idx)=>{
-        const delay = speedModeSpinAtStart ? speedModeStopDelay(i) : (MIN_SPIN_WAIT_MS + 120 + idx*360);
+        const normalAutoStopDelay = MIN_SPIN_WAIT_MS + Math.round((120 + idx*360) / 2);
+        const delay = speedModeSpinAtStart ? speedModeStopDelay(i) : normalAutoStopDelay;
         setTimeout(()=>stopSingleReel(i), delay);
       });
     }
@@ -13230,12 +13153,8 @@ body{
         }
       });
     }
-    if(i === 1 && (result === "BIG" || result === "MID" || isZoneEntryResult(result))){
-      playVoiceSound(VOICE_SRC.reach);
-    }
     playBellReelStopVideo(i);
     if(stopOrder === 3){
-      playZakoThirdStopVoices(currentSpin);
       if(shouldFadeReversePushAtZoneEnd(currentSpin)){
         fadeOutDevilZoneConfirmScreen();
         fadeOutReversePushGuide();
@@ -13254,6 +13173,7 @@ body{
 
     if(currentSpin.stopped.every(Boolean) && !currentSpin.finishScheduled){
       currentSpin.finishScheduled = true;
+      updatePremiumBigReelMovie();
       if(willEnterBattleAfterCurrentSpin(currentSpin)){
         ensurePendingBattleOutcome(currentSpin);
         showBattleIntro(battleRoundNumber(), !!(currentSpin.pendingBattleOutcome && currentSpin.pendingBattleOutcome.win));
@@ -13404,10 +13324,10 @@ body{
     setTimeout(()=>clearReelVideos(), 900);
 
     if(shouldFinishATypeBonus){
-      setTimeout(()=>{
+      playBonusEndBgmThen(()=>{
         finishSession();
         scheduleNextAuto();
-      }, 700);
+      });
     }else if(finishedBattleFinalGame){
       setTimeout(()=>{
         const continued = completeContinuationBattle(result);
@@ -13525,12 +13445,23 @@ body{
     if($("quickAutoBtn")){
       $("quickAutoBtn").textContent = autoPlay ? "STOP" : "AUTO";
       $("quickAutoBtn").classList.toggle("on", autoPlay);
+      $("quickAutoBtn").disabled = bonusEndBgmPlaying && !autoPlay;
+    }
+    if($("topAutoBtn")){
+      $("topAutoBtn").textContent = autoPlay ? "STOP" : "AUTO";
+      $("topAutoBtn").classList.toggle("on", autoPlay);
+      $("topAutoBtn").setAttribute("aria-pressed", autoPlay ? "true" : "false");
+      $("topAutoBtn").disabled = (isCompleteTrialLocked() || bonusEndBgmPlaying) && !autoPlay;
     }
     updateSpeedToBonusUi();
   }
 
   function startAutoPlay(){
     if(autoPlay) return;
+    if(bonusEndBgmPlaying){
+      if($("resultText")) $("resultText").textContent = "ボーナス終了BGM中...";
+      return;
+    }
     if(!canPlayCompleteTrial()) return;
     stopSpeedToBonus("AUTO開始のためSPEED停止");
     readSettings();
@@ -13553,6 +13484,10 @@ body{
 
   function runAutoStep(){
     if(!autoPlay) return;
+    if(bonusEndBgmPlaying || bonusConfirmSoundPlaying){
+      autoTimer = setTimeout(runAutoStep, 150);
+      return;
+    }
     if(!canPlayCompleteTrial()) return;
     if(isRogiThirdStopHoldActive()){
       if(isRogiThirdStopMoviePlaying()){
@@ -13584,6 +13519,10 @@ body{
 
   function scheduleNextAuto(){
     if(!autoPlay) return;
+    if(bonusEndBgmPlaying || bonusConfirmSoundPlaying){
+      autoTimer = setTimeout(runAutoStep, 150);
+      return;
+    }
     if(!canPlayCompleteTrial()) return;
     if(isRogiThirdStopHoldActive()){
       autoTimer = setTimeout(runAutoStep, 150);
@@ -13598,6 +13537,7 @@ body{
     if(isCompleteTrialLocked()) return "COMPLETE到達のため設定変更まで遊戯不可";
     if(session.active) return "ボーナス中はSPEEDを使用できません";
     if(normalState.bonusPending) return "ボーナス確定中のためSPEED停止";
+    if(bonusConfirmSoundPlaying) return "ボーナス確定音再生中のためSPEED停止";
     if(pendingAtStartTimer) return "AT開始待機中のためSPEEDを使用できません";
     if(isSpinning) return "現在の回転停止後にSPEEDを開始してください";
     if(debugFastSpinActive) return "高速回転中のためSPEEDを使用できません";
@@ -13862,8 +13802,6 @@ body{
     }else if(session.active && !zoneActiveAtSpinStart){
       session.remain = Math.max(0, (session.remain || 0) - 1);
     }
-    if(atSpinAtStart) playAtRemainVoiceIfNeeded();
-
     stats.totalSpins++;
     chargeSpinCost();
     jagLastGamePayout = 0;
@@ -13962,9 +13900,58 @@ body{
     }catch(e){}
   }
 
-  function playSevenConfirmSound(){ playOneShotSound(SEVEN_CONFIRM_SOUND_SRC, sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE)); }
-  function playRegConfirmSound(){ playOneShotSound(REG_CONFIRM_SOUND_SRC, sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE)); }
-  function playBonusConfirmSound(){ playOneShotSound(BONUS_CONFIRM_SOUND_SRC, sfxOutputVolume(BONUS_CONFIRM_SOUND_OUTPUT_SCALE)); }
+  function clearBonusConfirmSoundLock(){
+    bonusConfirmSoundPlaying = false;
+    if(bonusConfirmSoundTimer){
+      clearTimeout(bonusConfirmSoundTimer);
+      bonusConfirmSoundTimer = null;
+    }
+    if(bonusConfirmSoundAudio){
+      bonusConfirmSoundAudio.onended = null;
+      bonusConfirmSoundAudio.onerror = null;
+      bonusConfirmSoundAudio = null;
+    }
+    updateAutoUi();
+  }
+
+  function playLockedBonusConfirmSound(src, volume=sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE)){
+    if(debugFastSpinActive || speedToBonusActive) return;
+    if(!src) return;
+    try{
+      clearBonusConfirmSoundLock();
+      let audio = oneShotSoundCache.get(src);
+      if(!audio){
+        audio = new Audio(src);
+        audio.preload = "auto";
+        oneShotSoundCache.set(src, audio);
+      }
+      bonusConfirmSoundPlaying = true;
+      bonusConfirmSoundAudio = audio;
+      updateAutoUi();
+      const finish = ()=>{
+        if(!bonusConfirmSoundPlaying || bonusConfirmSoundAudio !== audio) return;
+        clearBonusConfirmSoundLock();
+      };
+      audio.pause();
+      if(audio.getAttribute("src") !== src){
+        audio.setAttribute("src", src);
+        try{ audio.load(); }catch(e){}
+      }
+      audio.currentTime = 0;
+      audio.volume = volume;
+      audio.onended = finish;
+      audio.onerror = finish;
+      bonusConfirmSoundTimer = setTimeout(finish, 8000);
+      const p = audio.play();
+      if(p && typeof p.catch === "function") p.catch(()=>setTimeout(finish, 250));
+    }catch(e){
+      clearBonusConfirmSoundLock();
+    }
+  }
+
+  function playSevenConfirmSound(){ playLockedBonusConfirmSound(SEVEN_CONFIRM_SOUND_SRC, sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE)); }
+  function playRegConfirmSound(){ playLockedBonusConfirmSound(REG_CONFIRM_SOUND_SRC, sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE)); }
+  function playBonusConfirmSound(){ playLockedBonusConfirmSound(BONUS_CONFIRM_SOUND_SRC, sfxOutputVolume(BONUS_CONFIRM_SOUND_OUTPUT_SCALE)); }
   function playPekaSound(){ playOneShotSound(PEKA_SOUND_SRC, sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE)); }
 
   function playKoatariSound(){
@@ -14021,73 +14008,6 @@ body{
       const p = payoutSound.play();
       if(p && typeof p.catch === "function") p.catch(()=>{});
     }catch(e){}
-  }
-
-  function playVoiceSound(src, delayMs=0){
-    if(debugFastSpinActive || speedToBonusActive) return;
-    if(!voiceSound || !src) return;
-    if(delayMs > 0){
-      setTimeout(()=>playVoiceSound(src), delayMs);
-      return;
-    }
-    try{
-      voiceSound.pause();
-      if(voiceSound.getAttribute("src") !== src){
-        voiceSound.setAttribute("src", src);
-      }
-      voiceSound.currentTime = 0;
-      voiceSound.volume = sfxOutputVolume();
-      const p = voiceSound.play();
-      if(p && typeof p.catch === "function") p.catch(()=>{});
-    }catch(e){}
-  }
-
-  function playZakoVoiceSound(src, delayMs=0){
-    if(debugFastSpinActive || speedToBonusActive) return;
-    if(!src) return;
-    if(delayMs > 0){
-      setTimeout(()=>playZakoVoiceSound(src), delayMs);
-      return;
-    }
-    try{
-      if(!zakoVoiceSound){
-        zakoVoiceSound = new Audio();
-        zakoVoiceSound.preload = "auto";
-      }
-      zakoVoiceSound.pause();
-      if(zakoVoiceSound.getAttribute("src") !== src){
-        zakoVoiceSound.setAttribute("src", src);
-        zakoVoiceSound.load();
-      }
-      zakoVoiceSound.currentTime = 0;
-      zakoVoiceSound.volume = sfxOutputVolume();
-      const p = zakoVoiceSound.play();
-      if(p && typeof p.catch === "function"){
-        p.catch(()=>{
-          setTimeout(()=>{
-            try{
-              zakoVoiceSound.currentTime = 0;
-              const retry = zakoVoiceSound.play();
-              if(retry && typeof retry.catch === "function") retry.catch(()=>{});
-            }catch(e){}
-          }, 40);
-        });
-      }
-    }catch(e){}
-  }
-
-  function playAtRemainVoiceIfNeeded(){
-    if(!session.active || session.phase === "battle" || isGoraiZoneActive()) return;
-    const remain = Math.max(0, Number(session.remain) || 0);
-    if(remain === 3){
-      playVoiceSound(VOICE_SRC.at3);
-    }else if(remain === 2){
-      playVoiceSound(VOICE_SRC.at2);
-    }else if(remain === 1){
-      playVoiceSound(VOICE_SRC.at1);
-    }else if(remain === 0){
-      playVoiceSound(VOICE_SRC.last);
-    }
   }
 
   function playSpinSound(){ playOneShotSound(SPIN_SOUND_SRC); }
@@ -14180,7 +14100,7 @@ body{
       [...document.querySelectorAll(".side > .card:not(.oddsPublic):not(.slumpPublic)")].forEach(card => drawer.appendChild(card));
       if(drawer.parentElement !== document.body) document.body.appendChild(drawer);
     }
-    ["titleInput","settingSelect","feeInput","stSpinsInput","oddsMultiplierInput","smallMulInput","midMulInput","crownMulInput","cherryMulInput","bigMulInput","bigAddInput","autoDelayInput","masterVolume","bgmVolume","sfxVolume","payoutVolume","movieVolume","rogiMovieVolume"].forEach(id=>{
+    ["titleInput","settingSelect","feeInput","stSpinsInput","oddsMultiplierInput","smallMulInput","midMulInput","crownMulInput","cherryMulInput","bigMulInput","bigAddInput","autoDelayInput","masterVolume","bgmVolume","sfxVolume","payoutVolume"].forEach(id=>{
       const el = $(id);
       if(el) el.addEventListener("input", ()=>{ readSettings(); updateDisplay(); });
     });
@@ -14201,43 +14121,43 @@ body{
       if(el) el.addEventListener("click", handler);
     };
 
-    if(audioToggleBtn){
-      audioToggleBtn.addEventListener("click", e=>{
+    const bindUtilityPress = (el, handler)=>{
+      if(!el) return;
+      el.addEventListener("pointerdown", e=>{
+        e.preventDefault();
         e.stopPropagation();
+        handler(e);
+      });
+      el.addEventListener("click", e=>{
+        e.stopPropagation();
+      });
+      el.addEventListener("keydown", e=>{
+        if(e.code !== "Enter" && e.code !== "Space") return;
+        e.preventDefault();
+        e.stopPropagation();
+        handler(e);
+      });
+    };
+
+    bindUtilityPress(audioToggleBtn, ()=>{
         setAudioPanelOpen(!audioDock.classList.contains("open"));
-      });
-    }
-    if(slumpToggleBtn){
-      slumpToggleBtn.addEventListener("click", e=>{
-        e.stopPropagation();
+    });
+    bindUtilityPress(slumpToggleBtn, ()=>{
         setInfoPanelOpen("slump", !audioDock.classList.contains("slumpOpen"));
-      });
-    }
-    if(oddsToggleBtn){
-      oddsToggleBtn.addEventListener("click", e=>{
-        e.stopPropagation();
+    });
+    bindUtilityPress(oddsToggleBtn, ()=>{
         setInfoPanelOpen("odds", !audioDock.classList.contains("oddsOpen"));
-      });
-    }
-    if(reelSlumpToggleBtn){
-      reelSlumpToggleBtn.addEventListener("click", e=>{
-        e.stopPropagation();
+    });
+    bindUtilityPress(reelSlumpToggleBtn, ()=>{
         setInfoPanelOpen("slump", !audioDock.classList.contains("slumpOpen"));
-      });
-    }
-    if(reelOddsToggleBtn){
-      reelOddsToggleBtn.addEventListener("click", e=>{
-        e.stopPropagation();
+    });
+    bindUtilityPress(reelOddsToggleBtn, ()=>{
         setInfoPanelOpen("odds", !audioDock.classList.contains("oddsOpen"));
-      });
-    }
-    if(reelDataToggleBtn){
-      reelDataToggleBtn.addEventListener("click", e=>{
-        e.stopPropagation();
+    });
+    bindUtilityPress(reelDataToggleBtn, ()=>{
         setReelDataCounterOpen(!isReelDataCounterOpen());
-      });
-      updateReelDataCounterMenu();
-    }
+    });
+    updateReelDataCounterMenu();
     if(audioCloseBtn){
       audioCloseBtn.addEventListener("click", e=>{
         e.stopPropagation();
@@ -14296,7 +14216,7 @@ body{
     if(pagePanResetBtn){
       pagePanResetBtn.addEventListener("click", e=>{
         e.stopPropagation();
-        pagePanX = 0;
+        pagePanX = PAGE_PAN_DEFAULT;
         applyPagePan(true);
       });
     }
@@ -14395,6 +14315,10 @@ body{
     }
     onClick("autoStartBtn", startAutoPlay);
     onClick("autoStopBtn", ()=>stopAutoPlay(A_TYPE_MODE ? "オート停止" : "オートAT停止"));
+    bindUtilityPress($("topAutoBtn"), ()=>{
+        if(autoPlay) stopAutoPlay(A_TYPE_MODE ? "オート停止" : "オートAT停止");
+        else startAutoPlay();
+    });
     if($("debugFastStartBtn")) $("debugFastStartBtn").addEventListener("click", startDebugFastSpin);
     if($("debugFastStopBtn")) $("debugFastStopBtn").addEventListener("click", ()=>stopDebugFastSpin());
     if(slumpSeekRange){
@@ -14487,22 +14411,6 @@ body{
       $("forceResult").value = "";
       log("次回転指定を解除");
     });
-
-    if($("forcePremiumBtn")){
-      $("forcePremiumBtn").addEventListener("click", ()=>{
-        forcePremiumEffect = false;
-        if($("premiumForceStatus")) $("premiumForceStatus").value = "使用しない";
-        log("プレミア演出は使用しません");
-      });
-    }
-
-    if($("clearPremiumBtn")){
-      $("clearPremiumBtn").addEventListener("click", ()=>{
-        forcePremiumEffect = false;
-        if($("premiumForceStatus")) $("premiumForceStatus").value = "OFF";
-        log("プレミア演出強制を解除");
-      });
-    }
 
     arrangeDebugDrawerTop();
 
