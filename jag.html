@@ -14758,7 +14758,9 @@ body{
       window.addEventListener("pointercancel", ()=>setLeverDown(false));
       betHitArea.addEventListener("mouseleave", ()=>setLeverDown(false));
       betHitArea.addEventListener("click", e=>{
-        if(e.target !== $("spinBtn")) $("spinBtn").click();
+        const target = e.target;
+        if(target && target.closest && target.closest("button, input, select, textarea, a, label")) return;
+        $("spinBtn").click();
       });
     }
     onClick("autoStartBtn", startAutoPlay);
@@ -14794,7 +14796,9 @@ body{
       });
     }
     if($("quickAutoBtn")){
-      $("quickAutoBtn").addEventListener("click", ()=>{
+      $("quickAutoBtn").addEventListener("click", e=>{
+        e.stopPropagation();
+        e.preventDefault();
         if(autoPlay) stopAutoPlay(A_TYPE_MODE ? "オート停止" : "オートAT停止");
         else startAutoPlay();
       });
