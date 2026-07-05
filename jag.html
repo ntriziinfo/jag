@@ -7101,8 +7101,8 @@ body{
     "assets/media/jag/bonus_stop_3.wav"
   ]);
   const PEKA_SOUND_SRC = "assets/media/jag/peka_1.wav";
-  const SEVEN_CONFIRM_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
-  const REG_CONFIRM_SOUND_SRC = "assets/media/jag/special_symbol.wav";
+  const SEVEN_CONFIRM_SOUND_SRC = "assets/media/jag/big_kakutei.wav";
+  const REG_CONFIRM_SOUND_SRC = "assets/media/jag/reg_kakutei.wav";
   const BONUS_CONFIRM_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
   const BONUS_END_BGM_SRC = "assets/media/jag/bonus_end.wav";
   const PREMIUM_BONUS_END_VOICE_SRC = "assets/media/jag/premium_bonus_end_voice.wav";
@@ -9163,6 +9163,7 @@ body{
   }
 
   function isAtFirstHitForAuto(resolved){
+    if(A_TYPE_MODE) return false;
     if(!resolved) return false;
     if(resolved.bonusWaitSpin) return true;
     if(resolved.bar3PremiumReady || resolved.bonusReady) return true;
@@ -11098,7 +11099,7 @@ body{
     const bonusLabel = aTypeEnd ? aTypeBonusLabel(session.bonusKind) : "";
     const premiumOneGameRen = !!(aTypeEnd && session.premiumBonus && normalizeATypeBonusKind(session.bonusKind) === "BIG");
     const settingVoiceAfterBonus = aTypeEnd ? pickSettingBonusEndVoiceSrc(settings.setting) : "";
-    if(autoPlay) stopAutoPlay("ボーナス終了のためオート停止");
+    if(!A_TYPE_MODE && autoPlay) stopAutoPlay("ボーナス終了のためオート停止");
     if(aTypeEnd){
       showMessage(`${bonusLabel}終了`, `純増${resultPayout}pt / 払出${session.paid}pt / BET${session.cost}pt`);
       log(`${bonusLabel}終了：純増${resultPayout}pt / 払出${session.paid}pt / BET${session.cost}pt`);
@@ -13632,7 +13633,7 @@ body{
     }
 
     if(!session.active){
-      if(normalState.bonusPending && pendingBonusWaitDone()){
+      if(!A_TYPE_MODE && normalState.bonusPending && pendingBonusWaitDone()){
         stopAutoPlay("BONUS確定画面のためAUTO停止");
         return;
       }
