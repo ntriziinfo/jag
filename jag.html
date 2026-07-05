@@ -7601,6 +7601,7 @@ body{
   const SLUMP_MAX_DRAW_POINTS = 1400;
   let autoPlay = false;
   let autoTimer = null;
+  let autoWatchdogTimer = null;
   let speedToBonusActive = false;
   let speedToBonusTimer = null;
   let speedToBonusCount = 0;
@@ -13905,9 +13906,39 @@ body{
     stopSpeedToBonus("AUTO開始のためSPEED停止");
     readSettings();
     autoPlay = true;
+    startAutoWatchdog();
     updateAutoUi();
     log(A_TYPE_MODE ? "オート開始" : "オートAT開始");
     runAutoStep();
+  }
+
+  function queueAutoStep(delayMs=150){
+    if(!autoPlay) return;
+    if(autoTimer){
+      clearTimeout(autoTimer);
+      autoTimer = null;
+    }
+    autoTimer = setTimeout(()=>{
+      autoTimer = null;
+      runAutoStep();
+    }, Math.max(50, delayMs));
+  }
+
+  function startAutoWatchdog(){
+    if(autoWatchdogTimer) return;
+    autoWatchdogTimer = setInterval(()=>{
+      if(!autoPlay) return;
+      if(autoTimer || isSpinning || bonusEndBgmPlaying || bonusConfirmSoundPlaying || pendingAtStartTimer) return;
+      if(!canPlayCompleteTrial()) return;
+      queueAutoStep(100);
+    }, 500);
+  }
+
+  function stopAutoWatchdog(){
+    if(autoWatchdogTimer){
+      clearInterval(autoWatchdogTimer);
+      autoWatchdogTimer = null;
+    }
   }
 
   function stopAutoPlay(reason){
@@ -13917,26 +13948,39 @@ body{
       clearTimeout(autoTimer);
       autoTimer = null;
     }
+    stopAutoWatchdog();
     updateAutoUi();
     if(reason) log(reason);
+  }
+
+  function requestAutoStopCurrentSpin(){
+    if(!isSpinning || !currentSpin) return false;
+    if(!spinCanStop) return false;
+    if(currentSpin.autoStopTakeoverScheduled) return true;
+    currentSpin.autoStopTakeoverScheduled = true;
+    currentSpin.autoStopAtStart = true;
+    currentSpin.manualBonusStop = false;
+    stopAllReels();
+    return true;
   }
 
   function runAutoStep(){
     if(!autoPlay) return;
     if(bonusEndBgmPlaying || bonusConfirmSoundPlaying){
-      autoTimer = setTimeout(runAutoStep, 150);
+      queueAutoStep(150);
       return;
     }
     if(!canPlayCompleteTrial()) return;
     if(isRogiThirdStopHoldActive()){
       if(isRogiThirdStopMoviePlaying()){
-        autoTimer = setTimeout(runAutoStep, 150);
+        queueAutoStep(150);
         return;
       }
       clearRogiThirdStopHoldForNextGame();
     }
     if(isSpinning){
-      autoTimer = setTimeout(runAutoStep, 150);
+      requestAutoStopCurrentSpin();
+      queueAutoStep(150);
       return;
     }
 
@@ -13946,30 +13990,30 @@ body{
         return;
       }
       spin();
-      autoTimer = setTimeout(runAutoStep, Math.max(100, settings.autoDelay * 1000));
+      queueAutoStep(Math.max(100, settings.autoDelay * 1000));
       return;
     }
 
     spin();
     if(!isSpinning && autoPlay){
-      autoTimer = setTimeout(runAutoStep, Math.max(100, settings.autoDelay * 1000));
+      queueAutoStep(Math.max(100, settings.autoDelay * 1000));
     }
   }
 
   function scheduleNextAuto(){
     if(!autoPlay) return;
     if(bonusEndBgmPlaying || bonusConfirmSoundPlaying){
-      autoTimer = setTimeout(runAutoStep, 150);
+      queueAutoStep(150);
       return;
     }
     if(!canPlayCompleteTrial()) return;
     if(isRogiThirdStopHoldActive()){
-      autoTimer = setTimeout(runAutoStep, 150);
+      queueAutoStep(150);
       return;
     }
     readSettings();
     const delayMs = Math.max(100, settings.autoDelay * 1000);
-    autoTimer = setTimeout(runAutoStep, delayMs);
+    queueAutoStep(delayMs);
   }
 
   function speedToBonusUnavailableReason(){
@@ -14926,6 +14970,7 @@ body{
 
     window.addEventListener("beforeunload", ()=>{
       if(autoTimer) clearTimeout(autoTimer);
+      if(autoWatchdogTimer) clearInterval(autoWatchdogTimer);
       if(debugFastTimer) clearInterval(debugFastTimer);
       readSettings();
       persistState();
