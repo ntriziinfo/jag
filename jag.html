@@ -6978,6 +6978,7 @@ body{
             <option value="MID_CHERRY">RBチェリー同時（77BAR/96pt）</option>
             <option value="BIG">BB（777/252pt）</option>
             <option value="BAR3">BAR</option>
+            <option value="REACH_ME">リーチ目</option>
           </select>
         </div>
         <div class="row">
@@ -9346,6 +9347,16 @@ body{
     return A_TYPE_RESULT_SET.has(result) ? result : "MISS";
   }
 
+  function normalizeForceResult(result){
+    if(result === "REACH_ME") return "REACH_ME";
+    return A_TYPE_MODE && result ? normalizeATypeResult(result) : result;
+  }
+
+  function forceResultName(result){
+    if(result === "REACH_ME") return "リーチ目";
+    return RESULT[result]?.name || "";
+  }
+
   function normalizeATypeBonusKind(kind){
     return kind === "MID" || kind === "REG" || kind === "RB" ? "MID" : "BIG";
   }
@@ -10398,6 +10409,12 @@ body{
         return normalState.bonusKind === "MID" ? "MID" : "BIG";
       }
 
+      if(pendingForceResult === "REACH_ME"){
+        const gamesSinceLastBonusAtStart = Math.max(0, Number(normalState.sinceBonus) || 0);
+        pendingATypeInternalBonus = {kind:"BIG", source:"リーチ目強制", internalResult:"REACH_ME", gamesSinceLastBonusAtStart};
+        return "MISS";
+      }
+
       if(pendingForceResult && RESULT[pendingForceResult]){
         return normalizeATypeResult(pendingForceResult);
       }
@@ -10754,10 +10771,10 @@ body{
     }else if(command.type === "reset"){
       morningResetGame(false, "管理リセット");
     }else if(command.type === "forceResult"){
-      const requested = command.result && RESULT[command.result] ? command.result : "";
-      forceResult = A_TYPE_MODE && requested ? normalizeATypeResult(requested) : requested;
+      const requested = command.result === "REACH_ME" || RESULT[command.result] ? command.result : "";
+      forceResult = normalizeForceResult(requested);
       if($("forceResult")) $("forceResult").value = forceResult;
-      log(forceResult ? `管理画面：次回転指定 ${RESULT[forceResult].name}` : "管理画面：次回転指定を解除");
+      log(forceResult ? `管理画面：次回転指定 ${forceResultName(forceResult)}` : "管理画面：次回転指定を解除");
       updateDisplay();
     }else if(command.type === "direct" && RESULT[command.result]){
       direct(command.result);
@@ -13300,7 +13317,8 @@ body{
       ? buildReversePushMissGrid()
       : buildGrid(result, lineRow);
     let reachMeLine = "";
-    if(A_TYPE_MODE && normalActiveAtSpinStart && result === "MISS" && resolved && resolved.bonusHit && Math.random() < A_TYPE_REACH_ME_ANNOUNCE_RATE){
+    const forceReachMeDisplay = A_TYPE_MODE && pendingForceResult === "REACH_ME";
+    if(A_TYPE_MODE && normalActiveAtSpinStart && result === "MISS" && resolved && resolved.bonusHit && (forceReachMeDisplay || Math.random() < A_TYPE_REACH_ME_ANNOUNCE_RATE)){
       grid = buildReachMeGrid();
       reachMeLine = reachMeLabelFromGrid(grid);
     }
@@ -14718,8 +14736,8 @@ body{
 
     onClick("applyForceBtn", ()=>{
       const requested = $("forceResult").value;
-      forceResult = A_TYPE_MODE && requested ? normalizeATypeResult(requested) : requested;
-      log(forceResult ? `次回転指定：${RESULT[forceResult].name}` : "次回転指定なし");
+      forceResult = normalizeForceResult(requested);
+      log(forceResult ? `次回転指定：${forceResultName(forceResult)}` : "次回転指定なし");
     });
     onClick("forceBarBtn", ()=>{
       forceResult = "BAR3";
