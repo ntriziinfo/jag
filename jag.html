@@ -7281,7 +7281,7 @@ body{
     BELL3:{name:"斜めベル", reel:[BELL_SYMBOL,BELL_SYMBOL,BELL_SYMBOL], label:"", cls:"gold", kind:"pay"},
     REPLAY:{name:"リプレイ", reel:[ELEPHANT_SYMBOL,ELEPHANT_SYMBOL,ELEPHANT_SYMBOL], label:"REPLAY", cls:"blue", kind:"pay"},
     SUICA:{name:"スイカ揃い", reel:["🍋","🍋","🍋"], label:"SUICA", cls:"green", kind:"pay"},
-    CHERRY_ANY:{name:"チェリーANY", reel:[CHERRY_SYMBOL,ELEPHANT_SYMBOL,PIERROT_SYMBOL], label:"CHERRY", cls:"red", kind:"payadd"},
+    CHERRY_ANY:{name:"チェリーANY", reel:[ELEPHANT_SYMBOL,PIERROT_SYMBOL,CHERRY_SYMBOL], label:"CHERRY", cls:"red", kind:"payadd"},
     CHERRY_DOUBLE:{name:"チェリー2連", reel:[CHERRY_SYMBOL,CHERRY_SYMBOL,ELEPHANT_SYMBOL], label:"CHERRY×2", cls:"red", kind:"add"},
     CHERRY_TRIPLE:{name:"チェリー3つ", reel:[CHERRY_SYMBOL,CHERRY_SYMBOL,CHERRY_SYMBOL], label:"CHERRY×3", cls:"red", kind:"payadd"}
   };
@@ -13030,7 +13030,9 @@ body{
   }
 
   function cherryResultFromRow(row){
-    if(!Array.isArray(row) || row[0] !== CHERRY_SYMBOL) return "";
+    if(!Array.isArray(row)) return "";
+    if(row[2] === CHERRY_SYMBOL && row[0] !== CHERRY_SYMBOL) return "CHERRY_ANY";
+    if(row[0] !== CHERRY_SYMBOL) return "";
     if(row[1] === CHERRY_SYMBOL && row[2] === CHERRY_SYMBOL) return "CHERRY_TRIPLE";
     if(row[1] === CHERRY_SYMBOL) return "CHERRY_DOUBLE";
     return "CHERRY_ANY";
@@ -13168,7 +13170,7 @@ body{
     const grid = [
       [GRAPE_SYMBOL,ELEPHANT_SYMBOL,PIERROT_SYMBOL],
       [PIERROT_SYMBOL,GRAPE_SYMBOL,ELEPHANT_SYMBOL],
-      [ELEPHANT_SYMBOL,PIERROT_SYMBOL,CHERRY_SYMBOL]
+      [ELEPHANT_SYMBOL,PIERROT_SYMBOL,GRAPE_SYMBOL]
     ];
     const row = clamp(winRow, 0, 2);
     grid[row] = (RESULT[result] || RESULT.MISS).reel.slice();
