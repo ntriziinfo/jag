@@ -1,0 +1,20 @@
+{
+  "rewrites": [
+    {
+      "source": "/jag",
+      "destination": "/jag.html"
+    },
+    {
+      "source": "/jag/",
+      "destination": "/jag.html"
+    },
+    {
+      "source": "/gorai",
+      "destination": "/jag.html"
+    },
+    {
+      "source": "/gourai",
+      "destination": "/jag.html"
+    }
+  ]
+}

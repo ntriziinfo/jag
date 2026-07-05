@@ -68,6 +68,11 @@ function sendCommand(machineId, command){
 }
 
 function serveFile(res, pathname){
+  if(pathname === "/jag" || pathname === "/jag/"){
+    res.writeHead(302, {"Location":"/jag.html"});
+    res.end();
+    return;
+  }
   if(pathname === "/gorai.html" || pathname === "/gourai.html" || pathname === "/gorai_complete_test.html"){
     res.writeHead(302, {"Location":"/jag.html"});
     res.end();
