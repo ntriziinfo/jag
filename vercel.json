@@ -1,0 +1,40 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/jag/",
+      "status": 302,
+      "headers": {
+        "Location": "/jag"
+      }
+    },
+    {
+      "src": "/(?:gorai|gourai)/?",
+      "status": 302,
+      "headers": {
+        "Location": "/jag"
+      }
+    },
+    {
+      "src": "/",
+      "dest": "/jag.html"
+    },
+    {
+      "src": "/jag",
+      "dest": "/jag.html"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/.*",
+      "dest": "/404.html"
+    }
+  ]
+}
