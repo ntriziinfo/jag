@@ -1,5 +1,4 @@
 {
-  "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
     {
@@ -16,6 +15,16 @@
       "source": "/gourai",
       "destination": "/jag",
       "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/jag.html"
+    },
+    {
+      "source": "/jag",
+      "destination": "/jag.html"
     }
   ]
 }
