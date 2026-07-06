@@ -7529,6 +7529,7 @@ body{
   let bonusConfirmSoundTimer = null;
   const MIN_SPIN_WAIT_MS = 500;
   const RESULT_WAIT_MS = 1000;
+  const KEYBOARD_STOP_TURBO_MULTIPLIER = 3;
   const REEL_FULL_ROTATION_MS = 750;
   const SPIN_COST = 3;
   const BONUS_ANNOUNCE_THIRD_STOP_RATE = 0.70;
@@ -13782,15 +13783,18 @@ body{
     );
   }
 
-  function stopSingleReel(i){
+  function stopSingleReel(i, options={}){
     if(!isSpinning || !currentSpin || currentSpin.stopped[i]) return;
+    if(options.keyboardTurbo){
+      currentSpin.keyboardTurboStop = true;
+    }
     if(isPremiumBigConfirmStopLocked()){
       $("resultText").textContent = "PBB確定動画中... 動画終了まで停止できません";
       syncCabinetControlState();
       return;
     }
     if(!spinCanStop){
-      $("resultText").textContent = "ウェイト中... 0.5秒後に停止可能";
+      $("resultText").textContent = options.keyboardTurbo ? "十字キー高速停止待機... 0.5秒後に停止可能" : "ウェイト中... 0.5秒後に停止可能";
       return;
     }
     hideBattleIntro();
@@ -13857,7 +13861,10 @@ body{
         showBattleIntro(battleRoundNumber(), !!(currentSpin.pendingBattleOutcome && currentSpin.pendingBattleOutcome.win));
       }
       $("resultText").textContent = currentSpin.speedModeAtStart ? "全リール停止 / 結果反映中..." : "全リール停止 / 結果確定待ち...";
-      const resultWaitMs = (currentSpin.speedModeAtStart || isPremiumBigFinalBonusSpin(currentSpin)) ? 0 : RESULT_WAIT_MS;
+      const keyboardResultWaitMs = currentSpin.keyboardTurboStop
+        ? Math.round(RESULT_WAIT_MS / KEYBOARD_STOP_TURBO_MULTIPLIER)
+        : RESULT_WAIT_MS;
+      const resultWaitMs = (currentSpin.speedModeAtStart || isPremiumBigFinalBonusSpin(currentSpin)) ? 0 : keyboardResultWaitMs;
       setTimeout(()=>{
         if(currentSpin){
           prepareManualBonusOutcome(currentSpin);
@@ -14696,6 +14703,10 @@ body{
     log(`${label}再生：${src.split("/").pop()}`);
   }
 
+  function stopSingleReelByKeyboard(i){
+    stopSingleReel(i, {keyboardTurbo:true});
+  }
+
   function playPremiumBigThirdStopVoice(spin=currentSpin){
     if(spin && spin.premiumBigThirdStopVoicePlayed) return false;
     if(spin) spin.premiumBigThirdStopVoicePlayed = true;
@@ -15332,9 +15343,9 @@ body{
       const handlers = {
         Space:()=>spin(),
         ArrowUp:()=>spin(),
-        ArrowLeft:()=>stopSingleReel(0),
-        ArrowDown:()=>stopSingleReel(1),
-        ArrowRight:()=>stopSingleReel(2)
+        ArrowLeft:()=>stopSingleReelByKeyboard(0),
+        ArrowDown:()=>stopSingleReelByKeyboard(1),
+        ArrowRight:()=>stopSingleReelByKeyboard(2)
       };
       if(handlers[e.code]){
         e.preventDefault();
