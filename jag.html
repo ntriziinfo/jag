@@ -8972,7 +8972,7 @@ body{
     layer.setAttribute("aria-hidden", show ? "false" : "true");
     if(show){
       const movieSrc = premiumBigReelMovieSrc();
-      video.muted = true;
+      video.muted = confirmMode ? premiumBigConfirmMovieTranslucent : true;
       video.loop = !confirmMode;
       video.playsInline = true;
       if(video.getAttribute("src") !== movieSrc){
@@ -9003,7 +9003,7 @@ body{
     if(barBgm) try{ barBgm.pause(); }catch(e){}
     const movieSrc = PREMIUM_BIG_CONFIRM_MOVIE_SRC;
     video.loop = false;
-    video.muted = true;
+    video.muted = false;
     video.playsInline = true;
     video.volume = movieOutputVolume(MOVIE_OUTPUT_SCALE);
     video.onended = null;
