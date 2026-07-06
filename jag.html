@@ -6645,6 +6645,13 @@ body{
             </div>
           </div>
           <div class="field">
+            <label>ボイス音量</label>
+            <div class="audioVolumeControl">
+              <input id="voiceVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
+              <input id="voiceVolumeNumber" class="audioVolumeNumber" type="number" min="0" max="100" step="1" value="50" inputmode="numeric" aria-label="ボイス音量 %" />
+            </div>
+          </div>
+          <div class="field">
             <label>払い出し音量</label>
             <div class="audioVolumeControl">
               <input id="payoutVolume" type="range" min="0" max="1" step="0.01" value="0.50" />
@@ -7306,10 +7313,11 @@ body{
   });
 
   const symbols = ["7","BAR",ELEPHANT_SYMBOL,GRAPE_SYMBOL,CHERRY_SYMBOL,PIERROT_SYMBOL,BELL_SYMBOL];
-  const AUDIO_BALANCE_VERSION = 5;
+  const AUDIO_BALANCE_VERSION = 6;
   const DEFAULT_MASTER_VOLUME = 0.70;
   const DEFAULT_BGM_VOLUME = 0.50;
   const DEFAULT_SFX_VOLUME = 0.50;
+  const DEFAULT_VOICE_VOLUME = 0.50;
   const DEFAULT_PAYOUT_VOLUME = 0.50;
   const DEFAULT_MOVIE_VOLUME = 0.50;
   const DEFAULT_ROGI_MOVIE_VOLUME = 0.50;
@@ -7318,7 +7326,7 @@ body{
   const BGM_OUTPUT_SCALE = dbToGain(MATCHED_BGM_GAIN_DB);
   const BAR_BGM_OUTPUT_SCALE = dbToGain(MATCHED_BGM_GAIN_DB);
   const SFX_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
-  const SETTING_VOICE_OUTPUT_SCALE = 2.8;
+  const SETTING_VOICE_OUTPUT_SCALE = 1;
   const CONFIRM_SOUND_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
   const LINEUP_CONFIRM_SOUND_OUTPUT_SCALE = 3.2;
   const BONUS_CONFIRM_SOUND_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
@@ -7361,6 +7369,7 @@ body{
     masterVolume:DEFAULT_MASTER_VOLUME,
     bgmVolume:DEFAULT_BGM_VOLUME,
     sfxVolume:DEFAULT_SFX_VOLUME,
+    voiceVolume:DEFAULT_VOICE_VOLUME,
     payoutVolume:DEFAULT_PAYOUT_VOLUME,
     movieVolume:DEFAULT_MOVIE_VOLUME,
     rogiMovieVolume:DEFAULT_ROGI_MOVIE_VOLUME,
@@ -7658,6 +7667,7 @@ body{
     {rangeId:"masterVolume", numberId:"masterVolumeNumber"},
     {rangeId:"bgmVolume", numberId:"bgmVolumeNumber"},
     {rangeId:"sfxVolume", numberId:"sfxVolumeNumber"},
+    {rangeId:"voiceVolume", numberId:"voiceVolumeNumber"},
     {rangeId:"payoutVolume", numberId:"payoutVolumeNumber"}
   ]);
   const machine = $("machine");
@@ -8171,6 +8181,10 @@ body{
     return audioOutputVolume(settings.sfxVolume, scale);
   }
 
+  function voiceOutputVolume(scale=1){
+    return audioOutputVolume(settings.voiceVolume, scale);
+  }
+
   function payoutOutputVolume(scale=PAYOUT_SOUND_OUTPUT_SCALE){
     return audioOutputVolume(settings.payoutVolume, scale);
   }
@@ -8220,14 +8234,14 @@ body{
     normalState.pendingPremiumVoiceSrc = "";
     normalState.pendingSettingVoiceSrc = "";
     if(premiumSrc){
-      playOneShotSound(premiumSrc, sfxOutputVolume(SETTING_VOICE_OUTPUT_SCALE));
+      playOneShotSound(premiumSrc, voiceOutputVolume(SETTING_VOICE_OUTPUT_SCALE));
       log("プレミアBIG継続ボイス：次GレバーON");
       if(settingSrc){
-        setTimeout(()=>playOneShotSound(settingSrc, sfxOutputVolume(SETTING_VOICE_OUTPUT_SCALE)), 1400);
+        setTimeout(()=>playOneShotSound(settingSrc, voiceOutputVolume(SETTING_VOICE_OUTPUT_SCALE)), 1400);
         log("設定示唆ボイス予約：継続ボイス後に再生");
       }
     }else if(settingSrc){
-      playOneShotSound(settingSrc, sfxOutputVolume(SETTING_VOICE_OUTPUT_SCALE));
+      playOneShotSound(settingSrc, voiceOutputVolume(SETTING_VOICE_OUTPUT_SCALE));
       log("設定示唆ボイス：ボーナス後1G目レバーON");
     }
     return true;
@@ -8302,7 +8316,7 @@ body{
     if(koatariSound) koatariSound.volume = sfxOutputVolume();
     if(bigSound) bigSound.volume = sfxOutputVolume();
     if(payoutSound) payoutSound.volume = payoutOutputVolume();
-    if(voiceSound) voiceSound.volume = sfxOutputVolume();
+    if(voiceSound) voiceSound.volume = voiceOutputVolume();
     if(gekiatsuVideo) gekiatsuVideo.volume = currentGekiatsuVideoOutputVolume();
     updateAudioMuteButton();
   }
@@ -9015,7 +9029,7 @@ body{
       try{ video.pause(); }catch(e){}
     }
     updatePremiumBigReelMovie();
-    playOneShotSound(BAR_AIM_VOICE_SRC, sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE), {allowDuringPremiumConfirm:true});
+    playOneShotSound(BAR_AIM_VOICE_SRC, voiceOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE), {allowDuringPremiumConfirm:true});
     return true;
   }
 
@@ -10698,6 +10712,7 @@ body{
         if(previousAudioBalance < AUDIO_BALANCE_VERSION){
           const savedBgmVolume = Number(settings.bgmVolume);
           const savedSfxVolume = Number(settings.sfxVolume);
+          const savedVoiceVolume = Number(settings.voiceVolume);
           const savedPayoutVolume = Number(settings.payoutVolume);
           const savedMovieVolume = Number(settings.movieVolume);
           const savedRogiMovieVolume = Number(settings.rogiMovieVolume);
@@ -10706,6 +10721,7 @@ body{
           settings.bgmVolume = (!Number.isFinite(savedBgmVolume) || Math.abs(savedBgmVolume - oldDefaultBgm) < 0.005) ? DEFAULT_BGM_VOLUME : clamp(savedBgmVolume, 0, 1);
           settings.sfxVolume = (!Number.isFinite(savedSfxVolume) || Math.abs(savedSfxVolume - oldDefaultSfx) < 0.005) ? DEFAULT_SFX_VOLUME : clamp(savedSfxVolume, 0, 1);
           const inheritedSfxVolume = Number.isFinite(Number(settings.sfxVolume)) ? clamp(Number(settings.sfxVolume), 0, 1) : DEFAULT_SFX_VOLUME;
+          settings.voiceVolume = Object.prototype.hasOwnProperty.call(data.settings, "voiceVolume") && Number.isFinite(savedVoiceVolume) ? clamp(savedVoiceVolume, 0, 1) : inheritedSfxVolume;
           settings.payoutVolume = Object.prototype.hasOwnProperty.call(data.settings, "payoutVolume") && Number.isFinite(savedPayoutVolume) ? clamp(savedPayoutVolume, 0, 1) : inheritedSfxVolume;
           settings.movieVolume = Object.prototype.hasOwnProperty.call(data.settings, "movieVolume") && Number.isFinite(savedMovieVolume) ? clamp(savedMovieVolume, 0, 1) : inheritedSfxVolume;
           settings.rogiMovieVolume = Object.prototype.hasOwnProperty.call(data.settings, "rogiMovieVolume") && Number.isFinite(savedRogiMovieVolume) ? clamp(savedRogiMovieVolume, 0, 1) : inheritedSfxVolume;
@@ -10799,6 +10815,7 @@ body{
         masterVolume: settings.masterVolume,
         bgmVolume: settings.bgmVolume,
         sfxVolume: settings.sfxVolume,
+        voiceVolume: settings.voiceVolume,
         payoutVolume: settings.payoutVolume,
         movieVolume: settings.movieVolume,
         rogiMovieVolume: settings.rogiMovieVolume,
@@ -10852,6 +10869,7 @@ body{
     setValue("masterVolume", nextSettings.masterVolume);
     setValue("bgmVolume", nextSettings.bgmVolume);
     setValue("sfxVolume", nextSettings.sfxVolume);
+    setValue("voiceVolume", nextSettings.voiceVolume);
     setValue("payoutVolume", nextSettings.payoutVolume);
     setValue("movieVolume", nextSettings.movieVolume);
     setValue("rogiMovieVolume", nextSettings.rogiMovieVolume);
@@ -10949,6 +10967,7 @@ body{
     if($("masterVolume")) settings.masterVolume = clamp(Number($("masterVolume").value) || 0, 0, 1);
     if($("bgmVolume")) settings.bgmVolume = clamp(Number($("bgmVolume").value) || 0, 0, 1);
     if($("sfxVolume")) settings.sfxVolume = clamp(Number($("sfxVolume").value) || 0, 0, 1);
+    if($("voiceVolume")) settings.voiceVolume = clamp(Number($("voiceVolume").value) || 0, 0, 1);
     if($("payoutVolume")) settings.payoutVolume = clamp(Number($("payoutVolume").value) || 0, 0, 1);
     if($("movieVolume")) settings.movieVolume = clamp(Number($("movieVolume").value) || 0, 0, 1);
     if($("rogiMovieVolume")) settings.rogiMovieVolume = clamp(Number($("rogiMovieVolume").value) || 0, 0, 1);
@@ -10990,7 +11009,7 @@ body{
       payoutSound.volume = payoutOutputVolume();
     }
     if(voiceSound){
-      voiceSound.volume = sfxOutputVolume();
+      voiceSound.volume = voiceOutputVolume();
     }
     if(barBgm){
       if(!barBgmActive && barBgm.getAttribute("src") !== AT_BGM_SRC) barBgm.setAttribute("src", AT_BGM_SRC);
@@ -11039,6 +11058,7 @@ body{
     if($("masterVolume")) $("masterVolume").value = settings.masterVolume;
     if($("bgmVolume")) $("bgmVolume").value = settings.bgmVolume;
     if($("sfxVolume")) $("sfxVolume").value = settings.sfxVolume;
+    if($("voiceVolume")) $("voiceVolume").value = settings.voiceVolume;
     if($("payoutVolume")) $("payoutVolume").value = settings.payoutVolume;
     if($("movieVolume")) $("movieVolume").value = settings.movieVolume;
     if($("rogiMovieVolume")) $("rogiMovieVolume").value = settings.rogiMovieVolume;
@@ -14455,14 +14475,14 @@ body{
     }
   }
 
-  function playSevenConfirmSound(){ playLockedBonusConfirmSound(SEVEN_CONFIRM_SOUND_SRC, sfxOutputVolume(LINEUP_CONFIRM_SOUND_OUTPUT_SCALE)); }
-  function playRegConfirmSound(){ playLockedBonusConfirmSound(REG_CONFIRM_SOUND_SRC, sfxOutputVolume(LINEUP_CONFIRM_SOUND_OUTPUT_SCALE)); }
+  function playSevenConfirmSound(){ playLockedBonusConfirmSound(SEVEN_CONFIRM_SOUND_SRC, voiceOutputVolume(LINEUP_CONFIRM_SOUND_OUTPUT_SCALE)); }
+  function playRegConfirmSound(){ playLockedBonusConfirmSound(REG_CONFIRM_SOUND_SRC, voiceOutputVolume(LINEUP_CONFIRM_SOUND_OUTPUT_SCALE)); }
   function playBonusConfirmSound(){ playLockedBonusConfirmSound(BONUS_CONFIRM_SOUND_SRC, sfxOutputVolume(BONUS_CONFIRM_SOUND_OUTPUT_SCALE)); }
   function playPekaSound(isBig=false){
     const src = isBig && Math.random() < PEKA_BIG_ATSU_RATE
       ? PEKA_BIG_ATSU_SOUND_SRC
       : PEKA_SOUND_SRCS[randomInt(0, PEKA_SOUND_SRCS.length - 1)];
-    playOneShotSound(src, sfxOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE));
+    playOneShotSound(src, voiceOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE));
   }
 
   function playKoatariSound(){
@@ -14611,7 +14631,7 @@ body{
       [...document.querySelectorAll(".side > .card:not(.oddsPublic):not(.slumpPublic)")].forEach(card => drawer.appendChild(card));
       if(drawer.parentElement !== document.body) document.body.appendChild(drawer);
     }
-    ["titleInput","settingSelect","feeInput","stSpinsInput","oddsMultiplierInput","smallMulInput","midMulInput","crownMulInput","cherryMulInput","bigMulInput","bigAddInput","autoDelayInput","masterVolume","bgmVolume","sfxVolume","payoutVolume"].forEach(id=>{
+    ["titleInput","settingSelect","feeInput","stSpinsInput","oddsMultiplierInput","smallMulInput","midMulInput","crownMulInput","cherryMulInput","bigMulInput","bigAddInput","autoDelayInput","masterVolume","bgmVolume","sfxVolume","voiceVolume","payoutVolume"].forEach(id=>{
       const el = $(id);
       if(el) el.addEventListener("input", ()=>{ readSettings(); updateDisplay(); });
     });
