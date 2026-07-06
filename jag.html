@@ -7757,6 +7757,8 @@ body{
   let premiumBigConfirmMovieHold = false;
   let premiumBigConfirmMovieTranslucent = false;
   let premiumBigConfirmSilence = false;
+  let premiumBigConfirmStopLock = false;
+  let premiumBigConfirmStopLockTimer = null;
   let speedBonusRogiHoldActive = false;
   let battleIntroHideTimer = null;
   const adminParams = new URLSearchParams(location.search);
@@ -8957,6 +8959,42 @@ body{
     return PREMIUM_BIG_REEL_MOVIE_SRC;
   }
 
+  function isPremiumBigConfirmStopLocked(){
+    return !!(
+      premiumBigConfirmStopLock &&
+      isSpinning &&
+      currentSpin &&
+      currentSpin.premiumBigConfirmMovieEffect &&
+      Array.isArray(currentSpin.stopped) &&
+      !currentSpin.stopped.every(Boolean)
+    );
+  }
+
+  function releasePremiumBigConfirmStopLock(){
+    if(premiumBigConfirmStopLockTimer){
+      clearTimeout(premiumBigConfirmStopLockTimer);
+      premiumBigConfirmStopLockTimer = null;
+    }
+    if(!premiumBigConfirmStopLock) return;
+    premiumBigConfirmStopLock = false;
+    if(isSpinning && spinCanStop && currentSpin && Array.isArray(currentSpin.stopped) && !currentSpin.stopped.every(Boolean)){
+      if($("resultText")) $("resultText").textContent = "PBB確定動画終了 / 停止できます";
+    }
+    syncCabinetControlState();
+    updateAutoUi();
+  }
+
+  function startPremiumBigConfirmStopLock(){
+    if(premiumBigConfirmStopLockTimer){
+      clearTimeout(premiumBigConfirmStopLockTimer);
+      premiumBigConfirmStopLockTimer = null;
+    }
+    premiumBigConfirmStopLock = true;
+    premiumBigConfirmStopLockTimer = setTimeout(releasePremiumBigConfirmStopLock, 18000);
+    syncCabinetControlState();
+    updateAutoUi();
+  }
+
   function updatePremiumBigReelMovie(){
     const layer = $("premiumBigReelMovie");
     if(!layer) return;
@@ -8999,6 +9037,7 @@ body{
     premiumBigConfirmMovieHold = true;
     premiumBigConfirmMovieTranslucent = false;
     premiumBigConfirmSilence = true;
+    startPremiumBigConfirmStopLock();
     pauseNormalBgm();
     if(barBgm) try{ barBgm.pause(); }catch(e){}
     const movieSrc = PREMIUM_BIG_CONFIRM_MOVIE_SRC;
@@ -9006,7 +9045,8 @@ body{
     video.muted = false;
     video.playsInline = true;
     video.volume = movieOutputVolume(MOVIE_OUTPUT_SCALE);
-    video.onended = null;
+    video.onended = releasePremiumBigConfirmStopLock;
+    video.onerror = releasePremiumBigConfirmStopLock;
     if(video.getAttribute("src") !== movieSrc){
       video.setAttribute("src", movieSrc);
       try{ video.load(); }catch(e){}
@@ -9016,8 +9056,10 @@ body{
     try{
       video.currentTime = 0;
       const p = video.play();
-      if(p && typeof p.catch === "function") p.catch(()=>{});
-    }catch(e){}
+      if(p && typeof p.catch === "function") p.catch(()=>releasePremiumBigConfirmStopLock());
+    }catch(e){
+      releasePremiumBigConfirmStopLock();
+    }
     updatePremiumBigReelMovie();
     return true;
   }
@@ -9028,6 +9070,7 @@ body{
     premiumBigConfirmMovieHold = false;
     premiumBigConfirmMovieTranslucent = false;
     premiumBigConfirmSilence = false;
+    releasePremiumBigConfirmStopLock();
     const layer = $("premiumBigReelMovie");
     const video = layer ? layer.querySelector("video") : null;
     if(video){
@@ -9043,6 +9086,7 @@ body{
     premiumBigConfirmMovieHold = false;
     premiumBigConfirmMovieTranslucent = false;
     premiumBigConfirmSilence = false;
+    releasePremiumBigConfirmStopLock();
   }
 
   function ensureReelVideo(index){
@@ -12134,10 +12178,12 @@ body{
   }
 
   function syncCabinetControlState(){
+    const canStopNow = !!(isSpinning && spinCanStop && !isPremiumBigConfirmStopLocked());
     stopBtns.forEach((btn, i)=>{
       if(!btn) return;
       const reelStopped = !!(currentSpin && Array.isArray(currentSpin.stopped) && currentSpin.stopped[i]);
-      const reelLive = !!(isSpinning && !reelStopped);
+      const reelLive = !!(canStopNow && !reelStopped);
+      btn.disabled = !reelLive;
       btn.classList.toggle("is-reel-live", reelLive);
       btn.classList.toggle("is-reel-stopped", !reelLive);
       const part = document.querySelector(`[data-stop-part="${i}"]`);
@@ -12352,9 +12398,10 @@ body{
 
     const spinButton = $("spinBtn");
     if(spinButton){
-      spinButton.textContent = isSpinning ? (spinCanStop ? "STOP" : "WAIT") : "BET";
-      spinButton.classList.toggle("waiting", isSpinning && !spinCanStop);
-      spinButton.classList.toggle("stopReady", isSpinning && spinCanStop);
+      const canStopNow = spinCanStop && !isPremiumBigConfirmStopLocked();
+      spinButton.textContent = isSpinning ? (canStopNow ? "STOP" : "WAIT") : "BET";
+      spinButton.classList.toggle("waiting", isSpinning && !canStopNow);
+      spinButton.classList.toggle("stopReady", isSpinning && canStopNow);
       if(isCompleteTrialLocked() && !isSpinning){
         spinButton.textContent = "COMPLETE";
         spinButton.disabled = true;
@@ -13390,14 +13437,17 @@ body{
     spinWaitTimer = setTimeout(()=>{
       spinCanStop = true;
       if(isSpinning){
-        $("spinBtn").textContent = "ストップ";
-        stopBtns.forEach(b=>b.disabled=false);
+        const stopLocked = isPremiumBigConfirmStopLocked();
+        $("spinBtn").textContent = stopLocked ? "WAIT" : "ストップ";
+        stopBtns.forEach(b=>b.disabled=stopLocked);
         syncCabinetControlState();
         $("resultText").textContent = zoneActiveAtSpinStart
           ? `${goraiZoneRemainText(session.bigZone, session.bigZoneType)} / 停止できます`
           : battleActiveAtSpinStart
             ? `${battleRemainText()} / 停止できます`
-            : "停止できます";
+            : stopLocked
+              ? "PBB確定動画中... 動画終了まで停止できません"
+              : "停止できます";
       }
     }, spinWaitMs);
 
@@ -13606,6 +13656,11 @@ body{
 
   function stopSingleReel(i){
     if(!isSpinning || !currentSpin || currentSpin.stopped[i]) return;
+    if(isPremiumBigConfirmStopLocked()){
+      $("resultText").textContent = "PBB確定動画中... 動画終了まで停止できません";
+      syncCabinetControlState();
+      return;
+    }
     if(!spinCanStop){
       $("resultText").textContent = "ウェイト中... 0.5秒後に停止可能";
       return;
@@ -13686,6 +13741,11 @@ body{
 
   function stopAllReels(){
     if(!isSpinning || !currentSpin) return;
+    if(isPremiumBigConfirmStopLocked()){
+      $("resultText").textContent = "PBB確定動画中... 動画終了まで停止できません";
+      syncCabinetControlState();
+      return;
+    }
     if(!spinCanStop){
       $("resultText").textContent = "ウェイト中... 0.5秒後に停止可能";
       return;
@@ -14023,6 +14083,7 @@ body{
   function requestAutoStopCurrentSpin(){
     if(!isSpinning || !currentSpin) return false;
     if(!spinCanStop) return false;
+    if(isPremiumBigConfirmStopLocked()) return false;
     if(currentSpin.autoStopTakeoverScheduled) return true;
     currentSpin.autoStopTakeoverScheduled = true;
     currentSpin.autoStopAtStart = true;
