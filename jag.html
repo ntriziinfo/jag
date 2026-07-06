@@ -7091,14 +7091,15 @@ body{
 
   const AT_BGM_SRC = "";
   const BAR_BGM_SRC = "";
+  const BGM_ASSET_VERSION = "?v=20260706_bgm_minus083";
   const BIG_BONUS_BGM_SRCS = Object.freeze([
-    "assets/media/jag/big_1.wav",
-    "assets/media/jag/big_2.wav"
+    "assets/media/jag/big_1.wav" + BGM_ASSET_VERSION,
+    "assets/media/jag/big_2.wav" + BGM_ASSET_VERSION
   ]);
-  const BIG_50G_BONUS_BGM_SRC = "assets/media/jag/big_50g.wav";
-  const REG_BONUS_BGM_SRC = "assets/media/jag/reg_bonus.wav";
-  const PREMIUM_BIG_FIRST_BGM_SRC = "assets/media/jag/premium_big_first.mp3";
-  const PREMIUM_BIG_SECOND_BGM_SRC = "assets/media/jag/premium_big_second.wav";
+  const BIG_50G_BONUS_BGM_SRC = "assets/media/jag/big_50g.wav" + BGM_ASSET_VERSION;
+  const REG_BONUS_BGM_SRC = "assets/media/jag/reg_bonus.wav" + BGM_ASSET_VERSION;
+  const PREMIUM_BIG_FIRST_BGM_SRC = "assets/media/jag/premium_big_first.mp3" + BGM_ASSET_VERSION;
+  const PREMIUM_BIG_SECOND_BGM_SRC = "assets/media/jag/premium_big_second.wav" + BGM_ASSET_VERSION;
 
   const BIG_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
 
@@ -7128,7 +7129,7 @@ body{
   const SEVEN_CONFIRM_SOUND_SRC = "assets/media/jag/big_kakutei.wav";
   const REG_CONFIRM_SOUND_SRC = "assets/media/jag/reg_kakutei.wav";
   const BONUS_CONFIRM_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
-  const BONUS_END_BGM_SRC = "assets/media/jag/bonus_end.wav";
+  const BONUS_END_BGM_SRC = "assets/media/jag/bonus_end.wav" + BGM_ASSET_VERSION;
   const PREMIUM_BONUS_END_VOICE_SRC = "assets/media/jag/premium_bonus_end_voice.wav";
   const PREMIUM_BIG_FIRST_THIRD_STOP_VOICE_SRC = "assets/media/jag/premium_bb2_bgm.mp3";
   const PREMIUM_BIG_SECOND_THIRD_STOP_VOICE_SRC = PREMIUM_BONUS_END_VOICE_SRC;
@@ -7312,7 +7313,7 @@ body{
   });
 
   const symbols = ["7","BAR",ELEPHANT_SYMBOL,GRAPE_SYMBOL,CHERRY_SYMBOL,PIERROT_SYMBOL,BELL_SYMBOL];
-  const AUDIO_BALANCE_VERSION = 7;
+  const AUDIO_BALANCE_VERSION = 8;
   const DEFAULT_MASTER_VOLUME = 0.70;
   const DEFAULT_BGM_VOLUME = 0.50;
   const DEFAULT_SFX_VOLUME = 0.50;
@@ -7382,7 +7383,8 @@ body{
   }
 
   function audioSourceOutputScale(src=""){
-    return AUDIO_SOURCE_OUTPUT_SCALE[normalizedAudioSourceKey(src)] || 1;
+    const key = String(src || "");
+    return AUDIO_SOURCE_OUTPUT_SCALE[key] || AUDIO_SOURCE_OUTPUT_SCALE[normalizedAudioSourceKey(key)] || 1;
   }
 
   function applyAudioSourceOutputScale(volume=0, src=""){
