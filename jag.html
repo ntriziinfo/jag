@@ -7313,7 +7313,8 @@ body{
   });
 
   const symbols = ["7","BAR",ELEPHANT_SYMBOL,GRAPE_SYMBOL,CHERRY_SYMBOL,PIERROT_SYMBOL,BELL_SYMBOL];
-  const AUDIO_BALANCE_VERSION = 8;
+  const AUDIO_BALANCE_VERSION = 9;
+  const ROLE_STAT_COUNTER_VERSION = 2;
   const DEFAULT_MASTER_VOLUME = 0.70;
   const DEFAULT_BGM_VOLUME = 0.50;
   const DEFAULT_SFX_VOLUME = 0.50;
@@ -7330,8 +7331,9 @@ body{
   const CONFIRM_SOUND_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
   const LINEUP_CONFIRM_SOUND_OUTPUT_SCALE = 2.0;
   const BONUS_CONFIRM_SOUND_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
-  const PAYOUT_SOUND_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
-  const BELL_PAYOUT_SOUND_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
+  const PAYOUT_UI_50_TO_33_SCALE = 33 / 50;
+  const PAYOUT_SOUND_OUTPUT_SCALE = PAYOUT_UI_50_TO_33_SCALE;
+  const BELL_PAYOUT_SOUND_OUTPUT_SCALE = PAYOUT_UI_50_TO_33_SCALE;
   const BATTLE_BGM_OUTPUT_SCALE = dbToGain(MATCHED_BGM_GAIN_DB);
   const MOVIE_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
   const ROGI_MOVIE_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
@@ -7436,6 +7438,7 @@ body{
     totalSpins:0,
     normalSpins:0,
     highSpins:0,
+    roleStatVersion:ROLE_STAT_COUNTER_VERSION,
     bigCount:0,
     midCount:0,
     grapeCount:0,
@@ -10849,6 +10852,9 @@ body{
           settings.sfxVolume = (!Number.isFinite(savedSfxVolume) || Math.abs(savedSfxVolume - oldDefaultSfx) < 0.005) ? DEFAULT_SFX_VOLUME : clamp(savedSfxVolume, 0, 1);
           const inheritedSfxVolume = Number.isFinite(Number(settings.sfxVolume)) ? clamp(Number(settings.sfxVolume), 0, 1) : DEFAULT_SFX_VOLUME;
           settings.payoutVolume = Object.prototype.hasOwnProperty.call(data.settings, "payoutVolume") && Number.isFinite(savedPayoutVolume) ? clamp(savedPayoutVolume, 0, 1) : inheritedSfxVolume;
+          if(previousAudioBalance < 9 && Number.isFinite(savedPayoutVolume) && Math.abs(savedPayoutVolume - 0.33) < 0.015){
+            settings.payoutVolume = DEFAULT_PAYOUT_VOLUME;
+          }
           settings.movieVolume = Object.prototype.hasOwnProperty.call(data.settings, "movieVolume") && Number.isFinite(savedMovieVolume) ? clamp(savedMovieVolume, 0, 1) : inheritedSfxVolume;
           settings.rogiMovieVolume = Object.prototype.hasOwnProperty.call(data.settings, "rogiMovieVolume") && Number.isFinite(savedRogiMovieVolume) ? clamp(savedRogiMovieVolume, 0, 1) : inheritedSfxVolume;
         }
@@ -10859,6 +10865,18 @@ body{
       settings.title = normalizeMachineTitle(settings.title);
       if(!SETTING[settings.setting]) settings.setting = 1;
       if(data?.stats) stats = {...stats, ...data.stats};
+      if((Number(stats.roleStatVersion) || 0) < ROLE_STAT_COUNTER_VERSION){
+        stats.normalSpins = 0;
+        stats.highSpins = 0;
+        stats.grapeCount = 0;
+        stats.smallCount = 0;
+        stats.bellCount = 0;
+        stats.diagonalBellCount = 0;
+        stats.replayCount = 0;
+        stats.suikaCount = 0;
+        stats.cherryCount = 0;
+        stats.roleStatVersion = ROLE_STAT_COUNTER_VERSION;
+      }
       if(data?.normalState){
         normalState = {
           ...normalState,
@@ -12165,7 +12183,9 @@ body{
       session.hits++;
     }
 
-    countRoleStat(result, true);
+    if(!(A_TYPE_MODE && aTypeBonusSpin)){
+      countRoleStat(result, true);
+    }
 
     recordSlumpPoint();
 
@@ -12319,13 +12339,14 @@ body{
     if($("totalSessionsView")) $("totalSessionsView").textContent = stats.totalSessions || 0;
     if($("bigCountView")) $("bigCountView").textContent = stats.bigCount || 0;
     if($("midCountView")) $("midCountView").textContent = stats.midCount || 0;
-    if($("grapeCountView")) $("grapeCountView").textContent = countOddsText(stats.grapeCount);
-    if($("smallCountView")) $("smallCountView").textContent = stats.smallCount || 0;
-    if($("bellCountView")) $("bellCountView").textContent = countOddsText(stats.bellCount);
-    if($("diagonalBellCountView")) $("diagonalBellCountView").textContent = countOddsText(stats.diagonalBellCount);
-    if($("replayCountView")) $("replayCountView").textContent = countOddsText(stats.replayCount);
-    if($("suikaCountView")) $("suikaCountView").textContent = countOddsText(stats.suikaCount);
-    if($("cherryCountView")) $("cherryCountView").textContent = countOddsText(stats.cherryCount);
+    const normalRoleDenominator = normalRoleStatDenominator();
+    if($("grapeCountView")) $("grapeCountView").textContent = countOddsText(stats.grapeCount, normalRoleDenominator);
+    if($("smallCountView")) $("smallCountView").textContent = countOddsText(stats.smallCount, normalRoleDenominator);
+    if($("bellCountView")) $("bellCountView").textContent = countOddsText(stats.bellCount, normalRoleDenominator);
+    if($("diagonalBellCountView")) $("diagonalBellCountView").textContent = countOddsText(stats.diagonalBellCount, normalRoleDenominator);
+    if($("replayCountView")) $("replayCountView").textContent = countOddsText(stats.replayCount, normalRoleDenominator);
+    if($("suikaCountView")) $("suikaCountView").textContent = countOddsText(stats.suikaCount, normalRoleDenominator);
+    if($("cherryCountView")) $("cherryCountView").textContent = countOddsText(stats.cherryCount, normalRoleDenominator);
     if($("totalFeeView")) $("totalFeeView").textContent = stats.totalFee || 0;
     if($("totalPaidView")) $("totalPaidView").textContent = stats.totalPaid || 0;
     if($("totalProfitView")){
@@ -12527,9 +12548,14 @@ body{
     return "1/" + (1 / prob).toFixed(1);
   }
 
-  function countOddsText(count){
+  function normalRoleStatDenominator(){
+    if(!A_TYPE_MODE) return Number(stats.totalSpins) || 0;
+    return (Number(stats.normalSpins) || 0) + (Number(stats.highSpins) || 0);
+  }
+
+  function countOddsText(count, denominator=Number(stats.totalSpins) || 0){
     const n = Number(count) || 0;
-    const total = Number(stats.totalSpins) || 0;
+    const total = Number(denominator) || 0;
     if(n <= 0 || total <= 0) return `${n} / -`;
     return `${n} / 1/${(total / n).toFixed(1)}`;
   }
@@ -12649,7 +12675,7 @@ body{
     reels.forEach(r=>r.classList.remove("spinning"));
     isSpinning = false;
     currentSpin = null;
-    stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,grapeCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
+    stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,roleStatVersion:ROLE_STAT_COUNTER_VERSION,bigCount:0,midCount:0,grapeCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",premiumBonus:false,oneGameRenBonus:false,bonusWaitGames:0,bonusHitGamesSince:0,reachMePending:false,reachMeBonusKind:"",reachMeBonusSource:"",reachMeHitGamesSince:0,pendingSettingVoiceSrc:"",pendingPremiumVoiceSrc:"",morningCeilingActive:false};
@@ -12704,7 +12730,7 @@ body{
     reels.forEach(r=>r.classList.remove("spinning"));
     isSpinning = false;
     currentSpin = null;
-    stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,bigCount:0,midCount:0,grapeCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
+    stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,roleStatVersion:ROLE_STAT_COUNTER_VERSION,bigCount:0,midCount:0,grapeCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",premiumBonus:false,oneGameRenBonus:false,bonusWaitGames:0,bonusHitGamesSince:0,reachMePending:false,reachMeBonusKind:"",reachMeBonusSource:"",reachMeHitGamesSince:0,pendingSettingVoiceSrc:"",pendingPremiumVoiceSrc:"",morningCeilingActive:!A_TYPE_MODE};
