@@ -7130,9 +7130,10 @@ body{
   const BONUS_CONFIRM_SOUND_SRC = "assets/media/jag/big_confirm.mp3";
   const BONUS_END_BGM_SRC = "assets/media/jag/bonus_end.wav";
   const PREMIUM_BONUS_END_VOICE_SRC = "assets/media/jag/premium_bonus_end_voice.wav";
-  const PREMIUM_BIG_VOICE_SRC = "assets/media/jag/premium_bb_voice.mp3";
-  const PREMIUM_BIG_SECOND_STOP_VOICE_SRC = "assets/media/jag/premium_bb2_bgm.mp3";
-  const PREMIUM_BIG_FIRST_END_VOICE_SRC = PREMIUM_BIG_SECOND_STOP_VOICE_SRC;
+  const PREMIUM_BIG_FIRST_THIRD_STOP_VOICE_SRC = "assets/media/jag/premium_bb2_bgm.mp3";
+  const PREMIUM_BIG_SECOND_THIRD_STOP_VOICE_SRC = "assets/media/jag/premium_bb_voice.mp3";
+  const PREMIUM_BIG_VOICE_SRC = PREMIUM_BIG_SECOND_THIRD_STOP_VOICE_SRC;
+  const PREMIUM_BIG_FIRST_END_VOICE_SRC = PREMIUM_BIG_FIRST_THIRD_STOP_VOICE_SRC;
   const PREMIUM_BIG_SECOND_END_VOICE_SRC = "assets/media/jag/premium_second_end_voice.mp3";
   const PREMIUM_BIG_REEL_MOVIE_SRC = "assets/media/jag/premium_big_reel.mp4?v=20260706_0710";
   const PREMIUM_BIG_CONFIRM_MOVIE_SRC = "assets/media/jag/premium_big_confirm_movie.mp4";
@@ -12895,6 +12896,7 @@ body{
       spin.normalActiveAtStart &&
       spin.resolved &&
       spin.resolved.aTypeBonusReady &&
+      !isPremiumBigLineupSpin(spin) &&
       !spin.autoStopAtStart &&
       !spin.speedModeAtStart &&
       !debugFastSpinActive
@@ -14481,17 +14483,35 @@ body{
     clearBonusConfirmSoundLock();
   }
 
-  function playPremiumBigConfirmVoice(label="PBB確定ボイス"){
+  function premiumBigThirdStopVoiceSrc(spin=currentSpin){
+    const resolved = spin && spin.resolved ? spin.resolved : null;
+    if(resolved && resolved.oneGameRenBonus) return PREMIUM_BIG_SECOND_THIRD_STOP_VOICE_SRC;
+    if(normalState.oneGameRenBonus) return PREMIUM_BIG_SECOND_THIRD_STOP_VOICE_SRC;
+    return PREMIUM_BIG_FIRST_THIRD_STOP_VOICE_SRC;
+  }
+
+  function premiumBigThirdStopVoiceLabel(spin=currentSpin){
+    const resolved = spin && spin.resolved ? spin.resolved : null;
+    return (resolved && resolved.oneGameRenBonus) || normalState.oneGameRenBonus
+      ? "2回目PBB第3停止ボイス"
+      : "初回PBB第3停止ボイス";
+  }
+
+  function isPremiumBigDedicatedVoiceSrc(src=""){
+    return src === PREMIUM_BIG_FIRST_THIRD_STOP_VOICE_SRC || src === PREMIUM_BIG_SECOND_THIRD_STOP_VOICE_SRC;
+  }
+
+  function playPremiumBigConfirmVoice(label="PBB確定ボイス", src=PREMIUM_BIG_SECOND_THIRD_STOP_VOICE_SRC){
     stopBigConfirmSoundNow();
-    playLockedBonusConfirmSound(PREMIUM_BIG_VOICE_SRC, sfxOutputVolume(PREMIUM_VOICE_OUTPUT_SCALE));
-    log(`${label}再生：premium_bb_voice.mp3`);
+    playLockedBonusConfirmSound(src, sfxOutputVolume(PREMIUM_VOICE_OUTPUT_SCALE));
+    log(`${label}再生：${src.split("/").pop()}`);
   }
 
   function playPremiumBigThirdStopVoice(spin=currentSpin){
     if(spin && spin.premiumBigThirdStopVoicePlayed) return false;
     if(spin) spin.premiumBigThirdStopVoicePlayed = true;
     // PBBは通常のBIG確定音を止め、専用ボイスを確定音扱いでロック再生する。
-    playPremiumBigConfirmVoice("PBB確定ボイス");
+    playPremiumBigConfirmVoice(premiumBigThirdStopVoiceLabel(spin), premiumBigThirdStopVoiceSrc(spin));
     return true;
   }
 
@@ -14528,8 +14548,6 @@ body{
     if(!isPremiumBigLineupSpin(spin)) return;
     if(stopOrder === 2 && !spin.premiumBigSecondStopVoicePlayed){
       spin.premiumBigSecondStopVoicePlayed = true;
-      playOneShotSound(PREMIUM_BIG_SECOND_STOP_VOICE_SRC, sfxOutputVolume(PREMIUM_VOICE_OUTPUT_SCALE), {allowDuringPremiumConfirm:true});
-      log("PBB第2停止ボイス再生：premium_bb2_bgm.mp3");
       return;
     }
     if(stopOrder === 3 && !spin.premiumBigThirdStopVoicePlayed){
@@ -14541,11 +14559,11 @@ body{
     if(debugFastSpinActive || speedToBonusActive) return;
     if(!src) return;
     if(src === SEVEN_CONFIRM_SOUND_SRC && isPremiumBigConfirmSoundContext(currentSpin)){
-      src = PREMIUM_BIG_VOICE_SRC;
+      src = premiumBigThirdStopVoiceSrc(currentSpin);
       volume = sfxOutputVolume(PREMIUM_VOICE_OUTPUT_SCALE);
-      log("PBB通常BIG確定音を差し替え：premium_bb_voice.mp3");
+      log(`PBB通常BIG確定音を差し替え：${src.split("/").pop()}`);
     }
-    if(premiumBigConfirmSilence && src !== PREMIUM_BIG_VOICE_SRC) return;
+    if(premiumBigConfirmSilence && !isPremiumBigDedicatedVoiceSrc(src)) return;
     try{
       clearBonusConfirmSoundLock();
       let audio = oneShotSoundCache.get(src);
@@ -14580,7 +14598,7 @@ body{
 
   function playSevenConfirmSound(){
     if(isPremiumBigConfirmSoundContext(currentSpin)){
-      playPremiumBigConfirmVoice("PBB通常BIG確定音差し替え");
+      playPremiumBigConfirmVoice("PBB通常BIG確定音差し替え", premiumBigThirdStopVoiceSrc(currentSpin));
       return;
     }
     playLockedBonusConfirmSound(SEVEN_CONFIRM_SOUND_SRC, sfxOutputVolume(LINEUP_CONFIRM_SOUND_OUTPUT_SCALE));
