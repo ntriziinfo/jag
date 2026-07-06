@@ -7435,7 +7435,7 @@ body{
     [PREMIUM_BIG_SECOND_THIRD_STOP_VOICE_SRC]: dbToGain(4),
     [PREMIUM_BIG_FIRST_END_VOICE_SRC]: dbToGain(3),
     [PREMIUM_BIG_SECOND_END_VOICE_SRC]: dbToGain(5),
-    [PREMIUM_BIG_CONFIRM_MOVIE_SRC]: dbToGain(-4)
+    [PREMIUM_BIG_CONFIRM_MOVIE_SRC]: dbToGain(4)
   });
 
   function normalizedAudioSourceKey(src=""){
@@ -9194,7 +9194,7 @@ body{
     video.loop = false;
     video.muted = false;
     video.playsInline = true;
-    video.volume = movieOutputVolumeForSource(MOVIE_OUTPUT_SCALE, movieSrc);
+    video.volume = voiceOutputVolumeForSource(PREMIUM_VOICE_OUTPUT_SCALE, movieSrc);
     video.onended = releasePremiumBigConfirmStopLock;
     video.onerror = releasePremiumBigConfirmStopLock;
     if(video.getAttribute("src") !== movieSrc){
