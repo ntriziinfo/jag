@@ -7312,7 +7312,7 @@ body{
   });
 
   const symbols = ["7","BAR",ELEPHANT_SYMBOL,GRAPE_SYMBOL,CHERRY_SYMBOL,PIERROT_SYMBOL,BELL_SYMBOL];
-  const AUDIO_BALANCE_VERSION = 5;
+  const AUDIO_BALANCE_VERSION = 6;
   const DEFAULT_MASTER_VOLUME = 0.70;
   const DEFAULT_BGM_VOLUME = 0.50;
   const DEFAULT_SFX_VOLUME = 0.50;
@@ -7324,10 +7324,10 @@ body{
   const BGM_OUTPUT_SCALE = dbToGain(MATCHED_BGM_GAIN_DB);
   const BAR_BGM_OUTPUT_SCALE = dbToGain(MATCHED_BGM_GAIN_DB);
   const SFX_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
-  const SETTING_VOICE_OUTPUT_SCALE = 2.8;
-  const PREMIUM_VOICE_OUTPUT_SCALE = 1.35;
+  const SETTING_VOICE_OUTPUT_SCALE = 1.35;
+  const PREMIUM_VOICE_OUTPUT_SCALE = 1.15;
   const CONFIRM_SOUND_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
-  const LINEUP_CONFIRM_SOUND_OUTPUT_SCALE = 3.2;
+  const LINEUP_CONFIRM_SOUND_OUTPUT_SCALE = 2.0;
   const BONUS_CONFIRM_SOUND_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
   const PAYOUT_SOUND_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
   const BELL_PAYOUT_SOUND_OUTPUT_SCALE = NORMALIZED_AUDIO_OUTPUT_SCALE;
@@ -7337,6 +7337,59 @@ body{
 
   function dbToGain(db){
     return Math.pow(10, Number(db) / 20);
+  }
+
+  const AUDIO_SOURCE_OUTPUT_SCALE = Object.freeze({
+    [BIG_BONUS_BGM_SRCS[0]]: dbToGain(0),
+    [BIG_BONUS_BGM_SRCS[1]]: dbToGain(-2),
+    [BIG_50G_BONUS_BGM_SRC]: dbToGain(-3.5),
+    [REG_BONUS_BGM_SRC]: dbToGain(-2),
+    [PREMIUM_BIG_FIRST_BGM_SRC]: dbToGain(-3.5),
+    [PREMIUM_BIG_SECOND_BGM_SRC]: dbToGain(-7),
+    [BONUS_END_BGM_SRC]: dbToGain(-3),
+    [PAYOUT_SOUND_SRC]: dbToGain(-0.5),
+    [REPLAY_SOUND_SRC]: dbToGain(0),
+    [CHERRY_SOUND_SRC]: dbToGain(1),
+    [SPECIAL_SYMBOL_SOUND_SRC]: dbToGain(-1.5),
+    [PREMIUM_PIERO_SYMBOL_SOUND_SRC]: dbToGain(-2),
+    [SPIN_SOUND_SRC]: dbToGain(-1),
+    [STOP_SOUND_SRC]: dbToGain(-1),
+    [BONUS_STOP_SOUND_SRCS[0]]: dbToGain(2),
+    [BONUS_STOP_SOUND_SRCS[1]]: dbToGain(2.5),
+    [BONUS_STOP_SOUND_SRCS[2]]: dbToGain(2.5),
+    [PEKA_SOUND_SRC]: dbToGain(-1),
+    ["assets/media/jag/peka_kyuin.wav"]: dbToGain(1),
+    ["assets/media/jag/peka_atari.wav"]: dbToGain(3),
+    ["assets/media/jag/peka_kyuin_triple.wav"]: dbToGain(2),
+    [PEKA_BIG_ATSU_SOUND_SRC]: dbToGain(3),
+    [SEVEN_CONFIRM_SOUND_SRC]: dbToGain(-1),
+    [REG_CONFIRM_SOUND_SRC]: dbToGain(0),
+    [BONUS_CONFIRM_SOUND_SRC]: dbToGain(-8),
+    [BAR_AIM_VOICE_SRC]: dbToGain(4),
+    [SETTING_BONUS_END_VOICE_SRCS[2]]: dbToGain(3),
+    [SETTING_BONUS_END_VOICE_SRCS[4]]: dbToGain(3),
+    [SETTING_BONUS_END_VOICE_SRCS[5]]: dbToGain(3),
+    [SETTING_BONUS_END_VOICE_SRCS[6]]: dbToGain(3),
+    [PREMIUM_BONUS_END_VOICE_SRC]: dbToGain(3),
+    [PREMIUM_BIG_FIRST_THIRD_STOP_VOICE_SRC]: dbToGain(4),
+    [PREMIUM_BIG_SECOND_THIRD_STOP_VOICE_SRC]: dbToGain(4),
+    [PREMIUM_BIG_FIRST_END_VOICE_SRC]: dbToGain(3),
+    [PREMIUM_BIG_SECOND_END_VOICE_SRC]: dbToGain(5),
+    [PREMIUM_BIG_CONFIRM_MOVIE_SRC]: dbToGain(-4)
+  });
+
+  function normalizedAudioSourceKey(src=""){
+    return String(src || "").split("?")[0];
+  }
+
+  function audioSourceOutputScale(src=""){
+    return AUDIO_SOURCE_OUTPUT_SCALE[normalizedAudioSourceKey(src)] || 1;
+  }
+
+  function applyAudioSourceOutputScale(volume=0, src=""){
+    const raw = Number(volume);
+    if(!Number.isFinite(raw) || raw <= 0) return 0;
+    return Math.max(0, Math.min(1, raw * audioSourceOutputScale(src)));
   }
 
   function audioOutputVolume(value, scale=1){
@@ -8176,12 +8229,24 @@ body{
     return audioOutputVolume(settings.bgmVolume, scale);
   }
 
+  function bgmOutputVolumeForSource(scale, src=""){
+    return bgmOutputVolume(scale * audioSourceOutputScale(src));
+  }
+
   function sfxOutputVolume(scale=SFX_OUTPUT_SCALE){
     return audioOutputVolume(settings.sfxVolume, scale);
   }
 
+  function sfxOutputVolumeForSource(scale=SFX_OUTPUT_SCALE, src=""){
+    return sfxOutputVolume(scale * audioSourceOutputScale(src));
+  }
+
   function payoutOutputVolume(scale=PAYOUT_SOUND_OUTPUT_SCALE){
     return audioOutputVolume(settings.payoutVolume, scale);
+  }
+
+  function payoutOutputVolumeForSource(scale=PAYOUT_SOUND_OUTPUT_SCALE, src=""){
+    return payoutOutputVolume(scale * audioSourceOutputScale(src));
   }
 
   function clearBonusEndBgmLock(){
@@ -8280,7 +8345,9 @@ body{
     };
     const audio = new Audio(premiumEndVoiceSrc || BONUS_END_BGM_SRC);
     bonusEndBgmAudio = audio;
-    audio.volume = premiumEndVoiceSrc ? sfxOutputVolume(PREMIUM_VOICE_OUTPUT_SCALE) : bgmOutputVolume(BGM_OUTPUT_SCALE);
+    audio.volume = premiumEndVoiceSrc
+      ? sfxOutputVolumeForSource(PREMIUM_VOICE_OUTPUT_SCALE, premiumEndVoiceSrc)
+      : bgmOutputVolumeForSource(BGM_OUTPUT_SCALE, BONUS_END_BGM_SRC);
     if(premiumEndVoiceSrc){
       const label = session.oneGameRenBonus ? "2回目PBB終了ボイス" : "1回目PBB終了ボイス";
       log(`${label}再生：${premiumEndVoiceSrc.split("/").pop()}`);
@@ -8300,8 +8367,16 @@ body{
     return audioOutputVolume(settings.movieVolume, scale);
   }
 
+  function movieOutputVolumeForSource(scale=MOVIE_OUTPUT_SCALE, src=""){
+    return movieOutputVolume(scale * audioSourceOutputScale(src));
+  }
+
   function rogiMovieOutputVolume(scale=ROGI_MOVIE_OUTPUT_SCALE){
     return audioOutputVolume(settings.rogiMovieVolume, scale);
+  }
+
+  function rogiMovieOutputVolumeForSource(scale=ROGI_MOVIE_OUTPUT_SCALE, src=""){
+    return rogiMovieOutputVolume(scale * audioSourceOutputScale(src));
   }
 
   function updateAudioMuteButton(){
@@ -8316,14 +8391,16 @@ body{
     if(!gekiatsuVideo) return 0;
     const src = gekiatsuVideo.getAttribute("src") || "";
     const isRogi = Object.values(ROGI_STOP_VIDEO_SRCS).some(rogiSrc => src === rogiSrc || src.endsWith(rogiSrc));
-    return isRogi ? rogiMovieOutputVolume(ROGI_MOVIE_OUTPUT_SCALE) : movieOutputVolume(MOVIE_OUTPUT_SCALE);
+    return isRogi
+      ? rogiMovieOutputVolumeForSource(ROGI_MOVIE_OUTPUT_SCALE, src)
+      : movieOutputVolumeForSource(MOVIE_OUTPUT_SCALE, src);
   }
 
   function applyAudioOutputVolumes(){
     applyBgmOutputVolumes();
-    if(koatariSound) koatariSound.volume = sfxOutputVolume();
-    if(bigSound) bigSound.volume = sfxOutputVolume();
-    if(payoutSound) payoutSound.volume = payoutOutputVolume();
+    if(koatariSound) koatariSound.volume = sfxOutputVolumeForSource(SFX_OUTPUT_SCALE, KOATARI_SOUND_SRC);
+    if(bigSound) bigSound.volume = sfxOutputVolumeForSource(SFX_OUTPUT_SCALE, BIG_SOUND_SRC);
+    if(payoutSound) payoutSound.volume = payoutOutputVolumeForSource(PAYOUT_SOUND_OUTPUT_SCALE, payoutSound.getAttribute("src") || PAYOUT_SOUND_SRC);
     if(voiceSound) voiceSound.volume = sfxOutputVolume();
     if(gekiatsuVideo) gekiatsuVideo.volume = currentGekiatsuVideoOutputVolume();
     updateAudioMuteButton();
@@ -8338,9 +8415,9 @@ body{
   }
 
   function applyBgmOutputVolumes(){
-    if(bgm) bgm.volume = bgmOutputVolume(BGM_OUTPUT_SCALE);
-    if(barBgm) barBgm.volume = bgmOutputVolume(BAR_BGM_OUTPUT_SCALE);
-    if(battleBgm) battleBgm.volume = bgmOutputVolume(BATTLE_BGM_OUTPUT_SCALE);
+    if(bgm) bgm.volume = bgmOutputVolumeForSource(BGM_OUTPUT_SCALE, bgm.getAttribute("src") || normalBgmSrc());
+    if(barBgm) barBgm.volume = bgmOutputVolumeForSource(BAR_BGM_OUTPUT_SCALE, activeBarBgmSrc());
+    if(battleBgm) battleBgm.volume = bgmOutputVolumeForSource(BATTLE_BGM_OUTPUT_SCALE, BATTLE_BGM_SRC);
   }
 
   function muteBgmForRogiStopEffect(){
@@ -9044,7 +9121,7 @@ body{
     video.loop = false;
     video.muted = false;
     video.playsInline = true;
-    video.volume = movieOutputVolume(MOVIE_OUTPUT_SCALE);
+    video.volume = movieOutputVolumeForSource(MOVIE_OUTPUT_SCALE, movieSrc);
     video.onended = releasePremiumBigConfirmStopLock;
     video.onerror = releasePremiumBigConfirmStopLock;
     if(video.getAttribute("src") !== movieSrc){
@@ -11036,22 +11113,22 @@ body{
     if(bgm){
       if(!barBgmActive && !battleBgmActive) ensureNormalBgmSource();
       bgm.loop = true;
-      bgm.volume = bgmOutputVolume(BGM_OUTPUT_SCALE);
+      bgm.volume = bgmOutputVolumeForSource(BGM_OUTPUT_SCALE, bgm.getAttribute("src") || normalBgmSrc());
       if(!barBgmActive && !battleBgmActive) playNormalBgm();
     }
     if(koatariSound){
       koatariSound.src = KOATARI_SOUND_SRC;
-      koatariSound.volume = sfxOutputVolume();
+      koatariSound.volume = sfxOutputVolumeForSource(SFX_OUTPUT_SCALE, KOATARI_SOUND_SRC);
     }
     if(bigSound){
       bigSound.src = BIG_SOUND_SRC;
-      bigSound.volume = sfxOutputVolume();
+      bigSound.volume = sfxOutputVolumeForSource(SFX_OUTPUT_SCALE, BIG_SOUND_SRC);
     }
     if(payoutSound){
       if(payoutSound.getAttribute("src") !== PAYOUT_SOUND_SRC){
         payoutSound.setAttribute("src", PAYOUT_SOUND_SRC);
       }
-      payoutSound.volume = payoutOutputVolume();
+      payoutSound.volume = payoutOutputVolumeForSource(PAYOUT_SOUND_OUTPUT_SCALE, PAYOUT_SOUND_SRC);
     }
     if(voiceSound){
       voiceSound.volume = sfxOutputVolume();
@@ -11059,7 +11136,7 @@ body{
     if(barBgm){
       if(!barBgmActive && barBgm.getAttribute("src") !== AT_BGM_SRC) barBgm.setAttribute("src", AT_BGM_SRC);
       barBgm.loop = true;
-      barBgm.volume = bgmOutputVolume(BAR_BGM_OUTPUT_SCALE);
+      barBgm.volume = bgmOutputVolumeForSource(BAR_BGM_OUTPUT_SCALE, activeBarBgmSrc());
       ensureBarBgmContinuing();
     }
     if(battleBgm){
@@ -11067,7 +11144,7 @@ body{
         battleBgm.setAttribute("src", BATTLE_BGM_SRC);
       }
       battleBgm.loop = true;
-      battleBgm.volume = bgmOutputVolume(BATTLE_BGM_OUTPUT_SCALE);
+      battleBgm.volume = bgmOutputVolumeForSource(BATTLE_BGM_OUTPUT_SCALE, BATTLE_BGM_SRC);
       ensureBattleBgmContinuing();
     }
     if(gekiatsuVideo){
@@ -11076,7 +11153,7 @@ body{
         gekiatsuVideo.load();
       }
       gekiatsuVideo.loop = false;
-      gekiatsuVideo.volume = movieOutputVolume();
+      gekiatsuVideo.volume = movieOutputVolumeForSource(MOVIE_OUTPUT_SCALE, GEKIATSU_VIDEO_SRC);
     }
     updateAudioMuteButton();
     renderSettingTable();
@@ -11561,8 +11638,8 @@ body{
     gekiatsuVideo.playsInline = true;
     const videoVolumeScale = Number.isFinite(Number(options.volumeScale)) ? Number(options.volumeScale) : MOVIE_OUTPUT_SCALE;
     gekiatsuVideo.volume = options.volumeGroup === "rogi"
-      ? rogiMovieOutputVolume(videoVolumeScale)
-      : movieOutputVolume(videoVolumeScale);
+      ? rogiMovieOutputVolumeForSource(videoVolumeScale, videoSrc)
+      : movieOutputVolumeForSource(videoVolumeScale, videoSrc);
     if(options.fadeOnEnd){
       gekiatsuVideo.onended = fadeOutGekiatsuEffect;
     }else if(options.holdUntilBet){
@@ -11612,7 +11689,7 @@ body{
       const src = ensureNormalBgmSource();
       if(!src) return;
       bgm.loop = true;
-      bgm.volume = bgmOutputVolume(BGM_OUTPUT_SCALE);
+      bgm.volume = bgmOutputVolumeForSource(BGM_OUTPUT_SCALE, src);
       if(bgm.paused){
         bgm.play().catch(()=>{});
       }
@@ -11640,7 +11717,7 @@ body{
         try{ barBgm.load(); }catch(e){}
       }
       barBgm.loop = true;
-      barBgm.volume = bgmOutputVolume(BAR_BGM_OUTPUT_SCALE);
+      barBgm.volume = bgmOutputVolumeForSource(BAR_BGM_OUTPUT_SCALE, src);
       if(barBgm.paused){
         barBgm.play().catch(()=>{});
         if(logLabel) log(logLabel);
@@ -11713,7 +11790,7 @@ body{
         battleBgm.setAttribute("src", BATTLE_BGM_SRC);
       }
       battleBgm.loop = true;
-      battleBgm.volume = bgmOutputVolume(BATTLE_BGM_OUTPUT_SCALE);
+      battleBgm.volume = bgmOutputVolumeForSource(BATTLE_BGM_OUTPUT_SCALE, BATTLE_BGM_SRC);
       if(battleBgm.paused){
         battleBgm.play().catch(()=>{});
         log("継続バトルBGM再生");
@@ -11744,7 +11821,7 @@ body{
         battleBgm.setAttribute("src", BATTLE_BGM_SRC);
       }
       battleBgm.loop = true;
-      battleBgm.volume = bgmOutputVolume(BATTLE_BGM_OUTPUT_SCALE);
+      battleBgm.volume = bgmOutputVolumeForSource(BATTLE_BGM_OUTPUT_SCALE, BATTLE_BGM_SRC);
       if(battleBgm.paused){
         battleBgm.play().catch(()=>{});
       }
@@ -11800,7 +11877,7 @@ body{
         try{ barBgm.load(); }catch(e){}
       }
       barBgm.loop = true;
-      barBgm.volume = bgmOutputVolume(BAR_BGM_OUTPUT_SCALE);
+      barBgm.volume = bgmOutputVolumeForSource(BAR_BGM_OUTPUT_SCALE, src);
       if(barBgm.paused){
         barBgm.play().catch(()=>{});
       }
@@ -14508,7 +14585,7 @@ body{
         try{ audio.load(); }catch(e){}
       }
       audio.currentTime = 0;
-      audio.volume = volume;
+      audio.volume = applyAudioSourceOutputScale(volume, src);
       const p = audio.play();
       if(p && typeof p.catch === "function") p.catch(()=>{});
     }catch(e){}
@@ -14646,7 +14723,7 @@ body{
         try{ audio.load(); }catch(e){}
       }
       audio.currentTime = 0;
-      audio.volume = volume;
+      audio.volume = applyAudioSourceOutputScale(volume, src);
       audio.onended = finish;
       audio.onerror = finish;
       bonusConfirmSoundTimer = setTimeout(finish, 8000);
@@ -14678,7 +14755,7 @@ body{
     try{
       koatariSound.pause();
       koatariSound.currentTime = 0;
-      koatariSound.volume = sfxOutputVolume();
+      koatariSound.volume = sfxOutputVolumeForSource(SFX_OUTPUT_SCALE, KOATARI_SOUND_SRC);
       const p = koatariSound.play();
       if(p && typeof p.catch === "function") p.catch(()=>{});
     }catch(e){}
@@ -14689,7 +14766,7 @@ body{
     try{
       bigSound.pause();
       bigSound.currentTime = 0;
-      bigSound.volume = sfxOutputVolume();
+      bigSound.volume = sfxOutputVolumeForSource(SFX_OUTPUT_SCALE, BIG_SOUND_SRC);
       const p = bigSound.play();
       if(p && typeof p.catch === "function") p.catch(()=>{});
     }catch(e){}
@@ -14742,7 +14819,7 @@ body{
         try{ payoutSound.load(); }catch(e){}
       }
       payoutSound.currentTime = 0;
-      payoutSound.volume = payoutOutputVolume(payoutSoundScaleFor(result, reward, spin));
+      payoutSound.volume = payoutOutputVolumeForSource(payoutSoundScaleFor(result, reward, spin), src);
       const p = payoutSound.play();
       if(p && typeof p.catch === "function") p.catch(()=>{});
     }catch(e){}
