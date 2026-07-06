@@ -7131,7 +7131,7 @@ body{
   const BONUS_END_BGM_SRC = "assets/media/jag/bonus_end.wav";
   const PREMIUM_BONUS_END_VOICE_SRC = "assets/media/jag/premium_bonus_end_voice.wav";
   const PREMIUM_BIG_FIRST_THIRD_STOP_VOICE_SRC = "assets/media/jag/premium_bb2_bgm.mp3";
-  const PREMIUM_BIG_SECOND_THIRD_STOP_VOICE_SRC = "assets/media/jag/premium_bb_voice.mp3";
+  const PREMIUM_BIG_SECOND_THIRD_STOP_VOICE_SRC = PREMIUM_BONUS_END_VOICE_SRC;
   const PREMIUM_BIG_VOICE_SRC = PREMIUM_BIG_SECOND_THIRD_STOP_VOICE_SRC;
   const PREMIUM_BIG_FIRST_END_VOICE_SRC = "assets/media/jag/premium_first_end_voice.mp3";
   const PREMIUM_BIG_SECOND_END_VOICE_SRC = "assets/media/jag/premium_second_end_voice.mp3";
@@ -7312,7 +7312,7 @@ body{
   });
 
   const symbols = ["7","BAR",ELEPHANT_SYMBOL,GRAPE_SYMBOL,CHERRY_SYMBOL,PIERROT_SYMBOL,BELL_SYMBOL];
-  const AUDIO_BALANCE_VERSION = 6;
+  const AUDIO_BALANCE_VERSION = 7;
   const DEFAULT_MASTER_VOLUME = 0.70;
   const DEFAULT_BGM_VOLUME = 0.50;
   const DEFAULT_SFX_VOLUME = 0.50;
@@ -7370,7 +7370,6 @@ body{
     [SETTING_BONUS_END_VOICE_SRCS[4]]: dbToGain(3),
     [SETTING_BONUS_END_VOICE_SRCS[5]]: dbToGain(3),
     [SETTING_BONUS_END_VOICE_SRCS[6]]: dbToGain(3),
-    [PREMIUM_BONUS_END_VOICE_SRC]: dbToGain(3),
     [PREMIUM_BIG_FIRST_THIRD_STOP_VOICE_SRC]: dbToGain(4),
     [PREMIUM_BIG_SECOND_THIRD_STOP_VOICE_SRC]: dbToGain(4),
     [PREMIUM_BIG_FIRST_END_VOICE_SRC]: dbToGain(3),
