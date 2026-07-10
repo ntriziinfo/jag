@@ -6733,7 +6733,7 @@ body{
           <div class="modeTag normal" id="modeTag">受付中</div>
           <div class="settingInfo">
             設定 <b id="settingViewLegacy">1</b><br>
-            機械割 <b id="targetRtpViewLegacy">97.0%</b><br>
+            機械割 <b id="targetRtpViewLegacy">90.0%</b><br>
             Aタイプ <b id="stInfoViewLegacy">通常</b><br>
             払出補正 <b id="payoutScaleViewLegacy">なし</b>
           </div>
@@ -6964,12 +6964,12 @@ body{
         <div class="field">
           <label>設定</label>
           <select id="settingSelect">
-            <option value="1">設定1 / 97.0%</option>
-            <option value="2">設定2 / 98.0%</option>
-            <option value="3">設定3 / 99.5%</option>
-            <option value="4">設定4 / 101.1%</option>
-            <option value="5">設定5 / 103.3%</option>
-            <option value="6">設定6 / 105.5%</option>
+            <option value="1">設定1 / 90.0%</option>
+            <option value="2">設定2 / 93.0%</option>
+            <option value="3">設定3 / 96.0%</option>
+            <option value="4">設定4 / 101.0%</option>
+            <option value="5">設定5 / 104.0%</option>
+            <option value="6">設定6 / 108.0%</option>
           </select>
         </div>
         <div class="field">
@@ -6988,7 +6988,7 @@ body{
           <label>管理用：適用設定情報</label>
           <div class="settingInfo">
             設定 <b id="adminSettingView">1</b><br>
-            表記割 <b id="adminTargetRtpView">97.0%</b><br>
+            表記割 <b id="adminTargetRtpView">90.0%</b><br>
             状態 <b id="adminStInfoView">10G/SET</b><br>
             内部確率 <b id="adminPayoutScaleView">固定</b>
           </div>
@@ -7218,29 +7218,37 @@ body{
   const SPEED_BGM_SRC = "";
 
   const SETTING = {
-    1:{target:0.930},
-    2:{target:0.950},
-    3:{target:0.970},
-    4:{target:1.020},
-    5:{target:1.050},
+    1:{target:0.900},
+    2:{target:0.930},
+    3:{target:0.960},
+    4:{target:1.010},
+    5:{target:1.040},
     6:{target:1.080}
   };
 
   const A_TYPE_MODE = true;
   const A_TYPE_BONUS_TABLE = Object.freeze({
-    1:{big:317.901940, reg:511.992608, total:196.125452, payout:93.0},
-    2:{big:311.671469, reg:461.799711, total:186.082944, payout:95.0},
-    3:{big:305.863510, reg:375.372790, total:168.535997, payout:97.0},
-    4:{big:284.221395, reg:345.760641, total:155.992657, payout:102.0},
-    5:{big:277.144402, reg:272.869226, total:137.495099, payout:105.0},
-    6:{big:272.956551, reg:272.961598, total:136.479537, payout:108.0}
+    1:{big:354.112628, reg:570.311235, total:218.465163, payout:90.0},
+    2:{big:335.340933, reg:496.870459, total:200.214759, payout:93.0},
+    3:{big:318.675842, reg:391.096799, total:175.595810, payout:96.0},
+    4:{big:295.728558, reg:359.759320, total:162.308272, payout:101.0},
+    5:{big:288.226978, reg:283.780845, total:142.993316, payout:104.0},
+    6:{big:276.519476, reg:276.524590, total:138.261016, payout:108.0}
+  });
+  const A_TYPE_BIG_DETAIL_TABLE = Object.freeze({
+    1:{solo:507.333036, cherry:1172.513751},
+    2:{solo:482.421007, cherry:1099.914526},
+    3:{solo:457.230556, cherry:1051.630277},
+    4:{solo:421.313106, cherry:992.115025},
+    5:{solo:411.523999, cherry:962.004741},
+    6:{solo:394.808291, cherry:922.929037}
   });
   const A_TYPE_POST_PREMIUM_TARGET_RTP = Object.freeze({
-    1:0.930,
-    2:0.950,
-    3:0.970,
-    4:1.020,
-    5:1.050,
+    1:0.900,
+    2:0.930,
+    3:0.960,
+    4:1.010,
+    5:1.040,
     6:1.080
   });
   const A_TYPE_GRAPE_TABLE = Object.freeze({
@@ -7276,12 +7284,12 @@ body{
     6:130.0
   });
   const A_TYPE_REG_DETAIL_TABLE = Object.freeze({
-    1:{solo:733.525843, cherry:1695.275247},
-    2:{solo:664.344433, cherry:1514.697911},
-    3:{solo:538.578351, cherry:1238.730206},
-    4:{solo:492.591892, cherry:1159.963480},
-    5:{solo:389.596546, cherry:910.745729},
-    6:{solo:389.728433, cherry:911.054036}
+    1:{solo:817.078260, cherry:1888.375933},
+    2:{solo:714.797163, cherry:1629.729574},
+    3:{solo:561.138886, cherry:1290.619438},
+    4:{solo:512.535272, cherry:1206.926476},
+    5:{solo:405.175910, cherry:947.165041},
+    6:{solo:394.815591, cherry:922.946104}
   });
   const A_TYPE_REACH_ME_ANNOUNCE_RATE = 0;
   const A_TYPE_PREMIUM_BIG_PAYOUT = 500;
@@ -10743,7 +10751,7 @@ body{
         return normalizeATypeResult(pendingForceResult);
       }
 
-      const table = A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1];
+      const bigDetail = A_TYPE_BIG_DETAIL_TABLE[settings.setting] || A_TYPE_BIG_DETAIL_TABLE[1];
       const grape = A_TYPE_GRAPE_TABLE[settings.setting] || A_TYPE_GRAPE_TABLE[1];
       const replay = A_TYPE_REPLAY_TABLE[settings.setting] || A_TYPE_REPLAY_TABLE[1];
       const bell = A_TYPE_BELL_TABLE[settings.setting] || A_TYPE_BELL_TABLE[1];
@@ -10751,19 +10759,25 @@ body{
       const regDetail = A_TYPE_REG_DETAIL_TABLE[settings.setting] || A_TYPE_REG_DETAIL_TABLE[1];
       let roll = Math.random();
       const multiplier = clamp(Number(settings.oddsMultiplier) || 1, 0.1, 100);
-      const bigP = clamp((1 / table.big) * multiplier, 0, 0.98);
-      const regSoloP = clamp((1 / regDetail.solo) * multiplier, 0, 0.98 - bigP);
-      const regCherryP = clamp((1 / regDetail.cherry) * multiplier, 0, 0.98 - bigP - regSoloP);
-      const grapeP = clamp((1 / grape) * multiplier, 0, 0.98 - bigP - regSoloP - regCherryP);
-      const replayP = clamp((1 / replay) * multiplier, 0, 0.98 - bigP - regSoloP - regCherryP - grapeP);
-      const bellP = clamp((1 / bell) * multiplier, 0, 0.98 - bigP - regSoloP - regCherryP - grapeP - replayP);
-      const pierrotP = clamp((1 / pierrot) * multiplier, 0, 0.98 - bigP - regSoloP - regCherryP - grapeP - replayP - bellP);
+      const bigSoloP = clamp((1 / bigDetail.solo) * multiplier, 0, 0.98);
+      const bigCherryP = clamp((1 / bigDetail.cherry) * multiplier, 0, 0.98 - bigSoloP);
+      const regSoloP = clamp((1 / regDetail.solo) * multiplier, 0, 0.98 - bigSoloP - bigCherryP);
+      const regCherryP = clamp((1 / regDetail.cherry) * multiplier, 0, 0.98 - bigSoloP - bigCherryP - regSoloP);
+      const grapeP = clamp((1 / grape) * multiplier, 0, 0.98 - bigSoloP - bigCherryP - regSoloP - regCherryP);
+      const replayP = clamp((1 / replay) * multiplier, 0, 0.98 - bigSoloP - bigCherryP - regSoloP - regCherryP - grapeP);
+      const bellP = clamp((1 / bell) * multiplier, 0, 0.98 - bigSoloP - bigCherryP - regSoloP - regCherryP - grapeP - replayP);
+      const pierrotP = clamp((1 / pierrot) * multiplier, 0, 0.98 - bigSoloP - bigCherryP - regSoloP - regCherryP - grapeP - replayP - bellP);
       const gamesSinceLastBonusAtStart = Math.max(0, Number(normalState.sinceBonus) || 0);
-      if(roll < bigP){
+      if(roll < bigSoloP){
         pendingATypeInternalBonus = {kind:"BIG", source:"単独当選", internalResult:"BIG", gamesSinceLastBonusAtStart};
         return "MISS";
       }
-      roll -= bigP;
+      roll -= bigSoloP;
+      if(roll < bigCherryP){
+        pendingATypeInternalBonus = {kind:"BIG", source:"チェリー同時当選", internalResult:"BIG_CHERRY", gamesSinceLastBonusAtStart};
+        return "CHERRY_ANY";
+      }
+      roll -= bigCherryP;
       if(roll < regSoloP){
         pendingATypeInternalBonus = {kind:"MID", source:"単独当選", internalResult:"MID", gamesSinceLastBonusAtStart};
         return "MISS";
@@ -11208,7 +11222,7 @@ body{
     if($("adminSettingView")) $("adminSettingView").textContent = settings.setting;
     if($("adminTargetRtpView")) $("adminTargetRtpView").textContent = targetRtpText();
     const setting6Option = document.querySelector('#settingSelect option[value="6"]');
-    if(setting6Option) setting6Option.textContent = A_TYPE_MODE ? "設定6 / 105.5%" : "設定6 / 目標115%";
+    if(setting6Option) setting6Option.textContent = A_TYPE_MODE ? "設定6 / 108.0%" : "設定6 / 目標115%";
     const adminStInfoText = A_TYPE_MODE
       ? `Aタイプ / BB ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).big)} / RB ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).reg)}`
       : session.active ? setGameCount() + "G/SET" : (normalState.bonusPending ? `BONUS確定 / ${pendingBonusLabel()}待ち` : `${normalModeLabel()} / 天井まで${ceilingRemain()}G`);
@@ -12656,13 +12670,16 @@ body{
       return;
     }
 
-    let html = `<tr><td>設定</td><td>単独当選</td><td>チェリー同時当選</td></tr>`;
+    let html = `<tr><td>設定</td><td>単独BIG</td><td>チェリーBIG</td><td>単独RB</td><td>チェリーRB</td></tr>`;
     for(const i of [1,2,3,4,5,6]){
-      const detail = A_TYPE_REG_DETAIL_TABLE[i];
+      const bigDetail = A_TYPE_BIG_DETAIL_TABLE[i];
+      const regDetail = A_TYPE_REG_DETAIL_TABLE[i];
       html += `<tr>
         <td>${i}</td>
-        <td>1/${detail.solo.toFixed(2)}</td>
-        <td>1/${detail.cherry.toFixed(2)}</td>
+        <td>1/${bigDetail.solo.toFixed(2)}</td>
+        <td>1/${bigDetail.cherry.toFixed(2)}</td>
+        <td>1/${regDetail.solo.toFixed(2)}</td>
+        <td>1/${regDetail.cherry.toFixed(2)}</td>
       </tr>`;
     }
     table.innerHTML = html;
@@ -13716,7 +13733,11 @@ body{
     const gekiatsuChance = premiumMovieEffect;
     const zakoEffect = decideZakoEffect(result, resolved, normalActiveAtSpinStart);
     const bonusAnnouncementTiming = !reachMeLine && shouldScheduleBonusAnnouncement(normalActiveAtSpinStart, resolved)
-      ? (A_TYPE_MODE && resolved.premiumBonus ? "lever" : decideBonusAnnouncementTiming())
+      ? (A_TYPE_MODE && resolved.premiumBonus
+        ? "lever"
+        : (A_TYPE_MODE && resolved.bonusHit && resolved.bonusSource === "チェリー同時当選")
+          ? "stop3"
+          : decideBonusAnnouncementTiming())
       : "";
 
 
@@ -14628,6 +14649,11 @@ body{
     const bigPremiumEffect = normalActiveAtSpinStart && decideBigPremiumEffect(result, resolved, premiumForced);
     if(A_TYPE_MODE && normalActiveAtSpinStart && resolved && (resolved.bonusHit || resolved.bonusReady) && resolved.bonusKind === "BIG"){
       resolved.premiumBonus = !!(resolved.premiumBonus || bigPremiumEffect);
+    }
+    if(A_TYPE_MODE && normalActiveAtSpinStart && shouldScheduleBonusAnnouncement(normalActiveAtSpinStart, resolved)){
+      jagChanceHold = true;
+      const lamp = $("stLamp");
+      if(lamp) lamp.classList.add("on");
     }
 
     if(normalActiveAtSpinStart){
