@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 900" role="img" aria-label="光れば、Rising。">
+  <defs>
+    <linearGradient id="goldText" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff8a6"/>
+      <stop offset="0.45" stop-color="#ffc837"/>
+      <stop offset="1" stop-color="#b66a00"/>
+    </linearGradient>
+    <filter id="copyShadow" x="-50%" y="-15%" width="200%" height="130%">
+      <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#000000" flood-opacity="0.85"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#ff2c1c" flood-opacity="0.62"/>
+    </filter>
+  </defs>
+  <rect width="220" height="900" fill="none"/>
+  <g writing-mode="tb" glyph-orientation-vertical="0" text-anchor="middle" font-family="'Yu Mincho', 'Hiragino Mincho ProN', serif" font-weight="900" filter="url(#copyShadow)">
+    <text x="80" y="80" font-size="56" fill="#ffffff" stroke="#060606" stroke-width="7" paint-order="stroke">光れば、</text>
+    <text x="150" y="170" font-size="52" fill="url(#goldText)" stroke="#5b0902" stroke-width="6" paint-order="stroke">Rising。</text>
+  </g>
+  <path d="M26 42 C52 120 50 265 31 342 C18 397 20 493 49 566 C74 628 74 745 35 845" fill="none" stroke="#ff1c16" stroke-width="8" stroke-linecap="round" opacity="0.78"/>
+  <path d="M196 52 C164 142 167 253 190 348 C208 420 203 521 168 600 C134 681 141 770 187 845" fill="none" stroke="#ffcf3d" stroke-width="7" stroke-linecap="round" opacity="0.78"/>
+</svg>

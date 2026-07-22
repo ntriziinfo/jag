@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "dev": "node server.js",
+    "check": "node --check server.js && node --check api/[...path].js"
+  }
+}
