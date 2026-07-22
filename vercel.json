@@ -30,5 +30,8 @@
       "source": "/jag",
       "destination": "/jag.html"
     }
-  ]
+  ],
+  "framework": null,
+  "buildCommand": null,
+  "outputDirectory": "."
 }
