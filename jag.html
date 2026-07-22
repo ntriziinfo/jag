@@ -6490,12 +6490,13 @@ body{
   .machine{min-height:1615px !important;}
 }
 
+  body:not(.debugMode) .debugToggleBtn{display:none!important}
 </style>
 </head>
 <body>
 <div class="confetti" id="confetti"></div>
 <div class="overlay" id="overlay"><div class="overlayText" id="overlayText">WIN</div></div>
-<button class="debugToggleBtn" id="debugToggleBtn" type="button">管理</button>
+<button class="debugToggleBtn" id="debugToggleBtn" type="button">デバッグ</button>
 
 <div class="wrap">
   <section class="wd-hero" id="top">
@@ -7922,6 +7923,11 @@ body{
   let adminPushTimer = null;
   let adminCommandStream = null;
   let adminCommandReconnectTimer = null;
+  let adminCommandPollTimer = null;
+  let adminCommandLastId = Number(safeStorageGet("jag_admin_command_last_id") || 0) || 0;
+  const ADMIN_STATE_PUSH_INTERVAL_MS = 60000;
+  const SLOT_DEBUG_ENABLED = adminParams.get("debug") === "1";
+  if(SLOT_DEBUG_ENABLED) document.body.classList.add("debugMode");
   const PAGE_ZOOM_STORAGE_KEY = "jag_unified_page_zoom_v3";
   const PAGE_PAN_STORAGE_KEY = "jag_unified_page_pan_x_v3";
   const LAYOUT_EDIT_STORAGE_KEY = "jag_layout_editor_v3";
@@ -11078,22 +11084,25 @@ body{
     };
   }
 
-  function pushAdminState(){
+  function pushAdminState(snapshot){
     if(!ADMIN_SERVER || !window.fetch || !machineId || machineId === "null" || machineId === "undefined") return;
     fetch(`${ADMIN_SERVER}/api/machines/${encodeURIComponent(machineId)}/state`, {
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(adminSnapshot())
+      body:JSON.stringify(snapshot || adminSnapshot())
     }).catch(()=>{});
   }
 
-  function scheduleAdminStatePush(delay=250){
-    if(adminPushTimer) clearTimeout(adminPushTimer);
+  function scheduleAdminStatePush(delay=ADMIN_STATE_PUSH_INTERVAL_MS){
+    if(adminPushTimer) return;
     adminPushTimer = setTimeout(()=>{
       adminPushTimer = null;
       pushAdminState();
     }, delay);
   }
+
+  window.__jagAdminSnapshot = adminSnapshot;
+  window.__jagPushAdminState = ()=>pushAdminState(adminSnapshot());
 
   function applyAdminSettings(nextSettings){
     if(!nextSettings) return;
@@ -11135,35 +11144,42 @@ body{
       updateDisplay();
     }else if(command.type === "direct" && RESULT[command.result]){
       direct(command.result);
+    }else if(command.type === "forceHigh"){
+      forceHighModeNow();
     }else if(command.type === "startAuto"){
       startAutoPlay();
     }else if(command.type === "stopAuto"){
       stopAutoPlay(A_TYPE_MODE ? "管理画面：オート停止" : "管理画面：オートAT停止");
+    }else if(command.type === "startDebugFast"){
+      startDebugFastSpin();
+    }else if(command.type === "stopDebugFast"){
+      stopDebugFastSpin("管理画面停止");
     }
     scheduleAdminStatePush(50);
   }
 
-  function connectAdminCommands(){
-    if(!window.EventSource || !ADMIN_SERVER || !machineId) return;
-    if(adminCommandReconnectTimer){
-      clearTimeout(adminCommandReconnectTimer);
-      adminCommandReconnectTimer = null;
-    }
-    if(adminCommandStream){
-      try{ adminCommandStream.close(); }catch(e){}
-      adminCommandStream = null;
-    }
+  async function pollAdminCommands(){
+    if(!window.fetch || !ADMIN_SERVER || !machineId) return;
     try{
-      adminCommandStream = new EventSource(`${ADMIN_SERVER}/api/machines/${encodeURIComponent(machineId)}/commands`);
-      adminCommandStream.addEventListener("command", event=>{
-        try{ handleAdminCommand(JSON.parse(event.data)); }catch(e){}
-      });
-      adminCommandStream.onerror = ()=>{
-        try{ adminCommandStream.close(); }catch(e){}
-        adminCommandStream = null;
-        adminCommandReconnectTimer = setTimeout(connectAdminCommands, 1500);
-      };
+      const res = await fetch(`${ADMIN_SERVER}/api/machines/${encodeURIComponent(machineId)}/commands/poll?since=${encodeURIComponent(adminCommandLastId)}`, {cache:"no-store"});
+      if(res.ok){
+        const data = await res.json();
+        const commands = Array.isArray(data.commands) ? data.commands : [];
+        for(const row of commands){
+          const command = row.command || row;
+          handleAdminCommand(command);
+          adminCommandLastId = Math.max(adminCommandLastId, Number(row.id || command.id || row.createdAtMs || 0) || 0);
+        }
+        safeStorageSet("jag_admin_command_last_id", String(adminCommandLastId));
+      }
     }catch(e){}
+    adminCommandPollTimer = setTimeout(pollAdminCommands, 5000);
+  }
+
+  function connectAdminCommands(){
+    if(adminCommandPollTimer) clearTimeout(adminCommandPollTimer);
+    adminCommandPollTimer = null;
+    pollAdminCommands();
   }
 
 
@@ -15403,17 +15419,19 @@ body{
     onClick("debugBellBtn", ()=>direct("CHERRY_TRIPLE"));
     onClick("debugMissBtn", ()=>direct("MISS"));
 
-    $("lcd").addEventListener("click", ()=>{
-      clickCount++;
-      clearTimeout(clickTimer);
-      clickTimer = setTimeout(()=>clickCount=0, 1600);
-      if(clickCount >= 5){
-        clickCount = 0;
-        document.body.classList.toggle("debugOpen");
-        if($("secretPanel")) $("secretPanel").classList.toggle("show", document.body.classList.contains("debugOpen"));
-        log(document.body.classList.contains("debugOpen") ? "デバッグメニューを表示" : "デバッグメニューを非表示");
-      }
-    });
+    if(SLOT_DEBUG_ENABLED){
+      $("lcd").addEventListener("click", ()=>{
+        clickCount++;
+        clearTimeout(clickTimer);
+        clickTimer = setTimeout(()=>clickCount=0, 1600);
+        if(clickCount >= 5){
+          clickCount = 0;
+          document.body.classList.toggle("debugOpen");
+          if($("secretPanel")) $("secretPanel").classList.toggle("show", document.body.classList.contains("debugOpen"));
+          log(document.body.classList.contains("debugOpen") ? "デバッグメニューを表示" : "デバッグメニューを非表示");
+        }
+      });
+    }
 
     if($("debugCloseBtn")){
       $("debugCloseBtn").addEventListener("click", ()=>{
@@ -15423,7 +15441,7 @@ body{
       });
     }
 
-    if($("debugToggleBtn")){
+    if(SLOT_DEBUG_ENABLED && $("debugToggleBtn")){
       $("debugToggleBtn").addEventListener("click", ()=>{
         document.body.classList.toggle("debugOpen");
         if($("secretPanel")) $("secretPanel").classList.toggle("show", document.body.classList.contains("debugOpen"));

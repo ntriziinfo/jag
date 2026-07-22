@@ -1,40 +1,12 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "**/*",
-      "use": "@vercel/static"
-    }
+  "redirects": [
+    { "source": "/jag/", "destination": "/jag", "permanent": false },
+    { "source": "/gorai", "destination": "/jag", "permanent": false },
+    { "source": "/gourai", "destination": "/jag", "permanent": false }
   ],
-  "routes": [
-    {
-      "src": "/jag/",
-      "status": 302,
-      "headers": {
-        "Location": "/jag"
-      }
-    },
-    {
-      "src": "/(?:gorai|gourai)/?",
-      "status": 302,
-      "headers": {
-        "Location": "/jag"
-      }
-    },
-    {
-      "src": "/",
-      "dest": "/jag.html"
-    },
-    {
-      "src": "/jag",
-      "dest": "/jag.html"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/.*",
-      "dest": "/404.html"
-    }
+  "rewrites": [
+    { "source": "/", "destination": "/jag.html" },
+    { "source": "/jag", "destination": "/jag.html" }
   ]
 }
