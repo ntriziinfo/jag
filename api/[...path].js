@@ -31,16 +31,34 @@ async function readBody(req){
     req.on("error", reject);
   });
 }
+function requestJson(urlString, options={}){
+  return new Promise((resolve, reject)=>{
+    const target = new URL(urlString);
+    const body = options.body || "";
+    const req = https.request(target, {
+      method:options.method || "GET",
+      headers:{...(options.headers || {}), ...(body ? {"Content-Length":Buffer.byteLength(body)} : {})}
+    }, response=>{
+      let text = "";
+      response.on("data", chunk=>text += chunk);
+      response.on("end", ()=>{
+        let data = null;
+        try{ data = text ? JSON.parse(text) : null; }catch(e){ data = text; }
+        resolve({ok:response.statusCode >= 200 && response.statusCode < 300, status:response.statusCode, data});
+      });
+    });
+    req.on("error", reject);
+    if(body) req.write(body);
+    req.end();
+  });
+}
 async function sb(path, options={}){
-  const res = await fetch(SUPABASE_URL + "/rest/v1/" + path, {
+  const result = await requestJson(SUPABASE_URL + "/rest/v1/" + path, {
     ...options,
     headers:{apikey:SUPABASE_KEY, Authorization:"Bearer " + SUPABASE_KEY, "Content-Type":"application/json", ...(options.headers || {})}
   });
-  const text = await res.text();
-  let data = null;
-  try{ data = text ? JSON.parse(text) : null; }catch(e){ data = text; }
-  if(!res.ok) throw new Error(typeof data === "string" ? data : JSON.stringify(data));
-  return data;
+  if(!result.ok) throw new Error(typeof result.data === "string" ? result.data : JSON.stringify(result.data));
+  return result.data;
 }
 function ms(){ return Date.now(); }
 function makeId(prefix){ return prefix + "_" + Date.now() + "_" + crypto.randomBytes(4).toString("hex"); }
@@ -147,12 +165,13 @@ function resultPayload(session, machine, body){
 }
 
 module.exports = async function handler(req, res){
-  if(req.method === "OPTIONS") return json(res, 204, {});
-  if(!requireSupabase(res)) return;
-  const rawPath = Array.isArray(req.query.path) ? req.query.path.join("/") : String(req.query.path || "");
-  const pathname = "/api/" + rawPath;
-  const origin = "https://" + req.headers.host;
   try{
+    if(req.method === "OPTIONS") return json(res, 204, {});
+    const rawPath = Array.isArray(req.query.path) ? req.query.path.join("/") : String(req.query.path || "");
+    const pathname = "/api/" + rawPath;
+    if(pathname === "/api/health") return json(res, 200, {ok:true, supabaseUrlSet:!!SUPABASE_URL, supabaseKeySet:!!SUPABASE_KEY});
+    if(!requireSupabase(res)) return;
+    const origin = "https://" + req.headers.host;
     if(pathname === "/api/machines" && req.method === "GET") return json(res, 200, (await getAllMachines()).map(publicMachine));
     if(pathname === "/api/admin/issue-password" && req.method === "POST"){
       if(!adminOk(req)) return json(res, 401, {ok:false, error:"admin password required"});
@@ -285,5 +304,8 @@ module.exports = async function handler(req, res){
       return json(res, 200, rows.map(row=>row.record));
     }
     return json(res, 404, {ok:false, error:"not found"});
-  }catch(e){ return json(res, 500, {ok:false, error:e.message}); }
+  }catch(e){
+    try{ return json(res, 500, {ok:false, error:e && e.message ? e.message : String(e)}); }
+    catch(finalError){ res.statusCode = 500; return res.end("api error"); }
+  }
 };
