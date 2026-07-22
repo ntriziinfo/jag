@@ -1,5 +1,5 @@
-const https = require("https");
-const crypto = require("crypto");
+import * as https from "node:https";
+import * as crypto from "node:crypto";
 
 const MACHINE_COUNT = 6;
 const DEBUG_MACHINE_ID = "debug";
@@ -164,7 +164,7 @@ function resultPayload(session, machine, body){
   return {type:"slot-session-ended", endedAt:new Date(endedAtMs).toISOString(), endedAtMs, machineId:machine.machineId, machineName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : machine.machineId+"号機"), playerName:session.playerName || body.playerName || "", sessionId:session.sessionId, password:session.password, setting:settings.setting || machine.assignedSetting || "", totalSpins:stats.totalSpins || 0, bigCount:stats.bigCount || 0, regCount:stats.midCount || 0, grapeCount:stats.grapeCount || 0, totalFee:stats.totalFee || 0, totalPaid:stats.totalPaid || 0, profit:Number(stats.profit ?? ((stats.totalPaid || 0) - (stats.totalFee || 0))) || 0, playerSpins:delta.playerSpins, playerBigCount:delta.playerBigCount, playerRegCount:delta.playerRegCount, playerGrapeCount:delta.playerGrapeCount, playerTotalFee:delta.playerTotalFee, playerTotalPaid:delta.playerTotalPaid, playerProfit:delta.playerProfit, billingBasis:"playerProfit", startStats:delta.startStats, currentResultText:snapshot.state ? snapshot.state.resultText || "" : "", stats, settings, normalState:snapshot.normalState || {}, session:snapshot.session || {}};
 }
 
-module.exports = async function handler(req, res){
+export default async function handler(req, res){
   try{
     if(req.method === "OPTIONS") return json(res, 204, {});
     const rawPath = Array.isArray(req.query.path) ? req.query.path.join("/") : String(req.query.path || "");
@@ -308,4 +308,4 @@ module.exports = async function handler(req, res){
     try{ return json(res, 500, {ok:false, error:e && e.message ? e.message : String(e)}); }
     catch(finalError){ res.statusCode = 500; return res.end("api error"); }
   }
-};
+}
