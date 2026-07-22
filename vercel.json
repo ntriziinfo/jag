@@ -1,12 +1,34 @@
 {
   "version": 2,
   "redirects": [
-    { "source": "/jag/", "destination": "/jag", "permanent": false },
-    { "source": "/gorai", "destination": "/jag", "permanent": false },
-    { "source": "/gourai", "destination": "/jag", "permanent": false }
+    {
+      "source": "/jag/",
+      "destination": "/jag",
+      "permanent": false
+    },
+    {
+      "source": "/gorai",
+      "destination": "/jag",
+      "permanent": false
+    },
+    {
+      "source": "/gourai",
+      "destination": "/jag",
+      "permanent": false
+    }
   ],
   "rewrites": [
-    { "source": "/", "destination": "/jag.html" },
-    { "source": "/jag", "destination": "/jag.html" }
+    {
+      "source": "/api/(.*)",
+      "destination": "/api?path=$1"
+    },
+    {
+      "source": "/",
+      "destination": "/jag.html"
+    },
+    {
+      "source": "/jag",
+      "destination": "/jag.html"
+    }
   ]
 }
