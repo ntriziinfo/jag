@@ -5,18 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>RISING 管理画面</title>
   <style>
-    *{box-sizing:border-box} body{margin:0;background:#111318;color:#f7f4ea;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Yu Gothic",sans-serif} header{position:sticky;top:0;z-index:5;background:#171a21;border-bottom:1px solid #303641;padding:14px 20px;display:flex;gap:12px;align-items:center;justify-content:space-between} h1{font-size:20px;margin:0} main{padding:20px;display:grid;gap:18px}.panel{background:#1b1f28;border:1px solid #313846;border-radius:8px;padding:16px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.field{display:grid;gap:6px;min-width:150px}.field input,.field select,.settingMini{height:38px;border-radius:6px;border:1px solid #3d4656;background:#0f1218;color:#fff;padding:0 10px}button{height:38px;border:0;border-radius:6px;padding:0 13px;font-weight:800;cursor:pointer;background:#f0c85a;color:#1b1300}.ghost{background:#293140;color:#f3f7ff}.danger{background:#d54a4a;color:#fff}.muted{color:#9aa4b5;font-size:13px}.machines{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.machine{background:#151922;border:1px solid #2d3440;border-radius:8px;padding:12px;display:grid;gap:9px}.machine h3{margin:0;font-size:18px;display:flex;justify-content:space-between}.pill{font-size:12px;border-radius:999px;padding:3px 8px;background:#303848}.pill.on{background:#1f7a48}.pill.lock{background:#8a5422}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.adminSlumpGraph{width:100%;height:150px;background:#0b0e14;border:1px solid #2b3342;border-radius:6px}.graphStats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.debugBox{border-top:1px solid #2d3440;padding-top:9px;display:grid;gap:8px}.debugBtns{display:flex;gap:6px;flex-wrap:wrap}.debugBtns button{height:34px;padding:0 10px}.debugSelect{height:34px;border-radius:6px;border:1px solid #3d4656;background:#0f1218;color:#fff;padding:0 8px}.stat{background:#0f1218;border-radius:6px;padding:8px}.stat span{display:block;color:#97a3b8;font-size:12px}.stat b{font-size:16px}.passwordList,.results{display:grid;gap:7px;max-height:260px;overflow:auto}.item{display:grid;grid-template-columns:110px 1fr 90px 140px;gap:8px;align-items:center;background:#10141c;border:1px solid #2b3340;border-radius:6px;padding:8px}.code{font-size:20px;letter-spacing:.08em;color:#ffe07c;font-weight:1000}.ok{color:#6aff9e}.bad{color:#ff8b8b}@media(max-width:980px){.machines{grid-template-columns:1fr}.item{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+    *{box-sizing:border-box} body{margin:0;background:#111318;color:#f7f4ea;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Yu Gothic",sans-serif} header{position:sticky;top:0;z-index:5;background:#171a21;border-bottom:1px solid #303641;padding:14px 20px;display:flex;gap:12px;align-items:center;justify-content:space-between} h1{font-size:20px;margin:0} main{padding:20px;display:grid;gap:18px}.panel{background:#1b1f28;border:1px solid #313846;border-radius:8px;padding:16px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.field{display:grid;gap:6px;min-width:150px}.field input,.field select,.settingMini{height:38px;border-radius:6px;border:1px solid #3d4656;background:#0f1218;color:#fff;padding:0 10px}button{height:38px;border:0;border-radius:6px;padding:0 13px;font-weight:800;cursor:pointer;background:#f0c85a;color:#1b1300}.ghost{background:#293140;color:#f3f7ff}.danger{background:#d54a4a;color:#fff}.muted{color:#9aa4b5;font-size:13px}.machines{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.machine{background:#151922;border:1px solid #2d3440;border-radius:8px;padding:12px;display:grid;gap:9px}.machine h3{margin:0;font-size:18px;display:flex;justify-content:space-between}.pill{font-size:12px;border-radius:999px;padding:3px 8px;background:#303848}.pill.on{background:#1f7a48}.pill.lock{background:#8a5422}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.adminSlumpGraph{width:100%;height:150px;background:#0b0e14;border:1px solid #2b3342;border-radius:6px}.graphStats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.debugBox{border-top:1px solid #2d3440;padding-top:9px;display:grid;gap:8px}.debugBtns{display:flex;gap:6px;flex-wrap:wrap}.debugBtns button{height:34px;padding:0 10px}.debugSelect{height:34px;border-radius:6px;border:1px solid #3d4656;background:#0f1218;color:#fff;padding:0 8px}.stat{background:#0f1218;border-radius:6px;padding:8px}.stat span{display:block;color:#97a3b8;font-size:12px}.stat b{font-size:16px}.passwordList,.results{display:grid;gap:7px;max-height:260px;overflow:auto}.item{display:grid;grid-template-columns:110px 1fr 90px 140px;gap:8px;align-items:center;background:#10141c;border:1px solid #2b3340;border-radius:6px;padding:8px}.code{font-size:20px;letter-spacing:.08em;color:#ffe07c;font-weight:1000}.ok{color:#6aff9e}.bad{color:#ff8b8b}body.locked header,body.locked main{display:none}.authGate{min-height:100vh;display:grid;place-items:center;padding:20px;background:#111318}.authPanel{width:min(420px,100%);background:#1b1f28;border:1px solid #313846;border-radius:8px;padding:22px;display:grid;gap:14px}.authPanel h1{font-size:22px}.authPanel input{width:100%;height:44px;border-radius:6px;border:1px solid #3d4656;background:#0f1218;color:#fff;padding:0 12px}.authPanel button{width:100%;height:44px}body:not(.locked) .authGate{display:none}.topActions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}button:disabled{opacity:.45;cursor:not-allowed}@media(max-width:980px){.machines{grid-template-columns:1fr}.item{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
   </style>
 </head>
-<body>
-<header><h1>RISING 管理画面</h1><div class="row"><a class="muted" href="/machines.html" target="_blank">台選びページ</a><a class="muted" href="/play.html" target="_blank">プレイ入口</a></div></header>
+<body class="locked">
+<div id="authGate" class="authGate"><form id="authForm" class="authPanel"><h1>RISING 管理画面</h1><p class="muted">管理パスを入力してください。</p><input id="gatePassword" type="password" autocomplete="current-password" placeholder="管理パス"><button type="submit">入室</button><div id="authError" class="bad"></div></form></div>
+<header><h1>RISING 管理画面</h1><div class="topActions"><a class="muted" href="/machines.html" target="_blank">台選びページ</a><a class="muted" href="/play.html" target="_blank">プレイ入口</a><button id="logoutBtn" class="ghost">退出</button></div></header>
 <main>
   <section class="panel">
     <h2>パスワード発行</h2>
     <div class="row">
       <label class="field"><span>名前</span><input id="playerName" placeholder="お客様名"></label>
       <label class="field"><span>使用台</span><select id="machineSelect"></select></label>
-      <label class="field"><span>管理パス</span><input id="adminPassword" type="password" placeholder="未設定なら空でOK"></label>
       <button id="issueBtn">発行</button>
       <b id="issueResult" class="code"></b>
     </div>
@@ -51,7 +51,9 @@
 <script>
 const $ = id => document.getElementById(id);
 let machines = [];
-function adminHeaders(){ const v = $('adminPassword').value; return v ? {'X-Admin-Password':v} : {}; }
+const ADMIN_STORAGE_KEY = 'risingAdminPassword';
+let adminSecret = sessionStorage.getItem(ADMIN_STORAGE_KEY) || '';
+function adminHeaders(){ return adminSecret ? {'X-Admin-Password':adminSecret} : {}; }
 function fmt(n){ return Number(n || 0).toLocaleString('ja-JP'); }
 function signed(n){ n = Number(n || 0); return (n >= 0 ? '+' : '') + fmt(n); }
 function isDebugMachine(machine){ return String(machine.machineId) === "debug"; }
@@ -174,12 +176,35 @@ async function resetMachine(id){
   if(!data.ok) alert(data.error || 'リセット失敗');
   await Promise.all([loadMachines(), loadResults()]);
 }
+async function verifyAdminPassword(password){
+  const res = await fetch('/api/admin/passwords', {headers:password ? {'X-Admin-Password':password} : {}});
+  return res.ok;
+}
+async function enterAdmin(password){
+  const value = String(password || '').trim();
+  if(!value){ $('authError').textContent = '管理パスを入力してください'; return; }
+  $('authError').textContent = '';
+  const ok = await verifyAdminPassword(value);
+  if(!ok){ $('authError').textContent = '管理パスが違います'; return; }
+  adminSecret = value;
+  sessionStorage.setItem(ADMIN_STORAGE_KEY, value);
+  document.body.classList.remove('locked');
+  await refreshAll();
+}
+function logoutAdmin(){
+  adminSecret = '';
+  sessionStorage.removeItem(ADMIN_STORAGE_KEY);
+  document.body.classList.add('locked');
+  $('gatePassword').value = '';
+  $('gatePassword').focus();
+}
+$('authForm').addEventListener('submit', e=>{ e.preventDefault(); enterAdmin($('gatePassword').value); });
+$('logoutBtn').addEventListener('click', logoutAdmin);
 $('issueBtn').addEventListener('click', issue);
-$('adminPassword').addEventListener('change', ()=>Promise.all([loadPasswords(), loadResults()]));
 window.addEventListener('resize', renderAdminSlumpGraphs);
-async function refreshAll(){ await Promise.all([loadMachines(), loadPasswords(), loadResults()]); }
+async function refreshAll(){ if(!adminSecret) return; await Promise.all([loadMachines(), loadPasswords(), loadResults()]); }
 setInterval(refreshAll, 60000);
-refreshAll();
+if(adminSecret){ enterAdmin(adminSecret); } else { $('gatePassword').focus(); }
 </script>
 </body>
 </html>
