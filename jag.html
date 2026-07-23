@@ -10316,6 +10316,12 @@ body{
     }
   }
 
+  function countTotalSpinIfNeeded(aTypeBonusActiveAtSpinStart=false){
+    if(A_TYPE_MODE && aTypeBonusActiveAtSpinStart) return false;
+    stats.totalSpins = (Number(stats.totalSpins) || 0) + 1;
+    return true;
+  }
+
   function expectedAverageSets(settingNo = settings.setting){
     const pRaw = hitProbability(settingNo) / settings.oddsMultiplier;
     const gamesPerSet = expectedGamesPerSet(settingNo);
@@ -11001,6 +11007,9 @@ body{
         stats.suikaCount = 0;
         stats.cherryCount = 0;
         stats.roleStatVersion = ROLE_STAT_COUNTER_VERSION;
+      }
+      if(A_TYPE_MODE){
+        stats.totalSpins = (Number(stats.normalSpins) || 0) + (Number(stats.highSpins) || 0);
       }
       if(data?.normalState){
         normalState = {
@@ -13860,7 +13869,7 @@ body{
     }else{
       session.remain--;
     }
-    stats.totalSpins++;
+    countTotalSpinIfNeeded(aTypeBonusActiveAtSpinStart);
     chargeSpinCost();
     $("stLamp").classList.remove("on");
     const reachMeAnnouncementLit = activateReachMeBonusAnnouncementIfNeeded(normalActiveAtSpinStart);
@@ -14339,7 +14348,7 @@ body{
     }
 
     if(normalDirect){
-      stats.totalSpins++;
+      countTotalSpinIfNeeded(false);
       chargeSpinCost();
       applyNormalResult(result, resolved, lineRow);
       if(A_TYPE_MODE && resolved.aTypeBonusReady){
@@ -14840,7 +14849,7 @@ body{
     }else if(session.active && !zoneActiveAtSpinStart){
       session.remain = Math.max(0, (session.remain || 0) - 1);
     }
-    stats.totalSpins++;
+    countTotalSpinIfNeeded(aTypeBonusActiveAtSpinStart);
     chargeSpinCost();
     jagLastGamePayout = 0;
     if(!normalState.bonusPending && !session.active) jagChanceHold = false;
