@@ -7157,6 +7157,7 @@ body{
   const bootParams = new URLSearchParams(location.search);
   const bootMachineId = bootParams.get("machine") || "standalone";
   const STORAGE_KEY = "jag_slot_state_v1_" + bootMachineId;
+  const STORAGE_RESUME_KEY = STORAGE_KEY + "_resume";
 
   const DEFAULT_NORMAL_BGM_SRC = "";
   const HIGH_MODE_BGM_SRC = "";
@@ -10945,7 +10946,20 @@ body{
 
   function load(){
     try{
-      const data = JSON.parse(safeStorageGet(STORAGE_KEY));
+      const fullData = JSON.parse(safeStorageGet(STORAGE_KEY));
+      const resumeData = JSON.parse(safeStorageGet(STORAGE_RESUME_KEY));
+      let data = fullData;
+      if(resumeData && (!data || Number(resumeData.savedAt || 0) > Number(data.savedAt || 0))){
+        data = {
+          ...(data || {}),
+          ...resumeData,
+          settings:{...((data && data.settings) || {}), ...(resumeData.settings || {})},
+          stats:{...((data && data.stats) || {}), ...(resumeData.stats || {})},
+          normalState:{...((data && data.normalState) || {}), ...(resumeData.normalState || {})},
+          completeTrialState:{...((data && data.completeTrialState) || {}), ...(resumeData.completeTrialState || {})},
+          runtimeState:{...((data && data.runtimeState) || {}), ...(resumeData.runtimeState || {})}
+        };
+      }
       if(data?.settings){
         const previousAudioBalance = data.settings.audioBalanceVersion || 0;
         settings = {...settings, ...data.settings};
@@ -11089,6 +11103,14 @@ body{
     }catch(e){}
   }
 
+  function compactStatsForResume(){
+    const compact = {...stats};
+    if(Array.isArray(compact.slumpHistory) && compact.slumpHistory.length > 600){
+      compact.slumpHistory = [compact.slumpHistory[0], ...compact.slumpHistory.slice(-599)];
+    }
+    return compact;
+  }
+
   function runtimeStateForStorage(){
     return {
       session:{...session},
@@ -11110,11 +11132,22 @@ body{
   }
 
   function persistState(){
+    const savedAt = Date.now();
+    const runtimeState = runtimeStateForStorage();
+    const resumeOk = safeStorageSet(STORAGE_RESUME_KEY, JSON.stringify({
+      savedAt,
+      settings,
+      stats:compactStatsForResume(),
+      normalState,
+      completeTrialState,
+      runtimeState
+    }));
     try{
-      return safeStorageSet(STORAGE_KEY, JSON.stringify({settings, stats, normalState, completeTrialState, runtimeState:runtimeStateForStorage()}));
+      const fullOk = safeStorageSet(STORAGE_KEY, JSON.stringify({savedAt, settings, stats, normalState, completeTrialState, runtimeState}));
+      return !!(fullOk || resumeOk);
     }catch(e){
-      console.warn("Failed to save local state", e);
-      return false;
+      console.warn("Failed to save full local state", e);
+      return !!resumeOk;
     }
   }
 
@@ -11198,7 +11231,7 @@ body{
   };
   window.__jagPushAdminState = ()=>pushAdminState(latestAdminSnapshot());
   window.__jagClearLocalPlayState = ()=>{
-    try{ if(window.localStorage) localStorage.removeItem(STORAGE_KEY); }catch(e){}
+    try{ if(window.localStorage){ localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(STORAGE_RESUME_KEY); } }catch(e){}
   };
 
   function applyAdminSettings(nextSettings){
