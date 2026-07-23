@@ -7577,6 +7577,7 @@ body{
     bonusTarget:0,
     premiumBonus:false,
     oneGameRenBonus:false,
+    premiumChainEligible:false,
     bonusBgmSrc:"",
     battleRemain:0,
     battleWin:false,
@@ -7792,6 +7793,7 @@ body{
   let pendingForceResult = "";
   let sessionStartGuard = false;
   let pendingAtStartTimer = null;
+  let pendingBonusStartOptions = null;
   let devilZoneConfirmIntroPending = false;
   let pendingDevilRushEntryEffect = "";
   let audioCtx = null;
@@ -11375,9 +11377,10 @@ body{
       readSettings();
       if(A_TYPE_MODE){
         const bonusKind = normalizeATypeBonusKind(options.bonusKind || normalState.bonusKind || "BIG");
-        const premiumBonus = bonusKind === "BIG" && !!(options.premiumBonus || normalState.premiumBonus);
         const oneGameRenBonus = bonusKind === "BIG" && !!(options.oneGameRenBonus || normalState.oneGameRenBonus);
+        const premiumBonus = bonusKind === "BIG" && !oneGameRenBonus && !!(options.premiumBonus || normalState.premiumBonus);
         const premiumTargetBonus = premiumBonus || oneGameRenBonus;
+        const premiumChainEligible = premiumBonus && !oneGameRenBonus;
         const bonusTarget = aTypeBonusTarget(bonusKind, premiumTargetBonus);
         const bonusLabel = aTypeBonusLabel(bonusKind, premiumTargetBonus);
         const hadPreviousBonus = (Number(stats.totalSessions) || 0) > 0;
@@ -11410,6 +11413,7 @@ body{
           bonusTarget,
           premiumBonus,
           oneGameRenBonus,
+          premiumChainEligible,
           bonusBgmSrc:bonusBgm.src || "",
           battleRemain:0,
           battleWin:false,
@@ -11488,16 +11492,23 @@ body{
     if(pendingAtStartTimer){
       clearTimeout(pendingAtStartTimer);
       pendingAtStartTimer = null;
-      updateDevilStatusLamp();
     }
+    pendingBonusStartOptions = null;
+    updateDevilStatusLamp();
   }
 
   function startBonusSessionNow(options={}){
+    const hasExplicitOptions = options && Object.keys(options).length > 0;
+    const startOptions = hasExplicitOptions
+      ? {...options}
+      : pendingBonusStartOptions
+        ? {...pendingBonusStartOptions}
+        : {};
     setSpeedFrameOffHold(false);
     stopSpeedToBonus("ボーナス開始のためSPEED停止");
     clearPendingAtStart();
     clearPremiumBigConfirmMovie();
-    const started = startSession(options);
+    const started = startSession(startOptions);
     if(started) scheduleNextAuto();
     return started;
   }
@@ -11505,6 +11516,7 @@ body{
   function queueBonusSessionStart(delayMs=450, options={}){
     clearPendingAtStart();
     const startOptions = {...options};
+    pendingBonusStartOptions = {...startOptions};
     const waitAndStart = ()=>{
       if(bonusConfirmSoundPlaying){
         pendingAtStartTimer = setTimeout(waitAndStart, 120);
@@ -11532,7 +11544,12 @@ body{
     const profit = session.paid - (Number(session.cost) || 0);
     const endedSets = session.setNo || 0;
     const bonusLabel = aTypeEnd ? aTypeBonusLabel(session.bonusKind) : "";
-    const premiumOneGameRen = !!(aTypeEnd && session.premiumBonus && normalizeATypeBonusKind(session.bonusKind) === "BIG");
+    const premiumOneGameRen = !!(
+      aTypeEnd &&
+      session.premiumChainEligible &&
+      !session.oneGameRenBonus &&
+      normalizeATypeBonusKind(session.bonusKind) === "BIG"
+    );
     const settingVoiceAfterBonus = aTypeEnd ? pickSettingBonusEndVoiceSrc(settings.setting) : "";
     if(!A_TYPE_MODE && autoPlay) stopAutoPlay("ボーナス終了のためオート停止");
     if(aTypeEnd){
@@ -11564,6 +11581,7 @@ body{
     session.bonusTarget = 0;
     session.premiumBonus = false;
     session.oneGameRenBonus = false;
+    session.premiumChainEligible = false;
     session.bonusBgmSrc = "";
     session.phase = (aTypeEnd || A_TYPE_MODE) ? "idle" : "ended";
     session.battleRemain = 0;
@@ -11582,6 +11600,8 @@ body{
       normalState.bonusHitGamesSince = 0;
       jagChanceHold = true;
       $("stLamp").classList.add("on");
+      showMessage("PBB 1G連待機", "次BETでBAR揃い / 2回目PBB");
+      log("PBB 1G連予約：次BETでBAR揃い");
     }
     normalState.pendingPremiumVoiceSrc = "";
     normalState.pendingSettingVoiceSrc = settingVoiceAfterBonus;
@@ -11590,8 +11610,10 @@ body{
     jagLastBonusPayout = resultPayout;
     if(aTypeEnd){
       hideSessionResultScreen();
-      if($("resultText")) $("resultText").textContent = `${bonusLabel}終了 / 純増${resultPayout}pt`;
-      showOverlay("ボーナス終了");
+      if($("resultText")) $("resultText").textContent = premiumOneGameRen
+        ? "PBB 1G連待機 / 次BETでBAR揃い"
+        : `${bonusLabel}終了 / 純増${resultPayout}pt`;
+      showOverlay(premiumOneGameRen ? "PBB 1G連" : "ボーナス終了");
     }else if(A_TYPE_MODE){
       hideSessionResultScreen();
       if($("resultText")) $("resultText").textContent = `ボーナス終了 / 獲得${resultPayout}pt`;
@@ -12827,7 +12849,7 @@ body{
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",premiumBonus:false,oneGameRenBonus:false,bonusWaitGames:0,bonusHitGamesSince:0,reachMePending:false,reachMeBonusKind:"",reachMeBonusSource:"",reachMeHitGamesSince:0,pendingSettingVoiceSrc:"",pendingPremiumVoiceSrc:"",morningCeilingActive:false};
-    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,premiumBonus:false,oneGameRenBonus:false,bonusBgmSrc:"",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
+    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,premiumBonus:false,oneGameRenBonus:false,premiumChainEligible:false,bonusBgmSrc:"",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     jagLastGamePayout = 0;
     jagLastBonusPayout = 0;
     jagChanceHold = false;
@@ -12882,7 +12904,7 @@ body{
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",premiumBonus:false,oneGameRenBonus:false,bonusWaitGames:0,bonusHitGamesSince:0,reachMePending:false,reachMeBonusKind:"",reachMeBonusSource:"",reachMeHitGamesSince:0,pendingSettingVoiceSrc:"",pendingPremiumVoiceSrc:"",morningCeilingActive:!A_TYPE_MODE};
-    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,premiumBonus:false,oneGameRenBonus:false,bonusBgmSrc:"",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
+    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,premiumBonus:false,oneGameRenBonus:false,premiumChainEligible:false,bonusBgmSrc:"",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     jagLastGamePayout = 0;
     jagLastBonusPayout = 0;
     jagChanceHold = false;
