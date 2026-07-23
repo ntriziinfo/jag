@@ -11032,12 +11032,86 @@ body{
           completeTrialState.completeProfit = 0;
         }
       }
+      const runtime = data?.runtimeState || {};
+      if(runtime.session && typeof runtime.session === "object"){
+        session = {
+          ...session,
+          ...runtime.session,
+          active:!!runtime.session.active,
+          remain:Math.max(0, Number(runtime.session.remain) || 0),
+          fee:Number(runtime.session.fee) || 0,
+          cost:Number(runtime.session.cost) || 0,
+          paid:Number(runtime.session.paid) || 0,
+          hits:Number(runtime.session.hits) || 0,
+          added:Number(runtime.session.added) || 0,
+          addedGames:Number(runtime.session.addedGames) || 0,
+          setNo:Number(runtime.session.setNo) || 0,
+          stockSets:Number(runtime.session.stockSets) || 0,
+          barBgmSets:Number(runtime.session.barBgmSets) || 0,
+          nextSetBarBgm:!!runtime.session.nextSetBarBgm,
+          currentSetBarBgm:!!runtime.session.currentSetBarBgm,
+          continuationRate:Number(runtime.session.continuationRate) || 0,
+          bigZone:Math.max(0, Number(runtime.session.bigZone) || 0),
+          bigZoneType:String(runtime.session.bigZoneType || ""),
+          phase:String(runtime.session.phase || "idle"),
+          bonusKind:String(runtime.session.bonusKind || ""),
+          bonusTarget:Number(runtime.session.bonusTarget) || 0,
+          premiumBonus:!!runtime.session.premiumBonus,
+          oneGameRenBonus:!!runtime.session.oneGameRenBonus,
+          premiumChainEligible:!!runtime.session.premiumChainEligible,
+          bonusBgmSrc:String(runtime.session.bonusBgmSrc || ""),
+          battleRemain:Math.max(0, Number(runtime.session.battleRemain) || 0),
+          battleWin:!!runtime.session.battleWin,
+          battleSource:String(runtime.session.battleSource || ""),
+          resultPayout:runtime.session.resultPayout === null || runtime.session.resultPayout === undefined ? null : Number(runtime.session.resultPayout) || 0,
+          endSignal:runtime.session.endSignal || null
+        };
+      }
+      jagLastGamePayout = Number(runtime.jagLastGamePayout) || 0;
+      jagLastBonusPayout = Number(runtime.jagLastBonusPayout) || 0;
+      jagChanceHold = !!runtime.jagChanceHold;
+      forceResult = String(runtime.forceResult || "");
+      forcePremiumEffect = !!runtime.forcePremiumEffect;
+      pendingForceResult = String(runtime.pendingForceResult || "");
+      pendingBonusStartOptions = runtime.pendingBonusStartOptions && typeof runtime.pendingBonusStartOptions === "object" ? {...runtime.pendingBonusStartOptions} : null;
+      devilZoneConfirmIntroPending = !!runtime.devilZoneConfirmIntroPending;
+      pendingDevilRushEntryEffect = String(runtime.pendingDevilRushEntryEffect || "");
+      speedFrameOffHold = !!runtime.speedFrameOffHold;
+      barBgmActive = !!runtime.barBgmActive;
+      barBgmMode = String(runtime.barBgmMode || "");
+      battleBgmActive = !!runtime.battleBgmActive;
+      rogiBgmMuted = !!runtime.rogiBgmMuted;
+      autoPlay = false;
+      speedToBonusActive = false;
+      isSpinning = false;
+      spinCanStop = false;
+      currentSpin = null;
     }catch(e){}
+  }
+
+  function runtimeStateForStorage(){
+    return {
+      session:{...session},
+      jagLastGamePayout,
+      jagLastBonusPayout,
+      jagChanceHold,
+      forceResult,
+      forcePremiumEffect,
+      pendingForceResult,
+      pendingBonusStartOptions: pendingBonusStartOptions ? {...pendingBonusStartOptions} : null,
+      devilZoneConfirmIntroPending,
+      pendingDevilRushEntryEffect,
+      speedFrameOffHold,
+      barBgmActive,
+      barBgmMode,
+      battleBgmActive,
+      rogiBgmMuted
+    };
   }
 
   function persistState(){
     try{
-      return safeStorageSet(STORAGE_KEY, JSON.stringify({settings, stats, normalState, completeTrialState}));
+      return safeStorageSet(STORAGE_KEY, JSON.stringify({settings, stats, normalState, completeTrialState, runtimeState:runtimeStateForStorage()}));
     }catch(e){
       console.warn("Failed to save local state", e);
       return false;
@@ -11123,6 +11197,9 @@ body{
     return snapshot;
   };
   window.__jagPushAdminState = ()=>pushAdminState(latestAdminSnapshot());
+  window.__jagClearLocalPlayState = ()=>{
+    try{ if(window.localStorage) localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  };
 
   function applyAdminSettings(nextSettings){
     if(!nextSettings) return;
@@ -15561,6 +15638,8 @@ body{
   connectAdminCommands();
   reels.forEach((_,i)=>setRandomReel(i));
   showMessage("READY",`1回転${SPIN_COST}pt / BB・RB完全告知 / 設定${settings.setting}`);
+  if($("forceResult")) $("forceResult").value = forceResult;
+  if($("premiumForceStatus")) $("premiumForceStatus").value = forcePremiumEffect ? "ON" : "OFF";
   updateDisplay();
   updateAutoUi();
   updateDebugFastUi();

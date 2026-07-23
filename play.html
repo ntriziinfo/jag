@@ -64,6 +64,12 @@ async function start(){
   $('startBtn').disabled = false;
   $('startBtn').textContent = 'この台で開始';
 }
+function clearSlotLocalState(){
+  try{
+    const win = $("slot").contentWindow;
+    if(win && typeof win.__jagClearLocalPlayState === "function") win.__jagClearLocalPlayState();
+  }catch(e){}
+}
 function latestSlotSnapshot(){
   try{
     const win = $("slot").contentWindow;
@@ -80,6 +86,7 @@ async function endSession(options={}){
   const snapshot = options.snapshot || latestSlotSnapshot();
   const res = await fetch('/api/sessions/end', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({...active, snapshot, forced:!!options.forced})});
   const data = await res.json();
+  clearSlotLocalState();
   active = null;
   $('play').hidden = true;
   $('slot').src = 'about:blank';
