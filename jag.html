@@ -7154,7 +7154,9 @@ body{
 (function(){
   "use strict";
 
-  const STORAGE_KEY = "jag_slot_state_v1";
+  const bootParams = new URLSearchParams(location.search);
+  const bootMachineId = bootParams.get("machine") || "standalone";
+  const STORAGE_KEY = "jag_slot_state_v1_" + bootMachineId;
 
   const DEFAULT_NORMAL_BGM_SRC = "";
   const HIGH_MODE_BGM_SRC = "";
@@ -7900,7 +7902,7 @@ body{
   let premiumBigConfirmStopLockTimer = null;
   let speedBonusRogiHoldActive = false;
   let battleIntroHideTimer = null;
-  const adminParams = new URLSearchParams(location.search);
+  const adminParams = bootParams;
 
   function safeStorageGet(key){
     try{ return window.localStorage ? localStorage.getItem(key) : null; }
@@ -7919,14 +7921,17 @@ body{
 
   const ADMIN_SERVER_DEFAULT = location.protocol.startsWith("http") ? location.origin : "http://localhost:8787";
   const ADMIN_SERVER = (adminParams.get("server") || safeStorageGet("jag_admin_server") || ADMIN_SERVER_DEFAULT).replace(/\/$/, "");
-  let machineId = adminParams.get("machine") || safeStorageGet("jag_machine_id");
+  let machineId = adminParams.get("machine") || bootMachineId;
   let adminPushTimer = null;
   let adminCommandStream = null;
   let adminCommandReconnectTimer = null;
   let adminCommandPollTimer = null;
-  let adminCommandLastId = Number(safeStorageGet("jag_admin_command_last_id") || 0) || 0;
+  const ADMIN_COMMAND_LAST_ID_KEY = "jag_admin_command_last_id_" + machineId;
+  let adminCommandLastId = Number(safeStorageGet(ADMIN_COMMAND_LAST_ID_KEY) || 0) || 0;
   const ADMIN_STATE_PUSH_INTERVAL_MS = 60000;
   const SLOT_DEBUG_ENABLED = adminParams.get("debug") === "1";
+  const CREDIT_BASELINE_PROFIT = Number(adminParams.get("creditBaseline") || 0) || 0;
+  const SLOT_PLAY_SESSION = adminParams.has("creditBaseline");
   if(SLOT_DEBUG_ENABLED) document.body.classList.add("debugMode");
   const PAGE_ZOOM_STORAGE_KEY = "jag_unified_page_zoom_v3";
   const PAGE_PAN_STORAGE_KEY = "jag_unified_page_pan_x_v3";
@@ -11101,8 +11106,20 @@ body{
     }, delay);
   }
 
-  window.__jagAdminSnapshot = adminSnapshot;
-  window.__jagPushAdminState = ()=>pushAdminState(adminSnapshot());
+  function latestAdminSnapshot(){
+    readSettings();
+    normalizeSlumpHistory();
+    persistState();
+    return adminSnapshot();
+  }
+
+  window.__jagAdminSnapshot = latestAdminSnapshot;
+  window.__jagPrepareEndSnapshot = ()=>{
+    const snapshot = latestAdminSnapshot();
+    pushAdminState(snapshot);
+    return snapshot;
+  };
+  window.__jagPushAdminState = ()=>pushAdminState(latestAdminSnapshot());
 
   function applyAdminSettings(nextSettings){
     if(!nextSettings) return;
@@ -11136,6 +11153,16 @@ body{
       applyAdminSettings(command.settings || {});
     }else if(command.type === "reset"){
       morningResetGame(false, "管理リセット");
+      setTimeout(()=>location.reload(), 250);
+    }else if(command.type === "forceEnd"){
+      const snapshot = latestAdminSnapshot();
+      pushAdminState(snapshot);
+      try{
+        if(window.parent && window.parent !== window){
+          window.parent.postMessage({type:"jag-force-end", machineId, snapshot}, "*");
+        }
+      }catch(e){}
+      setTimeout(()=>location.reload(), 1200);
     }else if(command.type === "forceResult"){
       const requested = command.result === "REACH_ME" || RESULT[command.result] ? command.result : "";
       forceResult = normalizeForceResult(requested);
@@ -11170,7 +11197,7 @@ body{
           handleAdminCommand(command);
           adminCommandLastId = Math.max(adminCommandLastId, Number(row.id || command.id || row.createdAtMs || 0) || 0);
         }
-        safeStorageSet("jag_admin_command_last_id", String(adminCommandLastId));
+        safeStorageSet(ADMIN_COMMAND_LAST_ID_KEY, String(adminCommandLastId));
       }
     }catch(e){}
     adminCommandPollTimer = setTimeout(pollAdminCommands, 5000);
@@ -12512,7 +12539,7 @@ body{
       gogoChance.classList.toggle("is-bar-confirm", jagChanceBarConfirm);
       gogoChance.setAttribute("aria-pressed", jagChanceLit ? "true" : "false");
     }
-    const displayCredit = profit;
+    const displayCredit = SLOT_PLAY_SESSION ? profit - CREDIT_BASELINE_PROFIT : profit;
     const displayCount = active
       ? (isATypeBonusActive() ? aTypeBonusNet() : Math.max(0, Number(session.paid) || 0))
       : session.resultPayout !== null && session.resultPayout !== undefined

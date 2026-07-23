@@ -162,11 +162,12 @@ async function applySetting(id){
   await loadMachines();
 }
 async function forceEndMachine(id){
-  if(!confirm(id + "号機を強制終了します。現在のデータを終了データとして送信し、この台は空き台に戻します。")) return;
+  if(!confirm(id + "号機を強制終了します。使用中の場合はお客様画面へ終了指示を送り、最新データで送信します。")) return;
   const res = await fetch("/api/admin/machines/" + encodeURIComponent(id) + "/force-end", {method:"POST", headers:adminHeaders()});
   const data = await res.json();
   if(!data.ok){ alert(data.error || "強制終了に失敗しました"); return; }
-  alert(id + "号機を強制終了しました。空き台に戻しました");
+  alert(data.queued ? id + "号機へ強制終了指示を送信しました。お客様画面が再読み込みされ、最新データで終了します。" : id + "号機を強制終了しました。空き台に戻しました");
+  await new Promise(resolve => setTimeout(resolve, data.queued ? 1800 : 0));
   await Promise.all([loadMachines(), loadResults()]);
 }
 async function resetMachine(id){
