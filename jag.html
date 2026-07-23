@@ -10441,7 +10441,10 @@ body{
     const deduped = [];
     for(const point of normalized){
       const last = deduped[deduped.length - 1];
-      if(last && last.spin === point.spin && last.profit === point.profit) continue;
+      if(last && last.spin === point.spin){
+        last.profit = point.profit;
+        continue;
+      }
       deduped.push(point);
     }
     stats.slumpHistory = deduped.length > SLUMP_MAX_HISTORY_POINTS
@@ -10457,7 +10460,13 @@ body{
       profit:currentProfit()
     };
     const last = stats.slumpHistory[stats.slumpHistory.length - 1];
-    if(last && last.spin === point.spin && last.profit === point.profit) return;
+    if(last && last.spin === point.spin){
+      if(last.profit === point.profit) return;
+      last.profit = point.profit;
+      refreshSlumpExtremes();
+      scheduleSlumpGraphRender();
+      return;
+    }
     stats.slumpHistory.push(point);
     if(stats.slumpHistory.length > SLUMP_MAX_HISTORY_POINTS){
       stats.slumpHistory = [stats.slumpHistory[0], ...stats.slumpHistory.slice(-(SLUMP_MAX_HISTORY_POINTS - 1))];
