@@ -6995,7 +6995,7 @@ body{
           </div>
         </div>
         <div class="field">
-          <label>オート間隔（秒）</label>
+          <label>オート間隔（秒 / AUTOは2倍速）</label>
           <input id="autoDelayInput" type="number" min="0.1" max="10" step="0.1" value="0.5" />
         </div>
         <div class="row">
@@ -7753,6 +7753,7 @@ body{
   const DEBUG_FAST_INTERVAL_MS = 100;
   const DEBUG_FAST_BATCH_SIZE = Math.max(1, Math.round(DEBUG_FAST_SPINS_PER_SECOND * DEBUG_FAST_INTERVAL_MS / 1000));
   const DEBUG_ONE_CLICK_SIM_SPINS = 10000;
+  const AUTO_SPEED_MULTIPLIER = 2;
   const SPEED_MODE_MAX_SPINS_PER_SECOND = 10;
   const SPEED_MODE_MULTIPLIER = 3;
   const COMPLETE_TRIAL_ENABLED = true;
@@ -13678,7 +13679,7 @@ body{
     const battleActiveAtSpinStart = isContinuationBattleActive() && !zoneActiveAtSpinStart;
     const battleRoundAtSpinStart = battleActiveAtSpinStart ? battleRoundNumber() : 0;
     const speedModeSpinAtStart = speedToBonusActive && speedModeSpinRequest && normalActiveAtSpinStart;
-    const spinWaitMs = speedModeSpinAtStart ? speedModeWaitMs() : MIN_SPIN_WAIT_MS;
+    const spinWaitMs = spinWaitMsForMode(speedModeSpinAtStart);
 
     isSpinning = true;
     jagLastGamePayout = 0;
@@ -13859,13 +13860,14 @@ body{
       lightBonusAnnouncement(currentSpin, "lever");
     }
 
+    const waitSeconds = spinWaitSecondsText();
     const waitText = speedModeSpinAtStart
       ? "SPEED中 / 停止できます"
       : bar3LeverEffect
-        ? "BAR揃い演出発生！ 0.5秒後に停止可能"
+        ? `BAR揃い演出発生！ ${waitSeconds}後に停止可能`
         : (gekiatsuChance || premiumConfirmMovieEffect)
-          ? "プレミア演出発生！ 0.5秒後に停止可能"
-          : "ウェイト中... 0.5秒後に停止可能";
+          ? `プレミア演出発生！ ${waitSeconds}後に停止可能`
+          : `ウェイト中... ${waitSeconds}後に停止可能`;
     $("resultText").textContent = zoneActiveAtSpinStart
       ? `${goraiZoneRemainText(session.bigZone, session.bigZoneType)} / ${waitText}`
       : battleActiveAtSpinStart
@@ -13889,7 +13891,7 @@ body{
     if(autoPlay || speedModeSpinAtStart){
       const stopOrder = zoneActiveAtSpinStart ? [2,1,0] : [0,1,2];
       stopOrder.forEach((i,idx)=>{
-        const normalAutoStopDelay = MIN_SPIN_WAIT_MS + Math.round((120 + idx*360) / 2);
+        const normalAutoStopDelay = autoStopDelayMs(idx);
         const delay = speedModeSpinAtStart ? speedModeStopDelay(i) : normalAutoStopDelay;
         setTimeout(()=>stopSingleReel(i), delay);
       });
@@ -13925,7 +13927,8 @@ body{
       return;
     }
     if(!spinCanStop){
-      $("resultText").textContent = options.keyboardTurbo ? "十字キー高速停止待機... 0.5秒後に停止可能" : "ウェイト中... 0.5秒後に停止可能";
+      const waitSeconds = spinWaitSecondsText();
+      $("resultText").textContent = options.keyboardTurbo ? `十字キー高速停止待機... ${waitSeconds}後に停止可能` : `ウェイト中... ${waitSeconds}後に停止可能`;
       return;
     }
     hideBattleIntro();
@@ -13995,7 +13998,8 @@ body{
       const keyboardResultWaitMs = currentSpin.keyboardTurboStop
         ? Math.round(RESULT_WAIT_MS / KEYBOARD_STOP_TURBO_MULTIPLIER)
         : RESULT_WAIT_MS;
-      const resultWaitMs = (currentSpin.speedModeAtStart || isPremiumBigFinalBonusSpin(currentSpin)) ? 0 : keyboardResultWaitMs;
+      const autoResultWaitMs = currentSpin.autoStopAtStart ? autoScaledDelayMs(keyboardResultWaitMs) : keyboardResultWaitMs;
+      const resultWaitMs = (currentSpin.speedModeAtStart || isPremiumBigFinalBonusSpin(currentSpin)) ? 0 : autoResultWaitMs;
       setTimeout(()=>{
         if(currentSpin){
           prepareManualBonusOutcome(currentSpin);
@@ -14013,7 +14017,7 @@ body{
       return;
     }
     if(!spinCanStop){
-      $("resultText").textContent = "ウェイト中... 0.5秒後に停止可能";
+      $("resultText").textContent = `ウェイト中... ${spinWaitSecondsText()}後に停止可能`;
       return;
     }
 
@@ -14268,7 +14272,7 @@ body{
     }
 
     if(autoPlay){
-      status.textContent = A_TYPE_MODE ? "オート中：Aタイプを自動消化" : `オート中：ATを自動消化`;
+      status.textContent = A_TYPE_MODE ? "オート中：Aタイプを2倍速で自動消化" : `オート中：ATを2倍速で自動消化`;
       status.style.color = "var(--green)";
     }else{
       status.textContent = "オート停止中";
@@ -14305,6 +14309,32 @@ body{
     runAutoStep();
   }
 
+  function autoScaledDelayMs(ms, minMs=50){
+    return Math.max(minMs, Math.round((Number(ms) || 0) / AUTO_SPEED_MULTIPLIER));
+  }
+
+  function autoDelayMs(){
+    const baseMs = Math.max(100, (Number(settings.autoDelay) || 0.5) * 1000);
+    return autoScaledDelayMs(baseMs);
+  }
+
+  function autoPollDelayMs(){
+    return autoScaledDelayMs(150);
+  }
+
+  function autoStopDelayMs(index=0){
+    return autoScaledDelayMs(MIN_SPIN_WAIT_MS + Math.round((120 + index * 360) / 2));
+  }
+
+  function spinWaitMsForMode(speedModeSpinAtStart=false){
+    if(speedModeSpinAtStart) return speedModeWaitMs();
+    return autoPlay ? autoScaledDelayMs(MIN_SPIN_WAIT_MS) : MIN_SPIN_WAIT_MS;
+  }
+
+  function spinWaitSecondsText(){
+    return autoPlay ? `${(autoScaledDelayMs(MIN_SPIN_WAIT_MS) / 1000).toFixed(2)}秒` : "0.5秒";
+  }
+
   function queueAutoStep(delayMs=150){
     if(!autoPlay) return;
     if(autoTimer){
@@ -14323,7 +14353,7 @@ body{
       if(!autoPlay) return;
       if(autoTimer || isSpinning || bonusEndBgmPlaying || bonusConfirmSoundPlaying || pendingAtStartTimer) return;
       if(!canPlayCompleteTrial()) return;
-      queueAutoStep(100);
+      queueAutoStep(autoScaledDelayMs(100));
     }, 500);
   }
 
@@ -14361,20 +14391,20 @@ body{
   function runAutoStep(){
     if(!autoPlay) return;
     if(bonusEndBgmPlaying || bonusConfirmSoundPlaying){
-      queueAutoStep(150);
+      queueAutoStep(autoPollDelayMs());
       return;
     }
     if(!canPlayCompleteTrial()) return;
     if(isRogiThirdStopHoldActive()){
       if(isRogiThirdStopMoviePlaying()){
-        queueAutoStep(150);
+        queueAutoStep(autoPollDelayMs());
         return;
       }
       clearRogiThirdStopHoldForNextGame();
     }
     if(isSpinning){
       requestAutoStopCurrentSpin();
-      queueAutoStep(150);
+      queueAutoStep(autoPollDelayMs());
       return;
     }
 
@@ -14384,30 +14414,29 @@ body{
         return;
       }
       spin();
-      queueAutoStep(Math.max(100, settings.autoDelay * 1000));
+      queueAutoStep(autoDelayMs());
       return;
     }
 
     spin();
     if(!isSpinning && autoPlay){
-      queueAutoStep(Math.max(100, settings.autoDelay * 1000));
+      queueAutoStep(autoDelayMs());
     }
   }
 
   function scheduleNextAuto(){
     if(!autoPlay) return;
     if(bonusEndBgmPlaying || bonusConfirmSoundPlaying){
-      queueAutoStep(150);
+      queueAutoStep(autoPollDelayMs());
       return;
     }
     if(!canPlayCompleteTrial()) return;
     if(isRogiThirdStopHoldActive()){
-      queueAutoStep(150);
+      queueAutoStep(autoPollDelayMs());
       return;
     }
     readSettings();
-    const delayMs = Math.max(100, settings.autoDelay * 1000);
-    queueAutoStep(delayMs);
+    queueAutoStep(autoDelayMs());
   }
 
   function speedToBonusUnavailableReason(){
@@ -14422,7 +14451,7 @@ body{
   }
 
   function speedModeDelayMs(){
-    const autoMs = Math.max(100, (Number(settings.autoDelay) || 0.5) * 1000);
+    const autoMs = autoDelayMs();
     const maxRateMs = Math.round(1000 / SPEED_MODE_MAX_SPINS_PER_SECOND);
     return Math.max(maxRateMs, Math.round(autoMs / SPEED_MODE_MULTIPLIER));
   }
