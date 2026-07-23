@@ -67,22 +67,32 @@ async function start(){
 function latestSlotSnapshot(){
   try{
     const win = $("slot").contentWindow;
+    if(win && typeof win.__jagPrepareEndSnapshot === "function") return win.__jagPrepareEndSnapshot();
     if(win && typeof win.__jagAdminSnapshot === "function") return win.__jagAdminSnapshot();
   }catch(e){}
   return null;
 }
-async function endSession(){
+async function endSession(options={}){
   if(!active) return;
-  if(!confirm('終了してデータを送信します。終了後はこのパスワードでは続きから遊べません。')) return;
+  if(!options.skipConfirm && !confirm('終了してデータを送信します。終了後はこのパスワードでは続きから遊べません。')) return;
   $('endBtn').disabled = true;
   $('endBtn').textContent = '送信中...';
-  const res = await fetch('/api/sessions/end', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({...active, snapshot:latestSlotSnapshot()})});
+  const snapshot = options.snapshot || latestSlotSnapshot();
+  const res = await fetch('/api/sessions/end', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({...active, snapshot, forced:!!options.forced})});
   const data = await res.json();
+  active = null;
   $('play').hidden = true;
   $('slot').src = 'about:blank';
   $('ended').hidden = false;
   $('sendStatus').textContent = data.sheets && data.sheets.ok ? 'スプレッドシートへ送信済みです。' : 'ローカルに記録しました。スプレッドシート連携URLが未設定の場合はこの表示になります。';
 }
+window.addEventListener('message', event=>{
+  const msg = event.data || {};
+  if(!msg || msg.type !== 'jag-force-end') return;
+  if(active && (!msg.machineId || String(msg.machineId) === String(active.machineId))){
+    endSession({skipConfirm:true, forced:true, snapshot:msg.snapshot || latestSlotSnapshot()});
+  }
+});
 $('startBtn').addEventListener('click', start);
 $('password').addEventListener('keydown', e=>{ if(e.key === 'Enter') start(); });
 $('endBtn').addEventListener('click', endSession);

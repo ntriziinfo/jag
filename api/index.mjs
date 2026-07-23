@@ -198,7 +198,7 @@ export default async function handler(req, res){
       if(requestedMachineId && requestedMachineId !== String(issued.machineId)) return json(res, 403, {ok:false, error:"このパスワードは別の台用です"});
       const machine = await getMachine(issued.machineId);
       const existingSession = issued.sessionId ? await getSession(issued.sessionId) : null;
-      const iframeUrl = "/jag.html?machine=" + encodeURIComponent(machine.machineId) + "&server=" + encodeURIComponent(origin);
+      const iframeUrl = "/jag.html?machine=" + encodeURIComponent(machine.machineId) + "&server=" + encodeURIComponent(origin) + "&creditBaseline=" + encodeURIComponent(String(snapshotProfit(machine.lastSnapshot || {})));
       if(issued.status === "used" && existingSession && existingSession.status === "active") return json(res, 200, {ok:true, resumed:true, session:{sessionId:existingSession.sessionId, token:existingSession.token, machineId:machine.machineId, playerName:existingSession.playerName}, iframeUrl});
       if(issued.status !== "issued") return json(res, 403, {ok:false, error:"このパスワードは終了済みです"});
       if(machine.currentSessionId && machine.currentSessionId !== (existingSession && existingSession.sessionId)) return json(res, 409, {ok:false, error:"machine is busy"});
@@ -215,7 +215,7 @@ export default async function handler(req, res){
       if(session.status === "ended") return json(res, 200, {ok:true, alreadyEnded:true, record:session.resultRecord || null});
       const machine = await getMachine(session.machineId);
       if(body.snapshot) machine.lastSnapshot = body.snapshot;
-      const record = resultPayload(session, machine, body);
+      const record = {...resultPayload(session, machine, body), forced:!!body.forced};
       await appendResult(record);
       const sheets = await sendToSheets(record);
       session.status = "ended"; session.endedAt = ms(); session.resultRecord = record; session.sheets = sheets;
@@ -272,12 +272,15 @@ export default async function handler(req, res){
       if(!adminOk(req)) return json(res, 401, {ok:false, error:"admin password required"});
       const machine = await getMachine(decodeURIComponent(m[1]));
       const session = machine.currentSessionId ? await getSession(machine.currentSessionId) : null;
-      if(!session && !machine.lastSnapshot) return json(res, 400, {ok:false, error:"終了できるデータがありません"});
-      const forcedSession = session || {sessionId:makeId("forced"), token:"", password:"", machineId:machine.machineId, playerName:machine.currentPlayerName || "強制終了", status:"active", startedAt:0, endedAt:0, startSnapshot:machine.lastSnapshot || null};
+      if(session && session.status === "active"){
+        const row = await insertCommand(machine.machineId, {type:"forceEnd", reason:"admin-force-end"});
+        return json(res, 200, {ok:true, queued:true, delivered:true, commandId:row.id});
+      }
+      if(!machine.lastSnapshot) return json(res, 400, {ok:false, error:"終了できるデータがありません"});
+      const forcedSession = {sessionId:makeId("forced"), token:"", password:"", machineId:machine.machineId, playerName:machine.currentPlayerName || "強制終了", status:"active", startedAt:0, endedAt:0, startSnapshot:machine.lastSnapshot || null};
       const record = {...resultPayload(forcedSession, machine, {}), forced:true, forcedBy:"admin"};
       await appendResult(record);
       const sheets = await sendToSheets(record);
-      if(session){ session.status = "ended"; session.endedAt = ms(); session.resultRecord = record; session.sheets = sheets; await saveSession(session); }
       machine.locked = false; machine.currentSessionId = ""; machine.currentPlayerName = ""; machine.lastEndedSession = {sessionId:forcedSession.sessionId, playerName:forcedSession.playerName, endedAt:ms(), record, sheets, forced:true};
       await upsertMachine(machine);
       return json(res, 200, {ok:true, record, sheets});
