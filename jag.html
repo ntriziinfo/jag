@@ -6053,6 +6053,18 @@ body{
 .jagBonusDataMeter:nth-child(n+3) b{
   font-size:23px;
 }
+.jagBonusDataMeter b.is-bonus-held{
+  animation:jagBonusHeldBlink .72s steps(2,end) infinite;
+}
+@keyframes jagBonusHeldBlink{
+  0%,44%{opacity:1}
+  45%,100%{opacity:.22}
+}
+@media (prefers-reduced-motion:reduce){
+  .jagBonusDataMeter b.is-bonus-held{
+    animation:none;
+  }
+}
 .cabinetFrontParts{
   position:absolute;
   inset:0;
@@ -7576,6 +7588,7 @@ body{
     phase:"idle",
     bonusKind:"",
     bonusTarget:0,
+    bonusStartGames:0,
     premiumBonus:false,
     oneGameRenBonus:false,
     premiumChainEligible:false,
@@ -10893,7 +10906,7 @@ body{
         bonusWaitSpin:bonusPendingAtStart && !isReadyBonus,
         bonusWaitGamesAtStart:0,
         highAdd:0,
-        ceilingAfter:(isNewBonusHit || isReadyBonus) ? 0 : clamp(gamesSinceLastBonusAtStart + 1, 0, NORMAL_CEILING_GAMES),
+        ceilingAfter:(isNewBonusHit || isReadyBonus) ? 0 : Math.max(0, gamesSinceLastBonusAtStart + 1),
         gamesSinceLastBonusAtStart,
         bonusHit:isNewBonusHit,
         bonusReady:isReadyBonus && isBig,
@@ -11047,7 +11060,9 @@ body{
           normalState.premiumBonus = false;
           normalState.oneGameRenBonus = false;
         }
-        normalState.sinceBonus = clamp(normalState.sinceBonus, 0, currentNormalCeilingGames());
+        normalState.sinceBonus = A_TYPE_MODE
+          ? Math.max(0, Number(normalState.sinceBonus) || 0)
+          : clamp(normalState.sinceBonus, 0, currentNormalCeilingGames());
       }
       if(data?.completeTrialState){
         completeTrialState = {
@@ -11539,6 +11554,7 @@ body{
           phase:"a_type_bonus",
           bonusKind,
           bonusTarget,
+          bonusStartGames:gamesSinceLastBonus,
           premiumBonus,
           oneGameRenBonus,
           premiumChainEligible,
@@ -11590,6 +11606,7 @@ body{
         phase:"st",
         bonusKind:"",
         bonusTarget:0,
+        bonusStartGames:0,
         bonusBgmSrc:"",
         battleRemain:0,
         battleWin:false,
@@ -11707,6 +11724,7 @@ body{
     session.bigZoneType = "";
     session.bonusKind = "";
     session.bonusTarget = 0;
+    session.bonusStartGames = 0;
     session.premiumBonus = false;
     session.oneGameRenBonus = false;
     session.premiumChainEligible = false;
@@ -12219,7 +12237,9 @@ body{
       recordSlumpPoint();
       updateCompleteTrialState("通常払い出し");
     }
-    normalState.sinceBonus = clamp(Number(resolved.ceilingAfter) || 0, 0, NORMAL_CEILING_GAMES);
+    normalState.sinceBonus = A_TYPE_MODE
+      ? Math.max(0, Number(resolved.ceilingAfter) || 0)
+      : clamp(Number(resolved.ceilingAfter) || 0, 0, NORMAL_CEILING_GAMES);
     if(normalState.highRemain > 0){
       normalState.highRemain = Math.max(0, (Number(normalState.highRemain) || 0) - 1);
     }
@@ -12668,7 +12688,11 @@ body{
       return `${raw < 0 ? "-" : ""}${formatMeterDigits(raw, 4, 9999)}`;
     };
     setText("jagTotalGameDataMeter", formatMeterDigits(stats.totalSpins, 5, 99999));
-    setText("jagAfterBonusDataMeter", formatMeterDigits(normalState.sinceBonus, 4, 9999));
+    const afterBonusMeter = $("jagAfterBonusDataMeter");
+    const holdAfterBonusGames = !!(A_TYPE_MODE && isATypeBonusActive());
+    const afterBonusGames = holdAfterBonusGames ? session.bonusStartGames : normalState.sinceBonus;
+    setText("jagAfterBonusDataMeter", formatMeterDigits(afterBonusGames, 4, 9999));
+    if(afterBonusMeter) afterBonusMeter.classList.toggle("is-bonus-held", holdAfterBonusGames);
     setText("jagBigDataMeter", formatMeterDigits(stats.bigCount, 3, 999));
     setText("jagRegDataMeter", formatMeterDigits(stats.midCount, 3, 999));
     const stLampOn = !!($("stLamp") && $("stLamp").classList.contains("on"));
@@ -12977,7 +13001,7 @@ body{
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",premiumBonus:false,oneGameRenBonus:false,bonusWaitGames:0,bonusHitGamesSince:0,reachMePending:false,reachMeBonusKind:"",reachMeBonusSource:"",reachMeHitGamesSince:0,pendingSettingVoiceSrc:"",pendingPremiumVoiceSrc:"",morningCeilingActive:false};
-    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,premiumBonus:false,oneGameRenBonus:false,premiumChainEligible:false,bonusBgmSrc:"",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
+    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,bonusStartGames:0,premiumBonus:false,oneGameRenBonus:false,premiumChainEligible:false,bonusBgmSrc:"",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     jagLastGamePayout = 0;
     jagLastBonusPayout = 0;
     jagChanceHold = false;
@@ -13032,7 +13056,7 @@ body{
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",premiumBonus:false,oneGameRenBonus:false,bonusWaitGames:0,bonusHitGamesSince:0,reachMePending:false,reachMeBonusKind:"",reachMeBonusSource:"",reachMeHitGamesSince:0,pendingSettingVoiceSrc:"",pendingPremiumVoiceSrc:"",morningCeilingActive:!A_TYPE_MODE};
-    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,premiumBonus:false,oneGameRenBonus:false,premiumChainEligible:false,bonusBgmSrc:"",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
+    session = {active:false,remain:0,fee:0,cost:0,paid:0,hits:0,added:0,addedGames:0,setNo:0,stockSets:0,barBgmSets:0,nextSetBarBgm:false,currentSetBarBgm:false,continuationRate:0,bigZone:0,bigZoneType:"",phase:"idle",bonusKind:"",bonusTarget:0,bonusStartGames:0,premiumBonus:false,oneGameRenBonus:false,premiumChainEligible:false,bonusBgmSrc:"",battleRemain:0,battleWin:false,battleSource:"",resultPayout:null,endSignal:null};
     jagLastGamePayout = 0;
     jagLastBonusPayout = 0;
     jagChanceHold = false;
@@ -13368,7 +13392,7 @@ body{
       return;
     }
 
-    const nextCeiling = clamp((Number(normalState.sinceBonus) || 0) + 1, 0, NORMAL_CEILING_GAMES);
+    const nextCeiling = Math.max(0, (Number(normalState.sinceBonus) || 0) + 1);
     spin.result = "MISS";
     spin.spec = RESULT.MISS;
     spin.lineRow = 1;
