@@ -336,7 +336,7 @@ async function applySetting(id){
   await loadMachines();
 }
 async function forceEndMachine(id){
-  if(!confirm(id + "号機を強制清算します。管理側に最後に保存されたデータを送信し、空き台に戻します。")) return;
+  if(!confirm(id + "号機の強制終了を実行しますか？\n\n最後に保存されたデータで清算し、空き台に戻します。")) return;
   const res = await fetch("/api/admin/machines/" + encodeURIComponent(id) + "/force-end", {method:"POST", headers:adminHeaders()});
   const data = await res.json();
   if(!data.ok){ alert(data.error || "強制終了に失敗しました"); return; }
