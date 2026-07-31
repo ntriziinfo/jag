@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const { URL } = require("url");
+const {machineTotalFor} = require("./machine-totals.cjs");
 
 const PORT = Number(process.env.PORT || 8787);
 const ROOT = __dirname;
@@ -121,7 +122,7 @@ function sseSend(res, event, data){
   res.write(`data: ${JSON.stringify(data)}\n\n`);
 }
 
-function publicMachine(machine){
+function publicMachine(machine, machineTotal){
   const snapshot = machine.lastSnapshot || null;
   const stats = snapshot && snapshot.stats ? snapshot.stats : null;
   return {
@@ -138,7 +139,9 @@ function publicMachine(machine){
     playSessionId:snapshot && snapshot.playSessionId || "",
     playSessionStartStats:snapshot && snapshot.playSessionStartStats || null,
     stats,
-    slumpHistory:stats && Array.isArray(stats.slumpHistory) ? stats.slumpHistory : [{spin:0, profit:0}]
+    slumpHistory:stats && Array.isArray(stats.slumpHistory) ? stats.slumpHistory : [{spin:0, profit:0}],
+    machineTotalStats:machineTotal.stats,
+    machineTotalSlumpHistory:machineTotal.history
   };
 }
 
@@ -150,8 +153,13 @@ function allMachines(){
   });
 }
 
+function publicMachines(){
+  const records = readResultRecords(1000);
+  return allMachines().map(machine=>publicMachine(machine, machineTotalFor(machine, records)));
+}
+
 function broadcastMachines(){
-  const payload = allMachines().map(publicMachine);
+  const payload = publicMachines();
   for(const res of adminClients) sseSend(res, "machines", payload);
 }
 
@@ -205,6 +213,14 @@ function restoreResultResetSerial(record){
   const session = state.sessions[String(record && record.sessionId || "")];
   if(!session || session.resetSerialAtStart === undefined || session.resetSerialAtStart === null) return record;
   return {...record, resetSerial:Number(session.resetSerialAtStart) || 0};
+}
+
+function readResultRecords(limit=200){
+  let rows = [];
+  try{
+    rows = fs.readFileSync(RESULTS_FILE, "utf8").split(/\n+/).filter(Boolean).map(line=>JSON.parse(line));
+  }catch(e){}
+  return rows.slice(-Math.max(1, Number(limit) || 200)).reverse().map(restoreResultResetSerial);
 }
 
 function postJson(urlString, payload){
@@ -359,13 +375,13 @@ const server = http.createServer(async (req, res)=>{
 
   try{
     if(url.pathname === "/api/machines" && req.method === "GET"){
-      return sendJson(res, 200, allMachines().map(publicMachine));
+      return sendJson(res, 200, publicMachines());
     }
 
     if(url.pathname === "/api/events" && req.method === "GET"){
       sseHeaders(res);
       adminClients.add(res);
-      sseSend(res, "machines", allMachines().map(publicMachine));
+      sseSend(res, "machines", publicMachines());
       req.on("close", ()=>adminClients.delete(res));
       return;
     }
@@ -625,11 +641,7 @@ const server = http.createServer(async (req, res)=>{
 
     if(url.pathname === "/api/results" && req.method === "GET"){
       if(!adminOk(req)) return sendJson(res, 401, {ok:false, error:"admin password required"});
-      let rows = [];
-      try{
-        rows = fs.readFileSync(RESULTS_FILE, "utf8").split(/\n+/).filter(Boolean).map(line=>JSON.parse(line));
-      }catch(e){}
-      return sendJson(res, 200, rows.slice(-200).reverse().map(restoreResultResetSerial));
+      return sendJson(res, 200, readResultRecords(200));
     }
 
     return serveFile(res, url.pathname);

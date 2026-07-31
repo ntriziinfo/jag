@@ -1,5 +1,8 @@
 import * as https from "node:https";
 import * as crypto from "node:crypto";
+import machineTotals from "../machine-totals.cjs";
+
+const {machineTotalFor} = machineTotals;
 
 const MACHINE_COUNT = 6;
 const DEBUG_MACHINE_ID = "debug";
@@ -75,10 +78,10 @@ function machineFromRow(row){
   if(!row) return null;
   return {machineId:String(row.machine_id), displayName:row.display_name || (String(row.machine_id) === DEBUG_MACHINE_ID ? "確認台" : String(row.machine_id)+"号機"), online:Date.now() - Number(row.updated_at_ms || 0) < 90000, locked:!!row.locked, resetSerial:Number(row.reset_serial || 0), currentSessionId:row.current_session_id || "", currentPlayerName:row.current_player_name || "", lastSnapshot:row.last_snapshot || null, lastEndedSession:row.last_ended_session || null, updatedAt:Number(row.updated_at_ms || 0), assignedSetting:Number(row.assigned_setting || 1)};
 }
-function publicMachine(machine){
+function publicMachine(machine, machineTotal){
   const snapshot = machine.lastSnapshot || null;
   const stats = snapshot && snapshot.stats ? snapshot.stats : null;
-  return {machineId:machine.machineId, displayName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : machine.machineId+"号機"), online:!!machine.online, locked:!!machine.locked, currentSessionId:machine.currentSessionId || "", currentPlayerName:machine.currentPlayerName || "", updatedAt:machine.updatedAt || 0, resetSerial:machine.resetSerial || 0, assignedSetting:machine.assignedSetting || (stats && stats.setting) || (snapshot && snapshot.settings ? snapshot.settings.setting : 1), lastEndedSession:machine.lastEndedSession || null, playSessionId:snapshot && snapshot.playSessionId || "", playSessionStartStats:snapshot && snapshot.playSessionStartStats || null, stats, slumpHistory:stats && Array.isArray(stats.slumpHistory) ? stats.slumpHistory : [{spin:0, profit:0}]};
+  return {machineId:machine.machineId, displayName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : machine.machineId+"号機"), online:!!machine.online, locked:!!machine.locked, currentSessionId:machine.currentSessionId || "", currentPlayerName:machine.currentPlayerName || "", updatedAt:machine.updatedAt || 0, resetSerial:machine.resetSerial || 0, assignedSetting:machine.assignedSetting || (stats && stats.setting) || (snapshot && snapshot.settings ? snapshot.settings.setting : 1), lastEndedSession:machine.lastEndedSession || null, playSessionId:snapshot && snapshot.playSessionId || "", playSessionStartStats:snapshot && snapshot.playSessionStartStats || null, stats, slumpHistory:stats && Array.isArray(stats.slumpHistory) ? stats.slumpHistory : [{spin:0, profit:0}], machineTotalStats:machineTotal.stats, machineTotalSlumpHistory:machineTotal.history};
 }
 async function getMachine(id){
   const rows = await sb("machine_states?machine_id=eq." + encodeURIComponent(String(id)) + "&select=*&limit=1");
@@ -136,6 +139,10 @@ async function restoreResultResetSerials(records){
     const sessionId = String(record && record.sessionId || "");
     return serialBySession.has(sessionId) ? {...record, resetSerial:serialBySession.get(sessionId)} : record;
   });
+}
+async function recentResultRecords(limit=200){
+  const rows = await sb("session_results?select=record&order=ended_at_ms.desc&limit=" + Math.max(1, Number(limit) || 200));
+  return restoreResultResetSerials(rows.map(row=>row.record));
 }
 function postJson(urlString, payload){
   return new Promise((resolve, reject)=>{
@@ -202,7 +209,10 @@ export default async function handler(req, res){
     if(pathname === "/api/health") return json(res, 200, {ok:true, supabaseUrlSet:!!SUPABASE_URL, supabaseKeySet:!!SUPABASE_KEY});
     if(!requireSupabase(res)) return;
     const origin = "https://" + req.headers.host;
-    if(pathname === "/api/machines" && req.method === "GET") return json(res, 200, (await getAllMachines()).map(publicMachine));
+    if(pathname === "/api/machines" && req.method === "GET"){
+      const [machines, records] = await Promise.all([getAllMachines(), recentResultRecords(1000)]);
+      return json(res, 200, machines.map(machine=>publicMachine(machine, machineTotalFor(machine, records))));
+    }
     if(pathname === "/api/admin/issue-password" && req.method === "POST"){
       if(!adminOk(req)) return json(res, 401, {ok:false, error:"admin password required"});
       const body = await readBody(req);
@@ -343,8 +353,7 @@ export default async function handler(req, res){
     }
     if(pathname === "/api/results" && req.method === "GET"){
       if(!adminOk(req)) return json(res, 401, {ok:false, error:"admin password required"});
-      const rows = await sb("session_results?select=record&order=ended_at_ms.desc&limit=200");
-      return json(res, 200, await restoreResultResetSerials(rows.map(row=>row.record)));
+      return json(res, 200, await recentResultRecords(200));
     }
     return json(res, 404, {ok:false, error:"not found"});
   }catch(e){

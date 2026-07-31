@@ -9,7 +9,7 @@
   </style>
 </head>
 <body>
-<header><h1>RISING 台選び</h1><p class="muted">スランプグラフは管理リセットまで保持されます。</p></header>
+<header><h1>RISING 台選び</h1><p class="muted">管理リセット以降の台累計データを表示しています。</p></header>
 <main id="grid" class="grid"></main>
 <script>
 const grid = document.getElementById('grid');
@@ -41,16 +41,16 @@ function draw(canvas, points){
 function visibleMachines(machines){ return machines.filter(m => String(m.machineId) !== "debug"); }
 function render(machines){
   grid.innerHTML = visibleMachines(machines).map(m=>{
-    const s = m.stats || {}; const profit = s.profit ?? ((s.totalPaid||0)-(s.totalFee||0));
+    const s = m.machineTotalStats || {}; const profit = s.profit ?? ((s.totalPaid||0)-(s.totalFee||0));
     const free = !m.locked;
     return `<article class="machine">
       <div class="head"><h2>${m.machineId}号機</h2><span class="pill ${free ? 'free' : 'lock'}">${free ? '空き' : '使用不可'}</span></div>
       <canvas class="graph" data-machine="${m.machineId}"></canvas>
-      <div class="stats"><div class="stat"><span>G数</span><b>${fmt(s.totalSpins)}</b></div><div class="stat"><span>BB</span><b>${fmt(s.bigCount)}</b></div><div class="stat"><span>RB</span><b>${fmt(s.midCount)}</b></div><div class="stat"><span>差pt</span><b>${signed(profit)}</b></div></div>
+      <div class="stats"><div class="stat"><span>G数</span><b>${fmt(s.totalSpins)}</b></div><div class="stat"><span>BB</span><b>${fmt(s.bigCount)}</b></div><div class="stat"><span>RB</span><b>${fmt(s.midCount)}</b></div><div class="stat"><span>差枚</span><b>${signed(profit)}</b></div></div>
       <div class="actions"><a class="${free ? '' : 'disabled'}" href="/play.html?machine=${m.machineId}">この台で遊ぶ</a></div>
     </article>`;
   }).join('');
-  for(const m of visibleMachines(machines)){ const c = document.querySelector(`canvas[data-machine="${m.machineId}"]`); if(c) draw(c, m.slumpHistory); }
+  for(const m of visibleMachines(machines)){ const c = document.querySelector(`canvas[data-machine="${m.machineId}"]`); if(c) draw(c, m.machineTotalSlumpHistory); }
 }
 let lastMachines = [];
 async function load(){ const res = await fetch("/api/machines"); lastMachines = await res.json(); render(lastMachines); }
