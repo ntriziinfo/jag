@@ -78,7 +78,7 @@ function machineFromRow(row){
 function publicMachine(machine){
   const snapshot = machine.lastSnapshot || null;
   const stats = snapshot && snapshot.stats ? snapshot.stats : null;
-  return {machineId:machine.machineId, displayName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : machine.machineId+"号機"), online:!!machine.online, locked:!!machine.locked, currentPlayerName:machine.currentPlayerName || "", updatedAt:machine.updatedAt || 0, resetSerial:machine.resetSerial || 0, assignedSetting:machine.assignedSetting || (stats && stats.setting) || (snapshot && snapshot.settings ? snapshot.settings.setting : 1), lastEndedSession:machine.lastEndedSession || null, stats, slumpHistory:stats && Array.isArray(stats.slumpHistory) ? stats.slumpHistory : [{spin:0, profit:0}]};
+  return {machineId:machine.machineId, displayName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : machine.machineId+"号機"), online:!!machine.online, locked:!!machine.locked, currentSessionId:machine.currentSessionId || "", currentPlayerName:machine.currentPlayerName || "", updatedAt:machine.updatedAt || 0, resetSerial:machine.resetSerial || 0, assignedSetting:machine.assignedSetting || (stats && stats.setting) || (snapshot && snapshot.settings ? snapshot.settings.setting : 1), lastEndedSession:machine.lastEndedSession || null, playSessionId:snapshot && snapshot.playSessionId || "", playSessionStartStats:snapshot && snapshot.playSessionStartStats || null, stats, slumpHistory:stats && Array.isArray(stats.slumpHistory) ? stats.slumpHistory : [{spin:0, profit:0}]};
 }
 async function getMachine(id){
   const rows = await sb("machine_states?machine_id=eq." + encodeURIComponent(String(id)) + "&select=*&limit=1");
@@ -137,9 +137,19 @@ function snapshotProfit(snapshot){
   const stats = snapshot && snapshot.stats ? snapshot.stats : {};
   return Number(stats.profit ?? (numberStat(stats, "totalPaid") - numberStat(stats, "totalFee"))) || 0;
 }
+function sessionStartStats(session, snapshot){
+  const clientStartStats = snapshot && snapshot.playSessionStartStats;
+  const clientSessionId = String(snapshot && snapshot.playSessionId || "");
+  const expectedSessionId = String(session && session.sessionId || "");
+  if(clientStartStats && typeof clientStartStats === "object" && clientSessionId && clientSessionId === expectedSessionId){
+    return {stats:clientStartStats, source:"client-session-start"};
+  }
+  const startSnapshot = session && session.startSnapshot || {};
+  return {stats:startSnapshot.stats || {}, source:"server-machine-start"};
+}
 function sessionDelta(session, snapshot){
-  const start = session.startSnapshot || {};
-  const startStats = start.stats || {};
+  const baseline = sessionStartStats(session, snapshot);
+  const startStats = baseline.stats;
   const endStats = snapshot && snapshot.stats ? snapshot.stats : {};
   const playerTotalFee = Math.max(0, numberStat(endStats, "totalFee") - numberStat(startStats, "totalFee"));
   const playerTotalPaid = Math.max(0, numberStat(endStats, "totalPaid") - numberStat(startStats, "totalPaid"));
@@ -147,8 +157,9 @@ function sessionDelta(session, snapshot){
   const playerBigCount = Math.max(0, numberStat(endStats, "bigCount") - numberStat(startStats, "bigCount"));
   const playerRegCount = Math.max(0, numberStat(endStats, "midCount") - numberStat(startStats, "midCount"));
   const playerGrapeCount = Math.max(0, numberStat(endStats, "grapeCount") - numberStat(startStats, "grapeCount"));
-  const playerProfit = snapshotProfit(snapshot) - snapshotProfit(start);
-  return {playerTotalFee, playerTotalPaid, playerProfit, playerSpins, playerBigCount, playerRegCount, playerGrapeCount, startStats};
+  const startProfit = Number(startStats.profit ?? (numberStat(startStats, "totalPaid") - numberStat(startStats, "totalFee"))) || 0;
+  const playerProfit = snapshotProfit(snapshot) - startProfit;
+  return {playerTotalFee, playerTotalPaid, playerProfit, playerSpins, playerBigCount, playerRegCount, playerGrapeCount, startStats, baselineSource:baseline.source};
 }
 
 async function sendToSheets(record){
@@ -161,7 +172,7 @@ function resultPayload(session, machine, body){
   const settings = snapshot.settings || {};
   const delta = sessionDelta(session, snapshot);
   const endedAtMs = ms();
-  return {type:"slot-session-ended", endedAt:new Date(endedAtMs).toISOString(), endedAtMs, machineId:machine.machineId, machineName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : machine.machineId+"号機"), playerName:session.playerName || body.playerName || "", sessionId:session.sessionId, password:session.password, setting:settings.setting || machine.assignedSetting || "", totalSpins:stats.totalSpins || 0, bigCount:stats.bigCount || 0, regCount:stats.midCount || 0, grapeCount:stats.grapeCount || 0, totalFee:stats.totalFee || 0, totalPaid:stats.totalPaid || 0, profit:Number(stats.profit ?? ((stats.totalPaid || 0) - (stats.totalFee || 0))) || 0, playerSpins:delta.playerSpins, playerBigCount:delta.playerBigCount, playerRegCount:delta.playerRegCount, playerGrapeCount:delta.playerGrapeCount, playerTotalFee:delta.playerTotalFee, playerTotalPaid:delta.playerTotalPaid, playerProfit:delta.playerProfit, billingBasis:"playerProfit", startStats:delta.startStats, currentResultText:snapshot.state ? snapshot.state.resultText || "" : "", stats, settings, normalState:snapshot.normalState || {}, session:snapshot.session || {}};
+  return {type:"slot-session-ended", endedAt:new Date(endedAtMs).toISOString(), endedAtMs, machineId:machine.machineId, machineName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : machine.machineId+"号機"), playerName:session.playerName || body.playerName || "", sessionId:session.sessionId, password:session.password, resetSerial:Number(session.resetSerialAtStart ?? machine.resetSerial) || 0, setting:settings.setting || machine.assignedSetting || "", totalSpins:stats.totalSpins || 0, bigCount:stats.bigCount || 0, regCount:stats.midCount || 0, grapeCount:stats.grapeCount || 0, totalFee:stats.totalFee || 0, totalPaid:stats.totalPaid || 0, profit:Number(stats.profit ?? ((stats.totalPaid || 0) - (stats.totalFee || 0))) || 0, playerSpins:delta.playerSpins, playerBigCount:delta.playerBigCount, playerRegCount:delta.playerRegCount, playerGrapeCount:delta.playerGrapeCount, playerTotalFee:delta.playerTotalFee, playerTotalPaid:delta.playerTotalPaid, playerProfit:delta.playerProfit, billingBasis:"playerProfit", playerBaselineSource:delta.baselineSource, startStats:delta.startStats, currentResultText:snapshot.state ? snapshot.state.resultText || "" : "", stats, settings, normalState:snapshot.normalState || {}, session:snapshot.session || {}};
 }
 
 export default async function handler(req, res){
@@ -198,15 +209,15 @@ export default async function handler(req, res){
       if(requestedMachineId && requestedMachineId !== String(issued.machineId)) return json(res, 403, {ok:false, error:"このパスワードは別の台用です"});
       const machine = await getMachine(issued.machineId);
       const existingSession = issued.sessionId ? await getSession(issued.sessionId) : null;
-      const iframeUrl = "/jag.html?machine=" + encodeURIComponent(machine.machineId) + "&server=" + encodeURIComponent(origin) + "&creditBaseline=" + encodeURIComponent(String(snapshotProfit(machine.lastSnapshot || {})));
-      if(issued.status === "used" && existingSession && existingSession.status === "active") return json(res, 200, {ok:true, resumed:true, session:{sessionId:existingSession.sessionId, token:existingSession.token, machineId:machine.machineId, playerName:existingSession.playerName}, iframeUrl});
+      const iframeUrlFor = sessionId=>"/jag.html?machine=" + encodeURIComponent(machine.machineId) + "&server=" + encodeURIComponent(origin) + "&creditBaseline=" + encodeURIComponent(String(snapshotProfit(machine.lastSnapshot || {}))) + "&playSessionId=" + encodeURIComponent(String(sessionId || ""));
+      if(issued.status === "used" && existingSession && existingSession.status === "active") return json(res, 200, {ok:true, resumed:true, session:{sessionId:existingSession.sessionId, token:existingSession.token, machineId:machine.machineId, playerName:existingSession.playerName}, iframeUrl:iframeUrlFor(existingSession.sessionId)});
       if(issued.status !== "issued") return json(res, 403, {ok:false, error:"このパスワードは終了済みです"});
       if(machine.currentSessionId && machine.currentSessionId !== (existingSession && existingSession.sessionId)) return json(res, 409, {ok:false, error:"machine is busy"});
       const session = {sessionId:makeId("sess"), token:crypto.randomBytes(16).toString("hex"), password, machineId:machine.machineId, playerName:issued.playerName, status:"active", startedAt:ms(), endedAt:0, resetSerialAtStart:machine.resetSerial || 0, startSnapshot:machine.lastSnapshot || null};
       issued.status = "used"; issued.usedAt = ms(); issued.sessionId = session.sessionId;
       machine.locked = true; machine.currentSessionId = session.sessionId; machine.currentPlayerName = session.playerName;
       await saveIssued(issued); await saveSession(session); await upsertMachine(machine);
-      return json(res, 200, {ok:true, session:{sessionId:session.sessionId, token:session.token, machineId:machine.machineId, playerName:session.playerName}, iframeUrl});
+      return json(res, 200, {ok:true, session:{sessionId:session.sessionId, token:session.token, machineId:machine.machineId, playerName:session.playerName}, iframeUrl:iframeUrlFor(session.sessionId)});
     }
     if(pathname === "/api/sessions/end" && req.method === "POST"){
       const body = await readBody(req);
@@ -219,7 +230,7 @@ export default async function handler(req, res){
       await appendResult(record);
       const sheets = await sendToSheets(record);
       session.status = "ended"; session.endedAt = ms(); session.resultRecord = record; session.sheets = sheets;
-      machine.locked = true; machine.currentSessionId = ""; machine.currentPlayerName = ""; machine.lastEndedSession = {sessionId:session.sessionId, playerName:session.playerName, endedAt:session.endedAt, record, sheets};
+      machine.locked = false; machine.currentSessionId = ""; machine.currentPlayerName = ""; machine.lastEndedSession = {sessionId:session.sessionId, playerName:session.playerName, endedAt:session.endedAt, record, sheets};
       await saveSession(session); await upsertMachine(machine);
       return json(res, 200, {ok:true, record, sheets});
     }
@@ -273,8 +284,18 @@ export default async function handler(req, res){
       const machine = await getMachine(decodeURIComponent(m[1]));
       const session = machine.currentSessionId ? await getSession(machine.currentSessionId) : null;
       if(session && session.status === "active"){
-        const row = await insertCommand(machine.machineId, {type:"forceEnd", reason:"admin-force-end"});
-        return json(res, 200, {ok:true, queued:true, delivered:true, commandId:row.id});
+        const record = {...resultPayload(session, machine, {snapshot:machine.lastSnapshot || session.startSnapshot || {}}), forced:true, forcedBy:"admin"};
+        await appendResult(record);
+        const sheets = await sendToSheets(record);
+        session.status = "ended"; session.endedAt = ms(); session.resultRecord = record; session.sheets = sheets;
+        machine.locked = false; machine.currentSessionId = ""; machine.currentPlayerName = ""; machine.lastEndedSession = {sessionId:session.sessionId, playerName:session.playerName, endedAt:session.endedAt, record, sheets, forced:true};
+        await saveSession(session); await upsertMachine(machine);
+        return json(res, 200, {ok:true, forced:true, record, sheets});
+      }
+      if(machine.lastEndedSession){
+        machine.locked = false; machine.currentSessionId = ""; machine.currentPlayerName = "";
+        await upsertMachine(machine);
+        return json(res, 200, {ok:true, released:true, alreadyEnded:true, record:machine.lastEndedSession.record || null, sheets:machine.lastEndedSession.sheets || null});
       }
       if(!machine.lastSnapshot) return json(res, 400, {ok:false, error:"終了できるデータがありません"});
       const forcedSession = {sessionId:makeId("forced"), token:"", password:"", machineId:machine.machineId, playerName:machine.currentPlayerName || "強制終了", status:"active", startedAt:0, endedAt:0, startSnapshot:machine.lastSnapshot || null};

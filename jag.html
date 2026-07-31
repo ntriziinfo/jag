@@ -7995,10 +7995,13 @@ body{
   let adminCommandPollTimer = null;
   const ADMIN_COMMAND_LAST_ID_KEY = "jag_admin_command_last_id_" + machineId;
   let adminCommandLastId = Number(safeStorageGet(ADMIN_COMMAND_LAST_ID_KEY) || 0) || 0;
-  const ADMIN_STATE_PUSH_INTERVAL_MS = 60000;
+  const ADMIN_STATE_PUSH_INTERVAL_MS = 5000;
   const SLOT_DEBUG_ENABLED = adminParams.get("debug") === "1";
   const CREDIT_BASELINE_PROFIT = Number(adminParams.get("creditBaseline") || 0) || 0;
-  const SLOT_PLAY_SESSION = adminParams.has("creditBaseline");
+  const PLAY_SESSION_ID = String(adminParams.get("playSessionId") || "");
+  const SLOT_PLAY_SESSION = adminParams.has("creditBaseline") || !!PLAY_SESSION_ID;
+  const PLAY_SESSION_BASELINE_STORAGE_KEY = PLAY_SESSION_ID ? `jag_play_session_baseline_${PLAY_SESSION_ID}` : "";
+  let playSessionStartStats = null;
   if(SLOT_DEBUG_ENABLED) document.body.classList.add("debugMode");
   const PAGE_ZOOM_STORAGE_KEY = "jag_unified_page_zoom_v3";
   const PAGE_PAN_STORAGE_KEY = "jag_unified_page_pan_x_v3";
@@ -11283,10 +11286,46 @@ body{
     }
   }
 
+  function sessionBaselineStats(source=stats){
+    const totalFee = Math.max(0, Number(source && source.totalFee) || 0);
+    const totalPaid = Math.max(0, Number(source && source.totalPaid) || 0);
+    return {
+      totalFee,
+      totalPaid,
+      profit:totalPaid - totalFee,
+      totalSpins:Math.max(0, Number(source && source.totalSpins) || 0),
+      bigCount:Math.max(0, Number(source && source.bigCount) || 0),
+      midCount:Math.max(0, Number(source && source.midCount) || 0),
+      grapeCount:Math.max(0, Number(source && source.grapeCount) || 0)
+    };
+  }
+
+  function initializePlaySessionBaseline(){
+    if(!SLOT_PLAY_SESSION) return;
+    let saved = null;
+    if(PLAY_SESSION_BASELINE_STORAGE_KEY){
+      try{
+        const parsed = JSON.parse(safeStorageGet(PLAY_SESSION_BASELINE_STORAGE_KEY) || "null");
+        if(parsed && typeof parsed === "object") saved = sessionBaselineStats(parsed);
+      }catch(e){}
+    }
+    playSessionStartStats = saved || sessionBaselineStats(stats);
+    if(PLAY_SESSION_BASELINE_STORAGE_KEY){
+      safeStorageSet(PLAY_SESSION_BASELINE_STORAGE_KEY, JSON.stringify(playSessionStartStats));
+    }
+  }
+
+  function playSessionBaselineProfit(){
+    if(playSessionStartStats) return Number(playSessionStartStats.profit) || 0;
+    return CREDIT_BASELINE_PROFIT;
+  }
+
   function adminSnapshot(){
     const profit = stats.totalPaid - stats.totalFee;
     return {
       machineId,
+      playSessionId:PLAY_SESSION_ID,
+      playSessionStartStats:playSessionStartStats ? {...playSessionStartStats} : null,
       name: settings.title || machineId,
       settings:{
         title: settings.title,
@@ -11329,6 +11368,26 @@ body{
     }).catch(()=>{});
   }
 
+  function pushAdminStateOnExit(snapshot){
+    if(!ADMIN_SERVER || !machineId || machineId === "null" || machineId === "undefined") return;
+    const url = `${ADMIN_SERVER}/api/machines/${encodeURIComponent(machineId)}/state`;
+    const body = JSON.stringify(snapshot || adminSnapshot());
+    try{
+      if(window.navigator && typeof navigator.sendBeacon === "function"){
+        const blob = new Blob([body], {type:"application/json"});
+        if(navigator.sendBeacon(url, blob)) return;
+      }
+    }catch(e){}
+    try{
+      fetch(url, {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body,
+        keepalive:true
+      }).catch(()=>{});
+    }catch(e){}
+  }
+
   function scheduleAdminStatePush(delay=ADMIN_STATE_PUSH_INTERVAL_MS){
     if(adminPushTimer) return;
     adminPushTimer = setTimeout(()=>{
@@ -11352,7 +11411,13 @@ body{
   };
   window.__jagPushAdminState = ()=>pushAdminState(latestAdminSnapshot());
   window.__jagClearLocalPlayState = ()=>{
-    try{ if(window.localStorage){ localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(STORAGE_RESUME_KEY); } }catch(e){}
+    try{
+      if(window.localStorage){
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(STORAGE_RESUME_KEY);
+        if(PLAY_SESSION_BASELINE_STORAGE_KEY) localStorage.removeItem(PLAY_SESSION_BASELINE_STORAGE_KEY);
+      }
+    }catch(e){}
   };
 
   function applyAdminSettings(nextSettings){
@@ -11389,14 +11454,7 @@ body{
       morningResetGame(false, "管理リセット");
       setTimeout(()=>location.reload(), 250);
     }else if(command.type === "forceEnd"){
-      const snapshot = latestAdminSnapshot();
-      pushAdminState(snapshot);
-      try{
-        if(window.parent && window.parent !== window){
-          window.parent.postMessage({type:"jag-force-end", machineId, snapshot}, "*");
-        }
-      }catch(e){}
-      setTimeout(()=>location.reload(), 1200);
+      log("旧方式の強制終了指示を無視");
     }else if(command.type === "forceResult"){
       const requested = command.result === "REACH_ME" || RESULT[command.result] ? command.result : "";
       forceResult = normalizeForceResult(requested);
@@ -12805,7 +12863,7 @@ body{
       gogoChance.classList.toggle("is-bar-confirm", jagChanceBarConfirm);
       gogoChance.setAttribute("aria-pressed", jagChanceLit ? "true" : "false");
     }
-    const displayCredit = SLOT_PLAY_SESSION ? profit - CREDIT_BASELINE_PROFIT : profit;
+    const displayCredit = SLOT_PLAY_SESSION ? profit - playSessionBaselineProfit() : profit;
     const displayCount = active
       ? (isATypeBonusActive() ? aTypeBonusNet() : Math.max(0, Number(session.paid) || 0))
       : session.resultPayout !== null && session.resultPayout !== undefined
@@ -15846,16 +15904,26 @@ body{
       }
     });
 
+    let exitStatePushed = false;
+    const persistAndPushExitState = ()=>{
+      if(exitStatePushed) return;
+      exitStatePushed = true;
+      readSettings();
+      persistState();
+      pushAdminStateOnExit(adminSnapshot());
+    };
+    window.addEventListener("pagehide", persistAndPushExitState);
+    window.addEventListener("pageshow", ()=>{ exitStatePushed = false; });
     window.addEventListener("beforeunload", ()=>{
       if(autoTimer) clearTimeout(autoTimer);
       if(autoWatchdogTimer) clearInterval(autoWatchdogTimer);
       if(debugFastTimer) clearInterval(debugFastTimer);
-      readSettings();
-      persistState();
+      persistAndPushExitState();
     });
   }
 
   load();
+  initializePlaySessionBaseline();
   loadPageZoom();
   loadPagePan();
   loadLayoutDefaultState();

@@ -129,11 +129,14 @@ function publicMachine(machine){
     displayName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : `${machine.machineId}号機`),
     online:!!machine.online,
     locked:!!machine.locked,
+    currentSessionId:machine.currentSessionId || "",
     currentPlayerName:machine.currentPlayerName || "",
     updatedAt:machine.updatedAt || 0,
     resetSerial:machine.resetSerial || 0,
     assignedSetting:machine.assignedSetting || (stats && stats.setting) || (snapshot && snapshot.settings ? snapshot.settings.setting : 1),
     lastEndedSession:machine.lastEndedSession || null,
+    playSessionId:snapshot && snapshot.playSessionId || "",
+    playSessionStartStats:snapshot && snapshot.playSessionStartStats || null,
     stats,
     slumpHistory:stats && Array.isArray(stats.slumpHistory) ? stats.slumpHistory : [{spin:0, profit:0}]
   };
@@ -218,9 +221,19 @@ function snapshotProfit(snapshot){
   const stats = snapshot && snapshot.stats ? snapshot.stats : {};
   return Number(stats.profit ?? (numberStat(stats, "totalPaid") - numberStat(stats, "totalFee"))) || 0;
 }
+function sessionStartStats(session, snapshot){
+  const clientStartStats = snapshot && snapshot.playSessionStartStats;
+  const clientSessionId = String(snapshot && snapshot.playSessionId || "");
+  const expectedSessionId = String(session && session.sessionId || "");
+  if(clientStartStats && typeof clientStartStats === "object" && clientSessionId && clientSessionId === expectedSessionId){
+    return {stats:clientStartStats, source:"client-session-start"};
+  }
+  const startSnapshot = session && session.startSnapshot || {};
+  return {stats:startSnapshot.stats || {}, source:"server-machine-start"};
+}
 function sessionDelta(session, snapshot){
-  const start = session.startSnapshot || {};
-  const startStats = start.stats || {};
+  const baseline = sessionStartStats(session, snapshot);
+  const startStats = baseline.stats;
   const endStats = snapshot && snapshot.stats ? snapshot.stats : {};
   const playerTotalFee = Math.max(0, numberStat(endStats, "totalFee") - numberStat(startStats, "totalFee"));
   const playerTotalPaid = Math.max(0, numberStat(endStats, "totalPaid") - numberStat(startStats, "totalPaid"));
@@ -228,8 +241,9 @@ function sessionDelta(session, snapshot){
   const playerBigCount = Math.max(0, numberStat(endStats, "bigCount") - numberStat(startStats, "bigCount"));
   const playerRegCount = Math.max(0, numberStat(endStats, "midCount") - numberStat(startStats, "midCount"));
   const playerGrapeCount = Math.max(0, numberStat(endStats, "grapeCount") - numberStat(startStats, "grapeCount"));
-  const playerProfit = snapshotProfit(snapshot) - snapshotProfit(start);
-  return {playerTotalFee, playerTotalPaid, playerProfit, playerSpins, playerBigCount, playerRegCount, playerGrapeCount, startStats};
+  const startProfit = Number(startStats.profit ?? (numberStat(startStats, "totalPaid") - numberStat(startStats, "totalFee"))) || 0;
+  const playerProfit = snapshotProfit(snapshot) - startProfit;
+  return {playerTotalFee, playerTotalPaid, playerProfit, playerSpins, playerBigCount, playerRegCount, playerGrapeCount, startStats, baselineSource:baseline.source};
 }
 
 async function sendToSheets(record){
@@ -257,6 +271,7 @@ function resultPayload(session, machine, body){
     playerName:session.playerName || body.playerName || "",
     sessionId:session.sessionId,
     password:session.password,
+    resetSerial:Number(session.resetSerialAtStart ?? machine.resetSerial) || 0,
     setting:settings.setting || "",
     totalSpins:stats.totalSpins || 0,
     bigCount:stats.bigCount || 0,
@@ -273,6 +288,7 @@ function resultPayload(session, machine, body){
     playerTotalPaid:delta.playerTotalPaid,
     playerProfit:delta.playerProfit,
     billingBasis:"playerProfit",
+    playerBaselineSource:delta.baselineSource,
     startStats:delta.startStats,
     currentResultText:snapshot.state ? snapshot.state.resultText || "" : "",
     stats,
@@ -384,13 +400,13 @@ const server = http.createServer(async (req, res)=>{
       const machine = machineFor(issued.machineId);
       if(!machine) return sendJson(res, 400, {ok:false, error:"machine not found"});
       const existingSession = issued.sessionId ? state.sessions[issued.sessionId] : null;
-      const existingIframeUrl = `/jag.html?machine=${encodeURIComponent(machine.machineId)}&server=${encodeURIComponent(url.origin)}`;
+      const iframeUrlFor = sessionId=>`/jag.html?machine=${encodeURIComponent(machine.machineId)}&server=${encodeURIComponent(url.origin)}&creditBaseline=${encodeURIComponent(String(snapshotProfit(machine.lastSnapshot || {})))}&playSessionId=${encodeURIComponent(String(sessionId || ""))}`;
       if(issued.status === "used" && existingSession && existingSession.status === "active"){
         return sendJson(res, 200, {
           ok:true,
           resumed:true,
           session:{sessionId:existingSession.sessionId, token:existingSession.token, machineId:machine.machineId, playerName:existingSession.playerName},
-          iframeUrl:existingIframeUrl
+          iframeUrl:iframeUrlFor(existingSession.sessionId)
         });
       }
       if(issued.status !== "issued") return sendJson(res, 403, {ok:false, error:"このパスワードは終了済みです"});
@@ -418,8 +434,7 @@ const server = http.createServer(async (req, res)=>{
       machine.currentPlayerName = session.playerName;
       saveState();
       broadcastMachines();
-      const iframeUrl = `/jag.html?machine=${encodeURIComponent(machine.machineId)}&server=${encodeURIComponent(url.origin)}`;
-      return sendJson(res, 200, {ok:true, session:{sessionId, token, machineId:machine.machineId, playerName:session.playerName}, iframeUrl});
+      return sendJson(res, 200, {ok:true, session:{sessionId, token, machineId:machine.machineId, playerName:session.playerName}, iframeUrl:iframeUrlFor(sessionId)});
     }
 
     if(url.pathname === "/api/sessions/end" && req.method === "POST"){
@@ -429,6 +444,7 @@ const server = http.createServer(async (req, res)=>{
       if(session.status === "ended") return sendJson(res, 200, {ok:true, alreadyEnded:true, record:session.resultRecord || null});
       const machine = machineFor(session.machineId);
       if(!machine) return sendJson(res, 400, {ok:false, error:"machine not found"});
+      if(body.snapshot) machine.lastSnapshot = body.snapshot;
       const record = resultPayload(session, machine, body);
       appendResult(record);
       const sheets = await sendToSheets(record);
@@ -436,7 +452,7 @@ const server = http.createServer(async (req, res)=>{
       session.endedAt = Date.now();
       session.resultRecord = record;
       session.sheets = sheets;
-      machine.locked = true;
+      machine.locked = false;
       machine.currentSessionId = "";
       machine.currentPlayerName = "";
       machine.lastEndedSession = {sessionId:session.sessionId, playerName:session.playerName, endedAt:session.endedAt, record, sheets};
@@ -451,8 +467,32 @@ const server = http.createServer(async (req, res)=>{
       const machine = machineFor(decodeURIComponent(forceEndMatch[1]));
       if(!machine) return sendJson(res, 404, {ok:false, error:"machine not found"});
       const session = machine.currentSessionId ? state.sessions[machine.currentSessionId] : null;
+      if(session && session.status === "active"){
+        const record = {...resultPayload(session, machine, {snapshot:machine.lastSnapshot || session.startSnapshot || {}}), forced:true, forcedBy:"admin"};
+        appendResult(record);
+        const sheets = await sendToSheets(record);
+        session.status = "ended";
+        session.endedAt = Date.now();
+        session.resultRecord = record;
+        session.sheets = sheets;
+        machine.locked = false;
+        machine.currentSessionId = "";
+        machine.currentPlayerName = "";
+        machine.lastEndedSession = {sessionId:session.sessionId, playerName:session.playerName, endedAt:session.endedAt, record, sheets, forced:true};
+        saveState();
+        broadcastMachines();
+        return sendJson(res, 200, {ok:true, forced:true, record, sheets});
+      }
+      if(machine.lastEndedSession){
+        machine.locked = false;
+        machine.currentSessionId = "";
+        machine.currentPlayerName = "";
+        saveState();
+        broadcastMachines();
+        return sendJson(res, 200, {ok:true, released:true, alreadyEnded:true, record:machine.lastEndedSession.record || null, sheets:machine.lastEndedSession.sheets || null});
+      }
       if(!session && !machine.lastSnapshot) return sendJson(res, 400, {ok:false, error:"終了できるデータがありません"});
-      const forcedSession = session || {
+      const forcedSession = {
         sessionId:makeId("forced"),
         token:"",
         password:"",
@@ -466,12 +506,6 @@ const server = http.createServer(async (req, res)=>{
       const record = {...resultPayload(forcedSession, machine, {}), forced:true, forcedBy:"admin"};
       appendResult(record);
       const sheets = await sendToSheets(record);
-      if(session){
-        session.status = "ended";
-        session.endedAt = Date.now();
-        session.resultRecord = record;
-        session.sheets = sheets;
-      }
       machine.locked = false;
       machine.currentSessionId = "";
       machine.currentPlayerName = "";
