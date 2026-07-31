@@ -296,6 +296,7 @@ function renderMachines(){
       </div>
       <div class="row">
         <label class="field"><span>設定</span><select class="settingMini" id="setting-${m.machineId}">${[1,2,3,4,5,6].map(n => '<option value="' + n + '" ' + (String((settingStats.setting || m.assignedSetting || 1)) === String(n) ? 'selected' : '') + '>設定' + n + '</option>').join('')}</select></label>
+        <label class="field"><span>コンプリート発動枚数</span><input class="settingMini" id="complete-limit-${m.machineId}" type="number" min="1" max="999999" step="1" value="${Math.max(1, Number(m.settings && m.settings.completeLimitPt) || 19000)}"></label>
         <button onclick="applySetting('${m.machineId}')">設定反映</button>
         <button class="danger" ${m.currentSessionId || m.lastEndedSession || m.stats ? '' : 'disabled'} onclick="forceEndMachine('${m.machineId}')">強制終了</button>
         <button class="danger" onclick="resetMachine('${m.machineId}')">管理リセット</button>
@@ -333,10 +334,12 @@ async function issue(){
 async function applySetting(id){
   const el = document.getElementById('setting-' + id);
   const value = el ? el.value : '1';
-  const res = await fetch('/api/admin/machines/' + encodeURIComponent(id) + '/setting', {method:'POST', headers:{'Content-Type':'application/json', ...adminHeaders()}, body:JSON.stringify({setting:value})});
+  const completeLimitEl = document.getElementById('complete-limit-' + id);
+  const completeLimitPt = Math.max(1, Math.min(999999, Math.round(Number(completeLimitEl && completeLimitEl.value) || 19000)));
+  const res = await fetch('/api/admin/machines/' + encodeURIComponent(id) + '/setting', {method:'POST', headers:{'Content-Type':'application/json', ...adminHeaders()}, body:JSON.stringify({setting:value, completeLimitPt})});
   const data = await res.json();
   if(!data.ok){ alert(data.error || '設定反映に失敗しました'); return; }
-  alert(id + '号機を設定' + data.setting + 'にしました' + (data.delivered ? '' : '（台が未接続なので、表示上の設定として保存しました）'));
+  alert(id + '号機へ設定' + data.setting + '・コンプリート' + data.completeLimitPt + '枚を反映しました');
   await loadMachines();
 }
 async function forceEndMachine(id){

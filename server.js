@@ -125,6 +125,7 @@ function sseSend(res, event, data){
 function publicMachine(machine, machineTotal){
   const snapshot = machine.lastSnapshot || null;
   const stats = snapshot && snapshot.stats ? snapshot.stats : null;
+  const settings = snapshot && snapshot.settings ? snapshot.settings : {setting:machine.assignedSetting || 1, completeLimitPt:19000};
   return {
     machineId:machine.machineId,
     displayName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : `${machine.machineId}号機`),
@@ -134,10 +135,11 @@ function publicMachine(machine, machineTotal){
     currentPlayerName:machine.currentPlayerName || "",
     updatedAt:machine.updatedAt || 0,
     resetSerial:machine.resetSerial || 0,
-    assignedSetting:machine.assignedSetting || (stats && stats.setting) || (snapshot && snapshot.settings ? snapshot.settings.setting : 1),
+    assignedSetting:machine.assignedSetting || (stats && stats.setting) || settings.setting || 1,
     lastEndedSession:machine.lastEndedSession || null,
     playSessionId:snapshot && snapshot.playSessionId || "",
     playSessionStartStats:snapshot && snapshot.playSessionStartStats || null,
+    settings,
     stats,
     slumpHistory:stats && Array.isArray(stats.slumpHistory) ? stats.slumpHistory : [{spin:0, profit:0}],
     machineTotalStats:machineTotal.stats,
@@ -552,11 +554,14 @@ const server = http.createServer(async (req, res)=>{
       if(!adminOk(req)) return sendJson(res, 401, {ok:false, error:"admin password required"});
       const machine = machineFor(decodeURIComponent(resetMatch[1]));
       if(!machine) return sendJson(res, 404, {ok:false, error:"machine not found"});
+      const preservedSettings = machine.lastSnapshot && machine.lastSnapshot.settings
+        ? machine.lastSnapshot.settings
+        : {setting:machine.assignedSetting || 1, completeLimitPt:19000};
       machine.locked = false;
       machine.currentSessionId = "";
       machine.currentPlayerName = "";
       machine.lastEndedSession = null;
-      machine.lastSnapshot = null;
+      machine.lastSnapshot = {machineId:machine.machineId, stats:null, settings:preservedSettings, updatedAt:Date.now()};
       machine.resetSerial = (Number(machine.resetSerial) || 0) + 1;
       const delivered = sendCommand(machine.machineId, {type:"reset", reason:"admin-reset", id:makeId("cmd")});
       saveState();
@@ -618,8 +623,9 @@ const server = http.createServer(async (req, res)=>{
       if(!machine) return sendJson(res, 404, {ok:false, error:"machine not found"});
       const body = await readBody(req);
       const setting = Math.max(1, Math.min(6, Math.round(Number(body.setting) || 1)));
+      const completeLimitPt = Math.max(1, Math.min(999999, Math.round(Number(body.completeLimitPt) || 19000)));
       const currentSettings = machine.lastSnapshot && machine.lastSnapshot.settings ? machine.lastSnapshot.settings : {};
-      const settings = {...currentSettings, setting};
+      const settings = {...currentSettings, setting, completeLimitPt};
       machine.assignedSetting = setting;
       machine.lastSnapshot = machine.lastSnapshot || {machineId:machine.machineId, stats:{}, settings:{}, updatedAt:Date.now()};
       machine.lastSnapshot.settings = settings;
@@ -627,7 +633,7 @@ const server = http.createServer(async (req, res)=>{
       const delivered = sendCommand(machine.machineId, {type:"applySettings", settings, id:makeId("cmd")});
       saveState();
       broadcastMachines();
-      return sendJson(res, 200, {ok:true, setting, delivered});
+      return sendJson(res, 200, {ok:true, setting, completeLimitPt, delivered});
     }
 
     const commandMatch = url.pathname.match(/^\/api\/machines\/([^/]+)\/command$/);

@@ -7573,7 +7573,8 @@ body{
     movieVolume:DEFAULT_MOVIE_VOLUME,
     rogiMovieVolume:DEFAULT_ROGI_MOVIE_VOLUME,
     audioMuted:false,
-    audioBalanceVersion:AUDIO_BALANCE_VERSION
+    audioBalanceVersion:AUDIO_BALANCE_VERSION,
+    completeLimitPt:19000
   };
 
   let stats = {
@@ -7823,8 +7824,7 @@ body{
   const SPEED_MODE_MAX_SPINS_PER_SECOND = 10;
   const SPEED_MODE_MULTIPLIER = 3;
   const COMPLETE_TRIAL_ENABLED = true;
-  const COMPLETE_LOCK_ENABLED = false;
-  const COMPLETE_LIMIT_PT = 2000;
+  const DEFAULT_COMPLETE_LIMIT_PT = 19000;
   const SLUMP_MAX_HISTORY_POINTS = 20000;
   const SLUMP_MAX_DRAW_POINTS = 1400;
   let autoPlay = false;
@@ -10462,8 +10462,12 @@ body{
     return currentProfit();
   }
 
+  function completeLimitPt(){
+    return Math.max(0, Math.round(Number(settings.completeLimitPt) || 0));
+  }
+
   function isCompleteLockEnabled(){
-    return COMPLETE_TRIAL_ENABLED && COMPLETE_LOCK_ENABLED;
+    return COMPLETE_TRIAL_ENABLED && completeLimitPt() > 0;
   }
 
   function isCompleteTrialLocked(){
@@ -10496,16 +10500,17 @@ body{
     if(!COMPLETE_TRIAL_ENABLED) return false;
     const profit = completeTrialProfit();
 
-    if(isCompleteLockEnabled() && !completeTrialState.locked && profit >= COMPLETE_LIMIT_PT){
+    const limit = completeLimitPt();
+    if(isCompleteLockEnabled() && !completeTrialState.locked && profit >= limit){
       completeTrialState.locked = true;
       completeTrialState.lockedSetting = Number(settings.setting) || 1;
       completeTrialState.completeProfit = profit;
       stopAutoPlay("COMPLETE到達のためAUTO停止");
       stopSpeedToBonus("COMPLETE到達のためSPEED停止");
       stopDebugFastSpin("COMPLETE到達");
-      showOverlay("COMPLETE");
-      showMessage("COMPLETE", `+${COMPLETE_LIMIT_PT}pt到達 / 設定変更まで遊戯不可`);
-      log(`[COMPLETE] +${COMPLETE_LIMIT_PT}pt到達：${formatSigned(profit)}pt / 設定${completeTrialState.lockedSetting}`);
+      showOverlay("コンプリートしました。");
+      showMessage("コンプリートしました。", `+${limit}pt到達 / 管理リセットまたは設定変更まで遊技できません`);
+      log(`[COMPLETE] +${limit}pt到達：${formatSigned(profit)}pt / 設定${completeTrialState.lockedSetting}`);
       persistState();
       updateDisplay();
     }
@@ -10518,8 +10523,8 @@ body{
     stopAutoPlay("COMPLETE中のためAUTO停止");
     stopSpeedToBonus("COMPLETE中のためSPEED停止");
     stopDebugFastSpin("COMPLETE中");
-    showMessage("COMPLETE", `+${COMPLETE_LIMIT_PT}pt到達 / 設定変更まで遊戯不可`);
-    showOverlay("COMPLETE");
+    showMessage("コンプリートしました。", `+${completeLimitPt()}pt到達 / 管理リセットまたは設定変更まで遊技できません`);
+    showOverlay("コンプリートしました。");
     return false;
   }
 
@@ -11114,6 +11119,7 @@ body{
         settings.masterVolume = Object.prototype.hasOwnProperty.call(data.settings, "masterVolume") && Number.isFinite(savedMasterVolume) ? clamp(savedMasterVolume, 0, 1) : DEFAULT_MASTER_VOLUME;
         settings.audioBalanceVersion = AUDIO_BALANCE_VERSION;
       }
+      settings.completeLimitPt = Math.max(1, Math.round(Number(settings.completeLimitPt) || DEFAULT_COMPLETE_LIMIT_PT));
       settings.title = normalizeMachineTitle(settings.title);
       if(!SETTING[settings.setting]) settings.setting = 1;
       if(data?.stats) stats = {...stats, ...data.stats};
@@ -11174,7 +11180,7 @@ body{
           rescueActive:false,
           completeProfit:Number(data.completeTrialState.completeProfit) || 0
         };
-        if(!COMPLETE_LOCK_ENABLED){
+        if(!isCompleteLockEnabled()){
           completeTrialState.locked = false;
           completeTrialState.lockedSetting = 0;
           completeTrialState.completeProfit = 0;
@@ -11352,7 +11358,8 @@ body{
         payoutVolume: settings.payoutVolume,
         movieVolume: settings.movieVolume,
         rogiMovieVolume: settings.rogiMovieVolume,
-        audioMuted: settings.audioMuted
+        audioMuted: settings.audioMuted,
+        completeLimitPt: completeLimitPt()
       },
       stats:{...stats, profit},
       normalState:{...normalState},
@@ -11451,6 +11458,9 @@ body{
     setValue("movieVolume", nextSettings.movieVolume);
     setValue("rogiMovieVolume", nextSettings.rogiMovieVolume);
     if(nextSettings.audioMuted !== undefined) settings.audioMuted = !!nextSettings.audioMuted;
+    if(nextSettings.completeLimitPt !== undefined){
+      settings.completeLimitPt = Math.max(1, Math.round(Number(nextSettings.completeLimitPt) || DEFAULT_COMPLETE_LIMIT_PT));
+    }
     readSettings();
     safeStorageSet(STORAGE_KEY, JSON.stringify({settings, stats, normalState, completeTrialState}));
     updateDisplay();

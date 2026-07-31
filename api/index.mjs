@@ -81,7 +81,8 @@ function machineFromRow(row){
 function publicMachine(machine, machineTotal){
   const snapshot = machine.lastSnapshot || null;
   const stats = snapshot && snapshot.stats ? snapshot.stats : null;
-  return {machineId:machine.machineId, displayName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : machine.machineId+"号機"), online:!!machine.online, locked:!!machine.locked, currentSessionId:machine.currentSessionId || "", currentPlayerName:machine.currentPlayerName || "", updatedAt:machine.updatedAt || 0, resetSerial:machine.resetSerial || 0, assignedSetting:machine.assignedSetting || (stats && stats.setting) || (snapshot && snapshot.settings ? snapshot.settings.setting : 1), lastEndedSession:machine.lastEndedSession || null, playSessionId:snapshot && snapshot.playSessionId || "", playSessionStartStats:snapshot && snapshot.playSessionStartStats || null, stats, slumpHistory:stats && Array.isArray(stats.slumpHistory) ? stats.slumpHistory : [{spin:0, profit:0}], machineTotalStats:machineTotal.stats, machineTotalSlumpHistory:machineTotal.history};
+  const settings = snapshot && snapshot.settings ? snapshot.settings : {setting:machine.assignedSetting || 1, completeLimitPt:19000};
+  return {machineId:machine.machineId, displayName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : machine.machineId+"号機"), online:!!machine.online, locked:!!machine.locked, currentSessionId:machine.currentSessionId || "", currentPlayerName:machine.currentPlayerName || "", updatedAt:machine.updatedAt || 0, resetSerial:machine.resetSerial || 0, assignedSetting:machine.assignedSetting || (stats && stats.setting) || settings.setting || 1, lastEndedSession:machine.lastEndedSession || null, playSessionId:snapshot && snapshot.playSessionId || "", playSessionStartStats:snapshot && snapshot.playSessionStartStats || null, settings, stats, slumpHistory:stats && Array.isArray(stats.slumpHistory) ? stats.slumpHistory : [{spin:0, profit:0}], machineTotalStats:machineTotal.stats, machineTotalSlumpHistory:machineTotal.history};
 }
 async function getMachine(id){
   const rows = await sb("machine_states?machine_id=eq." + encodeURIComponent(String(id)) + "&select=*&limit=1");
@@ -298,21 +299,25 @@ export default async function handler(req, res){
       const id = decodeURIComponent(m[1]);
       const body = await readBody(req);
       const setting = Math.max(1, Math.min(6, Math.round(Number(body.setting) || 1)));
+      const completeLimitPt = Math.max(1, Math.min(999999, Math.round(Number(body.completeLimitPt) || 19000)));
       const machine = await getMachine(id);
       const currentSettings = machine.lastSnapshot && machine.lastSnapshot.settings ? machine.lastSnapshot.settings : {};
       machine.assignedSetting = setting;
       machine.lastSnapshot = machine.lastSnapshot || {machineId:machine.machineId, stats:{}, settings:{}, updatedAt:ms()};
-      machine.lastSnapshot.settings = {...currentSettings, setting};
+      machine.lastSnapshot.settings = {...currentSettings, setting, completeLimitPt};
       machine.lastSnapshot.updatedAt = ms();
       await upsertMachine(machine);
       const row = await insertCommand(machine.machineId, {type:"applySettings", settings:machine.lastSnapshot.settings});
-      return json(res, 200, {ok:true, setting, delivered:true, commandId:row.id});
+      return json(res, 200, {ok:true, setting, completeLimitPt, delivered:true, commandId:row.id});
     }
     m = pathname.match(/^\/api\/admin\/machines\/([^/]+)\/reset$/);
     if(m && req.method === "POST"){
       if(!adminOk(req)) return json(res, 401, {ok:false, error:"admin password required"});
       const machine = await getMachine(decodeURIComponent(m[1]));
-      machine.locked = false; machine.currentSessionId = ""; machine.currentPlayerName = ""; machine.lastEndedSession = null; machine.lastSnapshot = null; machine.resetSerial = Number(machine.resetSerial || 0) + 1;
+      const preservedSettings = machine.lastSnapshot && machine.lastSnapshot.settings
+        ? machine.lastSnapshot.settings
+        : {setting:machine.assignedSetting || 1, completeLimitPt:19000};
+      machine.locked = false; machine.currentSessionId = ""; machine.currentPlayerName = ""; machine.lastEndedSession = null; machine.lastSnapshot = {machineId:machine.machineId, stats:null, settings:preservedSettings, updatedAt:ms()}; machine.resetSerial = Number(machine.resetSerial || 0) + 1;
       await upsertMachine(machine);
       const row = await insertCommand(machine.machineId, {type:"reset", reason:"admin-reset"});
       return json(res, 200, {ok:true, delivered:true, commandId:row.id});
