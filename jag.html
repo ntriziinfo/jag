@@ -12866,9 +12866,7 @@ body{
     const displayCredit = SLOT_PLAY_SESSION ? profit - playSessionBaselineProfit() : profit;
     const displayCount = active
       ? (isATypeBonusActive() ? aTypeBonusNet() : Math.max(0, Number(session.paid) || 0))
-      : session.resultPayout !== null && session.resultPayout !== undefined
-        ? Math.max(0, Number(session.resultPayout) || 0)
-        : Math.max(0, Number(jagLastBonusPayout) || 0);
+      : 0;
     setText("jagCreditMeter", formatCreditDifference(displayCredit));
     setText("jagCountMeter", formatMeterDigits(displayCount, 3, 999));
     setText("jagGamePayoutMeter", formatMeterDigits(jagLastGamePayout, 3, 999));
