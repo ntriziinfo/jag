@@ -226,6 +226,7 @@ h1{
 .audioToggleBtn:focus-visible,
 .audioDock.slumpOpen #slumpToggleBtn,
 .audioDock.oddsOpen #oddsToggleBtn,
+.audioDock.counterOpen #roleCounterToggleBtn,
 .utilityToggleBtn:focus-visible{
   outline:2px solid rgba(77,231,255,.72);
   outline-offset:2px;
@@ -521,7 +522,8 @@ body.layoutEditOpen .jagBonusDataMeters{
   overflow:auto;
 }
 .audioDock.slumpOpen #slumpPanel,
-.audioDock.oddsOpen #oddsPanel{
+.audioDock.oddsOpen #oddsPanel,
+.audioDock.counterOpen #roleCounterPanel{
   position:fixed;
   left:var(--wd-info-panel-left, 50vw);
   top:var(--wd-info-panel-top, 84px);
@@ -538,8 +540,22 @@ body.layoutEditOpen .jagBonusDataMeters{
 }
 .audioDock.open .audioPanel,
 .audioDock.slumpOpen #slumpPanel,
-.audioDock.oddsOpen #oddsPanel{
+.audioDock.oddsOpen #oddsPanel,
+.audioDock.counterOpen #roleCounterPanel{
   display:block;
+}
+#roleCounterPanel{
+  width:min(560px, calc(100vw - 32px));
+}
+.roleCounterTable td:first-child{
+  color:#eaf8ff;
+  font-weight:1000;
+}
+.roleCounterTable td:not(:first-child){
+  text-align:right;
+}
+.roleCounterTable td:nth-child(2){
+  color:#fff;
 }
 .audioPanelHead,
 .infoPanelHead{
@@ -6591,6 +6607,9 @@ body{
         <button class="utilityToggleBtn" id="oddsToggleBtn" type="button" aria-label="確率表を開く" aria-expanded="false" title="確率表">
           <img src="assets/ui/icon_odds_percent_blue.png" alt="">
         </button>
+        <button class="utilityToggleBtn" id="roleCounterToggleBtn" type="button" aria-label="役カウンターを開く" aria-expanded="false" title="役カウンター">
+          <span class="utilityGlyph">役</span>
+        </button>
         <button class="audioToggleBtn" id="audioToggleBtn" type="button" aria-label="音量を開く" aria-expanded="false" title="音量">
           <img src="assets/ui/icon_sound_red.png" alt="">
         </button>
@@ -6688,6 +6707,26 @@ body{
             <table class="oddsTable" id="settingTable"></table>
             <h2>REG確率詳細</h2>
             <table class="oddsTable" id="regDetailTable"></table>
+          </div>
+        </div>
+        <div class="infoPanel" id="roleCounterPanel">
+          <div class="infoPanelHead">
+            <div class="infoPanelTitle">役カウンター</div>
+            <button class="infoCloseBtn" id="roleCounterCloseBtn" type="button" aria-label="役カウンターを閉じる" title="閉じる">×</button>
+          </div>
+          <div id="roleCounterPanelBody">
+            <h2>全役カウンター</h2>
+            <table class="oddsTable roleCounterTable">
+              <tr><td>役</td><td>回数</td><td>実践値</td></tr>
+              <tr><td>BB</td><td id="roleCounterBigCount">0</td><td id="roleCounterBigOdds">-</td></tr>
+              <tr><td>PBB</td><td id="roleCounterPremiumBigCount">0</td><td id="roleCounterPremiumBigOdds">-</td></tr>
+              <tr><td>RB</td><td id="roleCounterRegCount">0</td><td id="roleCounterRegOdds">-</td></tr>
+              <tr><td>ブドウ</td><td id="roleCounterGrapeCount">0</td><td id="roleCounterGrapeOdds">-</td></tr>
+              <tr><td>リプレイ</td><td id="roleCounterReplayCount">0</td><td id="roleCounterReplayOdds">-</td></tr>
+              <tr><td>ベル</td><td id="roleCounterBellCount">0</td><td id="roleCounterBellOdds">-</td></tr>
+              <tr><td>宗介</td><td id="roleCounterPieroCount">0</td><td id="roleCounterPieroOdds">-</td></tr>
+              <tr><td>チェリー</td><td id="roleCounterCherryCount">0</td><td id="roleCounterCherryOdds">-</td></tr>
+            </table>
           </div>
         </div>
         <div class="audioPanel" id="audioPanel">
@@ -7055,7 +7094,7 @@ body{
           <input id="bigAddInput" type="number" min="0" max="1000" step="1" value="252" readonly />
         </div>
         <div class="help">
-          BBは252pt、RBは96pt、ブドウは8pt、ベルは10pt、ゾウリプレイは3pt、ピエロ特殊役は14pt、チェリーは中段1pt・上下段2pt。
+          BBは252pt、RBは96pt、ブドウは8pt、ベルは10pt、ゾウリプレイは3pt、宗介特殊役は14pt、チェリーは中段1pt・上下段2pt。
         </div>
       </div>
 
@@ -7068,7 +7107,7 @@ body{
             <option value="MISS">ハズレ</option>
             <option value="REPLAY">リプレイ（3pt）</option>
             <option value="GRAPE">ブドウ（8pt）</option>
-            <option value="SMALL">特殊役（ピエロ/14pt）</option>
+            <option value="SMALL">特殊役（宗介/14pt）</option>
             <option value="CHERRY_ANY">チェリー（中段1pt・上下段2pt）</option>
             <option value="MID">RB（77BAR/96pt）</option>
             <option value="MID_CHERRY">RBチェリー同時（77BAR/96pt）</option>
@@ -7544,6 +7583,7 @@ body{
     roleStatVersion:ROLE_STAT_COUNTER_VERSION,
     bigCount:0,
     midCount:0,
+    premiumBigCount:0,
     grapeCount:0,
     smallCount:0,
     bellCount:0,
@@ -7873,6 +7913,7 @@ body{
   const audioDock = $("audioDock");
   const slumpToggleBtn = $("slumpToggleBtn");
   const oddsToggleBtn = $("oddsToggleBtn");
+  const roleCounterToggleBtn = $("roleCounterToggleBtn");
   const reelSlumpToggleBtn = $("reelSlumpToggleBtn");
   const reelOddsToggleBtn = $("reelOddsToggleBtn");
   const reelDataToggleBtn = $("reelDataToggleBtn");
@@ -7881,6 +7922,7 @@ body{
   const audioCloseBtn = $("audioCloseBtn");
   const slumpCloseBtn = $("slumpCloseBtn");
   const oddsCloseBtn = $("oddsCloseBtn");
+  const roleCounterCloseBtn = $("roleCounterCloseBtn");
   const pageZoomOutBtn = $("pageZoomOutBtn");
   const pageZoomResetBtn = $("pageZoomResetBtn");
   const pageZoomInBtn = $("pageZoomInBtn");
@@ -8640,17 +8682,30 @@ body{
     audioToggleBtn.setAttribute("aria-label", open ? "音量を閉じる" : "音量を開く");
   }
 
+  function infoPanelClassForType(type){
+    if(type === "slump") return "slumpOpen";
+    if(type === "counter") return "counterOpen";
+    return "oddsOpen";
+  }
+
+  function infoPanelButtonForType(type){
+    if(type === "slump") return slumpToggleBtn;
+    if(type === "counter") return roleCounterToggleBtn;
+    return oddsToggleBtn;
+  }
+
   function closeInfoPanels(){
     if(!audioDock) return;
-    audioDock.classList.remove("slumpOpen","oddsOpen");
+    audioDock.classList.remove("slumpOpen","oddsOpen","counterOpen");
     if(slumpToggleBtn) slumpToggleBtn.setAttribute("aria-expanded", "false");
     if(oddsToggleBtn) oddsToggleBtn.setAttribute("aria-expanded", "false");
+    if(roleCounterToggleBtn) roleCounterToggleBtn.setAttribute("aria-expanded", "false");
     updateReelInfoButtons();
   }
 
   function isInfoPanelOpen(type){
     if(!audioDock) return false;
-    return audioDock.classList.contains(type === "slump" ? "slumpOpen" : "oddsOpen");
+    return audioDock.classList.contains(infoPanelClassForType(type));
   }
 
   function updateReelInfoButtons(){
@@ -8695,7 +8750,9 @@ body{
       ? $("slumpPanel")
       : audioDock && audioDock.classList.contains("oddsOpen")
         ? $("oddsPanel")
-        : null;
+        : audioDock && audioDock.classList.contains("counterOpen")
+          ? $("roleCounterPanel")
+          : null;
     const viewW = window.innerWidth || root.clientWidth || PAGE_STAGE_WIDTH;
     let left = viewW / 2;
     let top = 16;
@@ -8730,7 +8787,7 @@ body{
   }
 
   function syncInfoPanelPositionIfOpen(){
-    if(audioDock && (audioDock.classList.contains("slumpOpen") || audioDock.classList.contains("oddsOpen"))){
+    if(audioDock && (audioDock.classList.contains("slumpOpen") || audioDock.classList.contains("oddsOpen") || audioDock.classList.contains("counterOpen"))){
       syncInfoPanelPosition();
     }
   }
@@ -8744,8 +8801,8 @@ body{
       return;
     }
     const isSlump = type === "slump";
-    audioDock.classList.add(isSlump ? "slumpOpen" : "oddsOpen");
-    const btn = isSlump ? slumpToggleBtn : oddsToggleBtn;
+    audioDock.classList.add(infoPanelClassForType(type));
+    const btn = infoPanelButtonForType(type);
     if(btn) btn.setAttribute("aria-expanded", "true");
     syncInfoPanelPosition();
     updateReelInfoButtons();
@@ -10237,8 +10294,16 @@ body{
     return normalState.morningCeilingActive ? MORNING_CEILING_GAMES : NORMAL_CEILING_GAMES;
   }
 
+  function normalizeBonusAfterGames(value){
+    return Math.max(0, Math.floor(Number(value) || 0));
+  }
+
+  function nextBonusAfterGames(value=normalState.sinceBonus){
+    return normalizeBonusAfterGames(value) + 1;
+  }
+
   function ceilingRemain(){
-    return Math.max(0, currentNormalCeilingGames() - (Number(normalState.sinceBonus) || 0));
+    return Math.max(0, currentNormalCeilingGames() - normalizeBonusAfterGames(normalState.sinceBonus));
   }
 
   function resetNormalModeAfterBonus(){
@@ -10320,8 +10385,11 @@ body{
   }
 
   function countRoleStat(result, includeBonus=false){
-    if(includeBonus && result === "BIG"){
+    if(includeBonus && (result === "BIG" || result === "BAR3")){
       stats.bigCount++;
+      if(result === "BAR3"){
+        stats.premiumBigCount = (Number(stats.premiumBigCount) || 0) + 1;
+      }
     }else if(includeBonus && (result === "MID" || result === "MID_CHERRY")){
       stats.midCount++;
     }else if(result === "GRAPE"){
@@ -10797,7 +10865,7 @@ body{
       }
 
       if(pendingForceResult === "REACH_ME"){
-        const gamesSinceLastBonusAtStart = Math.max(0, Number(normalState.sinceBonus) || 0);
+        const gamesSinceLastBonusAtStart = normalizeBonusAfterGames(normalState.sinceBonus);
         pendingATypeInternalBonus = {kind:"BIG", source:"リーチ目強制", internalResult:"REACH_ME", gamesSinceLastBonusAtStart};
         return "MISS";
       }
@@ -10824,7 +10892,7 @@ body{
       const replayP = clamp((1 / replay) * multiplier, 0, 0.98 - soloCherryP - bigCherryP - regCherryP - bigSoloP - regSoloP - grapeP);
       const bellP = clamp((1 / bell) * multiplier, 0, 0.98 - soloCherryP - bigCherryP - regCherryP - bigSoloP - regSoloP - grapeP - replayP);
       const pierrotP = clamp((1 / pierrot) * multiplier, 0, 0.98 - soloCherryP - bigCherryP - regCherryP - bigSoloP - regSoloP - grapeP - replayP - bellP);
-      const gamesSinceLastBonusAtStart = Math.max(0, Number(normalState.sinceBonus) || 0);
+      const gamesSinceLastBonusAtStart = normalizeBonusAfterGames(normalState.sinceBonus);
       if(roll < soloCherryP){
         return "CHERRY_ANY";
       }
@@ -10896,10 +10964,10 @@ body{
       const isBig = bonusKind === "BIG" && (isNewBonusHit || isReadyBonus);
       const isReg = bonusKind === "MID" && (isNewBonusHit || isReadyBonus);
       const gamesSinceLastBonusAtStart = internalBonus
-        ? Math.max(0, Number(internalBonus.gamesSinceLastBonusAtStart) || 0)
+        ? normalizeBonusAfterGames(internalBonus.gamesSinceLastBonusAtStart)
         : bonusPendingAtStart
-          ? Math.max(0, Number(normalState.bonusHitGamesSince) || 0)
-          : Math.max(0, Number(normalState.sinceBonus) || 0);
+          ? normalizeBonusAfterGames(normalState.bonusHitGamesSince)
+          : normalizeBonusAfterGames(normalState.sinceBonus);
       const bonusSource = internalBonus
         ? internalBonus.source
         : bonusPendingAtStart
@@ -10924,7 +10992,7 @@ body{
         bonusWaitSpin:bonusPendingAtStart && !isReadyBonus,
         bonusWaitGamesAtStart:0,
         highAdd:0,
-        ceilingAfter:(isNewBonusHit || isReadyBonus) ? 0 : Math.max(0, gamesSinceLastBonusAtStart + 1),
+        ceilingAfter:(isNewBonusHit || isReadyBonus) ? 0 : nextBonusAfterGames(gamesSinceLastBonusAtStart),
         gamesSinceLastBonusAtStart,
         bonusHit:isNewBonusHit,
         bonusReady:isReadyBonus && isBig,
@@ -11036,12 +11104,14 @@ body{
       settings.title = normalizeMachineTitle(settings.title);
       if(!SETTING[settings.setting]) settings.setting = 1;
       if(data?.stats) stats = {...stats, ...data.stats};
+      stats.premiumBigCount = Math.max(0, Number(stats.premiumBigCount) || 0);
       if((Number(stats.roleStatVersion) || 0) < ROLE_STAT_COUNTER_VERSION){
         stats.normalSpins = 0;
         stats.highSpins = 0;
         stats.grapeCount = 0;
         stats.smallCount = 0;
         stats.bellCount = 0;
+        stats.premiumBigCount = 0;
         stats.diagonalBellCount = 0;
         stats.replayCount = 0;
         stats.suikaCount = 0;
@@ -11056,18 +11126,18 @@ body{
           ...normalState,
           ...data.normalState,
           highRemain:Math.max(0, Number(data.normalState.highRemain) || 0),
-          sinceBonus:Math.max(0, Number(data.normalState.sinceBonus) || 0),
+          sinceBonus:normalizeBonusAfterGames(data.normalState.sinceBonus),
           bonusPending:!!data.normalState.bonusPending,
           bonusKind:String(data.normalState.bonusKind || ""),
           bonusSource:String(data.normalState.bonusSource || ""),
           premiumBonus:!!data.normalState.premiumBonus,
           oneGameRenBonus:!!data.normalState.oneGameRenBonus,
           bonusWaitGames:Math.max(0, Number(data.normalState.bonusWaitGames) || 0),
-          bonusHitGamesSince:Math.max(0, Number(data.normalState.bonusHitGamesSince) || 0),
+          bonusHitGamesSince:normalizeBonusAfterGames(data.normalState.bonusHitGamesSince),
           reachMePending:!!data.normalState.reachMePending,
           reachMeBonusKind:String(data.normalState.reachMeBonusKind || ""),
           reachMeBonusSource:String(data.normalState.reachMeBonusSource || ""),
-          reachMeHitGamesSince:Math.max(0, Number(data.normalState.reachMeHitGamesSince) || 0),
+          reachMeHitGamesSince:normalizeBonusAfterGames(data.normalState.reachMeHitGamesSince),
           pendingSettingVoiceSrc:String(data.normalState.pendingSettingVoiceSrc || ""),
           pendingPremiumVoiceSrc:String(data.normalState.pendingPremiumVoiceSrc || ""),
           morningCeilingActive:!!data.normalState.morningCeilingActive
@@ -11079,7 +11149,7 @@ body{
           normalState.oneGameRenBonus = false;
         }
         normalState.sinceBonus = A_TYPE_MODE
-          ? Math.max(0, Number(normalState.sinceBonus) || 0)
+          ? normalizeBonusAfterGames(normalState.sinceBonus)
           : clamp(normalState.sinceBonus, 0, currentNormalCeilingGames());
       }
       if(data?.completeTrialState){
@@ -11548,9 +11618,9 @@ body{
         const bonusTarget = aTypeBonusTarget(bonusKind, premiumTargetBonus);
         const bonusLabel = aTypeBonusLabel(bonusKind, premiumTargetBonus);
         const hadPreviousBonus = (Number(stats.totalSessions) || 0) > 0;
-        const gamesSinceLastBonus = Math.max(0, Number.isFinite(Number(options.gamesSinceLastBonus))
+        const gamesSinceLastBonus = normalizeBonusAfterGames(Number.isFinite(Number(options.gamesSinceLastBonus))
           ? Number(options.gamesSinceLastBonus)
-          : Number(normalState.sinceBonus) || 0);
+          : normalState.sinceBonus);
         const within50 = hadPreviousBonus && gamesSinceLastBonus <= 50;
         const bonusBgm = pickATypeBonusBgm(bonusKind, within50, {premiumBonus, oneGameRenBonus});
         resetNormalModeAfterBonus();
@@ -12259,8 +12329,8 @@ body{
       updateCompleteTrialState("通常払い出し");
     }
     normalState.sinceBonus = A_TYPE_MODE
-      ? Math.max(0, Number(resolved.ceilingAfter) || 0)
-      : clamp(Number(resolved.ceilingAfter) || 0, 0, NORMAL_CEILING_GAMES);
+      ? normalizeBonusAfterGames(resolved.ceilingAfter)
+      : clamp(Number(resolved.ceilingAfter) || 0, 0, currentNormalCeilingGames());
     if(normalState.highRemain > 0){
       normalState.highRemain = Math.max(0, (Number(normalState.highRemain) || 0) - 1);
     }
@@ -12387,7 +12457,7 @@ body{
         normalState.premiumBonus = (normalState.bonusKind === "BIG") && !!resolved.premiumBonus;
         normalState.oneGameRenBonus = false;
         normalState.bonusWaitGames = 1;
-        normalState.bonusHitGamesSince = Math.max(0, Number(resolved.gamesSinceLastBonusAtStart) || 0);
+        normalState.bonusHitGamesSince = normalizeBonusAfterGames(resolved.gamesSinceLastBonusAtStart);
         hideBonusConfirmScreen();
         if(isChanceLampLit()) $("stLamp").classList.add("on");
         const bonusLabel = pendingBonusLabel();
@@ -12665,7 +12735,7 @@ body{
     if($("stInfoViewLegacy")) $("stInfoViewLegacy").textContent = stInfoText;
     if($("adminStInfoView")) $("adminStInfoView").textContent = stInfoText;
     const payoutScaleText = A_TYPE_MODE
-      ? `Aタイプ:BB純増${A_TYPE_PAYOUTS.BIG}pt/RB純増${A_TYPE_PAYOUTS.MID}pt/ブドウ${A_TYPE_PAYOUTS.GRAPE}pt/ベル${A_TYPE_PAYOUTS.BELL}pt/ゾウリプレイ${A_TYPE_PAYOUTS.REPLAY}pt/ピエロ特殊役${A_TYPE_PAYOUTS.SMALL}pt/チェリー中段1pt・上下段2pt`
+      ? `Aタイプ:BB純増${A_TYPE_PAYOUTS.BIG}pt/RB純増${A_TYPE_PAYOUTS.MID}pt/ブドウ${A_TYPE_PAYOUTS.GRAPE}pt/ベル${A_TYPE_PAYOUTS.BELL}pt/ゾウリプレイ${A_TYPE_PAYOUTS.REPLAY}pt/宗介特殊役${A_TYPE_PAYOUTS.SMALL}pt/チェリー中段1pt・上下段2pt`
       : `通常:ベル${NORMAL_ROLE_PAYOUTS.BELL}pt/スイカ${NORMAL_ROLE_PAYOUTS.SUICA}pt/チェリー${NORMAL_ROLE_PAYOUTS.CHERRY_ANY}pt/リプレイ${NORMAL_ROLE_PAYOUTS.REPLAY}pt/REG${NORMAL_ROLE_PAYOUTS.MID}pt / 通常小役${Math.round(NORMAL_ROLE_RATE * 100)}% / 高確小役${Math.round(HIGH_ROLE_RATE * 100)}% / ATベル${ROLE_PAYOUTS.BELL}pt/斜めベル${ROLE_PAYOUTS.BELL3}pt / 平均継続${formatRate(averageContinuationRate(settings.setting))}`;
     if($("payoutScaleView")) $("payoutScaleView").textContent = payoutScaleText;
     if($("payoutScaleViewLegacy")) $("payoutScaleViewLegacy").textContent = payoutScaleText;
@@ -12711,7 +12781,7 @@ body{
     setText("jagTotalGameDataMeter", formatMeterDigits(stats.totalSpins, 5, 99999));
     const afterBonusMeter = $("jagAfterBonusDataMeter");
     const holdAfterBonusGames = !!(A_TYPE_MODE && isATypeBonusActive());
-    const afterBonusGames = holdAfterBonusGames ? session.bonusStartGames : normalState.sinceBonus;
+    const afterBonusGames = holdAfterBonusGames ? normalizeBonusAfterGames(session.bonusStartGames) : normalizeBonusAfterGames(normalState.sinceBonus);
     setText("jagAfterBonusDataMeter", formatMeterDigits(afterBonusGames, 4, 9999));
     if(afterBonusMeter) afterBonusMeter.classList.toggle("is-bonus-held", holdAfterBonusGames);
     setText("jagBigDataMeter", formatMeterDigits(stats.bigCount, 3, 999));
@@ -12771,6 +12841,29 @@ body{
     setText("wdCounterSuika", stats.suikaCount || 0);
     setText("wdCounterCherry", stats.cherryCount || 0);
     setText("wdCounterReplay", stats.replayCount || 0);
+    const roleCounterDenominator = normalRoleStatDenominator();
+    const roleCounterOddsText = count=>{
+      const n = Number(count) || 0;
+      const total = Number(roleCounterDenominator) || 0;
+      if(n <= 0 || total <= 0) return "-";
+      return `1/${(total / n).toFixed(1)}`;
+    };
+    setText("roleCounterBigCount", stats.bigCount || 0);
+    setText("roleCounterBigOdds", roleCounterOddsText(stats.bigCount));
+    setText("roleCounterPremiumBigCount", stats.premiumBigCount || 0);
+    setText("roleCounterPremiumBigOdds", roleCounterOddsText(stats.premiumBigCount));
+    setText("roleCounterRegCount", stats.midCount || 0);
+    setText("roleCounterRegOdds", roleCounterOddsText(stats.midCount));
+    setText("roleCounterGrapeCount", stats.grapeCount || 0);
+    setText("roleCounterGrapeOdds", roleCounterOddsText(stats.grapeCount));
+    setText("roleCounterReplayCount", stats.replayCount || 0);
+    setText("roleCounterReplayOdds", roleCounterOddsText(stats.replayCount));
+    setText("roleCounterBellCount", stats.bellCount || 0);
+    setText("roleCounterBellOdds", roleCounterOddsText(stats.bellCount));
+    setText("roleCounterPieroCount", stats.smallCount || 0);
+    setText("roleCounterPieroOdds", roleCounterOddsText(stats.smallCount));
+    setText("roleCounterCherryCount", stats.cherryCount || 0);
+    setText("roleCounterCherryOdds", roleCounterOddsText(stats.cherryCount));
     const setMirrorCell = (valueId, label, value)=>{
       const valueEl = $(valueId);
       if(!valueEl) return;
@@ -12929,7 +13022,7 @@ body{
     if(!table) return;
 
     if(A_TYPE_MODE){
-      let html = `<tr><td>設定</td><td>BB</td><td>RB</td><td>合算</td><td>ぶどう</td><td>単独チェリー</td><td>リプレイ</td><td>ベル</td><td>ピエロ</td><td>機械割</td></tr>`;
+      let html = `<tr><td>設定</td><td>BB</td><td>RB</td><td>合算</td><td>ぶどう</td><td>単独チェリー</td><td>リプレイ</td><td>ベル</td><td>宗介</td><td>機械割</td></tr>`;
       for(const i of [1,2,3,4,5,6]){
         const bonus = A_TYPE_BONUS_TABLE[i];
         const grape = A_TYPE_GRAPE_TABLE[i] || A_TYPE_GRAPE_TABLE[1];
@@ -13024,7 +13117,7 @@ body{
     reels.forEach(r=>r.classList.remove("spinning"));
     isSpinning = false;
     currentSpin = null;
-    stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,roleStatVersion:ROLE_STAT_COUNTER_VERSION,bigCount:0,midCount:0,grapeCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
+    stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,roleStatVersion:ROLE_STAT_COUNTER_VERSION,bigCount:0,midCount:0,premiumBigCount:0,grapeCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",premiumBonus:false,oneGameRenBonus:false,bonusWaitGames:0,bonusHitGamesSince:0,reachMePending:false,reachMeBonusKind:"",reachMeBonusSource:"",reachMeHitGamesSince:0,pendingSettingVoiceSrc:"",pendingPremiumVoiceSrc:"",morningCeilingActive:false};
@@ -13079,7 +13172,7 @@ body{
     reels.forEach(r=>r.classList.remove("spinning"));
     isSpinning = false;
     currentSpin = null;
-    stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,roleStatVersion:ROLE_STAT_COUNTER_VERSION,bigCount:0,midCount:0,grapeCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
+    stats = {totalSessions:0,totalFee:0,totalPaid:0,totalSpins:0,normalSpins:0,highSpins:0,roleStatVersion:ROLE_STAT_COUNTER_VERSION,bigCount:0,midCount:0,premiumBigCount:0,grapeCount:0,smallCount:0,bellCount:0,diagonalBellCount:0,replayCount:0,suikaCount:0,cherryCount:0,slumpHigh:0,slumpLow:0,slumpHistory:[{spin:0, profit:0}]};
     slumpView = {xZoom:1,yZoom:1,seekStart:0,followEnd:true};
     bonusConfirmBgmHold = false;
     normalState = {mode:"normal",highRemain:0,sinceBonus:0,bonusPending:false,bonusKind:"",bonusSource:"",premiumBonus:false,oneGameRenBonus:false,bonusWaitGames:0,bonusHitGamesSince:0,reachMePending:false,reachMeBonusKind:"",reachMeBonusSource:"",reachMeHitGamesSince:0,pendingSettingVoiceSrc:"",pendingPremiumVoiceSrc:"",morningCeilingActive:!A_TYPE_MODE};
@@ -13419,7 +13512,7 @@ body{
       return;
     }
 
-    const nextCeiling = Math.max(0, (Number(normalState.sinceBonus) || 0) + 1);
+    const nextCeiling = nextBonusAfterGames(normalState.sinceBonus);
     spin.result = "MISS";
     spin.spec = RESULT.MISS;
     spin.lineRow = 1;
@@ -13636,7 +13729,7 @@ body{
     normalState.reachMePending = true;
     normalState.reachMeBonusKind = resolved.bonusKind || "BIG";
     normalState.reachMeBonusSource = `${resolved.bonusSource || "単独当選"} / リーチ目 ${reachLine}`;
-    normalState.reachMeHitGamesSince = Math.max(0, Number(resolved.gamesSinceLastBonusAtStart) || Number(normalState.sinceBonus) || 0);
+    normalState.reachMeHitGamesSince = normalizeBonusAfterGames(resolved.gamesSinceLastBonusAtStart || normalState.sinceBonus);
     normalState.bonusPending = false;
     normalState.bonusKind = "";
     normalState.bonusSource = "";
@@ -13667,7 +13760,7 @@ body{
     normalState.premiumBonus = false;
     normalState.oneGameRenBonus = false;
     normalState.bonusWaitGames = 1;
-    normalState.bonusHitGamesSince = Math.max(0, Number(normalState.reachMeHitGamesSince) || Number(normalState.sinceBonus) || 0);
+    normalState.bonusHitGamesSince = normalizeBonusAfterGames(normalState.reachMeHitGamesSince || normalState.sinceBonus);
     normalState.reachMeHitGamesSince = 0;
     jagChanceHold = true;
     const lamp = $("stLamp");
@@ -15413,6 +15506,9 @@ body{
     bindUtilityPress(oddsToggleBtn, ()=>{
         setInfoPanelOpen("odds", !audioDock.classList.contains("oddsOpen"));
     });
+    bindUtilityPress(roleCounterToggleBtn, ()=>{
+        setInfoPanelOpen("counter", !audioDock.classList.contains("counterOpen"));
+    });
     bindUtilityPress(reelSlumpToggleBtn, ()=>{
         setInfoPanelOpen("slump", !audioDock.classList.contains("slumpOpen"));
     });
@@ -15444,6 +15540,13 @@ body{
         setInfoPanelOpen("odds", false);
         if(reelOddsToggleBtn) reelOddsToggleBtn.focus();
         else if(oddsToggleBtn) oddsToggleBtn.focus();
+      });
+    }
+    if(roleCounterCloseBtn){
+      roleCounterCloseBtn.addEventListener("click", e=>{
+        e.stopPropagation();
+        setInfoPanelOpen("counter", false);
+        if(roleCounterToggleBtn) roleCounterToggleBtn.focus();
       });
     }
     if(pageZoomOutBtn){
