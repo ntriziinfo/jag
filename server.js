@@ -196,6 +196,17 @@ function appendResult(record){
   fs.appendFileSync(RESULTS_FILE, JSON.stringify(record) + "\n");
 }
 
+function hasResetSerial(record){
+  return record && record.resetSerial !== undefined && record.resetSerial !== null && record.resetSerial !== "";
+}
+
+function restoreResultResetSerial(record){
+  if(hasResetSerial(record)) return record;
+  const session = state.sessions[String(record && record.sessionId || "")];
+  if(!session || session.resetSerialAtStart === undefined || session.resetSerialAtStart === null) return record;
+  return {...record, resetSerial:Number(session.resetSerialAtStart) || 0};
+}
+
 function postJson(urlString, payload){
   return new Promise((resolve, reject)=>{
     if(!urlString) return resolve({skipped:true});
@@ -619,7 +630,7 @@ const server = http.createServer(async (req, res)=>{
       try{
         rows = fs.readFileSync(RESULTS_FILE, "utf8").split(/\n+/).filter(Boolean).map(line=>JSON.parse(line));
       }catch(e){}
-      return sendJson(res, 200, rows.slice(-200).reverse());
+      return sendJson(res, 200, rows.slice(-200).reverse().map(restoreResultResetSerial));
     }
 
     return serveFile(res, url.pathname);

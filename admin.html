@@ -182,12 +182,18 @@ function appendPlayerView(aggregate, playerView){
 function resultsForMachine(machine){
   const serial = num(machine.resetSerial);
   const unique = new Map();
-  for(const record of sessionResults){
-    if(String(record.machineId) !== String(machine.machineId)) continue;
-    if(num(record.resetSerial) !== serial) continue;
+  const addRecord = (record, trustCurrentCycle=false)=>{
+    if(!record || String(record.machineId) !== String(machine.machineId)) return;
+    const hasSerial = record.resetSerial !== undefined && record.resetSerial !== null && record.resetSerial !== '';
+    if(!trustCurrentCycle && (!hasSerial || num(record.resetSerial) !== serial)) return;
+    if(trustCurrentCycle && hasSerial && num(record.resetSerial) !== serial) return;
     const key = String(record.sessionId || `${record.endedAtMs || record.endedAt}-${record.playerName || ''}`);
     if(!unique.has(key)) unique.set(key, record);
+  };
+  for(const record of sessionResults){
+    addRecord(record);
   }
+  addRecord(machine.lastEndedSession && machine.lastEndedSession.record, true);
   return [...unique.values()].sort((a,b)=>num(a.endedAtMs || Date.parse(a.endedAt))-num(b.endedAtMs || Date.parse(b.endedAt)));
 }
 function totalViewForMachine(machine){

@@ -117,6 +117,26 @@ async function insertCommand(machineId, command){
   return rows[0];
 }
 async function appendResult(record){ await sb("session_results", {method:"POST", headers:{Prefer:"return=minimal"}, body:JSON.stringify({ended_at_ms:record.endedAtMs || ms(), machine_id:String(record.machineId || ""), record})}); }
+function hasResetSerial(record){
+  return record && record.resetSerial !== undefined && record.resetSerial !== null && record.resetSerial !== "";
+}
+async function restoreResultResetSerials(records){
+  const missingSessionIds = [...new Set(records
+    .filter(record=>!hasResetSerial(record) && record && record.sessionId)
+    .map(record=>String(record.sessionId)))];
+  if(!missingSessionIds.length) return records;
+  const serialBySession = new Map();
+  for(let offset=0;offset<missingSessionIds.length;offset+=50){
+    const ids = missingSessionIds.slice(offset, offset + 50);
+    const rows = await sb("sessions?select=session_id,reset_serial_at_start&session_id=in.(" + ids.map(encodeURIComponent).join(",") + ")");
+    for(const row of rows) serialBySession.set(String(row.session_id), Number(row.reset_serial_at_start || 0));
+  }
+  return records.map(record=>{
+    if(hasResetSerial(record)) return record;
+    const sessionId = String(record && record.sessionId || "");
+    return serialBySession.has(sessionId) ? {...record, resetSerial:serialBySession.get(sessionId)} : record;
+  });
+}
 function postJson(urlString, payload){
   return new Promise((resolve, reject)=>{
     if(!urlString) return resolve({skipped:true});
@@ -325,7 +345,7 @@ export default async function handler(req, res){
     if(pathname === "/api/results" && req.method === "GET"){
       if(!adminOk(req)) return json(res, 401, {ok:false, error:"admin password required"});
       const rows = await sb("session_results?select=record&order=ended_at_ms.desc&limit=200");
-      return json(res, 200, rows.map(row=>row.record));
+      return json(res, 200, await restoreResultResetSerials(rows.map(row=>row.record)));
     }
     return json(res, 404, {ok:false, error:"not found"});
   }catch(e){
