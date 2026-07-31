@@ -160,10 +160,6 @@ function postJson(urlString, payload){
   });
 }
 function numberStat(stats, key){ return Number(stats && stats[key] || 0) || 0; }
-function snapshotProfit(snapshot){
-  const stats = snapshot && snapshot.stats ? snapshot.stats : {};
-  return Number(stats.profit ?? (numberStat(stats, "totalPaid") - numberStat(stats, "totalFee"))) || 0;
-}
 function sessionStartStats(session, snapshot){
   const clientStartStats = snapshot && snapshot.playSessionStartStats;
   const clientSessionId = String(snapshot && snapshot.playSessionId || "");
@@ -171,8 +167,14 @@ function sessionStartStats(session, snapshot){
   if(clientStartStats && typeof clientStartStats === "object" && clientSessionId && clientSessionId === expectedSessionId){
     return {stats:clientStartStats, source:"client-session-start"};
   }
-  const startSnapshot = session && session.startSnapshot || {};
-  return {stats:startSnapshot.stats || {}, source:"server-machine-start"};
+  return {stats:{}, source:"server-session-zero"};
+}
+function snapshotForSession(session, machine, submittedSnapshot=null){
+  const expectedSessionId = String(session && session.sessionId || "");
+  for(const snapshot of [submittedSnapshot, machine && machine.lastSnapshot]){
+    if(snapshot && String(snapshot.playSessionId || "") === expectedSessionId) return snapshot;
+  }
+  return {playSessionId:expectedSessionId, playSessionStartStats:{}, stats:{}};
 }
 function sessionDelta(session, snapshot){
   const baseline = sessionStartStats(session, snapshot);
@@ -241,7 +243,7 @@ export default async function handler(req, res){
       if(requestedMachineId && requestedMachineId !== String(issued.machineId)) return json(res, 403, {ok:false, error:"このパスワードは別の台用です"});
       const machine = await getMachine(issued.machineId);
       const existingSession = issued.sessionId ? await getSession(issued.sessionId) : null;
-      const iframeUrlFor = sessionId=>"/jag.html?machine=" + encodeURIComponent(machine.machineId) + "&server=" + encodeURIComponent(origin) + "&creditBaseline=" + encodeURIComponent(String(snapshotProfit(machine.lastSnapshot || {}))) + "&playSessionId=" + encodeURIComponent(String(sessionId || ""));
+      const iframeUrlFor = sessionId=>"/jag.html?machine=" + encodeURIComponent(machine.machineId) + "&server=" + encodeURIComponent(origin) + "&creditBaseline=0&playSessionId=" + encodeURIComponent(String(sessionId || ""));
       if(issued.status === "used" && existingSession && existingSession.status === "active") return json(res, 200, {ok:true, resumed:true, session:{sessionId:existingSession.sessionId, token:existingSession.token, machineId:machine.machineId, playerName:existingSession.playerName}, iframeUrl:iframeUrlFor(existingSession.sessionId)});
       if(issued.status !== "issued") return json(res, 403, {ok:false, error:"このパスワードは終了済みです"});
       if(machine.currentSessionId && machine.currentSessionId !== (existingSession && existingSession.sessionId)) return json(res, 409, {ok:false, error:"machine is busy"});
@@ -257,8 +259,9 @@ export default async function handler(req, res){
       if(!session || session.token !== String(body.token || "")) return json(res, 403, {ok:false, error:"invalid session"});
       if(session.status === "ended") return json(res, 200, {ok:true, alreadyEnded:true, record:session.resultRecord || null});
       const machine = await getMachine(session.machineId);
-      if(body.snapshot) machine.lastSnapshot = body.snapshot;
-      const record = {...resultPayload(session, machine, body), forced:!!body.forced};
+      const snapshot = snapshotForSession(session, machine, body.snapshot);
+      if(body.snapshot && snapshot === body.snapshot) machine.lastSnapshot = snapshot;
+      const record = {...resultPayload(session, machine, {...body, snapshot}), forced:!!body.forced};
       await appendResult(record);
       const sheets = await sendToSheets(record);
       session.status = "ended"; session.endedAt = ms(); session.resultRecord = record; session.sheets = sheets;
@@ -271,6 +274,10 @@ export default async function handler(req, res){
       const machineId = decodeURIComponent(m[1]);
       const body = await readBody(req);
       const machine = await getMachine(machineId);
+      const incomingSessionId = String(body.playSessionId || "");
+      if(incomingSessionId && incomingSessionId !== String(machine.currentSessionId || "")){
+        return json(res, 200, {ok:true, ignored:true, reason:"stale play session"});
+      }
       machine.lastSnapshot = {...body, machineId, online:true, updatedAt:ms()};
       machine.displayName = body.name || machine.displayName || machineId+"号機";
       machine.updatedAt = ms();
@@ -316,7 +323,7 @@ export default async function handler(req, res){
       const machine = await getMachine(decodeURIComponent(m[1]));
       const session = machine.currentSessionId ? await getSession(machine.currentSessionId) : null;
       if(session && session.status === "active"){
-        const record = {...resultPayload(session, machine, {snapshot:machine.lastSnapshot || session.startSnapshot || {}}), forced:true, forcedBy:"admin"};
+        const record = {...resultPayload(session, machine, {snapshot:snapshotForSession(session, machine)}), forced:true, forcedBy:"admin"};
         await appendResult(record);
         const sheets = await sendToSheets(record);
         session.status = "ended"; session.endedAt = ms(); session.resultRecord = record; session.sheets = sheets;

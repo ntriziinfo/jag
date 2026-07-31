@@ -244,10 +244,6 @@ function postJson(urlString, payload){
 }
 
 function numberStat(stats, key){ return Number(stats && stats[key] || 0) || 0; }
-function snapshotProfit(snapshot){
-  const stats = snapshot && snapshot.stats ? snapshot.stats : {};
-  return Number(stats.profit ?? (numberStat(stats, "totalPaid") - numberStat(stats, "totalFee"))) || 0;
-}
 function sessionStartStats(session, snapshot){
   const clientStartStats = snapshot && snapshot.playSessionStartStats;
   const clientSessionId = String(snapshot && snapshot.playSessionId || "");
@@ -255,8 +251,14 @@ function sessionStartStats(session, snapshot){
   if(clientStartStats && typeof clientStartStats === "object" && clientSessionId && clientSessionId === expectedSessionId){
     return {stats:clientStartStats, source:"client-session-start"};
   }
-  const startSnapshot = session && session.startSnapshot || {};
-  return {stats:startSnapshot.stats || {}, source:"server-machine-start"};
+  return {stats:{}, source:"server-session-zero"};
+}
+function snapshotForSession(session, machine, submittedSnapshot=null){
+  const expectedSessionId = String(session && session.sessionId || "");
+  for(const snapshot of [submittedSnapshot, machine && machine.lastSnapshot]){
+    if(snapshot && String(snapshot.playSessionId || "") === expectedSessionId) return snapshot;
+  }
+  return {playSessionId:expectedSessionId, playSessionStartStats:{}, stats:{}};
 }
 function sessionDelta(session, snapshot){
   const baseline = sessionStartStats(session, snapshot);
@@ -429,7 +431,7 @@ const server = http.createServer(async (req, res)=>{
       const machine = machineFor(issued.machineId);
       if(!machine) return sendJson(res, 400, {ok:false, error:"machine not found"});
       const existingSession = issued.sessionId ? state.sessions[issued.sessionId] : null;
-      const iframeUrlFor = sessionId=>`/jag.html?machine=${encodeURIComponent(machine.machineId)}&server=${encodeURIComponent(url.origin)}&creditBaseline=${encodeURIComponent(String(snapshotProfit(machine.lastSnapshot || {})))}&playSessionId=${encodeURIComponent(String(sessionId || ""))}`;
+      const iframeUrlFor = sessionId=>`/jag.html?machine=${encodeURIComponent(machine.machineId)}&server=${encodeURIComponent(url.origin)}&creditBaseline=0&playSessionId=${encodeURIComponent(String(sessionId || ""))}`;
       if(issued.status === "used" && existingSession && existingSession.status === "active"){
         return sendJson(res, 200, {
           ok:true,
@@ -473,8 +475,9 @@ const server = http.createServer(async (req, res)=>{
       if(session.status === "ended") return sendJson(res, 200, {ok:true, alreadyEnded:true, record:session.resultRecord || null});
       const machine = machineFor(session.machineId);
       if(!machine) return sendJson(res, 400, {ok:false, error:"machine not found"});
-      if(body.snapshot) machine.lastSnapshot = body.snapshot;
-      const record = resultPayload(session, machine, body);
+      const snapshot = snapshotForSession(session, machine, body.snapshot);
+      if(body.snapshot && snapshot === body.snapshot) machine.lastSnapshot = snapshot;
+      const record = resultPayload(session, machine, {...body, snapshot});
       appendResult(record);
       const sheets = await sendToSheets(record);
       session.status = "ended";
@@ -497,7 +500,7 @@ const server = http.createServer(async (req, res)=>{
       if(!machine) return sendJson(res, 404, {ok:false, error:"machine not found"});
       const session = machine.currentSessionId ? state.sessions[machine.currentSessionId] : null;
       if(session && session.status === "active"){
-        const record = {...resultPayload(session, machine, {snapshot:machine.lastSnapshot || session.startSnapshot || {}}), forced:true, forcedBy:"admin"};
+        const record = {...resultPayload(session, machine, {snapshot:snapshotForSession(session, machine)}), forced:true, forcedBy:"admin"};
         appendResult(record);
         const sheets = await sendToSheets(record);
         session.status = "ended";
@@ -566,6 +569,10 @@ const server = http.createServer(async (req, res)=>{
       const machineId = decodeURIComponent(stateMatch[1]);
       const machine = machineFor(machineId) || emptyMachine(machineId);
       const body = await readBody(req);
+      const incomingSessionId = String(body.playSessionId || "");
+      if(incomingSessionId && incomingSessionId !== String(machine.currentSessionId || "")){
+        return sendJson(res, 200, {ok:true, ignored:true, reason:"stale play session"});
+      }
       const snapshot = {...body, machineId, online:true, updatedAt:Date.now()};
       machine.lastSnapshot = snapshot;
       machine.displayName = body.name || machine.displayName || `${machineId}号機`;

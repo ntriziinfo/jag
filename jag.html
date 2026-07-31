@@ -7207,8 +7207,11 @@ body{
 
   const bootParams = new URLSearchParams(location.search);
   const bootMachineId = bootParams.get("machine") || "standalone";
-  const STORAGE_KEY = "jag_slot_state_v1_" + bootMachineId;
+  const bootPlaySessionId = String(bootParams.get("playSessionId") || "");
+  const MACHINE_STORAGE_KEY = "jag_slot_state_v1_" + bootMachineId;
+  const STORAGE_KEY = bootPlaySessionId ? `${MACHINE_STORAGE_KEY}_session_${bootPlaySessionId}` : MACHINE_STORAGE_KEY;
   const STORAGE_RESUME_KEY = STORAGE_KEY + "_resume";
+  const PREFERENCES_STORAGE_KEY = "jag_slot_preferences_v1_" + bootMachineId;
 
   const DEFAULT_NORMAL_BGM_SRC = "";
   const HIGH_MODE_BGM_SRC = "";
@@ -7998,7 +8001,7 @@ body{
   const ADMIN_STATE_PUSH_INTERVAL_MS = 5000;
   const SLOT_DEBUG_ENABLED = adminParams.get("debug") === "1";
   const CREDIT_BASELINE_PROFIT = Number(adminParams.get("creditBaseline") || 0) || 0;
-  const PLAY_SESSION_ID = String(adminParams.get("playSessionId") || "");
+  const PLAY_SESSION_ID = bootPlaySessionId;
   const SLOT_PLAY_SESSION = adminParams.has("creditBaseline") || !!PLAY_SESSION_ID;
   const PLAY_SESSION_BASELINE_STORAGE_KEY = PLAY_SESSION_ID ? `jag_play_session_baseline_${PLAY_SESSION_ID}` : "";
   let playSessionStartStats = null;
@@ -11063,6 +11066,7 @@ body{
 
   function load(){
     try{
+      const preferenceData = JSON.parse(safeStorageGet(PREFERENCES_STORAGE_KEY) || "null");
       const fullData = JSON.parse(safeStorageGet(STORAGE_KEY));
       const resumeData = JSON.parse(safeStorageGet(STORAGE_RESUME_KEY));
       let data = fullData;
@@ -11075,6 +11079,12 @@ body{
           normalState:{...((data && data.normalState) || {}), ...(resumeData.normalState || {})},
           completeTrialState:{...((data && data.completeTrialState) || {}), ...(resumeData.completeTrialState || {})},
           runtimeState:{...((data && data.runtimeState) || {}), ...(resumeData.runtimeState || {})}
+        };
+      }
+      if(preferenceData && preferenceData.settings){
+        data = {
+          ...(data || {}),
+          settings:{...preferenceData.settings, ...((data && data.settings) || {})}
         };
       }
       if(data?.settings){
@@ -11258,6 +11268,7 @@ body{
   function persistState(){
     const savedAt = Date.now();
     const runtimeState = runtimeStateForStorage();
+    const preferencesOk = safeStorageSet(PREFERENCES_STORAGE_KEY, JSON.stringify({savedAt, settings}));
     const resumeOk = safeStorageSet(STORAGE_RESUME_KEY, JSON.stringify({
       savedAt,
       settings,
@@ -11268,10 +11279,10 @@ body{
     }));
     try{
       const fullOk = safeStorageSet(STORAGE_KEY, JSON.stringify({savedAt, settings, stats, normalState, completeTrialState, runtimeState}));
-      return !!(fullOk || resumeOk);
+      return !!(fullOk || resumeOk || preferencesOk);
     }catch(e){
       console.warn("Failed to save full local state", e);
-      return !!resumeOk;
+      return !!(resumeOk || preferencesOk);
     }
   }
 
