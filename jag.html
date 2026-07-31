@@ -6977,12 +6977,12 @@ body{
         <div class="field">
           <label>設定</label>
           <select id="settingSelect">
-            <option value="1">設定1 / 90.0%</option>
-            <option value="2">設定2 / 93.0%</option>
-            <option value="3">設定3 / 96.0%</option>
-            <option value="4">設定4 / 101.0%</option>
-            <option value="5">設定5 / 104.0%</option>
-            <option value="6">設定6 / 108.0%</option>
+            <option value="1">設定1 / 90.9%</option>
+            <option value="2">設定2 / 93.9%</option>
+            <option value="3">設定3 / 96.9%</option>
+            <option value="4">設定4 / 101.9%</option>
+            <option value="5">設定5 / 104.9%</option>
+            <option value="6">設定6 / 108.9%</option>
           </select>
         </div>
         <div class="field">
@@ -7260,28 +7260,28 @@ body{
     6:{solo:394.808291, cherry:922.929037}
   });
   const A_TYPE_POST_PREMIUM_TARGET_RTP = Object.freeze({
-    1:0.900,
-    2:0.930,
-    3:0.960,
-    4:1.010,
-    5:1.040,
-    6:1.080
+    1:0.908680556,
+    2:0.938680556,
+    3:0.968680556,
+    4:1.018680556,
+    5:1.048680556,
+    6:1.088680556
   });
   const A_TYPE_GRAPE_TABLE = Object.freeze({
-    1:6.8266,
-    2:6.7986,
-    3:6.7059,
-    4:6.4970,
-    5:6.3747,
-    6:6.1492
+    1:6.592194,
+    2:6.554256,
+    3:6.455407,
+    4:6.248231,
+    5:6.120643,
+    6:5.897360
   });
   const A_TYPE_SOLO_CHERRY_TABLE = Object.freeze({
-    1:40.0,
-    2:38.0,
-    3:36.0,
-    4:34.0,
-    5:32.0,
-    6:30.0
+    1:64.0,
+    2:64.0,
+    3:64.0,
+    4:64.0,
+    5:64.0,
+    6:64.0
   });
   const A_TYPE_REPLAY_TABLE = Object.freeze({
     1:7.464630,
@@ -7389,7 +7389,7 @@ body{
     BELL3:{name:"斜めベル", reel:[BELL_SYMBOL,BELL_SYMBOL,BELL_SYMBOL], label:"", cls:"gold", kind:"pay"},
     REPLAY:{name:"リプレイ", reel:[ELEPHANT_SYMBOL,ELEPHANT_SYMBOL,ELEPHANT_SYMBOL], label:"REPLAY", cls:"blue", kind:"pay"},
     SUICA:{name:"スイカ揃い", reel:["🍋","🍋","🍋"], label:"SUICA", cls:"green", kind:"pay"},
-    CHERRY_ANY:{name:"チェリーANY", reel:[ELEPHANT_SYMBOL,PIERROT_SYMBOL,CHERRY_SYMBOL], label:"CHERRY", cls:"red", kind:"payadd"},
+    CHERRY_ANY:{name:"チェリー", reel:[CHERRY_SYMBOL,PIERROT_SYMBOL,GRAPE_SYMBOL], label:"CHERRY", cls:"red", kind:"payadd"},
     CHERRY_DOUBLE:{name:"チェリー2連", reel:[CHERRY_SYMBOL,CHERRY_SYMBOL,ELEPHANT_SYMBOL], label:"CHERRY×2", cls:"red", kind:"add"},
     CHERRY_TRIPLE:{name:"チェリー3つ", reel:[CHERRY_SYMBOL,CHERRY_SYMBOL,CHERRY_SYMBOL], label:"CHERRY×3", cls:"red", kind:"payadd"}
   };
@@ -11428,8 +11428,10 @@ body{
     if($("targetRtpViewLegacy")) $("targetRtpViewLegacy").textContent = targetRtpText();
     if($("adminSettingView")) $("adminSettingView").textContent = settings.setting;
     if($("adminTargetRtpView")) $("adminTargetRtpView").textContent = targetRtpText();
-    const setting6Option = document.querySelector('#settingSelect option[value="6"]');
-    if(setting6Option) setting6Option.textContent = A_TYPE_MODE ? "設定6 / 108.0%" : "設定6 / 目標115%";
+    for(const settingNo of [1,2,3,4,5,6]){
+      const option = document.querySelector(`#settingSelect option[value="${settingNo}"]`);
+      if(option) option.textContent = A_TYPE_MODE ? `設定${settingNo} / ${targetRtpText(settingNo)}` : (settingNo === 6 ? "設定6 / 目標115%" : option.textContent);
+    }
     const adminStInfoText = A_TYPE_MODE
       ? `Aタイプ / BB ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).big)} / RB ${oddsText(1 / (A_TYPE_BONUS_TABLE[settings.setting] || A_TYPE_BONUS_TABLE[1]).reg)}`
       : session.active ? setGameCount() + "G/SET" : (normalState.bonusPending ? `BONUS確定 / ${pendingBonusLabel()}待ち` : `${normalModeLabel()} / 天井まで${ceilingRemain()}G`);
@@ -11451,10 +11453,11 @@ body{
       bigSound.volume = sfxOutputVolumeForSource(SFX_OUTPUT_SCALE, BIG_SOUND_SRC);
     }
     if(payoutSound){
-      if(payoutSound.getAttribute("src") !== PAYOUT_SOUND_SRC){
+      const activePayoutSrc = payoutSound.getAttribute("src") || PAYOUT_SOUND_SRC;
+      if(!payoutSound.getAttribute("src")){
         payoutSound.setAttribute("src", PAYOUT_SOUND_SRC);
       }
-      payoutSound.volume = payoutOutputVolumeForSource(PAYOUT_SOUND_OUTPUT_SCALE, PAYOUT_SOUND_SRC);
+      payoutSound.volume = payoutOutputVolumeForSource(PAYOUT_SOUND_OUTPUT_SCALE, activePayoutSrc);
     }
     if(voiceSound){
       voiceSound.volume = voiceOutputVolume();
@@ -12926,12 +12929,14 @@ body{
     if(!table) return;
 
     if(A_TYPE_MODE){
-      let html = `<tr><td>設定</td><td>BB</td><td>RB</td><td>合算</td><td>ぶどう</td><td>単独チェリー</td><td>リプレイ</td><td>機械割</td></tr>`;
+      let html = `<tr><td>設定</td><td>BB</td><td>RB</td><td>合算</td><td>ぶどう</td><td>単独チェリー</td><td>リプレイ</td><td>ベル</td><td>ピエロ</td><td>機械割</td></tr>`;
       for(const i of [1,2,3,4,5,6]){
         const bonus = A_TYPE_BONUS_TABLE[i];
         const grape = A_TYPE_GRAPE_TABLE[i] || A_TYPE_GRAPE_TABLE[1];
         const soloCherry = A_TYPE_SOLO_CHERRY_TABLE[i] || A_TYPE_SOLO_CHERRY_TABLE[1];
         const replay = A_TYPE_REPLAY_TABLE[i] || A_TYPE_REPLAY_TABLE[1];
+        const bell = A_TYPE_BELL_TABLE[i] || A_TYPE_BELL_TABLE[1];
+        const pierrot = A_TYPE_PIERROT_TABLE[i] || A_TYPE_PIERROT_TABLE[1];
         html += `<tr>
           <td>${i}</td>
           <td>1/${bonus.big.toFixed(1)}</td>
@@ -12940,6 +12945,8 @@ body{
           <td>1/${grape.toFixed(2)}</td>
           <td>1/${soloCherry.toFixed(1)}</td>
           <td>1/${replay.toFixed(2)}</td>
+          <td>1/${bell.toFixed(0)}</td>
+          <td>1/${pierrot.toFixed(0)}</td>
           <td>${(targetRtpFor(i) * 100).toFixed(1)}%</td>
         </tr>`;
       }
@@ -13439,6 +13446,7 @@ body{
 
   function resultLineRow(result){
     if(isMiddleLineOnlyResult(result)) return 1;
+    if(result === "CHERRY_ANY" || result === "MID_CHERRY") return randomLineRow();
     if(result === "BELL3") return Math.random() < 0.5 ? [0,1,2] : [2,1,0];
     return randomLineRow();
   }
@@ -13698,6 +13706,19 @@ body{
     return grid;
   }
 
+  function buildLeftCherryGrid(winRow=1){
+    const row = clamp(winRow, 0, 2);
+    const grid = [
+      [GRAPE_SYMBOL,ELEPHANT_SYMBOL,PIERROT_SYMBOL],
+      [PIERROT_SYMBOL,GRAPE_SYMBOL,ELEPHANT_SYMBOL],
+      [ELEPHANT_SYMBOL,PIERROT_SYMBOL,GRAPE_SYMBOL]
+    ];
+    grid[row][0] = CHERRY_SYMBOL;
+    grid[row][1] = randomSymbol({excludeCherry:true, reelIndex:1});
+    grid[row][2] = randomSymbol({excludeCherry:true, reelIndex:2});
+    return gridMatchesResult(grid, "CHERRY_ANY", row) ? grid : safeGridForResult("CHERRY_ANY", row);
+  }
+
   function gridMatchesResult(grid, result, winRow=1){
     if(result === "BELL3") return !hasCrownVisible(grid) && !hasBarDiagonal(grid) && displayedResultFromGrid(grid) === "BELL3" && hasOnlyTargetPayline(grid, result, winRow);
     if(hasCrownVisible(grid)) return false;
@@ -13716,6 +13737,7 @@ body{
 
     if(result === "BELL3") return buildDiagonalBellGrid(winRow);
     if(isMiddleLineOnlyResult(result)) winRow = 1;
+    if(result === "CHERRY_ANY" || result === "MID_CHERRY") return buildLeftCherryGrid(winRow);
     if(result === "MISS"){
       let picked = MISS_GRID_PATTERNS[randomInt(0, MISS_GRID_PATTERNS.length - 1)].map(row => row.slice());
 
@@ -15340,7 +15362,12 @@ body{
     }
     ["titleInput","settingSelect","feeInput","stSpinsInput","oddsMultiplierInput","smallMulInput","midMulInput","crownMulInput","cherryMulInput","bigMulInput","bigAddInput","autoDelayInput","masterVolume","bgmVolume","sfxVolume","voiceVolume","payoutVolume"].forEach(id=>{
       const el = $(id);
-      if(el) el.addEventListener("input", ()=>{ readSettings(); updateDisplay(); });
+      if(el) el.addEventListener("input", ()=>{
+        const volumeField = AUDIO_VOLUME_FIELDS.find(item=>item.rangeId === id);
+        if(volumeField) syncVolumeNumberInput(volumeField.rangeId, volumeField.numberId);
+        readSettings();
+        updateDisplay();
+      });
     });
     AUDIO_VOLUME_FIELDS.forEach(({numberId})=>{
       const el = $(numberId);
