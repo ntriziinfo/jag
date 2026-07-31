@@ -129,6 +129,7 @@ function playerStatsFrom(endStats, startStats={}, explicit={}){
   result.profit = explicit.playerProfit !== undefined && explicit.playerProfit !== null
     ? num(explicit.playerProfit)
     : statsProfit(endStats) - statsProfit(startStats);
+  if(result.totalSpins === 0 && result.totalFee === 0 && result.totalPaid === 0) result.profit = 0;
   result.slumpHistory = individualHistory(endStats, startStats, result);
   return result;
 }

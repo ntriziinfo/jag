@@ -252,8 +252,7 @@ function sessionDelta(session, snapshot){
   const playerBigCount = Math.max(0, numberStat(endStats, "bigCount") - numberStat(startStats, "bigCount"));
   const playerRegCount = Math.max(0, numberStat(endStats, "midCount") - numberStat(startStats, "midCount"));
   const playerGrapeCount = Math.max(0, numberStat(endStats, "grapeCount") - numberStat(startStats, "grapeCount"));
-  const startProfit = Number(startStats.profit ?? (numberStat(startStats, "totalPaid") - numberStat(startStats, "totalFee"))) || 0;
-  const playerProfit = snapshotProfit(snapshot) - startProfit;
+  const playerProfit = playerTotalPaid - playerTotalFee;
   return {playerTotalFee, playerTotalPaid, playerProfit, playerSpins, playerBigCount, playerRegCount, playerGrapeCount, startStats, baselineSource:baseline.source};
 }
 
