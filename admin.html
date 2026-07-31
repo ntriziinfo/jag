@@ -111,9 +111,13 @@ function individualHistory(endStats, startStats, playerStats){
   return points;
 }
 function playerStatsFrom(endStats, startStats={}, explicit={}){
+  const countersReset = stat(endStats, 'totalSpins') < stat(startStats, 'totalSpins')
+    || stat(endStats, 'totalFee') < stat(startStats, 'totalFee')
+    || stat(endStats, 'totalPaid') < stat(startStats, 'totalPaid');
+  const baselineStats = countersReset ? {} : startStats;
   const result = {};
   for(const key of ADDITIVE_STAT_KEYS){
-    result[key] = Math.max(0, stat(endStats, key) - stat(startStats, key));
+    result[key] = Math.max(0, stat(endStats, key) - stat(baselineStats, key));
   }
   const explicitMap = {
     totalSpins:'playerSpins',
@@ -128,9 +132,9 @@ function playerStatsFrom(endStats, startStats={}, explicit={}){
   }
   result.profit = explicit.playerProfit !== undefined && explicit.playerProfit !== null
     ? num(explicit.playerProfit)
-    : statsProfit(endStats) - statsProfit(startStats);
+    : statsProfit(endStats) - statsProfit(baselineStats);
   if(result.totalSpins === 0 && result.totalFee === 0 && result.totalPaid === 0) result.profit = 0;
-  result.slumpHistory = individualHistory(endStats, startStats, result);
+  result.slumpHistory = individualHistory(endStats, baselineStats, result);
   return result;
 }
 function playerViewForMachine(machine){

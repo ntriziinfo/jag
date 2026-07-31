@@ -260,8 +260,11 @@ function sessionStartStats(session, snapshot){
 }
 function sessionDelta(session, snapshot){
   const baseline = sessionStartStats(session, snapshot);
-  const startStats = baseline.stats;
   const endStats = snapshot && snapshot.stats ? snapshot.stats : {};
+  const countersReset = numberStat(endStats, "totalSpins") < numberStat(baseline.stats, "totalSpins")
+    || numberStat(endStats, "totalFee") < numberStat(baseline.stats, "totalFee")
+    || numberStat(endStats, "totalPaid") < numberStat(baseline.stats, "totalPaid");
+  const startStats = countersReset ? {} : baseline.stats;
   const playerTotalFee = Math.max(0, numberStat(endStats, "totalFee") - numberStat(startStats, "totalFee"));
   const playerTotalPaid = Math.max(0, numberStat(endStats, "totalPaid") - numberStat(startStats, "totalPaid"));
   const playerSpins = Math.max(0, numberStat(endStats, "totalSpins") - numberStat(startStats, "totalSpins"));
@@ -269,7 +272,7 @@ function sessionDelta(session, snapshot){
   const playerRegCount = Math.max(0, numberStat(endStats, "midCount") - numberStat(startStats, "midCount"));
   const playerGrapeCount = Math.max(0, numberStat(endStats, "grapeCount") - numberStat(startStats, "grapeCount"));
   const playerProfit = playerTotalPaid - playerTotalFee;
-  return {playerTotalFee, playerTotalPaid, playerProfit, playerSpins, playerBigCount, playerRegCount, playerGrapeCount, startStats, baselineSource:baseline.source};
+  return {playerTotalFee, playerTotalPaid, playerProfit, playerSpins, playerBigCount, playerRegCount, playerGrapeCount, startStats, baselineSource:countersReset ? baseline.source + "-counter-reset" : baseline.source};
 }
 
 async function sendToSheets(record){

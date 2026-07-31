@@ -48,8 +48,12 @@ function playerHistory(endStats, startStats, playerStats){
 }
 
 function playerView(endStats={}, startStats={}, explicit={}){
+  const countersReset = stat(endStats, "totalSpins") < stat(startStats, "totalSpins")
+    || stat(endStats, "totalFee") < stat(startStats, "totalFee")
+    || stat(endStats, "totalPaid") < stat(startStats, "totalPaid");
+  const baselineStats = countersReset ? {} : startStats;
   const stats = {};
-  for(const key of STAT_KEYS) stats[key] = Math.max(0, stat(endStats, key) - stat(startStats, key));
+  for(const key of STAT_KEYS) stats[key] = Math.max(0, stat(endStats, key) - stat(baselineStats, key));
   const explicitMap = {
     totalSpins:"playerSpins",
     bigCount:"playerBigCount",
@@ -64,9 +68,9 @@ function playerView(endStats={}, startStats={}, explicit={}){
   }
   stats.profit = explicit.playerProfit !== undefined && explicit.playerProfit !== null
     ? num(explicit.playerProfit)
-    : statsProfit(endStats) - statsProfit(startStats);
+    : statsProfit(endStats) - statsProfit(baselineStats);
   if(stats.totalSpins === 0 && stats.totalFee === 0 && stats.totalPaid === 0) stats.profit = 0;
-  const history = playerHistory(endStats, startStats, stats);
+  const history = playerHistory(endStats, baselineStats, stats);
   stats.slumpHistory = history;
   return {stats, history};
 }
