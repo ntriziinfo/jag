@@ -142,7 +142,7 @@ async function restoreResultResetSerials(records){
   });
 }
 async function recentResultRecords(limit=200){
-  const rows = await sb("session_results?select=record&order=ended_at_ms.desc&limit=" + Math.max(1, Number(limit) || 200));
+  const rows = await sb("session_results?select=record&order=id.desc&limit=" + Math.max(1, Number(limit) || 200));
   return restoreResultResetSerials(rows.map(row=>row.record));
 }
 function postJson(urlString, payload){
@@ -216,7 +216,10 @@ export default async function handler(req, res){
     if(!requireSupabase(res)) return;
     const origin = "https://" + req.headers.host;
     if(pathname === "/api/machines" && req.method === "GET"){
-      const [machines, records] = await Promise.all([getAllMachines(), recentResultRecords(1000)]);
+      const [machines, records] = await Promise.all([
+        getAllMachines(),
+        recentResultRecords(300).catch(()=>[])
+      ]);
       return json(res, 200, machines.map(machine=>publicMachine(machine, machineTotalFor(machine, records))));
     }
     if(pathname === "/api/admin/issue-password" && req.method === "POST"){
