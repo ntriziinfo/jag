@@ -549,7 +549,7 @@ async function enterAdmin(password){
   adminSecret = value;
   sessionStorage.setItem(ADMIN_STORAGE_KEY, value);
   document.body.classList.remove('locked');
-  await refreshAll();
+  await Promise.allSettled([loadMachines(), loadPasswords(), loadResults()]);
 }
 function logoutAdmin(){
   adminSecret = '';
@@ -566,7 +566,7 @@ $('machinePlayerViewBtn').addEventListener('click', ()=>setMachineDataView('play
 window.addEventListener('resize', renderAdminSlumpGraphs);
 async function refreshAll(){
   if(!adminSecret) return;
-  await Promise.allSettled([loadMachines(), loadPasswords(), loadResults()]);
+  await loadMachines().catch(()=>false);
 }
 setInterval(refreshAll, 60000);
 if(adminSecret){ enterAdmin(adminSecret); } else { $('gatePassword').focus(); }

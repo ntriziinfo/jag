@@ -216,11 +216,10 @@ export default async function handler(req, res){
     if(!requireSupabase(res)) return;
     const origin = "https://" + req.headers.host;
     if(pathname === "/api/machines" && req.method === "GET"){
-      const [machines, records] = await Promise.all([
-        getAllMachines(),
-        recentResultRecords(300).catch(()=>[])
-      ]);
-      return json(res, 200, machines.map(machine=>publicMachine(machine, machineTotalFor(machine, records))));
+      const machines = await getAllMachines();
+      // Keep the frequently-polled machine list lightweight. Completed-session
+      // history is loaded separately by the authenticated admin results route.
+      return json(res, 200, machines.map(machine=>publicMachine(machine, machineTotalFor(machine, []))));
     }
     if(pathname === "/api/admin/issue-password" && req.method === "POST"){
       if(!adminOk(req)) return json(res, 401, {ok:false, error:"admin password required"});
