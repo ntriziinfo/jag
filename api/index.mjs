@@ -76,7 +76,10 @@ function validMachineId(id){ const n = Number(id); return isDebugMachine(id) || 
 function emptyMachine(id){ return {machineId:String(id), displayName:String(id) === DEBUG_MACHINE_ID ? "確認台" : String(id)+"番台", online:false, locked:false, resetSerial:0, currentSessionId:"", currentPlayerName:"", lastSnapshot:null, lastEndedSession:null, updatedAt:0, assignedSetting:1}; }
 function machineFromRow(row){
   if(!row) return null;
-  return {machineId:String(row.machine_id), displayName:row.display_name || (String(row.machine_id) === DEBUG_MACHINE_ID ? "確認台" : String(row.machine_id)+"番台"), online:Date.now() - Number(row.updated_at_ms || 0) < 90000, locked:!!row.locked, resetSerial:Number(row.reset_serial || 0), currentSessionId:row.current_session_id || "", currentPlayerName:row.current_player_name || "", lastSnapshot:row.last_snapshot || null, lastEndedSession:row.last_ended_session || null, updatedAt:Number(row.updated_at_ms || 0), assignedSetting:Number(row.assigned_setting || 1)};
+  const projectedSnapshot = row.snapshot_stats || row.snapshot_settings || row.snapshot_play_session_id || row.snapshot_play_session_start_stats
+    ? {stats:row.snapshot_stats || null, settings:row.snapshot_settings || null, playSessionId:row.snapshot_play_session_id || "", playSessionStartStats:row.snapshot_play_session_start_stats || null}
+    : null;
+  return {machineId:String(row.machine_id), displayName:row.display_name || (String(row.machine_id) === DEBUG_MACHINE_ID ? "確認台" : String(row.machine_id)+"番台"), online:Date.now() - Number(row.updated_at_ms || 0) < 90000, locked:!!row.locked, resetSerial:Number(row.reset_serial || 0), currentSessionId:row.current_session_id || "", currentPlayerName:row.current_player_name || "", lastSnapshot:row.last_snapshot || projectedSnapshot, lastEndedSession:row.last_ended_session || null, updatedAt:Number(row.updated_at_ms || 0), assignedSetting:Number(row.assigned_setting || 1)};
 }
 function publicMachine(machine, machineTotal){
   const snapshot = machine.lastSnapshot || null;
@@ -89,8 +92,8 @@ async function getMachine(id){
   return machineFromRow(rows[0]) || emptyMachine(id);
 }
 async function getAllMachines(){
-  const fields = "machine_id,display_name,locked,reset_serial,current_session_id,current_player_name,last_snapshot,updated_at_ms,assigned_setting";
-  const rows = await sb("machine_states?select=" + fields + "&order=machine_id.asc");
+  const fields = "machine_id,display_name,locked,reset_serial,current_session_id,current_player_name,updated_at_ms,assigned_setting,snapshot_stats:last_snapshot->stats,snapshot_settings:last_snapshot->settings,snapshot_play_session_id:last_snapshot->>playSessionId,snapshot_play_session_start_stats:last_snapshot->playSessionStartStats";
+  const rows = await sb("machine_states?select=" + encodeURIComponent(fields) + "&order=machine_id.asc");
   const byId = new Map(rows.map(row=>[String(row.machine_id), machineFromRow(row)]));
   const out = [];
   for(let i=1;i<=MACHINE_COUNT;i++) out.push(byId.get(String(i)) || emptyMachine(i));
