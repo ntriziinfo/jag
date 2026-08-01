@@ -89,7 +89,8 @@ async function getMachine(id){
   return machineFromRow(rows[0]) || emptyMachine(id);
 }
 async function getAllMachines(){
-  const rows = await sb("machine_states?select=*&order=machine_id.asc");
+  const fields = "machine_id,display_name,locked,reset_serial,current_session_id,current_player_name,last_snapshot,updated_at_ms,assigned_setting";
+  const rows = await sb("machine_states?select=" + fields + "&order=machine_id.asc");
   const byId = new Map(rows.map(row=>[String(row.machine_id), machineFromRow(row)]));
   const out = [];
   for(let i=1;i<=MACHINE_COUNT;i++) out.push(byId.get(String(i)) || emptyMachine(i));
