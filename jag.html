@@ -10666,33 +10666,39 @@ body{
 
   function reduceSlumpPoints(points, maxPoints){
     if(points.length <= maxPoints) return points;
-    const bucketCount = Math.max(1, Math.floor(maxPoints / 3));
-    const bucketSize = Math.ceil(points.length / bucketCount);
-    const reduced = [];
-    const pushCandidate = candidate => {
-      if(!candidate || !candidate.point) return;
-      const last = reduced[reduced.length - 1];
-      if(last && last.spin === candidate.point.spin && last.profit === candidate.point.profit) return;
-      reduced.push(candidate.point);
-    };
+    const first = points[0];
+    const last = points[points.length - 1];
+    const firstSpin = Number(first.spin) || 0;
+    const lastSpin = Number(last.spin) || firstSpin;
+    const spinRange = lastSpin - firstSpin;
+    if(spinRange <= 0) return points.slice(-maxPoints);
 
-    for(let i=0;i<points.length;i+=bucketSize){
-      const bucket = points.slice(i, i + bucketSize);
-      let min = {index:i, point:bucket[0]};
-      let max = {index:i, point:bucket[0]};
-      bucket.forEach((point, offset)=>{
-        const index = i + offset;
-        if(point.profit < min.point.profit) min = {index, point};
-        if(point.profit > max.point.profit) max = {index, point};
-      });
-      [
-        {index:i, point:bucket[0]},
-        min,
-        max,
-        {index:i + bucket.length - 1, point:bucket[bucket.length - 1]}
-      ].sort((a,b)=>a.index - b.index).forEach(pushCandidate);
+    const bucketCount = Math.max(1, Math.floor((maxPoints - 2) / 2));
+    const buckets = Array.from({length:bucketCount}, ()=>({min:null, max:null}));
+    for(let index=1; index<points.length - 1; index+=1){
+      const point = points[index];
+      const spin = Number(point.spin) || firstSpin;
+      const bucketIndex = Math.min(bucketCount - 1, Math.max(0,
+        Math.floor(((spin - firstSpin) / spinRange) * bucketCount)
+      ));
+      const entry = {index, point};
+      const bucket = buckets[bucketIndex];
+      if(!bucket.min || point.profit < bucket.min.point.profit) bucket.min = entry;
+      if(!bucket.max || point.profit > bucket.max.point.profit) bucket.max = entry;
     }
-    return reduced;
+
+    const reduced = [first];
+    for(const bucket of buckets){
+      const candidates = [bucket.min, bucket.max]
+        .filter(Boolean)
+        .sort((a,b)=>a.index - b.index);
+      for(const candidate of candidates){
+        const previous = reduced[reduced.length - 1];
+        if(previous !== candidate.point) reduced.push(candidate.point);
+      }
+    }
+    if(reduced[reduced.length - 1] !== last) reduced.push(last);
+    return reduced.slice(0, maxPoints);
   }
 
   function renderSlumpGraph(){

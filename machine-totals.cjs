@@ -142,22 +142,35 @@ function currentPlayerView(machine){
 function compactHistory(points, maxPoints=720){
   const normalized = normalizeHistory(points);
   if(normalized.length <= maxPoints) return normalized;
-  const output = [normalized[0]];
-  const middle = normalized.slice(1, -1);
+  const first = normalized[0];
+  const last = normalized[normalized.length - 1];
+  const firstSpin = num(first.spin);
+  const lastSpin = num(last.spin);
+  const spinRange = lastSpin - firstSpin;
+  if(spinRange <= 0) return normalized.slice(-maxPoints);
+
   const bucketCount = Math.max(1, Math.floor((maxPoints - 2) / 2));
-  const bucketSize = Math.ceil(middle.length / bucketCount);
-  for(let offset=0;offset<middle.length;offset+=bucketSize){
-    const bucket = middle.slice(offset, offset + bucketSize);
-    let minIndex = 0;
-    let maxIndex = 0;
-    for(let index=1;index<bucket.length;index++){
-      if(bucket[index].profit < bucket[minIndex].profit) minIndex = index;
-      if(bucket[index].profit > bucket[maxIndex].profit) maxIndex = index;
-    }
-    for(const index of [...new Set([minIndex, maxIndex])].sort((a,b)=>a-b)) appendPoint(output, bucket[index]);
+  const buckets = Array.from({length:bucketCount}, ()=>({min:null, max:null}));
+  for(let index=1;index<normalized.length - 1;index++){
+    const point = normalized[index];
+    const bucketIndex = Math.min(bucketCount - 1, Math.max(0,
+      Math.floor(((num(point.spin) - firstSpin) / spinRange) * bucketCount)
+    ));
+    const entry = {index, point};
+    const bucket = buckets[bucketIndex];
+    if(!bucket.min || point.profit < bucket.min.point.profit) bucket.min = entry;
+    if(!bucket.max || point.profit > bucket.max.point.profit) bucket.max = entry;
   }
-  appendPoint(output, normalized[normalized.length - 1]);
-  return output;
+
+  const output = [first];
+  for(const bucket of buckets){
+    const candidates = [bucket.min, bucket.max].filter(Boolean).sort((a,b)=>a.index-b.index);
+    for(const candidate of candidates){
+      if(output[output.length - 1] !== candidate.point) appendPoint(output, candidate.point);
+    }
+  }
+  appendPoint(output, last);
+  return output.slice(0, maxPoints);
 }
 
 function machineTotalFor(machine, records=[]){

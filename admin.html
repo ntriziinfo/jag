@@ -233,6 +233,25 @@ function displayViewForMachine(machine){
 function historyFor(machine){ return machine._displayHistory || [{spin:0, profit:0}]; }
 function currentProfit(machine){ const points = historyFor(machine); return Number(points[points.length - 1].profit) || 0; }
 function graphBounds(machine){ const profits = historyFor(machine).map(p => Number(p.profit) || 0); return {min:Math.min(0, ...profits), max:Math.max(0, ...profits)}; }
+function drawableHistory(points){
+  const source = Array.isArray(points) ? points : [];
+  if(source.length < 4) return source;
+  const gaps = [];
+  for(let index = 1; index < source.length; index += 1){
+    const gap = (Number(source[index] && source[index].spin) || 0) - (Number(source[index - 1] && source[index - 1].spin) || 0);
+    if(gap > 0) gaps.push(gap);
+  }
+  if(!gaps.length) return source;
+  gaps.sort((a,b)=>a-b);
+  const medianGap = gaps[Math.floor(gaps.length / 2)] || 1;
+  const breakThreshold = Math.max(25, medianGap * 12);
+  let lastBreakIndex = -1;
+  for(let index = 1; index < source.length; index += 1){
+    const gap = (Number(source[index] && source[index].spin) || 0) - (Number(source[index - 1] && source[index - 1].spin) || 0);
+    if(gap > breakThreshold && source.length - index >= 3) lastBreakIndex = index;
+  }
+  return lastBreakIndex > 0 ? source.slice(lastBreakIndex) : source;
+}
 function drawSlump(canvas, points){
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
@@ -247,7 +266,7 @@ function drawSlump(canvas, points){
   ctx.strokeStyle = '#273044';
   ctx.lineWidth = 1;
   for(let i=1;i<5;i++){ const y = h*i/5; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
-  points = Array.isArray(points) && points.length ? points : [{spin:0, profit:0}];
+  points = drawableHistory(Array.isArray(points) && points.length ? points : [{spin:0, profit:0}]);
   const profits = points.map(p => Number(p.profit) || 0);
   let min = Math.min(0, ...profits), max = Math.max(0, ...profits);
   if(min === max){ min -= 100; max += 100; }
