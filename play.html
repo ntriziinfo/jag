@@ -32,8 +32,8 @@ let active = null;
 const params = new URLSearchParams(location.search);
 const entryMachineId = params.get('machine') || '';
 if(entryMachineId){
-  $('entryMachineTitle').textContent = entryMachineId + '号機';
-  $('entryHelp').textContent = entryMachineId + '号機用のパスワードを入力してください。';
+  $('entryMachineTitle').textContent = entryMachineId + '番台';
+  $('entryHelp').textContent = entryMachineId + '番台用のパスワードを入力してください。';
 }else{
   $('entryMachineTitle').textContent = '';
 }
@@ -56,7 +56,7 @@ async function start(){
   const data = await res.json();
   if(!data.ok){ $('error').textContent = friendlyError(data.error); $('startBtn').disabled = false; $('startBtn').textContent = 'この台で開始'; return; }
   active = data.session;
-  $('machineLabel').textContent = `${active.machineId}号機`;
+  $('machineLabel').textContent = `${active.machineId}番台`;
   $('playerLabel').textContent = active.playerName ? ` / ${active.playerName}` : '';
   $('slot').src = data.iframeUrl;
   $('login').hidden = true;

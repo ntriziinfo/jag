@@ -44,7 +44,7 @@ function render(machines){
     const s = m.machineTotalStats || {}; const profit = s.profit ?? ((s.totalPaid||0)-(s.totalFee||0));
     const free = !m.locked;
     return `<article class="machine">
-      <div class="head"><h2>${m.machineId}号機</h2><span class="pill ${free ? 'free' : 'lock'}">${free ? '空き' : '使用不可'}</span></div>
+      <div class="head"><h2>${m.machineId}番台</h2><span class="pill ${free ? 'free' : 'lock'}">${free ? '空き' : '使用不可'}</span></div>
       <canvas class="graph" data-machine="${m.machineId}"></canvas>
       <div class="stats"><div class="stat"><span>G数</span><b>${fmt(s.totalSpins)}</b></div><div class="stat"><span>BB</span><b>${fmt(s.bigCount)}</b></div><div class="stat"><span>RB</span><b>${fmt(s.midCount)}</b></div><div class="stat"><span>差枚</span><b>${signed(profit)}</b></div></div>
       <div class="actions"><a class="${free ? '' : 'disabled'}" href="/play.html?machine=${m.machineId}">この台で遊ぶ</a></div>

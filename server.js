@@ -13,7 +13,7 @@ const STATE_FILE = path.join(DATA_DIR, "admin-state.json");
 const RESULTS_FILE = path.join(DATA_DIR, "session-results.jsonl");
 const SHEETS_WEBHOOK_URL = String(process.env.GOOGLE_SHEETS_WEBHOOK_URL || "").trim();
 const ADMIN_PASSWORD = String(process.env.ADMIN_PASSWORD || "");
-const MACHINE_COUNT = 6;
+const MACHINE_COUNT = 12;
 const DEBUG_MACHINE_ID = "debug";
 
 const machines = new Map();
@@ -21,7 +21,7 @@ const adminClients = new Set();
 const commandClients = new Map();
 
 function isDebugMachine(id){ return String(id) === DEBUG_MACHINE_ID; }
-function machineLabel(id){ return isDebugMachine(id) ? "確認台" : `${id}号機`; }
+function machineLabel(id){ return isDebugMachine(id) ? "確認台" : `${id}番台`; }
 function emptyMachine(id){
   return {
     machineId:String(id),
@@ -128,7 +128,7 @@ function publicMachine(machine, machineTotal){
   const settings = snapshot && snapshot.settings ? snapshot.settings : {setting:machine.assignedSetting || 1, completeLimitPt:19000};
   return {
     machineId:machine.machineId,
-    displayName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : `${machine.machineId}号機`),
+    displayName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : `${machine.machineId}番台`),
     online:!!machine.online,
     locked:!!machine.locked,
     currentSessionId:machine.currentSessionId || "",
@@ -300,7 +300,7 @@ function resultPayload(session, machine, body){
     endedAt:new Date(now).toISOString(),
     endedAtMs:now,
     machineId:machine.machineId,
-    machineName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : `${machine.machineId}号機`),
+    machineName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : `${machine.machineId}番台`),
     playerName:session.playerName || body.playerName || "",
     sessionId:session.sessionId,
     password:session.password,
@@ -580,7 +580,7 @@ const server = http.createServer(async (req, res)=>{
       }
       const snapshot = {...body, machineId, online:true, updatedAt:Date.now()};
       machine.lastSnapshot = snapshot;
-      machine.displayName = body.name || machine.displayName || `${machineId}号機`;
+      machine.displayName = body.name || machine.displayName || `${machineId}番台`;
       machine.online = true;
       machine.updatedAt = Date.now();
       machines.set(machineId, machine);

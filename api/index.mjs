@@ -4,7 +4,7 @@ import machineTotals from "../machine-totals.cjs";
 
 const {machineTotalFor} = machineTotals;
 
-const MACHINE_COUNT = 6;
+const MACHINE_COUNT = 12;
 const DEBUG_MACHINE_ID = "debug";
 const SUPABASE_URL = String(process.env.SUPABASE_URL || "").replace(/\/$/, "");
 const SUPABASE_KEY = String(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || "");
@@ -73,16 +73,16 @@ function generatePassword(){
 }
 function isDebugMachine(id){ return String(id) === DEBUG_MACHINE_ID; }
 function validMachineId(id){ const n = Number(id); return isDebugMachine(id) || (Number.isInteger(n) && n >= 1 && n <= MACHINE_COUNT); }
-function emptyMachine(id){ return {machineId:String(id), displayName:String(id) === DEBUG_MACHINE_ID ? "確認台" : String(id)+"号機", online:false, locked:false, resetSerial:0, currentSessionId:"", currentPlayerName:"", lastSnapshot:null, lastEndedSession:null, updatedAt:0, assignedSetting:1}; }
+function emptyMachine(id){ return {machineId:String(id), displayName:String(id) === DEBUG_MACHINE_ID ? "確認台" : String(id)+"番台", online:false, locked:false, resetSerial:0, currentSessionId:"", currentPlayerName:"", lastSnapshot:null, lastEndedSession:null, updatedAt:0, assignedSetting:1}; }
 function machineFromRow(row){
   if(!row) return null;
-  return {machineId:String(row.machine_id), displayName:row.display_name || (String(row.machine_id) === DEBUG_MACHINE_ID ? "確認台" : String(row.machine_id)+"号機"), online:Date.now() - Number(row.updated_at_ms || 0) < 90000, locked:!!row.locked, resetSerial:Number(row.reset_serial || 0), currentSessionId:row.current_session_id || "", currentPlayerName:row.current_player_name || "", lastSnapshot:row.last_snapshot || null, lastEndedSession:row.last_ended_session || null, updatedAt:Number(row.updated_at_ms || 0), assignedSetting:Number(row.assigned_setting || 1)};
+  return {machineId:String(row.machine_id), displayName:row.display_name || (String(row.machine_id) === DEBUG_MACHINE_ID ? "確認台" : String(row.machine_id)+"番台"), online:Date.now() - Number(row.updated_at_ms || 0) < 90000, locked:!!row.locked, resetSerial:Number(row.reset_serial || 0), currentSessionId:row.current_session_id || "", currentPlayerName:row.current_player_name || "", lastSnapshot:row.last_snapshot || null, lastEndedSession:row.last_ended_session || null, updatedAt:Number(row.updated_at_ms || 0), assignedSetting:Number(row.assigned_setting || 1)};
 }
 function publicMachine(machine, machineTotal){
   const snapshot = machine.lastSnapshot || null;
   const stats = snapshot && snapshot.stats ? snapshot.stats : null;
   const settings = snapshot && snapshot.settings ? snapshot.settings : {setting:machine.assignedSetting || 1, completeLimitPt:19000};
-  return {machineId:machine.machineId, displayName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : machine.machineId+"号機"), online:!!machine.online, locked:!!machine.locked, currentSessionId:machine.currentSessionId || "", currentPlayerName:machine.currentPlayerName || "", updatedAt:machine.updatedAt || 0, resetSerial:machine.resetSerial || 0, assignedSetting:machine.assignedSetting || (stats && stats.setting) || settings.setting || 1, lastEndedSession:machine.lastEndedSession || null, playSessionId:snapshot && snapshot.playSessionId || "", playSessionStartStats:snapshot && snapshot.playSessionStartStats || null, settings, stats, slumpHistory:stats && Array.isArray(stats.slumpHistory) ? stats.slumpHistory : [{spin:0, profit:0}], machineTotalStats:machineTotal.stats, machineTotalSlumpHistory:machineTotal.history};
+  return {machineId:machine.machineId, displayName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : machine.machineId+"番台"), online:!!machine.online, locked:!!machine.locked, currentSessionId:machine.currentSessionId || "", currentPlayerName:machine.currentPlayerName || "", updatedAt:machine.updatedAt || 0, resetSerial:machine.resetSerial || 0, assignedSetting:machine.assignedSetting || (stats && stats.setting) || settings.setting || 1, lastEndedSession:machine.lastEndedSession || null, playSessionId:snapshot && snapshot.playSessionId || "", playSessionStartStats:snapshot && snapshot.playSessionStartStats || null, settings, stats, slumpHistory:stats && Array.isArray(stats.slumpHistory) ? stats.slumpHistory : [{spin:0, profit:0}], machineTotalStats:machineTotal.stats, machineTotalSlumpHistory:machineTotal.history};
 }
 async function getMachine(id){
   const rows = await sb("machine_states?machine_id=eq." + encodeURIComponent(String(id)) + "&select=*&limit=1");
@@ -97,7 +97,7 @@ async function getAllMachines(){
   return out;
 }
 async function upsertMachine(machine){
-  const row = {machine_id:String(machine.machineId), display_name:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : machine.machineId+"号機"), locked:!!machine.locked, reset_serial:Number(machine.resetSerial || 0), current_session_id:machine.currentSessionId || "", current_player_name:machine.currentPlayerName || "", last_snapshot:machine.lastSnapshot || null, last_ended_session:machine.lastEndedSession || null, updated_at_ms:Number(machine.updatedAt || 0), assigned_setting:Number(machine.assignedSetting || 1)};
+  const row = {machine_id:String(machine.machineId), display_name:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : machine.machineId+"番台"), locked:!!machine.locked, reset_serial:Number(machine.resetSerial || 0), current_session_id:machine.currentSessionId || "", current_player_name:machine.currentPlayerName || "", last_snapshot:machine.lastSnapshot || null, last_ended_session:machine.lastEndedSession || null, updated_at_ms:Number(machine.updatedAt || 0), assigned_setting:Number(machine.assignedSetting || 1)};
   return sb("machine_states?on_conflict=machine_id", {method:"POST", headers:{Prefer:"resolution=merge-duplicates,return=representation"}, body:JSON.stringify(row)});
 }
 async function getIssued(password){
@@ -204,7 +204,7 @@ function resultPayload(session, machine, body){
   const settings = snapshot.settings || {};
   const delta = sessionDelta(session, snapshot);
   const endedAtMs = ms();
-  return {type:"slot-session-ended", endedAt:new Date(endedAtMs).toISOString(), endedAtMs, machineId:machine.machineId, machineName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : machine.machineId+"号機"), playerName:session.playerName || body.playerName || "", sessionId:session.sessionId, password:session.password, resetSerial:Number(session.resetSerialAtStart ?? machine.resetSerial) || 0, setting:settings.setting || machine.assignedSetting || "", totalSpins:stats.totalSpins || 0, bigCount:stats.bigCount || 0, regCount:stats.midCount || 0, grapeCount:stats.grapeCount || 0, totalFee:stats.totalFee || 0, totalPaid:stats.totalPaid || 0, profit:Number(stats.profit ?? ((stats.totalPaid || 0) - (stats.totalFee || 0))) || 0, playerSpins:delta.playerSpins, playerBigCount:delta.playerBigCount, playerRegCount:delta.playerRegCount, playerGrapeCount:delta.playerGrapeCount, playerTotalFee:delta.playerTotalFee, playerTotalPaid:delta.playerTotalPaid, playerProfit:delta.playerProfit, billingBasis:"playerProfit", playerBaselineSource:delta.baselineSource, startStats:delta.startStats, currentResultText:snapshot.state ? snapshot.state.resultText || "" : "", stats, settings, normalState:snapshot.normalState || {}, session:snapshot.session || {}};
+  return {type:"slot-session-ended", endedAt:new Date(endedAtMs).toISOString(), endedAtMs, machineId:machine.machineId, machineName:machine.displayName || (String(machine.machineId) === DEBUG_MACHINE_ID ? "確認台" : machine.machineId+"番台"), playerName:session.playerName || body.playerName || "", sessionId:session.sessionId, password:session.password, resetSerial:Number(session.resetSerialAtStart ?? machine.resetSerial) || 0, setting:settings.setting || machine.assignedSetting || "", totalSpins:stats.totalSpins || 0, bigCount:stats.bigCount || 0, regCount:stats.midCount || 0, grapeCount:stats.grapeCount || 0, totalFee:stats.totalFee || 0, totalPaid:stats.totalPaid || 0, profit:Number(stats.profit ?? ((stats.totalPaid || 0) - (stats.totalFee || 0))) || 0, playerSpins:delta.playerSpins, playerBigCount:delta.playerBigCount, playerRegCount:delta.playerRegCount, playerGrapeCount:delta.playerGrapeCount, playerTotalFee:delta.playerTotalFee, playerTotalPaid:delta.playerTotalPaid, playerProfit:delta.playerProfit, billingBasis:"playerProfit", playerBaselineSource:delta.baselineSource, startStats:delta.startStats, currentResultText:snapshot.state ? snapshot.state.resultText || "" : "", stats, settings, normalState:snapshot.normalState || {}, session:snapshot.session || {}};
 }
 
 export default async function handler(req, res){
@@ -280,7 +280,7 @@ export default async function handler(req, res){
         return json(res, 200, {ok:true, ignored:true, reason:"stale play session"});
       }
       machine.lastSnapshot = {...body, machineId, online:true, updatedAt:ms()};
-      machine.displayName = body.name || machine.displayName || machineId+"号機";
+      machine.displayName = body.name || machine.displayName || machineId+"番台";
       machine.updatedAt = ms();
       if(body.settings && body.settings.setting) machine.assignedSetting = Number(body.settings.setting) || machine.assignedSetting;
       await upsertMachine(machine);

@@ -36,7 +36,7 @@
 
   <section class="panel">
     <div class="sectionHead">
-      <h2>6台状況</h2>
+      <h2>12台状況</h2>
       <div class="viewSwitch" role="group" aria-label="表示データ切替">
         <button id="machineTotalViewBtn" type="button">台累計</button>
         <button id="machinePlayerViewBtn" type="button">個人</button>
@@ -68,7 +68,7 @@ function adminHeaders(){ return adminSecret ? {'X-Admin-Password':adminSecret} :
 function fmt(n){ return Number(n || 0).toLocaleString('ja-JP'); }
 function signed(n){ n = Number(n || 0); return (n >= 0 ? '+' : '') + fmt(n); }
 function isDebugMachine(machine){ return String(machine.machineId) === "debug"; }
-function machineLabel(machine){ return isDebugMachine(machine) ? "確認台" : machine.machineId + "号機"; }
+function machineLabel(machine){ return isDebugMachine(machine) ? "確認台" : machine.machineId + "番台"; }
 function liveMachines(){ return machines.filter(m => !isDebugMachine(m)); }
 function debugMachine(){ return machines.find(isDebugMachine) || {machineId:"debug", displayName:"確認台", stats:null, slumpHistory:[{spin:0, profit:0}]}; }
 function status(machine){ if(machine.currentSessionId || machine.locked) return ['使用中','lock']; return ['空き','']; }
@@ -312,14 +312,14 @@ async function loadPasswords(){
   const res = await fetch('/api/admin/passwords', {headers:adminHeaders()});
   if(!res.ok){ $('passwordList').innerHTML = '<div class="bad">管理パスが必要です</div>'; return; }
   const rows = await res.json();
-  $('passwordList').innerHTML = rows.map(p => `<div class="item"><b class="code">${p.password}</b><span>${escapeHtml(p.playerName)} / ${p.machineId}号機</span><span>${p.status}</span><span>${new Date(p.issuedAt).toLocaleString('ja-JP')}</span></div>`).join('') || '<div class="muted">まだありません</div>';
+  $('passwordList').innerHTML = rows.map(p => `<div class="item"><b class="code">${p.password}</b><span>${escapeHtml(p.playerName)} / ${p.machineId}番台</span><span>${p.status}</span><span>${new Date(p.issuedAt).toLocaleString('ja-JP')}</span></div>`).join('') || '<div class="muted">まだありません</div>';
 }
 async function loadResults(){
   const res = await fetch('/api/results', {headers:adminHeaders()});
   if(!res.ok){ sessionResults = []; $('results').innerHTML = '<div class="bad">管理パスが必要です</div>'; renderMachines(); return; }
   const rows = await res.json();
   sessionResults = Array.isArray(rows) ? rows : [];
-  $('results').innerHTML = rows.map(r => `<div class="item"><b>${r.machineId}号機</b><span>${escapeHtml(r.playerName)} / 請求差枚 ${signed(r.playerProfit ?? r.profit)}pt / ${fmt(r.playerSpins ?? r.totalSpins)}G / BB ${fmt(r.playerBigCount ?? r.bigCount)} / RB ${fmt(r.playerRegCount ?? r.regCount)}</span><span>${r.sheets && r.sheets.ok ? '<span class="ok">Sheets</span>' : '<span class="muted">local</span>'}</span><span>${new Date(r.endedAt).toLocaleString('ja-JP')}</span></div>`).join('') || '<div class="muted">まだありません</div>';
+  $('results').innerHTML = rows.map(r => `<div class="item"><b>${r.machineId}番台</b><span>${escapeHtml(r.playerName)} / 請求差枚 ${signed(r.playerProfit ?? r.profit)}pt / ${fmt(r.playerSpins ?? r.totalSpins)}G / BB ${fmt(r.playerBigCount ?? r.bigCount)} / RB ${fmt(r.playerRegCount ?? r.regCount)}</span><span>${r.sheets && r.sheets.ok ? '<span class="ok">Sheets</span>' : '<span class="muted">local</span>'}</span><span>${new Date(r.endedAt).toLocaleString('ja-JP')}</span></div>`).join('') || '<div class="muted">まだありません</div>';
   renderMachines();
 }
 async function issue(){
@@ -339,26 +339,26 @@ async function applySetting(id){
   const res = await fetch('/api/admin/machines/' + encodeURIComponent(id) + '/setting', {method:'POST', headers:{'Content-Type':'application/json', ...adminHeaders()}, body:JSON.stringify({setting:value, completeLimitPt})});
   const data = await res.json();
   if(!data.ok){ alert(data.error || '設定反映に失敗しました'); return; }
-  alert(id + '号機へ設定' + data.setting + '・コンプリート' + data.completeLimitPt + '枚を反映しました');
+  alert(id + '番台へ設定' + data.setting + '・コンプリート' + data.completeLimitPt + '枚を反映しました');
   await loadMachines();
 }
 async function forceEndMachine(id){
-  if(!confirm(id + "号機の強制終了を実行しますか？\n\n最後に保存されたデータで清算し、空き台に戻します。")) return;
+  if(!confirm(id + "番台の強制終了を実行しますか？\n\n最後に保存されたデータで清算し、空き台に戻します。")) return;
   const res = await fetch("/api/admin/machines/" + encodeURIComponent(id) + "/force-end", {method:"POST", headers:adminHeaders()});
   const data = await res.json();
   if(!data.ok){ alert(data.error || "強制終了に失敗しました"); return; }
   alert(data.queued
-    ? id + "号機へ強制終了指示を送信しました。お客様画面が再読み込みされ、最新データで終了します。"
+    ? id + "番台へ強制終了指示を送信しました。お客様画面が再読み込みされ、最新データで終了します。"
     : data.released
-      ? id + "号機の終了済みデータを保持したまま、空き台に戻しました。"
+      ? id + "番台の終了済みデータを保持したまま、空き台に戻しました。"
       : data.forced
-        ? id + "号機を強制清算し、空き台に戻しました。"
-        : id + "号機を強制終了しました。空き台に戻しました");
+        ? id + "番台を強制清算し、空き台に戻しました。"
+        : id + "番台を強制終了しました。空き台に戻しました");
   await new Promise(resolve => setTimeout(resolve, data.queued ? 1800 : 0));
   await Promise.all([loadMachines(), loadResults()]);
 }
 async function resetMachine(id){
-  if(!confirm(`${id}号機をリセットします。スランプグラフと終了保持データも消えます。`)) return;
+  if(!confirm(`${id}番台をリセットします。スランプグラフと終了保持データも消えます。`)) return;
   const res = await fetch(`/api/admin/machines/${encodeURIComponent(id)}/reset`, {method:'POST', headers:adminHeaders()});
   const data = await res.json();
   if(!data.ok) alert(data.error || 'リセット失敗');

@@ -7998,7 +7998,7 @@ body{
   let adminCommandPollTimer = null;
   const ADMIN_COMMAND_LAST_ID_KEY = "jag_admin_command_last_id_" + machineId;
   let adminCommandLastId = Number(safeStorageGet(ADMIN_COMMAND_LAST_ID_KEY) || 0) || 0;
-  const ADMIN_STATE_PUSH_INTERVAL_MS = 5000;
+  const ADMIN_STATE_PUSH_INTERVAL_MS = 60000;
   const SLOT_DEBUG_ENABLED = adminParams.get("debug") === "1";
   const CREDIT_BASELINE_PROFIT = Number(adminParams.get("creditBaseline") || 0) || 0;
   const PLAY_SESSION_ID = bootPlaySessionId;
@@ -11339,6 +11339,7 @@ body{
 
   function adminSnapshot(){
     const profit = stats.totalPaid - stats.totalFee;
+    const adminStats = compactStatsForResume();
     return {
       machineId,
       playSessionId:PLAY_SESSION_ID,
@@ -11361,7 +11362,7 @@ body{
         audioMuted: settings.audioMuted,
         completeLimitPt: completeLimitPt()
       },
-      stats:{...stats, profit},
+      stats:{...adminStats, profit},
       normalState:{...normalState},
       session:{...session},
       completeTrialState:{...completeTrialState},
