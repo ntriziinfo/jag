@@ -537,8 +537,12 @@ async function resetMachine(id){
   await Promise.all([loadMachines(), loadResults()]);
 }
 async function verifyAdminPassword(password){
-  const res = await fetch('/api/admin/passwords', {headers:password ? {'X-Admin-Password':password} : {}});
-  return res.ok;
+  try{
+    const res = await fetch('/api/admin/verify', {headers:password ? {'X-Admin-Password':password} : {}, cache:'no-store'});
+    return res.ok;
+  }catch(e){
+    return false;
+  }
 }
 async function enterAdmin(password){
   const value = String(password || '').trim();

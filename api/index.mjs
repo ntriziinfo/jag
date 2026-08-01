@@ -217,6 +217,11 @@ export default async function handler(req, res){
     const rawPath = Array.isArray(req.query.path) ? req.query.path.join("/") : String(req.query.path || "");
     const pathname = "/api/" + rawPath;
     if(pathname === "/api/health") return json(res, 200, {ok:true, supabaseUrlSet:!!SUPABASE_URL, supabaseKeySet:!!SUPABASE_KEY});
+    if(pathname === "/api/admin/verify" && req.method === "GET"){
+      return adminOk(req)
+        ? json(res, 200, {ok:true})
+        : json(res, 401, {ok:false, error:"admin password required"});
+    }
     if(!requireSupabase(res)) return;
     const origin = "https://" + req.headers.host;
     if(pathname === "/api/machines" && req.method === "GET"){
