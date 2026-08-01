@@ -84,8 +84,9 @@ function fmt(n){ return Number(n || 0).toLocaleString('ja-JP'); }
 function signed(n){ n = Number(n || 0); return (n >= 0 ? '+' : '') + fmt(n); }
 function isDebugMachine(machine){ return String(machine.machineId) === "debug"; }
 function machineLabel(machine){ return isDebugMachine(machine) ? "確認台" : machine.machineId + "番台"; }
-function liveMachines(){ return machines.filter(m => !isDebugMachine(m)); }
-function debugMachine(){ return machines.find(isDebugMachine) || {machineId:"debug", displayName:"確認台", stats:null, slumpHistory:[{spin:0, profit:0}]}; }
+function machineRows(){ return Array.isArray(machines) ? machines : []; }
+function liveMachines(){ return machineRows().filter(m => !isDebugMachine(m)); }
+function debugMachine(){ return machineRows().find(isDebugMachine) || {machineId:"debug", displayName:"確認台", stats:null, slumpHistory:[{spin:0, profit:0}]}; }
 function status(machine){ if(machine.currentSessionId || machine.locked) return ['使用中','lock']; return ['空き','']; }
 function num(value){ return Number(value) || 0; }
 function stat(stats, key){ return num(stats && stats[key]); }
@@ -284,7 +285,7 @@ function drawSlump(canvas, points){
   ctx.stroke();
 }
 function renderAdminSlumpGraphs(){
-  for(const m of machines){
+  for(const m of machineRows()){
     const c = document.querySelector('canvas[data-machine="' + m.machineId + '"]');
     if(c) drawSlump(c, historyFor(m));
   }
@@ -357,18 +358,31 @@ function renderMachines(){
   renderAdminSlumpGraphs();
 }
 function escapeHtml(v){ return String(v ?? '').replace(/[&<>'"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
-async function loadMachines(){ const res = await fetch('/api/machines'); machines = await res.json(); renderMachines(); }
+async function loadMachines(){
+  const res = await fetch('/api/machines', {cache:'no-store'});
+  const data = await res.json().catch(() => null);
+  if(!res.ok || !Array.isArray(data)){
+    const statusEl = $('bulkStatus');
+    if(statusEl) statusEl.textContent = '台一覧の更新に失敗しました。前回の表示を維持しています。';
+    return false;
+  }
+  machines = data;
+  renderMachines();
+  return true;
+}
 async function loadPasswords(){
   const res = await fetch('/api/admin/passwords', {headers:adminHeaders()});
   if(!res.ok){ $('passwordList').innerHTML = '<div class="bad">管理パスが必要です</div>'; return; }
-  const rows = await res.json();
+  const data = await res.json().catch(() => []);
+  const rows = Array.isArray(data) ? data : [];
   $('passwordList').innerHTML = rows.map(p => `<div class="item"><b class="code">${p.password}</b><span>${escapeHtml(p.playerName)} / ${p.machineId}番台</span><span>${p.status}</span><span>${new Date(p.issuedAt).toLocaleString('ja-JP')}</span></div>`).join('') || '<div class="muted">まだありません</div>';
 }
 async function loadResults(){
   const res = await fetch('/api/results', {headers:adminHeaders()});
   if(!res.ok){ sessionResults = []; $('results').innerHTML = '<div class="bad">管理パスが必要です</div>'; renderMachines(); return; }
-  const rows = await res.json();
-  sessionResults = Array.isArray(rows) ? rows : [];
+  const data = await res.json().catch(() => []);
+  const rows = Array.isArray(data) ? data : [];
+  sessionResults = rows;
   $('results').innerHTML = rows.map(r => `<div class="item"><b>${r.machineId}番台</b><span>${escapeHtml(r.playerName)} / 請求差枚 ${signed(r.playerProfit ?? r.profit)}pt / ${fmt(r.playerSpins ?? r.totalSpins)}G / BB ${fmt(r.playerBigCount ?? r.bigCount)} / RB ${fmt(r.playerRegCount ?? r.regCount)}</span><span>${r.sheets && r.sheets.ok ? '<span class="ok">Sheets</span>' : '<span class="muted">local</span>'}</span><span>${new Date(r.endedAt).toLocaleString('ja-JP')}</span></div>`).join('') || '<div class="muted">まだありません</div>';
   renderMachines();
 }
@@ -550,7 +564,10 @@ $('issueBtn').addEventListener('click', issue);
 $('machineTotalViewBtn').addEventListener('click', ()=>setMachineDataView('total'));
 $('machinePlayerViewBtn').addEventListener('click', ()=>setMachineDataView('player'));
 window.addEventListener('resize', renderAdminSlumpGraphs);
-async function refreshAll(){ if(!adminSecret) return; await Promise.all([loadMachines(), loadPasswords(), loadResults()]); }
+async function refreshAll(){
+  if(!adminSecret) return;
+  await Promise.allSettled([loadMachines(), loadPasswords(), loadResults()]);
+}
 setInterval(refreshAll, 60000);
 if(adminSecret){ enterAdmin(adminSecret); } else { $('gatePassword').focus(); }
 </script>
