@@ -6,7 +6,7 @@
   <title>RISING 管理画面</title>
   <style>
     *{box-sizing:border-box} body{margin:0;background:#111318;color:#f7f4ea;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Yu Gothic",sans-serif} header{position:sticky;top:0;z-index:5;background:#171a21;border-bottom:1px solid #303641;padding:14px 20px;display:flex;gap:12px;align-items:center;justify-content:space-between} h1{font-size:20px;margin:0} main{padding:20px;display:grid;gap:18px}.panel{background:#1b1f28;border:1px solid #313846;border-radius:8px;padding:16px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.field{display:grid;gap:6px;min-width:150px}.field input,.field select,.settingMini{height:38px;border-radius:6px;border:1px solid #3d4656;background:#0f1218;color:#fff;padding:0 10px}button{height:38px;border:0;border-radius:6px;padding:0 13px;font-weight:800;cursor:pointer;background:#f0c85a;color:#1b1300}.ghost{background:#293140;color:#f3f7ff}.danger{background:#d54a4a;color:#fff}.muted{color:#9aa4b5;font-size:13px}.machines{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.machine{background:#151922;border:1px solid #2d3440;border-radius:8px;padding:12px;display:grid;gap:9px}.machine h3{margin:0;font-size:18px;display:flex;justify-content:space-between}.pill{font-size:12px;border-radius:999px;padding:3px 8px;background:#303848}.pill.on{background:#1f7a48}.pill.lock{background:#8a5422}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.adminSlumpGraph{width:100%;height:150px;background:#0b0e14;border:1px solid #2b3342;border-radius:6px}.graphStats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.debugBox{border-top:1px solid #2d3440;padding-top:9px;display:grid;gap:8px}.debugBtns{display:flex;gap:6px;flex-wrap:wrap}.debugBtns button{height:34px;padding:0 10px}.debugSelect{height:34px;border-radius:6px;border:1px solid #3d4656;background:#0f1218;color:#fff;padding:0 8px}.stat{background:#0f1218;border-radius:6px;padding:8px}.stat span{display:block;color:#97a3b8;font-size:12px}.stat b{font-size:16px}.passwordList,.results{display:grid;gap:7px;max-height:260px;overflow:auto}.item{display:grid;grid-template-columns:110px 1fr 90px 140px;gap:8px;align-items:center;background:#10141c;border:1px solid #2b3340;border-radius:6px;padding:8px}.code{font-size:20px;letter-spacing:.08em;color:#ffe07c;font-weight:1000}.ok{color:#6aff9e}.bad{color:#ff8b8b}body.locked header,body.locked main{display:none}.authGate{min-height:100vh;display:grid;place-items:center;padding:20px;background:#111318}.authPanel{width:min(420px,100%);background:#1b1f28;border:1px solid #313846;border-radius:8px;padding:22px;display:grid;gap:14px}.authPanel h1{font-size:22px}.authPanel input{width:100%;height:44px;border-radius:6px;border:1px solid #3d4656;background:#0f1218;color:#fff;padding:0 12px}.authPanel button{width:100%;height:44px}body:not(.locked) .authGate{display:none}.topActions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}button:disabled{opacity:.45;cursor:not-allowed}@media(max-width:980px){.machines{grid-template-columns:1fr}.item{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
-    .sectionHead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.sectionHead h2{margin:0}.viewSwitch{display:grid;grid-template-columns:1fr 1fr;border:1px solid #414a5a;border-radius:6px;overflow:hidden}.viewSwitch button{min-width:92px;border-radius:0;background:#242b37;color:#cbd3df}.viewSwitch button+button{border-left:1px solid #414a5a}.viewSwitch button.active{background:#f0c85a;color:#1b1300}.machineViewLabel{color:#ffe07c;font-size:12px;font-weight:800}
+    .sectionHead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.sectionHead h2{margin:0}.floorProfit{margin:12px 0 14px;padding:12px 16px;background:#0f1218;border:1px solid #3d4656;border-radius:6px;display:flex;align-items:baseline;justify-content:space-between;gap:12px}.floorProfit span{color:#cbd3df;font-weight:800}.floorProfit b{font-size:28px;color:#f7f4ea}.floorProfit b.positive{color:#62ff9a}.floorProfit b.negative{color:#ff6b7d}.viewSwitch{display:grid;grid-template-columns:1fr 1fr;border:1px solid #414a5a;border-radius:6px;overflow:hidden}.viewSwitch button{min-width:92px;border-radius:0;background:#242b37;color:#cbd3df}.viewSwitch button+button{border-left:1px solid #414a5a}.viewSwitch button.active{background:#f0c85a;color:#1b1300}.machineViewLabel{color:#ffe07c;font-size:12px;font-weight:800}
   </style>
 </head>
 <body class="locked">
@@ -42,6 +42,7 @@
         <button id="machinePlayerViewBtn" type="button">個人</button>
       </div>
     </div>
+    <div class="floorProfit"><span>全台合計 現在損益pt</span><b id="floorCurrentProfit">+0</b></div>
     <div id="machines" class="machines"></div>
   </section>
 
@@ -271,6 +272,13 @@ function setMachineDataView(view){
 }
 function renderMachines(){
   updateMachineViewControls();
+  const floorProfit = liveMachines().reduce((sum, machine) => sum + statsProfit(totalViewForMachine(machine).stats), 0);
+  const floorProfitEl = $('floorCurrentProfit');
+  if(floorProfitEl){
+    floorProfitEl.textContent = signed(floorProfit);
+    floorProfitEl.classList.toggle('positive', floorProfit > 0);
+    floorProfitEl.classList.toggle('negative', floorProfit < 0);
+  }
   $('machineSelect').innerHTML = liveMachines().map(m => `<option value="${m.machineId}">${machineLabel(m)}</option>`).join('');
   $('machines').innerHTML = liveMachines().map(m => {
     const view = displayViewForMachine(m);

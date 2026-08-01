@@ -7318,13 +7318,15 @@ body{
     6:5.897360
   });
   const A_TYPE_SOLO_CHERRY_TABLE = Object.freeze({
-    1:64.0,
-    2:64.0,
-    3:64.0,
-    4:64.0,
-    5:64.0,
-    6:64.0
+    1:71.381136,
+    2:71.224670,
+    3:70.999586,
+    4:70.877342,
+    5:70.593395,
+    6:70.515107
   });
+  const A_TYPE_MIDDLE_CHERRY_SOLO_RATE = 0.10;
+  const A_TYPE_MIDDLE_CHERRY_BONUS_RATE = 0.75;
   const A_TYPE_REPLAY_TABLE = Object.freeze({
     1:7.464630,
     2:7.482946,
@@ -13615,9 +13617,17 @@ body{
     return Math.floor(Math.random() * 3);
   }
 
+  function aTypeCherryLineRow(result){
+    const internalResult = String(pendingATypeInternalBonus && pendingATypeInternalBonus.internalResult || "");
+    const bonusCherry = result === "MID_CHERRY" || internalResult === "BIG_CHERRY" || internalResult === "MID_CHERRY";
+    const middleRate = bonusCherry ? A_TYPE_MIDDLE_CHERRY_BONUS_RATE : A_TYPE_MIDDLE_CHERRY_SOLO_RATE;
+    if(Math.random() < middleRate) return 1;
+    return Math.random() < 0.5 ? 0 : 2;
+  }
+
   function resultLineRow(result){
     if(isMiddleLineOnlyResult(result)) return 1;
-    if(result === "CHERRY_ANY" || result === "MID_CHERRY") return randomLineRow();
+    if(result === "CHERRY_ANY" || result === "MID_CHERRY") return A_TYPE_MODE ? aTypeCherryLineRow(result) : randomLineRow();
     if(result === "BELL3") return Math.random() < 0.5 ? [0,1,2] : [2,1,0];
     return randomLineRow();
   }
