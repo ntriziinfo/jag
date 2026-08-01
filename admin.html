@@ -251,14 +251,17 @@ function drawSlump(canvas, points){
   const profits = points.map(p => Number(p.profit) || 0);
   let min = Math.min(0, ...profits), max = Math.max(0, ...profits);
   if(min === max){ min -= 100; max += 100; }
-  const xFor = i => points.length <= 1 ? 0 : i * w / (points.length - 1);
+  const firstSpin = Number(points[0] && points[0].spin) || 0;
+  const lastSpin = Number(points[points.length - 1] && points[points.length - 1].spin) || firstSpin;
+  const spinRange = Math.max(1, lastSpin - firstSpin);
+  const xFor = point => ((Number(point && point.spin) || 0) - firstSpin) * w / spinRange;
   const yFor = v => h - ((v - min) / (max - min)) * h;
   const zero = yFor(0);
   ctx.strokeStyle = '#6b7280'; ctx.beginPath(); ctx.moveTo(0, zero); ctx.lineTo(w, zero); ctx.stroke();
   ctx.strokeStyle = profits[profits.length - 1] >= 0 ? '#62ff9a' : '#ff5c70';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  points.forEach((p,i)=>{ const x = xFor(i), y = yFor(Number(p.profit) || 0); if(i) ctx.lineTo(x,y); else ctx.moveTo(x,y); });
+  points.forEach((p,i)=>{ const x = xFor(p), y = yFor(Number(p.profit) || 0); if(i) ctx.lineTo(x,y); else ctx.moveTo(x,y); });
   ctx.stroke();
 }
 function renderAdminSlumpGraphs(){

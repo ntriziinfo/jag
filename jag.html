@@ -10554,7 +10554,7 @@ body{
       deduped.push(point);
     }
     stats.slumpHistory = deduped.length > SLUMP_MAX_HISTORY_POINTS
-      ? [deduped[0], ...deduped.slice(-(SLUMP_MAX_HISTORY_POINTS - 1))]
+      ? reduceSlumpPoints(deduped, Math.floor(SLUMP_MAX_HISTORY_POINTS * 0.75))
       : deduped;
     refreshSlumpExtremes();
   }
@@ -10575,7 +10575,7 @@ body{
     }
     stats.slumpHistory.push(point);
     if(stats.slumpHistory.length > SLUMP_MAX_HISTORY_POINTS){
-      stats.slumpHistory = [stats.slumpHistory[0], ...stats.slumpHistory.slice(-(SLUMP_MAX_HISTORY_POINTS - 1))];
+      stats.slumpHistory = reduceSlumpPoints(stats.slumpHistory, Math.floor(SLUMP_MAX_HISTORY_POINTS * 0.75));
     }
     refreshSlumpExtremes();
     scheduleSlumpGraphRender();
@@ -11248,7 +11248,7 @@ body{
   function compactStatsForResume(){
     const compact = {...stats};
     if(Array.isArray(compact.slumpHistory) && compact.slumpHistory.length > 600){
-      compact.slumpHistory = [compact.slumpHistory[0], ...compact.slumpHistory.slice(-599)];
+      compact.slumpHistory = reduceSlumpPoints(compact.slumpHistory, 450);
     }
     return compact;
   }
