@@ -6,7 +6,7 @@
   <title>RISING 管理画面</title>
   <style>
     *{box-sizing:border-box} body{margin:0;background:#111318;color:#f7f4ea;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Yu Gothic",sans-serif} header{position:sticky;top:0;z-index:5;background:#171a21;border-bottom:1px solid #303641;padding:14px 20px;display:flex;gap:12px;align-items:center;justify-content:space-between} h1{font-size:20px;margin:0} main{padding:20px;display:grid;gap:18px}.panel{background:#1b1f28;border:1px solid #313846;border-radius:8px;padding:16px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.field{display:grid;gap:6px;min-width:150px}.field input,.field select,.settingMini{height:38px;border-radius:6px;border:1px solid #3d4656;background:#0f1218;color:#fff;padding:0 10px}button{height:38px;border:0;border-radius:6px;padding:0 13px;font-weight:800;cursor:pointer;background:#f0c85a;color:#1b1300}.ghost{background:#293140;color:#f3f7ff}.danger{background:#d54a4a;color:#fff}.muted{color:#9aa4b5;font-size:13px}.machines{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.machine{background:#151922;border:1px solid #2d3440;border-radius:8px;padding:12px;display:grid;gap:9px}.machine h3{margin:0;font-size:18px;display:flex;justify-content:space-between}.pill{font-size:12px;border-radius:999px;padding:3px 8px;background:#303848}.pill.on{background:#1f7a48}.pill.lock{background:#8a5422}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.adminSlumpGraph{width:100%;height:150px;background:#0b0e14;border:1px solid #2b3342;border-radius:6px}.graphStats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.debugBox{border-top:1px solid #2d3440;padding-top:9px;display:grid;gap:8px}.debugBtns{display:flex;gap:6px;flex-wrap:wrap}.debugBtns button{height:34px;padding:0 10px}.debugSelect{height:34px;border-radius:6px;border:1px solid #3d4656;background:#0f1218;color:#fff;padding:0 8px}.stat{background:#0f1218;border-radius:6px;padding:8px}.stat span{display:block;color:#97a3b8;font-size:12px}.stat b{font-size:16px}.passwordList,.results{display:grid;gap:7px;max-height:260px;overflow:auto}.item{display:grid;grid-template-columns:110px 1fr 90px 140px;gap:8px;align-items:center;background:#10141c;border:1px solid #2b3340;border-radius:6px;padding:8px}.code{font-size:20px;letter-spacing:.08em;color:#ffe07c;font-weight:1000}.ok{color:#6aff9e}.bad{color:#ff8b8b}body.locked header,body.locked main{display:none}.authGate{min-height:100vh;display:grid;place-items:center;padding:20px;background:#111318}.authPanel{width:min(420px,100%);background:#1b1f28;border:1px solid #313846;border-radius:8px;padding:22px;display:grid;gap:14px}.authPanel h1{font-size:22px}.authPanel input{width:100%;height:44px;border-radius:6px;border:1px solid #3d4656;background:#0f1218;color:#fff;padding:0 12px}.authPanel button{width:100%;height:44px}body:not(.locked) .authGate{display:none}.topActions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}button:disabled{opacity:.45;cursor:not-allowed}@media(max-width:980px){.machines{grid-template-columns:1fr}.item{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
-    .sectionHead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.sectionHead h2{margin:0}.floorProfit{margin:12px 0 14px;padding:12px 16px;background:#0f1218;border:1px solid #3d4656;border-radius:6px;display:flex;align-items:baseline;justify-content:space-between;gap:12px}.floorProfit span{color:#cbd3df;font-weight:800}.floorProfit b{font-size:28px;color:#f7f4ea}.floorProfit b.positive{color:#62ff9a}.floorProfit b.negative{color:#ff6b7d}.viewSwitch{display:grid;grid-template-columns:1fr 1fr;border:1px solid #414a5a;border-radius:6px;overflow:hidden}.viewSwitch button{min-width:92px;border-radius:0;background:#242b37;color:#cbd3df}.viewSwitch button+button{border-left:1px solid #414a5a}.viewSwitch button.active{background:#f0c85a;color:#1b1300}.machineViewLabel{color:#ffe07c;font-size:12px;font-weight:800}
+    .sectionHead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.sectionHead h2{margin:0}.floorControlRow{margin:12px 0 14px;display:grid;grid-template-columns:minmax(250px,.8fr) minmax(520px,2fr);gap:10px;align-items:stretch}.floorProfit{padding:12px 16px;background:#0f1218;border:1px solid #3d4656;border-radius:6px;display:flex;align-items:baseline;justify-content:space-between;gap:12px}.floorProfit span{color:#cbd3df;font-weight:800}.floorProfit b{font-size:28px;color:#f7f4ea}.floorProfit b.positive{color:#62ff9a}.floorProfit b.negative{color:#ff6b7d}.bulkControls{padding:10px;background:#151922;border:1px solid #3d4656;border-radius:6px;display:flex;align-items:end;justify-content:flex-end;gap:8px;flex-wrap:wrap}.bulkControls .field{min-width:115px}.bulkControls .completeField{min-width:170px}.bulkStatus{min-height:18px;margin:-7px 0 12px;text-align:right}.viewSwitch{display:grid;grid-template-columns:1fr 1fr;border:1px solid #414a5a;border-radius:6px;overflow:hidden}.viewSwitch button{min-width:92px;border-radius:0;background:#242b37;color:#cbd3df}.viewSwitch button+button{border-left:1px solid #414a5a}.viewSwitch button.active{background:#f0c85a;color:#1b1300}.machineViewLabel{color:#ffe07c;font-size:12px;font-weight:800}@media(max-width:1180px){.floorControlRow{grid-template-columns:1fr}.bulkControls{justify-content:flex-start}.bulkStatus{text-align:left}}
   </style>
 </head>
 <body class="locked">
@@ -42,7 +42,17 @@
         <button id="machinePlayerViewBtn" type="button">個人</button>
       </div>
     </div>
-    <div class="floorProfit"><span>全台合計 現在損益pt</span><b id="floorCurrentProfit">+0</b></div>
+    <div class="floorControlRow">
+      <div class="floorProfit"><span>全台合計 現在損益pt</span><b id="floorCurrentProfit">+0</b></div>
+      <div class="bulkControls">
+        <label class="field"><span>全台設定</span><select id="bulkSetting"><option value="1">設定1</option><option value="2">設定2</option><option value="3">設定3</option><option value="4">設定4</option><option value="5">設定5</option><option value="6">設定6</option></select></label>
+        <button class="bulkAction" type="button" onclick="applyBulkSetting()">設定を一括変更</button>
+        <label class="field completeField"><span>全台コンプリート枚数</span><input id="bulkCompleteLimit" type="number" min="1" max="999999" step="1" value="19000"></label>
+        <button class="bulkAction" type="button" onclick="applyBulkCompleteLimit()">枚数を一括変更</button>
+        <button class="bulkAction danger" type="button" onclick="resetAllMachines()">全台リセット</button>
+      </div>
+    </div>
+    <div id="bulkStatus" class="bulkStatus muted"></div>
     <div id="machines" class="machines"></div>
   </section>
 
@@ -349,6 +359,77 @@ async function applySetting(id){
   if(!data.ok){ alert(data.error || '設定反映に失敗しました'); return; }
   alert(id + '番台へ設定' + data.setting + '・コンプリート' + data.completeLimitPt + '枚を反映しました');
   await loadMachines();
+}
+function machineSettingValue(machine){
+  return Math.max(1, Math.min(6, Math.round(Number(machine && machine.settings && machine.settings.setting) || Number(machine && machine.assignedSetting) || 1)));
+}
+function machineCompleteLimitValue(machine){
+  return Math.max(1, Math.min(999999, Math.round(Number(machine && machine.settings && machine.settings.completeLimitPt) || 19000)));
+}
+function setBulkBusy(busy, message=''){
+  document.querySelectorAll('.bulkAction').forEach(button => { button.disabled = !!busy; });
+  const statusEl = $('bulkStatus');
+  if(statusEl) statusEl.textContent = message;
+}
+async function updateMachineSettings(machine, setting, completeLimitPt){
+  const res = await fetch('/api/admin/machines/' + encodeURIComponent(machine.machineId) + '/setting', {
+    method:'POST',
+    headers:{'Content-Type':'application/json', ...adminHeaders()},
+    body:JSON.stringify({setting, completeLimitPt})
+  });
+  const data = await res.json().catch(() => ({}));
+  if(!res.ok || !data.ok) throw new Error(data.error || '設定反映に失敗しました');
+  return data;
+}
+async function runBulkOperation(label, operation){
+  const targets = liveMachines();
+  if(!targets.length){ alert('対象台がありません'); return false; }
+  setBulkBusy(true, `${label}中... 0/${targets.length}台`);
+  let completed = 0;
+  const results = await Promise.allSettled(targets.map(async machine => {
+    try{
+      return await operation(machine);
+    }finally{
+      completed += 1;
+      setBulkBusy(true, `${label}中... ${completed}/${targets.length}台`);
+    }
+  }));
+  const failedIds = results.map((result, index) => result.status === 'rejected' ? targets[index].machineId : '').filter(Boolean);
+  setBulkBusy(false, failedIds.length ? `${label}失敗: ${failedIds.join('・')}番台` : `${label}完了: ${targets.length}台`);
+  await Promise.all([loadMachines(), loadResults()]);
+  if(failedIds.length){
+    alert(`${label}に失敗した台: ${failedIds.join('・')}番台`);
+    return false;
+  }
+  return true;
+}
+async function applyBulkSetting(){
+  const setting = Math.max(1, Math.min(6, Math.round(Number($('bulkSetting').value) || 1)));
+  const targetCount = liveMachines().length;
+  if(!confirm(`全${targetCount}台の設定を設定${setting}へ変更します。\n各台のコンプリート枚数は変更しません。`)) return;
+  const ok = await runBulkOperation('設定一括変更', machine => updateMachineSettings(machine, setting, machineCompleteLimitValue(machine)));
+  if(ok) alert(`全${targetCount}台へ設定${setting}を反映しました`);
+}
+async function applyBulkCompleteLimit(){
+  const completeLimitPt = Math.max(1, Math.min(999999, Math.round(Number($('bulkCompleteLimit').value) || 19000)));
+  const targetCount = liveMachines().length;
+  $('bulkCompleteLimit').value = String(completeLimitPt);
+  if(!confirm(`全${targetCount}台のコンプリート発動枚数を${fmt(completeLimitPt)}ptへ変更します。\n各台の設定番号は変更しません。`)) return;
+  const ok = await runBulkOperation('コンプリート枚数一括変更', machine => updateMachineSettings(machine, machineSettingValue(machine), completeLimitPt));
+  if(ok) alert(`全${targetCount}台のコンプリート発動枚数を${fmt(completeLimitPt)}ptへ変更しました`);
+}
+async function resetAllMachines(){
+  const targets = liveMachines();
+  const activeCount = targets.filter(machine => machine.currentSessionId || machine.locked).length;
+  const warning = activeCount ? `\n\n現在使用中または終了待ちの台が${activeCount}台あります。` : '';
+  if(!confirm(`全${targets.length}台を管理リセットします。\nスランプグラフと終了保持データも消えます。${warning}`)) return;
+  const ok = await runBulkOperation('全台リセット', async machine => {
+    const res = await fetch(`/api/admin/machines/${encodeURIComponent(machine.machineId)}/reset`, {method:'POST', headers:adminHeaders()});
+    const data = await res.json().catch(() => ({}));
+    if(!res.ok || !data.ok) throw new Error(data.error || 'リセット失敗');
+    return data;
+  });
+  if(ok) alert(`全${targets.length}台をリセットしました`);
 }
 async function forceEndMachine(id){
   if(!confirm(id + "番台の強制終了を実行しますか？\n\n最後に保存されたデータで清算し、空き台に戻します。")) return;
