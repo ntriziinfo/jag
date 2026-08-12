@@ -7371,6 +7371,11 @@ body{
   const A_TYPE_BONUS_PAY_PER_GAME = A_TYPE_PAYOUTS.SMALL;
   const A_TYPE_BONUS_MAIN_RESULT = "SMALL";
   const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID", "MID_CHERRY", "SMALL", "GRAPE", "BELL", "REPLAY", "CHERRY_ANY", "CHERRY_DOUBLE", "CHERRY_TRIPLE", "BAR3"]);
+  const A_TYPE_VARIANCE_BLOCK_SIZE = 512;
+  const A_TYPE_VARIANCE_VERSION = 3;
+  const A_TYPE_BONUS_BURST_WINDOW = 100;
+  const A_TYPE_BONUS_BURST_RATE = 0.28;
+  const A_TYPE_BONUS_BURST_WEIGHT = 18;
 
   const USER_FACE = "__USER_FACE__";
   const ELEPHANT_SYMBOL = "🐘";
@@ -7657,6 +7662,8 @@ body{
   let jagLastBonusPayout = 0;
   let jagChanceHold = false;
   let pendingATypeInternalBonus = null;
+  let aTypeVarianceQueue = [];
+  let aTypeVarianceSignature = "";
   let currentSpin = null;
   let spinCanStop = false;
   let spinWaitTimer = null;
@@ -10872,6 +10879,111 @@ body{
     return "MISS";
   }
 
+  function aTypeCurrentVarianceSignature(){
+    const multiplier = clamp(Number(settings.oddsMultiplier) || 1, 0.1, 100);
+    return `${A_TYPE_VARIANCE_VERSION}:${Number(settings.setting) || 1}:${multiplier.toFixed(6)}`;
+  }
+
+  function drawIndependentATypeOutcome(){
+    const bigDetail = A_TYPE_BIG_DETAIL_TABLE[settings.setting] || A_TYPE_BIG_DETAIL_TABLE[1];
+    const grape = A_TYPE_GRAPE_TABLE[settings.setting] || A_TYPE_GRAPE_TABLE[1];
+    const soloCherry = A_TYPE_SOLO_CHERRY_TABLE[settings.setting] || A_TYPE_SOLO_CHERRY_TABLE[1];
+    const replay = A_TYPE_REPLAY_TABLE[settings.setting] || A_TYPE_REPLAY_TABLE[1];
+    const bell = A_TYPE_BELL_TABLE[settings.setting] || A_TYPE_BELL_TABLE[1];
+    const pierrot = A_TYPE_PIERROT_TABLE[settings.setting] || A_TYPE_PIERROT_TABLE[1];
+    const regDetail = A_TYPE_REG_DETAIL_TABLE[settings.setting] || A_TYPE_REG_DETAIL_TABLE[1];
+    let roll = Math.random();
+    const multiplier = clamp(Number(settings.oddsMultiplier) || 1, 0.1, 100);
+    const soloCherryP = clamp((1 / soloCherry) * multiplier, 0, 0.98);
+    const bigCherryP = clamp((1 / bigDetail.cherry) * multiplier, 0, 0.98 - soloCherryP);
+    const regCherryP = clamp((1 / regDetail.cherry) * multiplier, 0, 0.98 - soloCherryP - bigCherryP);
+    const bigSoloP = clamp((1 / bigDetail.solo) * multiplier, 0, 0.98 - soloCherryP - bigCherryP - regCherryP);
+    const regSoloP = clamp((1 / regDetail.solo) * multiplier, 0, 0.98 - soloCherryP - bigCherryP - regCherryP - bigSoloP);
+    const grapeP = clamp((1 / grape) * multiplier, 0, 0.98 - soloCherryP - bigCherryP - regCherryP - bigSoloP - regSoloP);
+    const replayP = clamp((1 / replay) * multiplier, 0, 0.98 - soloCherryP - bigCherryP - regCherryP - bigSoloP - regSoloP - grapeP);
+    const bellP = clamp((1 / bell) * multiplier, 0, 0.98 - soloCherryP - bigCherryP - regCherryP - bigSoloP - regSoloP - grapeP - replayP);
+    const pierrotP = clamp((1 / pierrot) * multiplier, 0, 0.98 - soloCherryP - bigCherryP - regCherryP - bigSoloP - regSoloP - grapeP - replayP - bellP);
+    if(roll < soloCherryP) return {result:"CHERRY_ANY", internalBonus:null};
+    roll -= soloCherryP;
+    if(roll < bigCherryP) return {result:"CHERRY_ANY", internalBonus:{kind:"BIG", source:"チェリー同時当選", internalResult:"BIG_CHERRY"}};
+    roll -= bigCherryP;
+    if(roll < regCherryP) return {result:"CHERRY_ANY", internalBonus:{kind:"MID", source:"チェリー同時当選", internalResult:"MID_CHERRY"}};
+    roll -= regCherryP;
+    if(roll < bigSoloP) return {result:"MISS", internalBonus:{kind:"BIG", source:"単独当選", internalResult:"BIG"}};
+    roll -= bigSoloP;
+    if(roll < regSoloP) return {result:"MISS", internalBonus:{kind:"MID", source:"単独当選", internalResult:"MID"}};
+    roll -= regSoloP;
+    if(roll < grapeP) return {result:"GRAPE", internalBonus:null};
+    roll -= grapeP;
+    if(roll < replayP) return {result:"REPLAY", internalBonus:null};
+    roll -= replayP;
+    if(roll < bellP) return {result:"BELL", internalBonus:null};
+    roll -= bellP;
+    if(roll < pierrotP) return {result:"SMALL", internalBonus:null};
+    return {result:"MISS", internalBonus:null};
+  }
+
+  function buildATypeVarianceQueue(){
+    const arranged = Array.from({length:A_TYPE_VARIANCE_BLOCK_SIZE}, ()=>drawIndependentATypeOutcome());
+    const bonusCount = arranged.reduce((total, token)=>total + (token.internalBonus ? 1 : 0), 0);
+    const burstActive = bonusCount >= 2 && Math.random() < A_TYPE_BONUS_BURST_RATE;
+    const burstStart = burstActive
+      ? Math.floor(Math.random() * (A_TYPE_VARIANCE_BLOCK_SIZE - A_TYPE_BONUS_BURST_WINDOW + 1))
+      : -1;
+    const burstEnd = burstStart + A_TYPE_BONUS_BURST_WINDOW;
+    const slotsByResult = new Map();
+    for(let index=0;index<arranged.length;index++){
+      const result = arranged[index].result;
+      if(!slotsByResult.has(result)) slotsByResult.set(result, []);
+      slotsByResult.get(result).push(index);
+    }
+    for(const indices of slotsByResult.values()){
+      const bonuses = indices.map(index=>arranged[index].internalBonus).filter(Boolean);
+      if(!bonuses.length) continue;
+      for(const index of indices) arranged[index].internalBonus = null;
+      for(let index=bonuses.length-1;index>0;index--){
+        const swapIndex = Math.floor(Math.random() * (index + 1));
+        [bonuses[index], bonuses[swapIndex]] = [bonuses[swapIndex], bonuses[index]];
+      }
+      const candidates = indices.map(index=>({
+        index,
+        weight:burstActive && index >= burstStart && index < burstEnd
+          ? A_TYPE_BONUS_BURST_WEIGHT
+          : 1
+      }));
+      for(const bonus of bonuses){
+        const totalWeight = candidates.reduce((sum, candidate)=>sum + candidate.weight, 0);
+        let roll = Math.random() * totalWeight;
+        let selectedIndex = candidates.length - 1;
+        for(let index=0;index<candidates.length;index++){
+          roll -= candidates[index].weight;
+          if(roll <= 0){
+            selectedIndex = index;
+            break;
+          }
+        }
+        const [selected] = candidates.splice(selectedIndex, 1);
+        arranged[selected.index].internalBonus = bonus;
+      }
+    }
+    aTypeVarianceQueue = arranged;
+    aTypeVarianceSignature = aTypeCurrentVarianceSignature();
+  }
+
+  function drawATypeVarianceOutcome(){
+    const signature = aTypeCurrentVarianceSignature();
+    if(aTypeVarianceSignature !== signature){
+      aTypeVarianceQueue = [];
+      aTypeVarianceSignature = signature;
+    }
+    if(!aTypeVarianceQueue.length) buildATypeVarianceQueue();
+    const token = aTypeVarianceQueue.shift() || {result:"MISS", internalBonus:null};
+    pendingATypeInternalBonus = token.internalBonus
+      ? {...token.internalBonus, gamesSinceLastBonusAtStart:normalizeBonusAfterGames(normalState.sinceBonus)}
+      : null;
+    return token.result;
+  }
+
   function drawNormalResult(){
     if(A_TYPE_MODE){
       pendingATypeInternalBonus = null;
@@ -10891,57 +11003,7 @@ body{
         return normalizeATypeResult(pendingForceResult);
       }
 
-      const bigDetail = A_TYPE_BIG_DETAIL_TABLE[settings.setting] || A_TYPE_BIG_DETAIL_TABLE[1];
-      const grape = A_TYPE_GRAPE_TABLE[settings.setting] || A_TYPE_GRAPE_TABLE[1];
-      const soloCherry = A_TYPE_SOLO_CHERRY_TABLE[settings.setting] || A_TYPE_SOLO_CHERRY_TABLE[1];
-      const replay = A_TYPE_REPLAY_TABLE[settings.setting] || A_TYPE_REPLAY_TABLE[1];
-      const bell = A_TYPE_BELL_TABLE[settings.setting] || A_TYPE_BELL_TABLE[1];
-      const pierrot = A_TYPE_PIERROT_TABLE[settings.setting] || A_TYPE_PIERROT_TABLE[1];
-      const regDetail = A_TYPE_REG_DETAIL_TABLE[settings.setting] || A_TYPE_REG_DETAIL_TABLE[1];
-      let roll = Math.random();
-      const multiplier = clamp(Number(settings.oddsMultiplier) || 1, 0.1, 100);
-      const soloCherryP = clamp((1 / soloCherry) * multiplier, 0, 0.98);
-      const bigCherryP = clamp((1 / bigDetail.cherry) * multiplier, 0, 0.98 - soloCherryP);
-      const regCherryP = clamp((1 / regDetail.cherry) * multiplier, 0, 0.98 - soloCherryP - bigCherryP);
-      const bigSoloP = clamp((1 / bigDetail.solo) * multiplier, 0, 0.98 - soloCherryP - bigCherryP - regCherryP);
-      const regSoloP = clamp((1 / regDetail.solo) * multiplier, 0, 0.98 - soloCherryP - bigCherryP - regCherryP - bigSoloP);
-      const grapeP = clamp((1 / grape) * multiplier, 0, 0.98 - soloCherryP - bigCherryP - regCherryP - bigSoloP - regSoloP);
-      const replayP = clamp((1 / replay) * multiplier, 0, 0.98 - soloCherryP - bigCherryP - regCherryP - bigSoloP - regSoloP - grapeP);
-      const bellP = clamp((1 / bell) * multiplier, 0, 0.98 - soloCherryP - bigCherryP - regCherryP - bigSoloP - regSoloP - grapeP - replayP);
-      const pierrotP = clamp((1 / pierrot) * multiplier, 0, 0.98 - soloCherryP - bigCherryP - regCherryP - bigSoloP - regSoloP - grapeP - replayP - bellP);
-      const gamesSinceLastBonusAtStart = normalizeBonusAfterGames(normalState.sinceBonus);
-      if(roll < soloCherryP){
-        return "CHERRY_ANY";
-      }
-      roll -= soloCherryP;
-      if(roll < bigCherryP){
-        pendingATypeInternalBonus = {kind:"BIG", source:"チェリー同時当選", internalResult:"BIG_CHERRY", gamesSinceLastBonusAtStart};
-        return "CHERRY_ANY";
-      }
-      roll -= bigCherryP;
-      if(roll < regCherryP){
-        pendingATypeInternalBonus = {kind:"MID", source:"チェリー同時当選", internalResult:"MID_CHERRY", gamesSinceLastBonusAtStart};
-        return "CHERRY_ANY";
-      }
-      roll -= regCherryP;
-      if(roll < bigSoloP){
-        pendingATypeInternalBonus = {kind:"BIG", source:"単独当選", internalResult:"BIG", gamesSinceLastBonusAtStart};
-        return "MISS";
-      }
-      roll -= bigSoloP;
-      if(roll < regSoloP){
-        pendingATypeInternalBonus = {kind:"MID", source:"単独当選", internalResult:"MID", gamesSinceLastBonusAtStart};
-        return "MISS";
-      }
-      roll -= regSoloP;
-      if(roll < grapeP) return "GRAPE";
-      roll -= grapeP;
-      if(roll < replayP) return "REPLAY";
-      roll -= replayP;
-      if(roll < bellP) return "BELL";
-      roll -= bellP;
-      if(roll < pierrotP) return "SMALL";
-      return "MISS";
+      return drawATypeVarianceOutcome();
     }
 
     if(normalState.bonusPending){
@@ -11230,6 +11292,10 @@ body{
       jagLastGamePayout = Number(runtime.jagLastGamePayout) || 0;
       jagLastBonusPayout = Number(runtime.jagLastBonusPayout) || 0;
       jagChanceHold = !!runtime.jagChanceHold;
+      aTypeVarianceQueue = Array.isArray(runtime.aTypeVarianceQueue)
+        ? runtime.aTypeVarianceQueue.slice(0, A_TYPE_VARIANCE_BLOCK_SIZE).filter(token=>token && A_TYPE_RESULT_SET.has(token.result))
+        : [];
+      aTypeVarianceSignature = String(runtime.aTypeVarianceSignature || "");
       forceResult = String(runtime.forceResult || "");
       forcePremiumEffect = !!runtime.forcePremiumEffect;
       pendingForceResult = String(runtime.pendingForceResult || "");
@@ -11263,6 +11329,11 @@ body{
       jagLastGamePayout,
       jagLastBonusPayout,
       jagChanceHold,
+      aTypeVarianceQueue:aTypeVarianceQueue.map(token=>({
+        result:token.result,
+        internalBonus:token.internalBonus ? {...token.internalBonus} : null
+      })),
+      aTypeVarianceSignature,
       forceResult,
       forcePremiumEffect,
       pendingForceResult,
@@ -13215,6 +13286,8 @@ body{
     forcePremiumEffect = false;
     pendingForceResult = "";
     pendingATypeInternalBonus = null;
+    aTypeVarianceQueue = [];
+    aTypeVarianceSignature = "";
     $("forceResult").value = "";
     if($("premiumForceStatus")) $("premiumForceStatus").value = "OFF";
     $("stLamp").classList.remove("on");
@@ -13270,6 +13343,8 @@ body{
     forcePremiumEffect = false;
     pendingForceResult = "";
     pendingATypeInternalBonus = null;
+    aTypeVarianceQueue = [];
+    aTypeVarianceSignature = "";
     if($("forceResult")) $("forceResult").value = "";
     if($("premiumForceStatus")) $("premiumForceStatus").value = "OFF";
     $("stLamp").classList.remove("on");
