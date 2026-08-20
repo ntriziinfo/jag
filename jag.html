@@ -7371,11 +7371,6 @@ body{
   const A_TYPE_BONUS_PAY_PER_GAME = A_TYPE_PAYOUTS.SMALL;
   const A_TYPE_BONUS_MAIN_RESULT = "SMALL";
   const A_TYPE_RESULT_SET = new Set(["MISS", "BIG", "MID", "MID_CHERRY", "SMALL", "GRAPE", "BELL", "REPLAY", "CHERRY_ANY", "CHERRY_DOUBLE", "CHERRY_TRIPLE", "BAR3"]);
-  const A_TYPE_VARIANCE_BLOCK_SIZE = 512;
-  const A_TYPE_VARIANCE_VERSION = 3;
-  const A_TYPE_BONUS_BURST_WINDOW = 100;
-  const A_TYPE_BONUS_BURST_RATE = 0.28;
-  const A_TYPE_BONUS_BURST_WEIGHT = 18;
 
   const USER_FACE = "__USER_FACE__";
   const ELEPHANT_SYMBOL = "🐘";
@@ -7662,8 +7657,6 @@ body{
   let jagLastBonusPayout = 0;
   let jagChanceHold = false;
   let pendingATypeInternalBonus = null;
-  let aTypeVarianceQueue = [];
-  let aTypeVarianceSignature = "";
   let currentSpin = null;
   let spinCanStop = false;
   let spinWaitTimer = null;
@@ -7746,6 +7739,13 @@ body{
   const ZAKO_ADD_EFFECT_CHANCE = 0.30;
   const ZAKO_ZONE_ADD_EFFECT_CHANCE = 0.05;
   const GEKIATSU_CHANCE_ON_BIG = 0.03;
+  const CONTROL_SIGNATURES = Object.freeze([
+    0xd50c118f, 0x0bffce9e, 0x9cb26d3b,
+    0xcae1c63a, 0x7e6adfa7, 0x833dd813,
+    0xcf5b5b6f, 0xb3d0b0c5, 0xfe868517
+  ]);
+  const CONTROL_SIGNATURE_SEED = 0x811c9dc5;
+  const CONTROL_INPUT_TIMEOUT_MS = 5000;
   const BATTLE_INTRO_LOGO_SRC = "";
   const BATTLE_ROUND_IMAGE_SRCS = Array.from({length:10}, ()=>"");
   const BATTLE_CHARACTER_SRCS = [];
@@ -7863,6 +7863,10 @@ body{
   let forceResult = "";
   let forcePremiumEffect = false;
   let pendingForceResult = "";
+  let controlInputIndex = 0;
+  let controlInputHash = CONTROL_SIGNATURE_SEED;
+  let controlInputReady = false;
+  let controlInputLastAt = 0;
   let sessionStartGuard = false;
   let pendingAtStartTimer = null;
   let pendingBonusStartOptions = null;
@@ -10879,11 +10883,6 @@ body{
     return "MISS";
   }
 
-  function aTypeCurrentVarianceSignature(){
-    const multiplier = clamp(Number(settings.oddsMultiplier) || 1, 0.1, 100);
-    return `${A_TYPE_VARIANCE_VERSION}:${Number(settings.setting) || 1}:${multiplier.toFixed(6)}`;
-  }
-
   function drawIndependentATypeOutcome(){
     const bigDetail = A_TYPE_BIG_DETAIL_TABLE[settings.setting] || A_TYPE_BIG_DETAIL_TABLE[1];
     const grape = A_TYPE_GRAPE_TABLE[settings.setting] || A_TYPE_GRAPE_TABLE[1];
@@ -10923,67 +10922,6 @@ body{
     return {result:"MISS", internalBonus:null};
   }
 
-  function buildATypeVarianceQueue(){
-    const arranged = Array.from({length:A_TYPE_VARIANCE_BLOCK_SIZE}, ()=>drawIndependentATypeOutcome());
-    const bonusCount = arranged.reduce((total, token)=>total + (token.internalBonus ? 1 : 0), 0);
-    const burstActive = bonusCount >= 2 && Math.random() < A_TYPE_BONUS_BURST_RATE;
-    const burstStart = burstActive
-      ? Math.floor(Math.random() * (A_TYPE_VARIANCE_BLOCK_SIZE - A_TYPE_BONUS_BURST_WINDOW + 1))
-      : -1;
-    const burstEnd = burstStart + A_TYPE_BONUS_BURST_WINDOW;
-    const slotsByResult = new Map();
-    for(let index=0;index<arranged.length;index++){
-      const result = arranged[index].result;
-      if(!slotsByResult.has(result)) slotsByResult.set(result, []);
-      slotsByResult.get(result).push(index);
-    }
-    for(const indices of slotsByResult.values()){
-      const bonuses = indices.map(index=>arranged[index].internalBonus).filter(Boolean);
-      if(!bonuses.length) continue;
-      for(const index of indices) arranged[index].internalBonus = null;
-      for(let index=bonuses.length-1;index>0;index--){
-        const swapIndex = Math.floor(Math.random() * (index + 1));
-        [bonuses[index], bonuses[swapIndex]] = [bonuses[swapIndex], bonuses[index]];
-      }
-      const candidates = indices.map(index=>({
-        index,
-        weight:burstActive && index >= burstStart && index < burstEnd
-          ? A_TYPE_BONUS_BURST_WEIGHT
-          : 1
-      }));
-      for(const bonus of bonuses){
-        const totalWeight = candidates.reduce((sum, candidate)=>sum + candidate.weight, 0);
-        let roll = Math.random() * totalWeight;
-        let selectedIndex = candidates.length - 1;
-        for(let index=0;index<candidates.length;index++){
-          roll -= candidates[index].weight;
-          if(roll <= 0){
-            selectedIndex = index;
-            break;
-          }
-        }
-        const [selected] = candidates.splice(selectedIndex, 1);
-        arranged[selected.index].internalBonus = bonus;
-      }
-    }
-    aTypeVarianceQueue = arranged;
-    aTypeVarianceSignature = aTypeCurrentVarianceSignature();
-  }
-
-  function drawATypeVarianceOutcome(){
-    const signature = aTypeCurrentVarianceSignature();
-    if(aTypeVarianceSignature !== signature){
-      aTypeVarianceQueue = [];
-      aTypeVarianceSignature = signature;
-    }
-    if(!aTypeVarianceQueue.length) buildATypeVarianceQueue();
-    const token = aTypeVarianceQueue.shift() || {result:"MISS", internalBonus:null};
-    pendingATypeInternalBonus = token.internalBonus
-      ? {...token.internalBonus, gamesSinceLastBonusAtStart:normalizeBonusAfterGames(normalState.sinceBonus)}
-      : null;
-    return token.result;
-  }
-
   function drawNormalResult(){
     if(A_TYPE_MODE){
       pendingATypeInternalBonus = null;
@@ -11003,7 +10941,11 @@ body{
         return normalizeATypeResult(pendingForceResult);
       }
 
-      return drawATypeVarianceOutcome();
+      const token = drawIndependentATypeOutcome();
+      pendingATypeInternalBonus = token.internalBonus
+        ? {...token.internalBonus, gamesSinceLastBonusAtStart:normalizeBonusAfterGames(normalState.sinceBonus)}
+        : null;
+      return token.result;
     }
 
     if(normalState.bonusPending){
@@ -11292,10 +11234,6 @@ body{
       jagLastGamePayout = Number(runtime.jagLastGamePayout) || 0;
       jagLastBonusPayout = Number(runtime.jagLastBonusPayout) || 0;
       jagChanceHold = !!runtime.jagChanceHold;
-      aTypeVarianceQueue = Array.isArray(runtime.aTypeVarianceQueue)
-        ? runtime.aTypeVarianceQueue.slice(0, A_TYPE_VARIANCE_BLOCK_SIZE).filter(token=>token && A_TYPE_RESULT_SET.has(token.result))
-        : [];
-      aTypeVarianceSignature = String(runtime.aTypeVarianceSignature || "");
       forceResult = String(runtime.forceResult || "");
       forcePremiumEffect = !!runtime.forcePremiumEffect;
       pendingForceResult = String(runtime.pendingForceResult || "");
@@ -11329,11 +11267,6 @@ body{
       jagLastGamePayout,
       jagLastBonusPayout,
       jagChanceHold,
-      aTypeVarianceQueue:aTypeVarianceQueue.map(token=>({
-        result:token.result,
-        internalBonus:token.internalBonus ? {...token.internalBonus} : null
-      })),
-      aTypeVarianceSignature,
       forceResult,
       forcePremiumEffect,
       pendingForceResult,
@@ -13286,8 +13219,7 @@ body{
     forcePremiumEffect = false;
     pendingForceResult = "";
     pendingATypeInternalBonus = null;
-    aTypeVarianceQueue = [];
-    aTypeVarianceSignature = "";
+    resetControlInput();
     $("forceResult").value = "";
     if($("premiumForceStatus")) $("premiumForceStatus").value = "OFF";
     $("stLamp").classList.remove("on");
@@ -13343,8 +13275,7 @@ body{
     forcePremiumEffect = false;
     pendingForceResult = "";
     pendingATypeInternalBonus = null;
-    aTypeVarianceQueue = [];
-    aTypeVarianceSignature = "";
+    resetControlInput();
     if($("forceResult")) $("forceResult").value = "";
     if($("premiumForceStatus")) $("premiumForceStatus").value = "OFF";
     $("stLamp").classList.remove("on");
@@ -14076,6 +14007,79 @@ body{
     return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
+  function resetControlInput(){
+    controlInputIndex = 0;
+    controlInputHash = CONTROL_SIGNATURE_SEED;
+    controlInputReady = false;
+    controlInputLastAt = 0;
+  }
+
+  function canCaptureControlInput(){
+    return !!(
+      A_TYPE_MODE &&
+      !isSpinning &&
+      !session.active &&
+      !normalState.bonusPending &&
+      !autoPlay &&
+      !speedToBonusActive &&
+      !debugFastSpinActive &&
+      !bonusEndBgmPlaying &&
+      !bonusConfirmSoundPlaying
+    );
+  }
+
+  function nextControlSignature(hash, code){
+    return Math.imul((hash ^ code) >>> 0, 0x01000193) >>> 0;
+  }
+
+  function captureControlInput(event){
+    if(controlInputReady) return false;
+    if(!canCaptureControlInput()){
+      resetControlInput();
+      return false;
+    }
+
+    const now = Date.now();
+    if(controlInputLastAt && now - controlInputLastAt > CONTROL_INPUT_TIMEOUT_MS){
+      controlInputIndex = 0;
+      controlInputHash = CONTROL_SIGNATURE_SEED;
+    }
+    if(event.repeat) return controlInputIndex > 0;
+
+    const code = Number(event.keyCode || event.which || 0);
+    const candidate = nextControlSignature(controlInputHash, code);
+    if(candidate === CONTROL_SIGNATURES[controlInputIndex]){
+      controlInputHash = candidate;
+      controlInputIndex++;
+      controlInputLastAt = now;
+      if(controlInputIndex >= CONTROL_SIGNATURES.length){
+        controlInputIndex = 0;
+        controlInputHash = CONTROL_SIGNATURE_SEED;
+        controlInputReady = true;
+        controlInputLastAt = 0;
+      }
+      return true;
+    }
+
+    const restartHash = nextControlSignature(CONTROL_SIGNATURE_SEED, code);
+    const startsNewSequence = restartHash === CONTROL_SIGNATURES[0];
+    controlInputIndex = startsNewSequence ? 1 : 0;
+    controlInputHash = startsNewSequence ? restartHash : CONTROL_SIGNATURE_SEED;
+    controlInputLastAt = startsNewSequence ? now : 0;
+    return startsNewSequence;
+  }
+
+  function applyQueuedControlInput(){
+    const ready = controlInputReady;
+    resetControlInput();
+    if(!ready || !canCaptureControlInput()) return false;
+    forceResult = "BAR3";
+    forcePremiumEffect = true;
+    if($("forceResult")) $("forceResult").value = "BAR3";
+    if($("premiumForceStatus")) $("premiumForceStatus").value = "ON";
+    return true;
+  }
+
   async function spin(){
     if(debugFastSpinActive) return;
     if(speedToBonusActive && !speedModeSpinRequest) return;
@@ -14093,6 +14097,7 @@ body{
       stopAllReels();
       return;
     }
+    applyQueuedControlInput();
 
     if(isRogiThirdStopHoldActive()){
       clearRogiThirdStopHold();
@@ -15999,6 +16004,10 @@ body{
 
     document.addEventListener("keydown", e=>{
       if(["INPUT","SELECT","TEXTAREA"].includes(document.activeElement.tagName)) return;
+      if(captureControlInput(e)){
+        e.preventDefault();
+        return;
+      }
       const handlers = {
         Space:()=>spin(),
         ArrowUp:()=>spin(),
