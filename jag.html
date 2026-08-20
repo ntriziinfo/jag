@@ -7251,6 +7251,7 @@ body{
     "assets/media/jag/peka_atari.wav",
     "assets/media/jag/peka_kyuin_triple.wav"
   ]);
+  const PEKA_PRIMARY_RATE = 0.5;
   const PEKA_BIG_ATSU_SOUND_SRC = "assets/media/jag/peka_atsu.wav";
   const PEKA_BIG_ATSU_RATE = 0.1;
   const SEVEN_CONFIRM_SOUND_SRC = "assets/media/jag/big_kakutei.wav";
@@ -15453,9 +15454,13 @@ body{
   function playRegConfirmSound(){ playLockedBonusConfirmSound(REG_CONFIRM_SOUND_SRC, voiceOutputVolume(LINEUP_CONFIRM_SOUND_OUTPUT_SCALE)); }
   function playBonusConfirmSound(){ playLockedBonusConfirmSound(BONUS_CONFIRM_SOUND_SRC, sfxOutputVolume(BONUS_CONFIRM_SOUND_OUTPUT_SCALE)); }
   function playPekaSound(isBig=false){
-    const src = isBig && Math.random() < PEKA_BIG_ATSU_RATE
+    const roll = Math.random();
+    const primaryThreshold = PEKA_PRIMARY_RATE + (isBig ? PEKA_BIG_ATSU_RATE : 0);
+    const src = isBig && roll < PEKA_BIG_ATSU_RATE
       ? PEKA_BIG_ATSU_SOUND_SRC
-      : PEKA_SOUND_SRCS[randomInt(0, PEKA_SOUND_SRCS.length - 1)];
+      : roll < primaryThreshold
+        ? PEKA_SOUND_SRC
+        : PEKA_SOUND_SRCS[randomInt(1, PEKA_SOUND_SRCS.length - 1)];
     playOneShotSound(src, voiceOutputVolume(CONFIRM_SOUND_OUTPUT_SCALE));
   }
 
