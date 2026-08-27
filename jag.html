@@ -7740,11 +7740,28 @@ body{
   const ZAKO_ADD_EFFECT_CHANCE = 0.30;
   const ZAKO_ZONE_ADD_EFFECT_CHANCE = 0.05;
   const GEKIATSU_CHANCE_ON_BIG = 0.03;
-  const CONTROL_SIGNATURES = Object.freeze([
-    0xd50c118f, 0x0bffce9e, 0x9cb26d3b,
-    0xcae1c63a, 0x7e6adfa7, 0x833dd813,
-    0xcf5b5b6f, 0xb3d0b0c5, 0xfe868517
-  ]);
+  const CONTROL_SIGNATURES = Object.freeze({
+    PBB:Object.freeze([
+      0xd50c118f, 0x0bffce9e, 0x9cb26d3b,
+      0xcae1c63a, 0x7e6adfa7, 0x833dd813,
+      0xcf5b5b6f, 0xb3d0b0c5, 0xfe868517
+    ]),
+    BIG:Object.freeze([
+      0xc70bfb85, 0xf7dd1ce0, 0xf8144d45,
+      0xe7f5ce20, 0x2ef35505, 0x0c0f0619,
+      0x3aa6d52d, 0x59a156df, 0x0ffbe6d5
+    ]),
+    REG:Object.freeze([
+      0xd70c14b5, 0x18045eb0, 0x65e0e7b5,
+      0xf10c87b0, 0x0db972b5, 0x2def5d69,
+      0x9ecfe35d, 0x7643112f, 0x3293ce05
+    ])
+  });
+  const CONTROL_RESULTS = Object.freeze({
+    PBB:Object.freeze({result:"BAR3", premium:true}),
+    BIG:Object.freeze({result:"BIG", premium:false}),
+    REG:Object.freeze({result:"MID", premium:false})
+  });
   const CONTROL_SIGNATURE_SEED = 0x811c9dc5;
   const CONTROL_INPUT_TIMEOUT_MS = 5000;
   const BATTLE_INTRO_LOGO_SRC = "";
@@ -7866,7 +7883,8 @@ body{
   let pendingForceResult = "";
   let controlInputIndex = 0;
   let controlInputHash = CONTROL_SIGNATURE_SEED;
-  let controlInputReady = false;
+  let controlInputCommand = "";
+  let controlInputReady = "";
   let controlInputLastAt = 0;
   let sessionStartGuard = false;
   let pendingAtStartTimer = null;
@@ -14011,7 +14029,8 @@ body{
   function resetControlInput(){
     controlInputIndex = 0;
     controlInputHash = CONTROL_SIGNATURE_SEED;
-    controlInputReady = false;
+    controlInputCommand = "";
+    controlInputReady = "";
     controlInputLastAt = 0;
   }
 
@@ -14044,40 +14063,48 @@ body{
     if(controlInputLastAt && now - controlInputLastAt > CONTROL_INPUT_TIMEOUT_MS){
       controlInputIndex = 0;
       controlInputHash = CONTROL_SIGNATURE_SEED;
+      controlInputCommand = "";
     }
     if(event.repeat) return controlInputIndex > 0;
 
     const code = Number(event.keyCode || event.which || 0);
+    const signatures = CONTROL_SIGNATURES[controlInputCommand];
     const candidate = nextControlSignature(controlInputHash, code);
-    if(candidate === CONTROL_SIGNATURES[controlInputIndex]){
+    if(signatures && candidate === signatures[controlInputIndex]){
       controlInputHash = candidate;
       controlInputIndex++;
       controlInputLastAt = now;
-      if(controlInputIndex >= CONTROL_SIGNATURES.length){
+      if(controlInputIndex >= signatures.length){
+        const completedCommand = controlInputCommand;
         controlInputIndex = 0;
         controlInputHash = CONTROL_SIGNATURE_SEED;
-        controlInputReady = true;
+        controlInputCommand = "";
+        controlInputReady = completedCommand;
         controlInputLastAt = 0;
       }
       return true;
     }
 
     const restartHash = nextControlSignature(CONTROL_SIGNATURE_SEED, code);
-    const startsNewSequence = restartHash === CONTROL_SIGNATURES[0];
+    const restartCommand = Object.keys(CONTROL_SIGNATURES)
+      .find(command=>restartHash === CONTROL_SIGNATURES[command][0]) || "";
+    const startsNewSequence = !!restartCommand;
     controlInputIndex = startsNewSequence ? 1 : 0;
     controlInputHash = startsNewSequence ? restartHash : CONTROL_SIGNATURE_SEED;
+    controlInputCommand = restartCommand;
     controlInputLastAt = startsNewSequence ? now : 0;
     return startsNewSequence;
   }
 
   function applyQueuedControlInput(){
-    const ready = controlInputReady;
+    const command = controlInputReady;
     resetControlInput();
-    if(!ready || !canCaptureControlInput()) return false;
-    forceResult = "BAR3";
-    forcePremiumEffect = true;
-    if($("forceResult")) $("forceResult").value = "BAR3";
-    if($("premiumForceStatus")) $("premiumForceStatus").value = "ON";
+    const control = CONTROL_RESULTS[command];
+    if(!control || !canCaptureControlInput()) return false;
+    forceResult = control.result;
+    forcePremiumEffect = control.premium;
+    if($("forceResult")) $("forceResult").value = control.result;
+    if($("premiumForceStatus")) $("premiumForceStatus").value = control.premium ? "ON" : "OFF";
     return true;
   }
 
