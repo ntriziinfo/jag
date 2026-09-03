@@ -3,6 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    if(new URLSearchParams(location.search).get("legacyControl") !== "1"){
+      location.replace("https://vertex-inky-ten.vercel.app/machines.html");
+    }
+  </script>
   <title>RISING 台選び</title>
   <style>
     *{box-sizing:border-box} body{margin:0;background:#090b10;color:#f8f3df;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Yu Gothic",sans-serif} header{padding:22px 24px;border-bottom:1px solid #2a303b;background:#11151d}h1{margin:0;font-size:28px}.muted{color:#9da8ba}.grid{padding:18px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.machine{background:#151a23;border:1px solid #303847;border-radius:8px;padding:14px;display:grid;gap:10px}.head{display:flex;justify-content:space-between;gap:10px;align-items:center}.head h2{margin:0}.pill{font-size:13px;border-radius:999px;padding:4px 9px;background:#303848}.pill.free{background:#1f7a48}.pill.lock{background:#8a5422}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.stat{background:#0e1118;border-radius:6px;padding:8px}.stat span{display:block;color:#93a0b5;font-size:12px}.stat b{font-size:16px}.graph{width:100%;height:180px;background:#0b0e14;border:1px solid #2b3342;border-radius:6px}.actions{display:flex;gap:8px}.actions a{display:inline-grid;place-items:center;height:38px;border-radius:6px;padding:0 12px;background:#f0c85a;color:#211600;text-decoration:none;font-weight:900}.actions a.disabled{pointer-events:none;opacity:.45;background:#424a57;color:#d2d7df}@media(max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:720px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
