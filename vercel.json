@@ -2,6 +2,21 @@
   "version": 2,
   "redirects": [
     {
+      "source": "/admin.html",
+      "destination": "https://vertex-inky-ten.vercel.app/admin.html",
+      "permanent": true
+    },
+    {
+      "source": "/machines.html",
+      "destination": "https://vertex-inky-ten.vercel.app/machines.html",
+      "permanent": true
+    },
+    {
+      "source": "/play.html",
+      "destination": "https://vertex-inky-ten.vercel.app/play.html",
+      "permanent": true
+    },
+    {
       "source": "/jag/",
       "destination": "/jag",
       "permanent": false
@@ -18,10 +33,6 @@
     }
   ],
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/index?path=$1"
-    },
     {
       "source": "/",
       "destination": "/jag.html"

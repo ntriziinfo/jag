@@ -8033,14 +8033,8 @@ body{
   }
 
   const VERTEX_CONTROLLER_ENABLED = adminParams.get("controller") === "vertex";
-  const LEGACY_ADMIN_ENABLED = adminParams.get("legacyAdmin") === "1";
   const VERTEX_STORE_ID = String(adminParams.get("storeId") || "").trim();
-  const ADMIN_SERVER = (VERTEX_CONTROLLER_ENABLED
-    ? adminParams.get("server") || ""
-    : LEGACY_ADMIN_ENABLED
-      ? adminParams.get("server") || safeStorageGet("jag_admin_server") || (location.protocol.startsWith("http") ? location.origin : "http://localhost:8787")
-      : ""
-  ).replace(/\/$/, "");
+  const ADMIN_SERVER = (VERTEX_CONTROLLER_ENABLED ? adminParams.get("server") || "" : "").replace(/\/$/, "");
   let machineId = adminParams.get("machine") || bootMachineId;
   let adminPushTimer = null;
   let adminPushDueAt = 0;
@@ -8066,9 +8060,6 @@ body{
       badge.textContent = normalized === "online"
         ? `VERTEX 接続: ONLINE${VERTEX_STORE_ID ? ` / ${VERTEX_STORE_ID}` : ""}`
         : normalized === "offline" ? "VERTEX 接続: OFFLINE" : "VERTEX 接続: 確認中";
-    }else if(LEGACY_ADMIN_ENABLED){
-      badge.classList.add("legacy");
-      badge.textContent = "旧管理接続: 手動復帰";
     }else{
       badge.textContent = "管理接続: 単独動作";
     }
