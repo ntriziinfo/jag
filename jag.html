@@ -6519,12 +6519,25 @@ body{
 }
 
   body:not(.debugMode) .debugToggleBtn{display:none!important}
+  .vertexConnectionBadge{
+    position:fixed;right:12px;top:12px;z-index:10020;
+    min-width:148px;padding:7px 11px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.24);background:rgba(10,14,22,.88);
+    color:#aeb8c8;font:800 12px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI","Yu Gothic",sans-serif;
+    letter-spacing:.04em;text-align:center;box-shadow:0 5px 18px rgba(0,0,0,.35);
+    pointer-events:none;backdrop-filter:blur(5px)
+  }
+  .vertexConnectionBadge.connecting{color:#ffe482;border-color:rgba(255,212,82,.6)}
+  .vertexConnectionBadge.online{color:#78ffae;border-color:rgba(77,255,145,.65);background:rgba(6,42,25,.9)}
+  .vertexConnectionBadge.offline{color:#ff8f9c;border-color:rgba(255,91,113,.65);background:rgba(52,9,17,.9)}
+  .vertexConnectionBadge.legacy{color:#d4a6ff;border-color:rgba(185,109,255,.6)}
 </style>
 </head>
 <body>
 <div class="confetti" id="confetti"></div>
 <div class="overlay" id="overlay"><div class="overlayText" id="overlayText">WIN</div></div>
 <button class="debugToggleBtn" id="debugToggleBtn" type="button">デバッグ</button>
+<div class="vertexConnectionBadge" id="vertexConnectionBadge">管理接続: 単独動作</div>
 
 <div class="wrap">
   <section class="wd-hero" id="top">
@@ -8019,10 +8032,18 @@ body{
     }
   }
 
-  const ADMIN_SERVER_DEFAULT = location.protocol.startsWith("http") ? location.origin : "http://localhost:8787";
-  const ADMIN_SERVER = (adminParams.get("server") || safeStorageGet("jag_admin_server") || ADMIN_SERVER_DEFAULT).replace(/\/$/, "");
+  const VERTEX_CONTROLLER_ENABLED = adminParams.get("controller") === "vertex";
+  const LEGACY_ADMIN_ENABLED = adminParams.get("legacyAdmin") === "1";
+  const VERTEX_STORE_ID = String(adminParams.get("storeId") || "").trim();
+  const ADMIN_SERVER = (VERTEX_CONTROLLER_ENABLED
+    ? adminParams.get("server") || ""
+    : LEGACY_ADMIN_ENABLED
+      ? adminParams.get("server") || safeStorageGet("jag_admin_server") || (location.protocol.startsWith("http") ? location.origin : "http://localhost:8787")
+      : ""
+  ).replace(/\/$/, "");
   let machineId = adminParams.get("machine") || bootMachineId;
   let adminPushTimer = null;
+  let adminPushDueAt = 0;
   let adminCommandStream = null;
   let adminCommandReconnectTimer = null;
   let adminCommandPollTimer = null;
@@ -8035,6 +8056,24 @@ body{
   const SLOT_PLAY_SESSION = adminParams.has("creditBaseline") || !!PLAY_SESSION_ID;
   const PLAY_SESSION_BASELINE_STORAGE_KEY = PLAY_SESSION_ID ? `jag_play_session_baseline_${PLAY_SESSION_ID}` : "";
   let playSessionStartStats = null;
+  function setAdminConnectionState(state){
+    const badge = $("vertexConnectionBadge");
+    if(!badge) return;
+    badge.className = "vertexConnectionBadge";
+    if(VERTEX_CONTROLLER_ENABLED){
+      const normalized = state === "online" ? "online" : state === "offline" ? "offline" : "connecting";
+      badge.classList.add(normalized);
+      badge.textContent = normalized === "online"
+        ? `VERTEX 接続: ONLINE${VERTEX_STORE_ID ? ` / ${VERTEX_STORE_ID}` : ""}`
+        : normalized === "offline" ? "VERTEX 接続: OFFLINE" : "VERTEX 接続: 確認中";
+    }else if(LEGACY_ADMIN_ENABLED){
+      badge.classList.add("legacy");
+      badge.textContent = "旧管理接続: 手動復帰";
+    }else{
+      badge.textContent = "管理接続: 単独動作";
+    }
+  }
+  setAdminConnectionState("connecting");
   if(SLOT_DEBUG_ENABLED) document.body.classList.add("debugMode");
   const PAGE_ZOOM_STORAGE_KEY = "jag_unified_page_zoom_v3";
   const PAGE_PAN_STORAGE_KEY = "jag_unified_page_pan_x_v3";
@@ -11409,11 +11448,14 @@ body{
 
   function pushAdminState(snapshot){
     if(!ADMIN_SERVER || !window.fetch || !machineId || machineId === "null" || machineId === "undefined") return;
-    fetch(`${ADMIN_SERVER}/api/machines/${encodeURIComponent(machineId)}/state`, {
+    return fetch(`${ADMIN_SERVER}/api/machines/${encodeURIComponent(machineId)}/state`, {
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify(snapshot || adminSnapshot())
-    }).catch(()=>{});
+    }).then(response=>{
+      setAdminConnectionState(response.ok ? "online" : "offline");
+      return response;
+    }).catch(()=>{ setAdminConnectionState("offline"); });
   }
 
   function pushAdminStateOnExit(snapshot){
@@ -11437,11 +11479,16 @@ body{
   }
 
   function scheduleAdminStatePush(delay=ADMIN_STATE_PUSH_INTERVAL_MS){
-    if(adminPushTimer) return;
+    const normalizedDelay = Math.max(0, Number(delay) || 0);
+    const nextDueAt = Date.now() + normalizedDelay;
+    if(adminPushTimer && adminPushDueAt <= nextDueAt) return;
+    if(adminPushTimer) clearTimeout(adminPushTimer);
+    adminPushDueAt = nextDueAt;
     adminPushTimer = setTimeout(()=>{
       adminPushTimer = null;
+      adminPushDueAt = 0;
       pushAdminState();
-    }, delay);
+    }, normalizedDelay);
   }
 
   function latestAdminSnapshot(){
@@ -11533,6 +11580,7 @@ body{
     try{
       const res = await fetch(`${ADMIN_SERVER}/api/machines/${encodeURIComponent(machineId)}/commands/poll?since=${encodeURIComponent(adminCommandLastId)}`, {cache:"no-store"});
       if(res.ok){
+        setAdminConnectionState("online");
         const data = await res.json();
         const commands = Array.isArray(data.commands) ? data.commands : [];
         for(const row of commands){
@@ -11541,14 +11589,15 @@ body{
           adminCommandLastId = Math.max(adminCommandLastId, Number(row.id || command.id || row.createdAtMs || 0) || 0);
         }
         safeStorageSet(ADMIN_COMMAND_LAST_ID_KEY, String(adminCommandLastId));
-      }
-    }catch(e){}
+      }else setAdminConnectionState("offline");
+    }catch(e){ setAdminConnectionState("offline"); }
     adminCommandPollTimer = setTimeout(pollAdminCommands, 5000);
   }
 
   function connectAdminCommands(){
     if(adminCommandPollTimer) clearTimeout(adminCommandPollTimer);
     adminCommandPollTimer = null;
+    if(ADMIN_SERVER) pushAdminState();
     pollAdminCommands();
   }
 
